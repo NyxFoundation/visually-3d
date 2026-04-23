@@ -11,7 +11,7 @@ The goal is to bridge the gap between 2D technical documentation (blueprints/tex
 - **Frontend**: React + Three.js (React Three Fiber / Drei) for 3D rendering.
 - **Backend**: FastAPI (Python) to orchestrate AI agents for blueprint analysis.
 - **AI Engine**: Claude (Anthropic) for interpreting blueprints and generating 3D scene descriptors (JSON/GLTF metadata).
-- **Auth**: Claude Auth Integration (OAuth2/Session-based) to allow users to utilize their own Claude accounts.
+- **Auth**: API Key / Token pass-through for AI processing.
 - **Rendering**: WebGL via Three.js, supporting click-to-inspect interactivity.
 
 ### 2. Workflow
@@ -27,7 +27,7 @@ The goal is to bridge the gap between 2D technical documentation (blueprints/tex
   - Interactive highlights on click.
   - "Exploded view" animation to show internal connectivity.
 - **Educational Overlay**: Side-panel showing detailed part information (material, role, and how it connects to others).
-- **Authentication**: Integration with Claude account for personalized AI processing.
+- **Authentication**: Secure handling of auth tokens for AI pipeline.
 
 ### Non-Functional Requirements
 - **Performance**: Smooth 60fps 3D interaction.
@@ -45,3 +45,43 @@ visually/
 │   └── plans/            # Implementation plans
 └── shared/               # Types and shared schemas (JSON descriptors)
 ```
+
+## 🚀 How to Run
+
+### Backend Setup
+1. Navigate to the server directory:
+   ```bash
+   cd apps/server
+   ```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Set up your environment variables (e.g., `ANTHROPIC_API_KEY`).
+4. Start the server:
+   ```bash
+   uvicorn main:app --reload
+   ```
+   The server should be running at `http://localhost:8000`.
+
+### Frontend Setup
+1. Navigate to the web directory:
+   ```bash
+   cd apps/web
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   The frontend should be available at `http://localhost:5173` (or similar).
+
+## 🛠 Final Polish Checklist
+- [x] CORS configured in FastAPI.
+- [x] Frontend error handling for API calls.
+- [x] Loading states implemented for AI analysis.
+- [x] User instructions added to the UI.
+- [x] README updated with setup guides.

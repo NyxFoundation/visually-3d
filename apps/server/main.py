@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Optional, Union
 from .analyst import analyze_machine
@@ -6,6 +7,15 @@ from .auth import get_current_user
 
 
 app = FastAPI(title="Visually Backend")
+
+# --- CORS Configuration ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # In production, replace with specific frontend URLs like ["http://localhost:5173", "http://localhost:3000"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- Schemas based on shared/schema.json ---
 
