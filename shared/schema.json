@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MachineSceneDescriptor",
+  "description": "Schema for describing a 3D machine assembly for AI generation and rendering.",
+  "type": "object",
+  "required": ["machine_name", "parts"],
+  "properties": {
+    "machine_name": {
+      "type": "string",
+      "description": "The name of the machine being described."
+    },
+    "assembly_instructions": {
+      "type": "string",
+      "description": "General description of how the machine is put together."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Any extra information related to the machine."
+    },
+    "parts": {
+      "type": "array",
+      "description": "A list of parts that make up the machine.",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "shape", "position", "size", "material", "role"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the part."
+          },
+          "name": {
+            "type": "string",
+            "description": "Descriptive name of the part."
+          },
+          "shape": {
+            "type": "string",
+            "enum": ["box", "cylinder", "sphere", "complex"],
+            "description": "The geometry type of the part."
+          },
+          "position": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": { "type": "number" },
+            "description": "[x, y, z] coordinates."
+          },
+          "size": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "number" },
+            "description": "Dimensions based on shape: [width, height, depth] for box, [radius, height] for cylinder, [radius] for sphere."
+          },
+          "material": {
+            "type": "string",
+            "description": "Material type or visual description of the part."
+          },
+          "role": {
+            "type": "string",
+            "description": "Functional explanation of what this part does in the machine."
+          },
+          "connections": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of part IDs that this part is connected to."
+          }
+        }
+      }
+    }
+  }
+}
