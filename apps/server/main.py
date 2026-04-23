@@ -1,6 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel, Field
 from typing import List, Optional, Union
+from .analyst import analyze_machine
+from .auth import get_current_user
+
 
 app = FastAPI(title="Visually Backend")
 
@@ -34,50 +37,17 @@ async def root():
     return {"status": "healthy", "message": "Visually Backend is running"}
 
 @app.post("/analyze", response_model=MachineSceneDescriptor)
-async def analyze(request: AnalyzeRequest):
+async def analyze(request: AnalyzeRequest, user=Depends(get_current_user)):
     """
-    Mock endpoint to analyze a machine via URL or name.
-    Returns a mock response adhering to the MachineSceneDescriptor schema.
+    Analyze a machine via URL or name using the AI analysis pipeline.
     """
-    # Identify what we are analyzing
-    target = request.url or request.machine_name or "Unknown Machine"
-    
-    # Mock Response Data
-    mock_response = MachineSceneDescriptor(
-        machine_name=f"Mock Machine ({target})",
-        assembly_instructions="This is a mock assembly instruction for testing the FastAPI skeleton.",
-        metadata={"version": "1.0-mock", "generated_by": "FastAPI-Skeleton"},
-        parts=[
-            Part(
-                id="part_001",
-                name="Base Plate",
-                shape="box",
-                position=[0.0, 0.0, 0.0],
-                size=[10.0, 1.0, 10.0],
-                material="Steel",
-                role="Provides the foundation for the machine."
-            ),
-            Part(
-                id="part_002",
-                name="Main Shaft",
-                shape="cylinder",
-                position=[0.0, 5.0, 0.0],
-                size=[0.5, 10.0],
-                material="Chrome",
-                role="Rotates to drive the internal mechanism.",
-                connections=["part_001"]
-            ),
-            Part(
-                id="part_003",
-                name="Control Knob",
-                shape="sphere",
-                position=[0.0, 11.0, 0.0],
-                size=[0.3],
-                material="Plastic",
-                role="Allows user to adjust rotation speed.",
-                connections=["part_002"]
-            )
-        ]
-    )
-    
-    return mock_response
+    try:
+        # Pass the user token to the analysis pipeline
+        result = await analyze_machine(url=request.url, machine_name=request.machine_name, token=user["token"])
+        return MachineSceneDescriptor(**result)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
