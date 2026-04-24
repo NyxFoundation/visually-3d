@@ -1,0 +1,59 @@
+{
+  "machine_name": "LifeTrac Open-Source Tractor",
+  "assembly_instructions": "Skid-steer hydraulic tractor built entirely from bolted square-tube steel. A rectangular modular-beam chassis carries a four-wheel layout driven by hub-mounted hydraulic universal rotors and planetary gear-downs. A rear-mounted PowerCube provides hydraulic power to everything; hoses run along the chassis to a universal quick-coupler. A welded operator space frame sits atop the chassis; at the front, a pivot plate supports a loader arm that lifts a front bucket. A universal tool bar at the rear accepts implements (ripper, backhoe, auger).",
+  "metadata": {
+    "reference": "https://www.opensourceecology.org/portfolio/tractor/",
+    "domain": "open-source-heavy-machinery",
+    "thumbnail_camera": [4.2, 3.0, 4.2],
+    "info": {
+      "japanese_name": "ライフトラック（オープンソース・トラクター）",
+      "english_name": "Open Source Ecology LifeTrac",
+      "summary": "Bolt-together, open-source, four-wheel hydraulic skid-steer tractor. Foundational workhorse of OSE's 50-machine Global Village Construction Set.",
+      "description": "LifeTrac is a modular, open-source tractor developed by Open Source Ecology as the prime mover of its Global Village Construction Set. The entire machine is built from bolted 4-inch square steel tubing — a 'XYZ space frame' — so that individual modules (wheels, PowerCube, loader arm, tool bar) can be swapped in the field without welding. Each of the four wheels is driven independently by a hydraulic 'universal rotor' hub motor through a planetary gear-down, enabling true skid-steer turning and four-wheel independent traction. Hydraulic power comes from a removable PowerCube engine/pump module mounted on the chassis; flows are distributed via quick-couplers to the loader-arm cylinders, the drive motors, and any attached implement. The front loader arm pivots on a welded pivot plate and carries a standard bucket; the rear universal tool bar accepts rippers, three-point hitches, augers, and backhoes. All CAD, bill of materials, and build instructions are released under CC BY-SA 4.0.",
+      "operator": "Open Source Ecology and community builders (farms, training sites, maker communities)",
+      "contractor": "Open Source Ecology (Marcin Jakubowski et al.)",
+      "contract_date": "2008 (v1) · 2011 (v3) · iterated through v6 (2016)",
+      "contract_value": "≈US$12,000 in materials (self-build kit)",
+      "status": "Open-source, production-tested; multiple independent builds in service",
+      "facts": [
+        { "label": "Configuration", "value": "Four-wheel hydraulic skid-steer, modular bolted XYZ space frame" },
+        { "label": "Length × Width × Height", "value": "≈3.0 m × 1.5 m × 2.0 m" },
+        { "label": "Drive", "value": "4 × hub-mounted hydraulic 'universal rotor' + planetary gear-down" },
+        { "label": "Power", "value": "Removable PowerCube (diesel or gasoline, ≈27 hp typical)" },
+        { "label": "Front attachment", "value": "Loader arm + universal bucket (pivot-plate mounted)" },
+        { "label": "Rear attachment", "value": "Universal tool bar — ripper, 3-point hitch, backhoe, auger" },
+        { "label": "Hydraulics", "value": "Quick-couplers throughout; hoses field-replaceable" },
+        { "label": "License", "value": "CC BY-SA 4.0 (docs, CAD, BOM)" }
+      ],
+      "sources": [
+        { "title": "OSE — Tractor (LifeTrac) portfolio page", "url": "https://www.opensourceecology.org/portfolio/tractor/" },
+        { "title": "OSE Wiki — LifeTrac", "url": "https://wiki.opensourceecology.org/wiki/LifeTrac" },
+        { "title": "OSE — Global Village Construction Set overview", "url": "https://www.opensourceecology.org/gvcs/" }
+      ]
+    }
+  },
+  "parts": [
+    { "id": "wheel_fl", "name": "Wheel (Fwd-Left)",  "shape": "cylinder", "position": [ 0.90, 0.38,  0.72], "rotation": [1.5708, 0, 0], "size": [0.38, 0.26], "material": "rubber", "role": "Independently driven front-left wheel. Reacts drive torque from its own universal-rotor hub motor.", "connections": ["modular_beams", "universal_rotor", "gear_down"] },
+    { "id": "wheel_fr", "name": "Wheel (Fwd-Right)", "shape": "cylinder", "position": [ 0.90, 0.38, -0.72], "rotation": [1.5708, 0, 0], "size": [0.38, 0.26], "material": "rubber", "role": "Independently driven front-right wheel.", "connections": ["modular_beams"] },
+    { "id": "wheel_rl", "name": "Wheel (Rear-Left)", "shape": "cylinder", "position": [-0.90, 0.38,  0.72], "rotation": [1.5708, 0, 0], "size": [0.38, 0.26], "material": "rubber", "role": "Independently driven rear-left wheel.", "connections": ["modular_beams"] },
+    { "id": "wheel_rr", "name": "Wheel (Rear-Right)","shape": "cylinder", "position": [-0.90, 0.38, -0.72], "rotation": [1.5708, 0, 0], "size": [0.38, 0.26], "material": "rubber", "role": "Independently driven rear-right wheel.", "connections": ["modular_beams"] },
+
+    { "id": "modular_beams", "name": "Modular-Beam Chassis", "shape": "box", "position": [0, 0.60, 0], "size": [2.0, 0.18, 1.10], "material": "welded steel", "role": "Bolted 4-inch square-tube chassis that forms the load path between the four wheels and every other module.", "connections": ["wheel_fl", "wheel_fr", "wheel_rl", "wheel_rr", "space_frame", "power_cube", "pivot_plate", "universal_tool_bar", "gear_down"] },
+
+    { "id": "space_frame", "name": "XYZ Space Frame (Operator Cage)", "shape": "box", "position": [0.10, 1.10, 0], "size": [1.00, 0.70, 1.05], "material": "welded steel", "role": "Three-axis bolted tube superstructure above the chassis; houses the operator seat, controls, and ROPS.", "connections": ["modular_beams"] },
+
+    { "id": "power_cube", "name": "PowerCube", "shape": "box", "position": [-0.70, 0.83, 0], "size": [0.60, 0.45, 0.72], "material": "dark anodized aluminum", "role": "Modular diesel/gas engine + hydraulic pump block. Supplies pressure to every hydraulic consumer on the tractor.", "connections": ["modular_beams", "hydraulic_hose"] },
+
+    { "id": "pivot_plate", "name": "Loader Pivot Plate", "shape": "box", "position": [0.95, 0.85, 0], "size": [0.12, 0.36, 1.00], "material": "welded steel", "role": "Front-mounted pivot bracket that the loader arm rotates on.", "connections": ["modular_beams", "loader_arm"] },
+    { "id": "loader_arm", "name": "Loader Arm", "shape": "box", "position": [1.37, 1.35, 0], "rotation": [0, 0, 0.8727], "size": [1.30, 0.14, 1.00], "material": "welded steel", "role": "Hydraulic-lift boom hinged at the pivot plate; raises and tilts the front bucket.", "connections": ["pivot_plate", "bucket"] },
+    { "id": "bucket", "name": "Front Bucket", "shape": "box", "position": [1.95, 1.72, 0], "size": [0.45, 0.32, 1.10], "material": "forged steel", "role": "Universal front bucket for earth, gravel, or material handling.", "connections": ["loader_arm"] },
+
+    { "id": "universal_rotor", "name": "Universal Rotor (Hub Motor)", "shape": "cylinder", "position": [0.90, 0.38, -0.55], "rotation": [1.5708, 0, 0], "size": [0.08, 0.10], "material": "brushed steel", "role": "Standardized hydraulic hub motor at each wheel. Shown on the front-right wheel as representative of all four.", "connections": ["wheel_fl", "gear_down"] },
+    { "id": "gear_down", "name": "Planetary Gear-Down", "shape": "box", "position": [0.90, 0.55, 0.50], "size": [0.20, 0.16, 0.14], "material": "dark anodized aluminum", "role": "Reduction gearbox between the universal rotor and the wheel hub. Gives low-speed/high-torque drive.", "connections": ["modular_beams", "universal_rotor", "wheel_fl"] },
+
+    { "id": "hydraulic_hose", "name": "Hydraulic Hose", "shape": "cylinder", "position": [-0.20, 0.95, 0.48], "rotation": [0, 0, 1.5708], "size": [0.025, 1.10], "material": "rubber", "role": "High-pressure hose routing fluid from the PowerCube along the chassis to the quick-couplers and loader cylinders.", "connections": ["power_cube", "quick_coupler"] },
+    { "id": "quick_coupler", "name": "Universal Quick-Coupler", "shape": "cylinder", "position": [-1.05, 0.78, 0.48], "rotation": [0, 0, 1.5708], "size": [0.040, 0.12], "material": "brushed steel", "role": "Standard hydraulic quick-disconnect. Lets tools and implements be hot-swapped without draining the system.", "connections": ["hydraulic_hose", "universal_tool_bar"] },
+
+    { "id": "universal_tool_bar", "name": "Universal Tool Bar", "shape": "box", "position": [-1.42, 0.58, 0], "size": [0.16, 0.20, 1.20], "material": "welded steel", "role": "Rear mounting bar that accepts standard implements (ripper, 3-point hitch, backhoe, auger).", "connections": ["modular_beams", "quick_coupler"] }
+  ]
+}

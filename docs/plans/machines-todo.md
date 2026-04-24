@@ -15,7 +15,7 @@ becomes a thin box).
 - [x] **CEB Press** ("The Liberator") — OSE compressed-earth-block press.
       https://wiki.opensourceecology.org/wiki/CEB_Press — CC BY-SA 4.0.
       Slug: `ceb-press`.
-- [ ] **LifeTrac Tractor** — OSE modular open-source tractor (GVCS).
+- [x] **LifeTrac Tractor** — OSE modular open-source tractor (GVCS).
       https://www.opensourceecology.org/portfolio/tractor/ — CC BY-SA 4.0.
       Slug: `lifetrac`.
 - [ ] **50 kW Wind Turbine** — OSE horizontal-axis turbine on lattice tower.

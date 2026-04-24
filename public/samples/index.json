@@ -41,6 +41,13 @@
       "subtitle": "OSE open-source hydraulic press for compressed-earth building blocks",
       "path": "/samples/ceb-press.json",
       "accent": "#b45309"
+    },
+    {
+      "id": "lifetrac",
+      "title": "LifeTrac Open-Source Tractor",
+      "subtitle": "OSE bolt-together skid-steer tractor with modular PowerCube and universal tool bar",
+      "path": "/samples/lifetrac.json",
+      "accent": "#ca8a04"
     }
   ]
 }
