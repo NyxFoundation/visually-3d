@@ -21,7 +21,7 @@ becomes a thin box).
 - [x] **50 kW Wind Turbine** — OSE horizontal-axis turbine on lattice tower.
       https://wiki.opensourceecology.org/wiki/Wind_Turbine — CC BY-SA 4.0.
       Slug: `wind-turbine-50kw`.
-- [ ] **OpenROV 2.8** — open-source underwater ROV with acrylic e-tubes.
+- [x] **OpenROV 2.8** — open-source underwater ROV with acrylic e-tubes.
       https://github.com/OpenROV/openrov-hardware — CC BY-NC-SA 4.0.
       Slug: `openrov-2-8`.
 - [ ] **Yale OpenHand Model T** — tendon-driven underactuated 4-finger hand.

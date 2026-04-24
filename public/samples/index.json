@@ -55,6 +55,13 @@
       "subtitle": "Guyed HAWT with direct-drive DC generator and tail-vane yaw (OSE GVCS)",
       "path": "/samples/wind-turbine-50kw.json",
       "accent": "#22d3ee"
+    },
+    {
+      "id": "openrov-2-8",
+      "title": "OpenROV 2.8",
+      "subtitle": "Tethered open-source underwater ROV with acrylic e-tubes and 3-thruster drive",
+      "path": "/samples/openrov-2-8.json",
+      "accent": "#0ea5e9"
     }
   ]
 }
