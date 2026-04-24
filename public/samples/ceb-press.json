@@ -1,0 +1,57 @@
+{
+  "machine_name": "CEB Press 'The Liberator'",
+  "assembly_instructions": "Compressed-earth-block press from Open Source Ecology. A welded-steel main frame sits on four adjustable cylindrical legs; a prominent vertical hydraulic cylinder rises from the frame and drives a flat pressing plate upward into a brick mold. A tapered hopper sits atop the mold, covered by a coarse soil-input grating and agitated by a side-mounted shaker so loose soil drops evenly into the mold. A horizontal chute on the front ejects the finished block. A hydraulic-power-unit connector on the rear side pipes in pressure from a LifeTrac or PowerCube; a small touchscreen-style control panel on the front face sequences the automatic press cycle.",
+  "metadata": {
+    "reference": "https://wiki.opensourceecology.org/wiki/CEB_Press",
+    "domain": "construction-automation",
+    "thumbnail_camera": [2.8, 2.0, 2.8],
+    "info": {
+      "japanese_name": "CEBプレス（通称リベレーター）",
+      "english_name": "Open Source Ecology CEB Press — 'The Liberator'",
+      "summary": "Open-source, fully automated hydraulic press that compresses moist soil into stabilized earth blocks for low-cost construction. Part of OSE's Global Village Construction Set (GVCS).",
+      "description": "The CEB (Compressed Earth Block) Press, nicknamed 'The Liberator', is an open-source earth-block press developed by Open Source Ecology (OSE) and its contributor community as part of the 50-machine Global Village Construction Set. A tractor-fed hopper dumps moist, stabilized soil onto a coarse grating; a hopper shaker vibrates it through into the brick mold below. When the mold is full, a vertical double-acting hydraulic cylinder drives a polished pressing plate upward to compact the soil at roughly 1,800 psi into a dense, load-bearing block. The finished block is then pushed horizontally out the front ejection chute while the hopper refills the mold for the next cycle. All control and sequencing is handled by an on-board panel that actuates solenoid valves on the hydraulic manifold; hydraulic pressure is supplied externally by an OSE PowerCube or a LifeTrac tractor's hydraulic take-off. The full CAD, wiring, and build documentation is published under CC BY-SA 4.0.",
+      "operator": "Open Source Ecology + independent builders and housing co-ops worldwide",
+      "contractor": "Open Source Ecology (Marcin Jakubowski et al.)",
+      "contract_date": "2011 (first publicly documented build) · iterated through 2023",
+      "contract_value": "≈US$7,500 in materials (self-build kit)",
+      "status": "Open-source, production-proven; dozens of independent builds on record",
+      "facts": [
+        { "label": "Footprint", "value": "≈0.9 m × 1.8 m × 1.5 m (H)" },
+        { "label": "Mass", "value": "≈770 kg" },
+        { "label": "Block size", "value": "6 × 12 × 4 in (152 × 305 × 102 mm) typical" },
+        { "label": "Compression force", "value": "≈1,800 psi (pressing-plate face pressure)" },
+        { "label": "Throughput", "value": "≈5–10 blocks/min (soil- and hydraulic-flow-limited)" },
+        { "label": "Hydraulic supply", "value": "External — OSE PowerCube or LifeTrac PTO" },
+        { "label": "Control", "value": "Onboard panel + solenoid valves; fully automated cycle" },
+        { "label": "License", "value": "CC BY-SA 4.0 (docs, CAD, firmware)" }
+      ],
+      "sources": [
+        { "title": "Open Source Ecology Wiki — CEB Press", "url": "https://wiki.opensourceecology.org/wiki/CEB_Press" },
+        { "title": "OSE — The Liberator (project page)", "url": "https://www.opensourceecology.org/portfolio/ceb-press/" },
+        { "title": "OSE — Global Village Construction Set overview", "url": "https://www.opensourceecology.org/gvcs/" }
+      ]
+    }
+  },
+  "parts": [
+    { "id": "leg_fl", "name": "Adjustable Leg (Fwd-Left)",  "shape": "cylinder", "position": [ 0.78, 0.11,  0.36], "size": [0.045, 0.22], "material": "welded steel", "role": "Threaded adjustable foot that levels the press on uneven ground.", "connections": ["main_frame"] },
+    { "id": "leg_fr", "name": "Adjustable Leg (Fwd-Right)", "shape": "cylinder", "position": [ 0.78, 0.11, -0.36], "size": [0.045, 0.22], "material": "welded steel", "role": "Threaded adjustable foot (forward-right).", "connections": ["main_frame"] },
+    { "id": "leg_rl", "name": "Adjustable Leg (Rear-Left)", "shape": "cylinder", "position": [-0.78, 0.11,  0.36], "size": [0.045, 0.22], "material": "welded steel", "role": "Threaded adjustable foot (rear-left).", "connections": ["main_frame"] },
+    { "id": "leg_rr", "name": "Adjustable Leg (Rear-Right)","shape": "cylinder", "position": [-0.78, 0.11, -0.36], "size": [0.045, 0.22], "material": "welded steel", "role": "Threaded adjustable foot (rear-right).", "connections": ["main_frame"] },
+
+    { "id": "main_frame", "name": "Welded Main Frame", "shape": "box", "position": [0, 0.33, 0], "size": [1.70, 0.20, 0.78], "material": "welded steel", "role": "Primary welded-steel chassis that ties the legs, hydraulic cylinder, mold, and ejector together and reacts the full press load.", "connections": ["leg_fl", "leg_fr", "leg_rl", "leg_rr", "hydraulic_cylinder", "brick_mold", "block_ejector", "hydraulic_pu_connector", "control_panel"] },
+
+    { "id": "hydraulic_cylinder", "name": "Main Hydraulic Cylinder", "shape": "cylinder", "position": [0, 0.70, 0], "size": [0.085, 0.56], "material": "brushed steel", "role": "Double-acting hydraulic ram. Extends upward to drive the pressing plate into the mold at ≈1,800 psi, retracts to reset.", "connections": ["main_frame", "pressing_plate", "hydraulic_pu_connector"] },
+    { "id": "pressing_plate", "name": "Pressing Plate", "shape": "box", "position": [0, 1.00, 0], "size": [0.40, 0.04, 0.40], "material": "forged steel", "role": "Hardened platen bolted to the top of the ram; forms the lower face of the finished block as it rises into the mold.", "connections": ["hydraulic_cylinder", "brick_mold"] },
+
+    { "id": "brick_mold", "name": "Brick Mold Chamber", "shape": "box", "position": [0, 1.14, 0], "size": [0.46, 0.22, 0.46], "material": "forged steel", "role": "Rigid mold that defines block geometry. Soil falls in from the hopper above; the pressing plate rises from below to compact it.", "connections": ["main_frame", "pressing_plate", "hopper", "block_ejector"] },
+
+    { "id": "hopper", "name": "Soil Hopper", "shape": "box", "position": [0, 1.36, 0], "size": [0.54, 0.22, 0.50], "material": "welded steel", "role": "Tapered container that meters moist soil into the mold between press cycles.", "connections": ["brick_mold", "grate", "hopper_shaker"] },
+    { "id": "grate", "name": "Soil Input Grating", "shape": "box", "position": [0, 1.485, 0], "size": [0.54, 0.03, 0.50], "material": "welded steel", "role": "Coarse grate across the hopper mouth that breaks up tractor-dumped soil clumps and keeps stones out.", "connections": ["hopper"] },
+    { "id": "hopper_shaker", "name": "Hopper Shaker", "shape": "box", "position": [0, 1.36, 0.36], "size": [0.26, 0.16, 0.14], "material": "dark anodized aluminum", "role": "Eccentric-cam agitator clamped to the hopper wall; vibrates the soil column so material flows evenly into the mold.", "connections": ["hopper"] },
+
+    { "id": "block_ejector", "name": "Block Ejector / Discharge Chute", "shape": "box", "position": [0.75, 1.14, 0], "size": [0.60, 0.12, 0.46], "material": "welded steel", "role": "Horizontal chute that the finished block is pushed along as the mold opens; finished blocks exit forward for stacking.", "connections": ["main_frame", "brick_mold"] },
+
+    { "id": "hydraulic_pu_connector", "name": "Hydraulic Power-Unit Connector", "shape": "box", "position": [0, 0.55, -0.50], "size": [0.26, 0.34, 0.16], "material": "dark anodized aluminum", "role": "Quick-disconnect hydraulic manifold with supply/return ports for an external PowerCube or a LifeTrac tractor's auxiliary hydraulics.", "connections": ["main_frame", "hydraulic_cylinder"] },
+    { "id": "control_panel", "name": "Control Panel", "shape": "box", "position": [-0.60, 0.85, 0.42], "size": [0.30, 0.34, 0.08], "material": "glass display", "role": "Front-mounted operator panel. Starts/stops the automated press cycle and drives the solenoid valves on the hydraulic manifold.", "connections": ["main_frame"] }
+  ]
+}

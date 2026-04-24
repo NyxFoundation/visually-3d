@@ -34,6 +34,13 @@
       "subtitle": "16-rotor pilotless eVTOL (EHang, world's first CAAC type-certified passenger drone)",
       "path": "/samples/eh216-s.json",
       "accent": "#34d399"
+    },
+    {
+      "id": "ceb-press",
+      "title": "CEB Press — 'The Liberator'",
+      "subtitle": "OSE open-source hydraulic press for compressed-earth building blocks",
+      "path": "/samples/ceb-press.json",
+      "accent": "#b45309"
     }
   ]
 }
