@@ -36,7 +36,7 @@ becomes a thin box).
 - [x] **TABBY EVO** — Open Motors EV hardware platform.
       https://www.openmotors.co/download/ — CC BY-SA 4.0.
       Slug: `tabby-evo`.
-- [ ] **Apollo Command & Service Module** — NASA CSM (conical CM + cylindrical SM).
+- [x] **Apollo Command & Service Module** — NASA CSM (conical CM + cylindrical SM).
       https://www.nasa.gov/history/historical-spacecraft-diagrams/ — Public Domain.
       Slug: `apollo-csm`.
 - [ ] **Pennsylvania Railroad S2** — 1944 experimental 6-8-6 steam-turbine loco.

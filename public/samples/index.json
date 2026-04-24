@@ -90,6 +90,13 @@
       "subtitle": "Open Motors open-source 'skateboard' EV chassis (Italy, 2016)",
       "path": "/samples/tabby-evo.json",
       "accent": "#14b8a6"
+    },
+    {
+      "id": "apollo-csm",
+      "title": "Apollo Command & Service Module",
+      "subtitle": "NASA Apollo-program crewed spacecraft — conical CM atop cylindrical SM with SPS nozzle",
+      "path": "/samples/apollo-csm.json",
+      "accent": "#f9fafb"
     }
   ]
 }
