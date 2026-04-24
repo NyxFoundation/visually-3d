@@ -1,0 +1,55 @@
+{
+  "machine_name": "OreSat0 1U CubeSat",
+  "assembly_instructions": "Open-source 1U CubeSat (10×10×10 cm). Four machined rails at the cube corners form the primary structural frame; thin end-caps close the top and bottom. A PC/104 stack of cards sits inside — battery card near the bottom, ADACS (attitude determination and control) module near the top, with a backplane PCB running along the back wall that connects them. Two deployable solar panels hinge outward from opposite side rails on small deploy mechanisms; a forward-facing imaging camera is mounted on one side wall, a sun sensor on the top face, and a communications monopole antenna extends from the top end-cap.",
+  "metadata": {
+    "reference": "https://github.com/oresat/oresat-structure",
+    "domain": "smallsat",
+    "thumbnail_camera": [0.40, 0.32, 0.40],
+    "info": {
+      "japanese_name": "OreSat0 1U CubeSat",
+      "english_name": "OreSat0 1U CubeSat (PSAS)",
+      "summary": "Open-hardware 1U CubeSat from the Portland State Aerospace Society — a technology-demonstration precursor to the larger OreSat bus.",
+      "description": "OreSat0 is an open-source 1U (10×10×10 cm) CubeSat developed by the Portland State Aerospace Society (PSAS). It was built to flight-qualify the structural, power, and command-and-data-handling systems of the larger OreSat bus before those subsystems flew on a 2U/3U science mission. The spacecraft follows classic CubeSat construction: four 6061 aluminum corner rails carry the launch loads, and a pair of thin end-caps close off the +Z and -Z faces. Inside, a PC/104-form-factor avionics stack holds a battery card, a backplane that carries the bus signals between cards, and an ADACS (Attitude Determination and Control) module. Two deployable solar panels hinge outward from opposite side rails via small spring-loaded burn-wire deploy mechanisms. Externally, the satellite carries a CMOS imaging camera, a sun sensor for coarse attitude, and a UHF monopole antenna. Structure and electronics are released under CERN-OHL-S v2.0.",
+      "operator": "Portland State Aerospace Society (PSAS)",
+      "contractor": "PSAS student/volunteer team, Portland State University",
+      "contract_date": "Launched 2022 (ELaNa 50 / Virgin Orbit 'Straight Up')",
+      "contract_value": "Student-built; materials ≈US$10k",
+      "status": "Flown (deorbited). Design iterated into OreSat (2U+) flight bus.",
+      "facts": [
+        { "label": "Form factor", "value": "1U CubeSat (10 × 10 × 10 cm)" },
+        { "label": "Mass", "value": "≈1.0 kg" },
+        { "label": "Avionics bus", "value": "PC/104 stack, CAN-based" },
+        { "label": "Power", "value": "Body-mounted solar + two deployable panels → Li-ion battery card" },
+        { "label": "Attitude", "value": "ADACS module + sun sensor" },
+        { "label": "Comms", "value": "UHF monopole antenna" },
+        { "label": "License", "value": "CERN-OHL-S v2.0 (hardware); open software" }
+      ],
+      "sources": [
+        { "title": "OreSat structure repository (GitHub)", "url": "https://github.com/oresat/oresat-structure" },
+        { "title": "PSAS — OreSat project page", "url": "https://www.oresat.org/" },
+        { "title": "NASA ELaNa 50 launch (carried OreSat0)", "url": "https://www.nasa.gov/centers/kennedy/launchingrockets/elana50.html" }
+      ]
+    }
+  },
+  "parts": [
+    { "id": "rail_fr",          "name": "Corner Rail (Fwd-Right)", "shape": "box",      "position": [ 0.047, 0.15,  0.047], "size": [0.006, 0.10, 0.006], "material": "dark anodized aluminum", "role": "Machined 6061 aluminum corner rail — one of four that carry launch-rail loads and bolt the end-caps together.", "connections": ["end_cap_top", "end_cap_bot"] },
+    { "id": "rail_fl",          "name": "Corner Rail (Fwd-Left)",  "shape": "box",      "position": [-0.047, 0.15,  0.047], "size": [0.006, 0.10, 0.006], "material": "dark anodized aluminum", "role": "Forward-left corner rail (with deploy mechanism attachment).", "connections": ["end_cap_top", "end_cap_bot", "deploy_mechanism"] },
+    { "id": "rail_rr",          "name": "Corner Rail (Rear-Right)","shape": "box",      "position": [ 0.047, 0.15, -0.047], "size": [0.006, 0.10, 0.006], "material": "dark anodized aluminum", "role": "Rear-right corner rail.", "connections": ["end_cap_top", "end_cap_bot"] },
+    { "id": "rail_rl",          "name": "Corner Rail (Rear-Left)", "shape": "box",      "position": [-0.047, 0.15, -0.047], "size": [0.006, 0.10, 0.006], "material": "dark anodized aluminum", "role": "Rear-left corner rail.", "connections": ["end_cap_top", "end_cap_bot"] },
+
+    { "id": "end_cap_top",      "name": "End Cap (Top, +Y)",       "shape": "box",      "position": [0, 0.20, 0],           "size": [0.10, 0.006, 0.10],  "material": "dark anodized aluminum", "role": "Top end-cap — seals the +Y face and mounts the antenna and sun sensor.", "connections": ["rail_fr", "rail_fl", "rail_rr", "rail_rl", "antenna", "sensor"] },
+    { "id": "end_cap_bot",      "name": "End Cap (Bottom, -Y)",    "shape": "box",      "position": [0, 0.10, 0],           "size": [0.10, 0.006, 0.10],  "material": "dark anodized aluminum", "role": "Bottom end-cap — deployment-switch interface to the launch dispenser.", "connections": ["rail_fr", "rail_fl", "rail_rr", "rail_rl"] },
+
+    { "id": "battery_card",     "name": "Battery Card (PC/104)",   "shape": "box",      "position": [0, 0.125, 0],          "size": [0.09, 0.012, 0.09],  "material": "black composite",        "role": "Li-ion battery board on the PC/104 stack — stores harvested solar power.", "connections": ["backplane"] },
+    { "id": "backplane",        "name": "PC/104 Backplane",        "shape": "box",      "position": [0, 0.15, -0.042],      "size": [0.09, 0.07, 0.005],  "material": "dark anodized aluminum", "role": "Vertical PC/104 backplane PCB along the rear interior wall; carries power and CAN bus between stacked cards.", "connections": ["battery_card", "adacs_module"] },
+    { "id": "adacs_module",     "name": "ADACS Module (PC/104)",   "shape": "box",      "position": [0, 0.175, 0],          "size": [0.09, 0.016, 0.09],  "material": "dark anodized aluminum", "role": "Attitude Determination and Control card — magnetometer, IMU, torque-rod drivers.", "connections": ["backplane"] },
+
+    { "id": "panel_left",       "name": "Deployable Solar Panel (Port)",  "shape": "box", "position": [-0.10, 0.15, 0],     "size": [0.10, 0.004, 0.10],  "material": "glass display",          "role": "Port-side deployable solar panel, hinged open 90° to catch sunlight. Recessed Si cells on one face.", "connections": ["rail_fl", "deploy_mechanism"] },
+    { "id": "panel_right",      "name": "Deployable Solar Panel (Stbd)",  "shape": "box", "position": [ 0.10, 0.15, 0],     "size": [0.10, 0.004, 0.10],  "material": "glass display",          "role": "Starboard-side deployable solar panel (same design, mirrored).", "connections": ["rail_fr"] },
+
+    { "id": "camera",           "name": "Imaging Camera",          "shape": "box",      "position": [0, 0.15, 0.055],       "size": [0.03, 0.02, 0.008],  "material": "black composite",        "role": "Small CMOS imaging camera on the +Z face for technology-demonstration imagery.", "connections": ["rail_fr", "rail_fl"] },
+    { "id": "antenna",          "name": "UHF Monopole Antenna",    "shape": "cylinder", "position": [0, 0.28, 0],           "size": [0.002, 0.15],        "material": "brushed steel",          "role": "Deployed UHF monopole, extending from the top end-cap after release.", "connections": ["end_cap_top"] },
+    { "id": "deploy_mechanism", "name": "Burn-Wire Deploy Mechanism","shape": "cylinder","position": [-0.055, 0.20, 0],     "rotation": [1.5708, 0, 0],   "size": [0.003, 0.02],        "material": "brushed steel",          "role": "Spring-loaded hinge at the +Y edge of the port rail. Release is burn-wire actuated on deployment.", "connections": ["rail_fl", "panel_left"] },
+    { "id": "sensor",           "name": "Sun Sensor",              "shape": "box",      "position": [0, 0.206, -0.03],      "size": [0.010, 0.004, 0.010],"material": "glass display",          "role": "Photodiode-based coarse sun sensor on the +Y face; feeds ADACS.", "connections": ["end_cap_top", "adacs_module"] }
+  ]
+}

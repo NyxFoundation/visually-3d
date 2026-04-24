@@ -76,6 +76,13 @@
       "subtitle": "Prusa Research bed-slinger FDM printer with Bondtech direct-drive extruder",
       "path": "/samples/prusa-i3-mk3s.json",
       "accent": "#ef4444"
+    },
+    {
+      "id": "oresat0",
+      "title": "OreSat0 1U CubeSat",
+      "subtitle": "PSAS open-hardware tech-demo CubeSat with deployable solar panels (2022)",
+      "path": "/samples/oresat0.json",
+      "accent": "#7c3aed"
     }
   ]
 }

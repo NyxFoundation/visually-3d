@@ -30,7 +30,7 @@ becomes a thin box).
 - [x] **RepRap Prusa i3 MK3S+** — the specific Prusa FDM build.
       https://reprap.org/wiki/Prusa_i3 — GFDL / GPL.
       Slug: `prusa-i3-mk3s` (the existing `3d-printer.json` is generic FDM).
-- [ ] **OreSat0 CubeSat** — 1U CubeSat with deployable solar panels.
+- [x] **OreSat0 CubeSat** — 1U CubeSat with deployable solar panels.
       https://github.com/oresat/oresat-structure — CERN OHL v2.
       Slug: `oresat0`.
 - [ ] **TABBY EVO** — Open Motors EV hardware platform.
