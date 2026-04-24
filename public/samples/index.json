@@ -97,6 +97,13 @@
       "subtitle": "NASA Apollo-program crewed spacecraft — conical CM atop cylindrical SM with SPS nozzle",
       "path": "/samples/apollo-csm.json",
       "accent": "#f9fafb"
+    },
+    {
+      "id": "prr-s2",
+      "title": "Pennsylvania Railroad S2",
+      "subtitle": "One-off 1944 6-8-6 experimental steam-turbine locomotive (Baldwin + Westinghouse)",
+      "path": "/samples/prr-s2.json",
+      "accent": "#334155"
     }
   ]
 }

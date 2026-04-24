@@ -39,7 +39,7 @@ becomes a thin box).
 - [x] **Apollo Command & Service Module** — NASA CSM (conical CM + cylindrical SM).
       https://www.nasa.gov/history/historical-spacecraft-diagrams/ — Public Domain.
       Slug: `apollo-csm`.
-- [ ] **Pennsylvania Railroad S2** — 1944 experimental 6-8-6 steam-turbine loco.
+- [x] **Pennsylvania Railroad S2** — 1944 experimental 6-8-6 steam-turbine loco.
       https://en.wikipedia.org/wiki/Pennsylvania_Railroad_class_S2 — CC BY-SA 4.0.
       Slug: `prr-s2`.
 - [ ] **MakAir open-source ventilator** — motor-driven AMBU-bag ventilator.
