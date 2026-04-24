@@ -1,0 +1,56 @@
+{
+  "machine_name": "Pennsylvania Railroad S2 Steam-Turbine Locomotive",
+  "assembly_instructions": "Experimental 6-8-6 direct-drive steam-turbine locomotive from 1944. A cylindrical boiler runs the length of the engine between a cylindrical smokebox at the front and a large Belpaire firebox at the rear; a three-axle leading truck sits under the smokebox and a three-axle trailing truck sits under the firebox. Four large driving wheels (one per axle, port side shown) are linked by connecting side rods. A Worthington feedwater heater rides on top of the boiler; an ahead-only direct-drive steam turbine is housed under the cab, with a reduction/transmission gear feeding one driving axle. Signature details: a quadruple exhaust stack atop the smokebox, tall 'elephant-ear' smoke deflectors at the front, a side-mounted radiator for the condenser/air system, and a 16-wheel tender coupled behind.",
+  "metadata": {
+    "reference": "https://en.wikipedia.org/wiki/Pennsylvania_Railroad_class_S2",
+    "domain": "railway-history",
+    "thumbnail_camera": [24.0, 11.0, 18.0],
+    "info": {
+      "japanese_name": "ペンシルバニア鉄道 S2形 蒸気タービン機関車 (1944)",
+      "english_name": "Pennsylvania Railroad class S2 steam turbine locomotive",
+      "summary": "One-off 1944 experimental 6-8-6 direct-drive steam-turbine locomotive. Only locomotive ever built with a 6-8-6 wheel arrangement.",
+      "description": "The Pennsylvania Railroad's S2 (PRR #6200) was a one-off experimental steam-turbine locomotive built by Baldwin in 1944 to see whether marine-style direct-drive turbines could keep steam competitive against emerging diesels. It is the only locomotive ever built with a 6-8-6 wheel arrangement — a three-axle leading truck, four driven axles, and a three-axle trailing truck under a massive Belpaire firebox. Rather than reciprocating pistons, the S2 used a Westinghouse ahead-turbine (with a smaller reverse turbine) geared through reduction transmission to one of the driving axles; the remaining driving axles were then connected via conventional side rods. The engine incorporated a Worthington feedwater heater, a quadruple exhaust stack to give the turbine enough draft, and distinctive tall smoke deflectors ('elephant ears') to lift the plume over the unusually long boiler. The S2 ran passenger service in 1944–1949 but suffered from turbine blade wear and poor efficiency at low speeds, and was scrapped in 1952.",
+      "operator": "Pennsylvania Railroad (PRR)",
+      "contractor": "Baldwin Locomotive Works (chassis) + Westinghouse (turbine + transmission)",
+      "contract_date": "Built 1944 · Retired 1949 · Scrapped 1952",
+      "contract_value": "≈US$600,000 (1944) one-off prototype",
+      "status": "Retired / scrapped; Wikipedia docs CC BY-SA 4.0",
+      "facts": [
+        { "label": "Wheel arrangement", "value": "6-8-6 (unique — only locomotive ever built with this layout)" },
+        { "label": "Length (with tender)", "value": "≈37.37 m (122 ft 7¼ in)" },
+        { "label": "Height", "value": "≈4.88 m (16 ft)" },
+        { "label": "Weight (loco + tender)", "value": "≈262 t / 573,000 lb" },
+        { "label": "Power", "value": "6,900 hp peak, ≈6,000 hp rated (turbine direct-drive)" },
+        { "label": "Drivetrain", "value": "Ahead + reverse steam turbines → reduction gears → side-rod-linked driving axles" },
+        { "label": "Quirks", "value": "Quadruple exhaust stack, Worthington feedwater heater, 'elephant-ear' smoke deflectors" }
+      ],
+      "sources": [
+        { "title": "Wikipedia — PRR class S2", "url": "https://en.wikipedia.org/wiki/Pennsylvania_Railroad_class_S2" },
+        { "title": "PRR Technical & Historical Society — S2 reference", "url": "https://prrths.com/" }
+      ]
+    }
+  },
+  "parts": [
+    { "id": "smokebox",          "name": "Smokebox",                          "shape": "cylinder", "position": [11.0, 2.50, 0], "rotation": [0, 0, 1.5708], "size": [1.50, 2.50],  "material": "forged steel",          "role": "Short cylindrical section at the front of the boiler that collects exhaust gases before the stack.", "connections": ["boiler", "quadruple_stack", "smoke_deflectors"] },
+    { "id": "boiler",            "name": "Boiler",                            "shape": "cylinder", "position": [ 5.0, 2.50, 0], "rotation": [0, 0, 1.5708], "size": [1.50, 9.00],  "material": "brushed steel",         "role": "Main pressure vessel. Holds water and steam that feeds the turbine.", "connections": ["smokebox", "firebox", "feedwater_heater", "radiator_assembly"] },
+    { "id": "firebox",           "name": "Belpaire Firebox",                  "shape": "box",      "position": [-3.0, 3.00, 0],                             "size": [4.0, 3.0, 3.2], "material": "forged steel",         "role": "Oversized Belpaire firebox at the rear of the boiler — generates the steam the turbine consumes.", "connections": ["boiler", "trailing_truck", "steam_turbine"] },
+
+    { "id": "quadruple_stack",   "name": "Quadruple Exhaust Stack",           "shape": "cylinder", "position": [11.0, 4.60, 0],                            "size": [0.45, 1.00],  "material": "forged steel",          "role": "Four-tube exhaust stack that gave the turbine exhaust enough draft pull despite the long boiler.", "connections": ["smokebox"] },
+    { "id": "smoke_deflectors",  "name": "Smoke Deflectors ('elephant ears')","shape": "box",      "position": [10.5, 3.00, 1.7],                          "size": [1.80, 2.00, 0.12], "material": "welded steel",      "role": "Tall vertical plates alongside the smokebox that lift the exhaust plume clear of the cab.", "connections": ["smokebox"] },
+    { "id": "feedwater_heater",  "name": "Worthington Feedwater Heater",      "shape": "cylinder", "position": [8.50, 4.40, 0], "rotation": [0, 0, 1.5708], "size": [0.30, 2.50],  "material": "brushed steel",         "role": "Exhaust-steam heat exchanger on top of the boiler — pre-heats boiler feedwater for efficiency.", "connections": ["boiler"] },
+    { "id": "radiator_assembly", "name": "Side Radiator Assembly",            "shape": "box",      "position": [3.0, 4.40, 1.6],                           "size": [2.00, 0.80, 0.12], "material": "dark anodized aluminum","role": "Side-mounted radiator / cooler for compressed-air and auxiliary systems.", "connections": ["boiler"] },
+
+    { "id": "leading_truck",     "name": "Leading Truck (3-axle)",            "shape": "box",      "position": [10.5, 0.60, 0],                            "size": [2.80, 1.20, 2.40], "material": "forged steel",      "role": "Three-axle (six-wheel) leading truck under the smokebox — helps the long engine track into curves.", "connections": ["smokebox"] },
+    { "id": "trailing_truck",    "name": "Trailing Truck (3-axle)",           "shape": "box",      "position": [-3.0, 0.60, 0],                            "size": [2.80, 1.20, 2.40], "material": "forged steel",      "role": "Three-axle (six-wheel) trailing truck under the firebox — supports the extra firebox weight.", "connections": ["firebox"] },
+
+    { "id": "driving_wheel_1",   "name": "Driving Wheel #1",                  "shape": "cylinder", "position": [1.5, 1.00, 0.75], "rotation": [1.5708, 0, 0], "size": [1.00, 0.30], "material": "forged steel",          "role": "First driven axle, port side shown. Four driven axles (eight driving wheels) total.", "connections": ["side_rods"] },
+    { "id": "driving_wheel_2",   "name": "Driving Wheel #2",                  "shape": "cylinder", "position": [3.5, 1.00, 0.75], "rotation": [1.5708, 0, 0], "size": [1.00, 0.30], "material": "forged steel",          "role": "Second driven axle.", "connections": ["side_rods"] },
+    { "id": "driving_wheel_3",   "name": "Driving Wheel #3",                  "shape": "cylinder", "position": [5.5, 1.00, 0.75], "rotation": [1.5708, 0, 0], "size": [1.00, 0.30], "material": "forged steel",          "role": "Third driven axle.", "connections": ["side_rods"] },
+    { "id": "driving_wheel_4",   "name": "Driving Wheel #4 (geared)",         "shape": "cylinder", "position": [7.5, 1.00, 0.75], "rotation": [1.5708, 0, 0], "size": [1.00, 0.30], "material": "forged steel",          "role": "Fourth driven axle. The turbine's reduction gears drove one of the driving axles directly; the rest were connected via side rods.", "connections": ["side_rods", "steam_turbine"] },
+    { "id": "side_rods",         "name": "Connecting Side Rods",              "shape": "box",      "position": [4.5, 1.00, 0.95],                          "size": [6.00, 0.15, 0.05], "material": "brushed steel",     "role": "Coupling rods that tie the four driven axles together so torque distributes across all eight driving wheels.", "connections": ["driving_wheel_1", "driving_wheel_2", "driving_wheel_3", "driving_wheel_4"] },
+
+    { "id": "steam_turbine",     "name": "Direct-Drive Steam Turbine",        "shape": "cylinder", "position": [-3.0, 1.80, 0], "rotation": [0, 0, 1.5708], "size": [0.50, 2.00],  "material": "brushed steel",         "role": "Westinghouse ahead-turbine (with smaller reverse turbine) under the cab — feeds reduction gears coupled to driving_wheel_4.", "connections": ["firebox", "driving_wheel_4"] },
+
+    { "id": "tender",            "name": "Tender (16-wheel)",                 "shape": "box",      "position": [-14.0, 1.50, 0],                           "size": [12.00, 3.00, 3.20], "material": "welded steel",     "role": "Coal + water tender on two 4-axle trucks (sixteen wheels total).", "connections": ["firebox"] }
+  ]
+}
