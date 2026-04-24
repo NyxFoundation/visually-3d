@@ -718,18 +718,43 @@ button, input {
     right: 0;
     bottom: 0;
     width: 100%;
-    max-height: 55dvh;
+    max-height: 38dvh;
     border-radius: 18px 18px 0 0;
     border-left: 0;
     border-right: 0;
     border-bottom: 0;
-    padding: 16px 18px calc(22px + var(--safe-bottom));
+    padding: 8px 16px calc(16px + var(--safe-bottom));
     transform: translateY(calc(100% + 20px));
+  }
+
+  .part-panel::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    margin: 2px auto 6px;
+    border-radius: 999px;
+    background: #30363d;
   }
 
   .part-panel--open {
     transform: translateY(0);
   }
+
+  .part-panel__header {
+    position: sticky;
+    top: 0;
+    background: rgba(13, 17, 23, 0.94);
+    margin: 0 -16px 8px;
+    padding: 4px 16px 8px;
+    border-bottom: 1px solid var(--border);
+    z-index: 1;
+  }
+
+  .part-panel h2 { font-size: 16px; }
+  .part-panel dt { margin-top: 10px; font-size: 10px; }
+  .part-panel dd { font-size: 13px; line-height: 1.4; }
+  .part-panel button { width: 28px; height: 28px; font-size: 18px; }
 
   /* Bottom sheet for info panel */
   .info-panel {
