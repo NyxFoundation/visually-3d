@@ -1,10 +1,10 @@
 {
   "machine_name": "Open Bionics Hero Arm",
-  "assembly_instructions": "3D-printed myoelectric prosthetic forearm. A cylindrical custom-fit forearm socket holds the electronics — battery pack, control board, and skin-contact myoelectric sensor — under a magnetic-mount external cover. A rotating wrist unit connects the socket to the hand frame; five independently driven fingers (thumb + four others) extend forward. Each finger has its own small drive motor at its base (two representative motors modeled here). The entire shell is a matte-textured printed Nylon 12.",
+  "assembly_instructions": "Custom-fit 3D-printed myoelectric below-elbow prosthesis. A cylindrical printed Nylon-12 socket is scanned and printed to match the wearer's residual limb, with a soft rim at the open elbow end. Two skin-contact EMG sensors live on the inside wall of the socket. A 180° manual-rotation wrist ring connects the socket to the printed palm / hand frame. Five independently driven fingers (thumb opposed + index, middle, ring, pinky) extend forward, each shown as three visible segments (proximal, middle, distal). Each finger's small DC gearmotor sits at its root inside the palm. A control board and battery pack are shown above the socket for inspectability (physically they live inside the socket). A magnetic 'hero cover' outer plate and its latch are shown above, representing the swappable cosmetic skin.",
   "metadata": {
     "reference": "https://openbionics.com/hero-arm/",
     "domain": "prosthetics",
-    "thumbnail_camera": [0.95, 0.55, 0.55],
+    "thumbnail_camera": [1.0, 0.6, 0.8],
     "info": {
       "japanese_name": "Open Bionics Hero Arm（筋電義手）",
       "english_name": "Open Bionics Hero Arm — Myoelectric Prosthetic Arm",
@@ -14,15 +14,15 @@
       "contractor": "Open Bionics Ltd. (Bristol, UK)",
       "contract_date": "First commercial delivery 2018; iterated through 2024",
       "contract_value": "≈£10k (UK NHS reference pricing; varies by fit)",
-      "status": "In production (covered by NHS in the UK, various insurers elsewhere)",
+      "status": "In production (covered by the NHS in the UK, various insurers elsewhere)",
       "facts": [
-        { "label": "Type",        "value": "Below-elbow myoelectric prosthesis, five independently motored fingers" },
-        { "label": "Control",     "value": "Dual skin-contact EMG sensors → pre-programmed grip classifier" },
-        { "label": "Wrist",       "value": "Manually-rotated 180° wrist unit" },
-        { "label": "Construction","value": "SLS laser-sintered Nylon-12 shell, off-the-shelf motors + battery + STM32 board" },
-        { "label": "Socket",      "value": "Fully custom — 3D-scanned from the residual limb" },
-        { "label": "Covers",      "value": "Magnetic swap-out external covers (many finishes, themed 'hero' skins)" },
-        { "label": "License",     "value": "Commercial product; design elements open for clinical integration" }
+        { "label": "Type",         "value": "Below-elbow myoelectric prosthesis, five independently motored fingers" },
+        { "label": "Control",      "value": "Dual skin-contact EMG sensors → STM32-based classifier → 6 grip programs" },
+        { "label": "Wrist",        "value": "Manually-rotated 180° wrist ring" },
+        { "label": "Construction", "value": "SLS laser-sintered Nylon-12 shell; off-the-shelf motors, battery, STM32" },
+        { "label": "Socket",       "value": "Fully custom — 3D-scanned from the residual limb" },
+        { "label": "Covers",       "value": "Magnetic swap-out hero covers (many finishes and themed skins)" },
+        { "label": "License",      "value": "Commercial product; design elements open for clinical integration" }
       ],
       "sources": [
         { "title": "Open Bionics — Hero Arm product page", "url": "https://openbionics.com/en/hero-arm/" },
@@ -31,25 +31,47 @@
     }
   },
   "parts": [
-    { "id": "forearm_socket",    "name": "Forearm Socket",             "shape": "cylinder", "position": [0.15, 0.15, 0],  "rotation": [0, 0, 1.5708], "size": [0.065, 0.30],      "material": "white composite",       "role": "Custom-fit cylindrical socket — 3D-scanned from the residual limb for a personalized, comfortable fit.", "connections": ["wrist_unit", "myoelectric_sensor", "control_board", "battery_pack", "external_cover"] },
+    { "id": "forearm_socket",  "name": "Forearm Socket (Nylon-12)",     "shape": "cylinder", "position": [0.13, 0.15, 0],    "rotation": [0, 0, 1.5708], "size": [0.065, 0.26],  "material": "white composite",        "role": "Custom-fit cylindrical socket — 3D-scanned from the residual limb for a personalized, comfortable fit. Houses the control board, battery, and EMG sensors.", "connections": ["socket_rim", "wrist_ring", "emg_sensor_1", "emg_sensor_2", "control_board", "battery_pack", "external_cover"] },
+    { "id": "socket_rim",      "name": "Socket Rim (elbow end)",        "shape": "cylinder", "position": [0, 0.15, 0],       "rotation": [0, 0, 1.5708], "size": [0.070, 0.020], "material": "black composite",        "role": "Soft rubber rim at the open elbow end of the socket — comfort pad against the residual limb.", "connections": ["forearm_socket"] },
 
-    { "id": "wrist_unit",        "name": "Wrist Unit (180° rotation)", "shape": "cylinder", "position": [0.33, 0.15, 0],  "rotation": [0, 0, 1.5708], "size": [0.050, 0.05],      "material": "dark anodized aluminum","role": "Manually-rotated wrist joint — lets the user pronate/supinate the hand over 180°.", "connections": ["forearm_socket", "hand_frame"] },
+    { "id": "wrist_ring",      "name": "Wrist Rotation Ring (180°)",    "shape": "cylinder", "position": [0.275, 0.15, 0],   "rotation": [0, 0, 1.5708], "size": [0.055, 0.025], "material": "dark anodized aluminum", "role": "Manual 180°-rotation ring between the socket and the hand — for pronation/supination.", "connections": ["forearm_socket", "palm"] },
 
-    { "id": "hand_frame",        "name": "Hand Frame (Palm)",          "shape": "box",      "position": [0.40, 0.15, 0],   "size": [0.090, 0.090, 0.090], "material": "white composite",       "role": "Printed Nylon-12 palm frame. Roots all five fingers and houses the per-finger drive motors.", "connections": ["wrist_unit", "thumb", "index_finger", "middle_finger", "ring_finger", "pinky_finger", "finger_motor_thumb", "finger_motor_index"] },
+    { "id": "palm",            "name": "Palm / Hand Frame",             "shape": "box",      "position": [0.335, 0.15, 0],                              "size": [0.08, 0.090, 0.085], "material": "white composite",        "role": "Printed Nylon-12 palm frame. Roots all five fingers and houses the per-finger drive motors.", "connections": ["wrist_ring", "back_of_hand_plate", "thumb_prox", "index_prox", "middle_prox", "ring_prox", "pinky_prox", "motor_thumb", "motor_index", "motor_middle", "motor_ring", "motor_pinky"] },
+    { "id": "back_of_hand_plate","name": "Back-of-Hand Plate",           "shape": "box",      "position": [0.335, 0.198, 0],                             "size": [0.07, 0.012, 0.075], "material": "white composite",        "role": "Top-of-hand cosmetic cover plate.", "connections": ["palm"] },
 
-    { "id": "thumb",             "name": "Thumb",                       "shape": "cylinder", "position": [0.46, 0.130, 0.06],  "rotation": [0, 0, 1.5708], "size": [0.014, 0.065], "material": "white composite", "role": "Opposed thumb — drives its own independent motor for pinch and tripod grips.", "connections": ["hand_frame", "finger_motor_thumb"] },
-    { "id": "index_finger",      "name": "Index Finger",                "shape": "cylinder", "position": [0.49, 0.16, 0.030],  "rotation": [0, 0, 1.5708], "size": [0.013, 0.090], "material": "white composite", "role": "Index finger — often the 'point' or 'trigger' finger in Hero Arm grip programs.", "connections": ["hand_frame", "finger_motor_index"] },
-    { "id": "middle_finger",     "name": "Middle Finger",               "shape": "cylinder", "position": [0.495, 0.16, 0.008], "rotation": [0, 0, 1.5708], "size": [0.013, 0.100], "material": "white composite", "role": "Middle finger — primary power-grip finger.", "connections": ["hand_frame"] },
-    { "id": "ring_finger",       "name": "Ring Finger",                 "shape": "cylinder", "position": [0.485, 0.16, -0.015],"rotation": [0, 0, 1.5708], "size": [0.013, 0.090], "material": "white composite", "role": "Ring finger.", "connections": ["hand_frame"] },
-    { "id": "pinky_finger",      "name": "Pinky Finger",                "shape": "cylinder", "position": [0.465, 0.16, -0.038],"rotation": [0, 0, 1.5708], "size": [0.012, 0.075], "material": "white composite", "role": "Pinky finger.", "connections": ["hand_frame"] },
+    { "id": "thumb_prox",      "name": "Thumb — Proximal",              "shape": "box",      "position": [0.370, 0.150, 0.055],                         "size": [0.028, 0.018, 0.018],"material": "white composite",        "role": "Opposed thumb, proximal segment.", "connections": ["palm", "thumb_mid", "motor_thumb"] },
+    { "id": "thumb_mid",       "name": "Thumb — Middle",                "shape": "box",      "position": [0.398, 0.150, 0.055],                         "size": [0.024, 0.016, 0.016],"material": "white composite",        "role": "Thumb middle segment.", "connections": ["thumb_prox", "thumb_dist"] },
+    { "id": "thumb_dist",      "name": "Thumb — Distal",                "shape": "box",      "position": [0.423, 0.150, 0.055],                         "size": [0.020, 0.014, 0.014],"material": "white composite",        "role": "Thumb tip.", "connections": ["thumb_mid"] },
 
-    { "id": "finger_motor_thumb","name": "Finger Motor — Thumb",        "shape": "cylinder", "position": [0.425, 0.145, 0.05], "rotation": [0, 0, 1.5708], "size": [0.008, 0.025], "material": "brushed steel", "role": "Small DC gearmotor at the thumb root — independent actuation, one of five in the hand.", "connections": ["hand_frame", "thumb"] },
-    { "id": "finger_motor_index","name": "Finger Motor — Index",        "shape": "cylinder", "position": [0.440, 0.165, 0.03], "rotation": [0, 0, 1.5708], "size": [0.008, 0.025], "material": "brushed steel", "role": "Small DC gearmotor at the index-finger root (representative — all four non-thumb fingers have their own).", "connections": ["hand_frame", "index_finger"] },
+    { "id": "index_prox",      "name": "Index — Proximal",              "shape": "box",      "position": [0.393, 0.150, 0.030],                         "size": [0.028, 0.018, 0.018],"material": "white composite",        "role": "Index finger, proximal segment.", "connections": ["palm", "index_mid", "motor_index"] },
+    { "id": "index_mid",       "name": "Index — Middle",                "shape": "box",      "position": [0.423, 0.150, 0.030],                         "size": [0.024, 0.016, 0.016],"material": "white composite",        "role": "Index middle segment.", "connections": ["index_prox", "index_dist"] },
+    { "id": "index_dist",      "name": "Index — Distal",                "shape": "box",      "position": [0.448, 0.150, 0.030],                         "size": [0.020, 0.014, 0.014],"material": "white composite",        "role": "Index tip.", "connections": ["index_mid"] },
 
-    { "id": "control_board",     "name": "Control Board (STM32)",       "shape": "box",      "position": [0.08, 0.22, 0],      "size": [0.10, 0.020, 0.05], "material": "dark anodized aluminum","role": "STM32-based controller. Classifies EMG signals into grip commands and drives the finger motors. Shown above the socket for inspectability.", "connections": ["forearm_socket", "myoelectric_sensor"] },
-    { "id": "battery_pack",      "name": "Battery Pack",                "shape": "box",      "position": [0.20, 0.22, 0],      "size": [0.10, 0.030, 0.05], "material": "black composite",        "role": "Li-ion battery pack powering the motors and control board; swapped through the external cover.", "connections": ["forearm_socket", "control_board"] },
-    { "id": "myoelectric_sensor","name": "Myoelectric (EMG) Sensor",    "shape": "box",      "position": [0.08, 0.205, 0.055], "size": [0.04, 0.015, 0.030], "material": "dark anodized aluminum","role": "Skin-contact surface EMG sensor on the socket interior — one of two that pick up forearm muscle signals.", "connections": ["forearm_socket", "control_board"] },
+    { "id": "middle_prox",     "name": "Middle — Proximal",             "shape": "box",      "position": [0.394, 0.150, 0.010],                         "size": [0.030, 0.018, 0.018],"material": "white composite",        "role": "Middle finger, proximal segment.", "connections": ["palm", "middle_mid", "motor_middle"] },
+    { "id": "middle_mid",      "name": "Middle — Middle",               "shape": "box",      "position": [0.426, 0.150, 0.010],                         "size": [0.026, 0.016, 0.016],"material": "white composite",        "role": "Middle finger middle segment.", "connections": ["middle_prox", "middle_dist"] },
+    { "id": "middle_dist",     "name": "Middle — Distal",               "shape": "box",      "position": [0.454, 0.150, 0.010],                         "size": [0.022, 0.014, 0.014],"material": "white composite",        "role": "Middle tip.", "connections": ["middle_mid"] },
 
-    { "id": "external_cover",    "name": "External Cover (magnetic)",   "shape": "box",      "position": [0.14, 0.27, 0],      "size": [0.24, 0.020, 0.14], "material": "white composite",        "role": "Magnetically-attached outer cover that snaps on over the forearm electronics. Available in many finishes and themed 'hero' skins.", "connections": ["forearm_socket"] }
+    { "id": "ring_prox",       "name": "Ring — Proximal",               "shape": "box",      "position": [0.393, 0.150, -0.010],                        "size": [0.028, 0.018, 0.018],"material": "white composite",        "role": "Ring finger, proximal segment.", "connections": ["palm", "ring_mid", "motor_ring"] },
+    { "id": "ring_mid",        "name": "Ring — Middle",                 "shape": "box",      "position": [0.423, 0.150, -0.010],                        "size": [0.024, 0.016, 0.016],"material": "white composite",        "role": "Ring middle segment.", "connections": ["ring_prox", "ring_dist"] },
+    { "id": "ring_dist",       "name": "Ring — Distal",                 "shape": "box",      "position": [0.448, 0.150, -0.010],                        "size": [0.020, 0.014, 0.014],"material": "white composite",        "role": "Ring tip.", "connections": ["ring_mid"] },
+
+    { "id": "pinky_prox",      "name": "Pinky — Proximal",              "shape": "box",      "position": [0.393, 0.150, -0.032],                        "size": [0.026, 0.017, 0.017],"material": "white composite",        "role": "Pinky finger, proximal segment.", "connections": ["palm", "pinky_mid", "motor_pinky"] },
+    { "id": "pinky_mid",       "name": "Pinky — Middle",                "shape": "box",      "position": [0.421, 0.150, -0.032],                        "size": [0.022, 0.015, 0.015],"material": "white composite",        "role": "Pinky middle segment.", "connections": ["pinky_prox", "pinky_dist"] },
+    { "id": "pinky_dist",      "name": "Pinky — Distal",                "shape": "box",      "position": [0.444, 0.150, -0.032],                        "size": [0.018, 0.013, 0.013],"material": "white composite",        "role": "Pinky tip.", "connections": ["pinky_mid"] },
+
+    { "id": "motor_thumb",     "name": "Finger Motor — Thumb",          "shape": "cylinder", "position": [0.355, 0.150, 0.048], "rotation": [0, 0, 1.5708], "size": [0.010, 0.028], "material": "brushed steel",           "role": "Small DC gearmotor at the thumb root — one of five independent finger motors.", "connections": ["palm", "thumb_prox"] },
+    { "id": "motor_index",     "name": "Finger Motor — Index",          "shape": "cylinder", "position": [0.358, 0.150, 0.030], "rotation": [0, 0, 1.5708], "size": [0.010, 0.028], "material": "brushed steel",           "role": "Index finger drive motor.", "connections": ["palm", "index_prox"] },
+    { "id": "motor_middle",    "name": "Finger Motor — Middle",         "shape": "cylinder", "position": [0.358, 0.150, 0.010], "rotation": [0, 0, 1.5708], "size": [0.010, 0.028], "material": "brushed steel",           "role": "Middle finger drive motor.", "connections": ["palm", "middle_prox"] },
+    { "id": "motor_ring",      "name": "Finger Motor — Ring",           "shape": "cylinder", "position": [0.358, 0.150, -0.010],"rotation": [0, 0, 1.5708], "size": [0.010, 0.028], "material": "brushed steel",           "role": "Ring finger drive motor.", "connections": ["palm", "ring_prox"] },
+    { "id": "motor_pinky",     "name": "Finger Motor — Pinky",          "shape": "cylinder", "position": [0.358, 0.150, -0.032],"rotation": [0, 0, 1.5708], "size": [0.010, 0.028], "material": "brushed steel",           "role": "Pinky finger drive motor.", "connections": ["palm", "pinky_prox"] },
+
+    { "id": "emg_sensor_1",    "name": "EMG Sensor (Port)",             "shape": "box",      "position": [0.050, 0.115, 0.055],                         "size": [0.020, 0.015, 0.030],"material": "dark anodized aluminum", "role": "Skin-contact surface-EMG electrode on the interior wall of the socket — picks up flexor muscle signals.", "connections": ["forearm_socket", "control_board"] },
+    { "id": "emg_sensor_2",    "name": "EMG Sensor (Starboard)",        "shape": "box",      "position": [0.050, 0.115, -0.055],                        "size": [0.020, 0.015, 0.030],"material": "dark anodized aluminum", "role": "Second EMG electrode on the opposite interior wall — extensor muscle signals.", "connections": ["forearm_socket", "control_board"] },
+
+    { "id": "control_board",   "name": "STM32 Control Board (shown)",   "shape": "box",      "position": [0.10, 0.24, 0],                                "size": [0.12, 0.015, 0.05], "material": "dark anodized aluminum", "role": "STM32-based classifier + 5-channel motor driver. Physically inside the socket; shown above for inspectability.", "connections": ["forearm_socket", "emg_sensor_1", "emg_sensor_2", "battery_pack"] },
+    { "id": "battery_pack",    "name": "Battery Pack (shown)",          "shape": "box",      "position": [0.10, 0.28, 0],                                "size": [0.12, 0.030, 0.05], "material": "black composite",        "role": "Li-ion battery pack — swapped through the external cover. Shown above for inspectability.", "connections": ["control_board", "forearm_socket"] },
+
+    { "id": "external_cover",  "name": "External 'Hero' Cover",         "shape": "box",      "position": [0.13, 0.33, 0],                                "size": [0.22, 0.015, 0.12], "material": "white composite",        "role": "Magnetically-attached outer cover — available in themed 'hero' finishes. Snaps off for battery swaps.", "connections": ["forearm_socket", "cover_latch"] },
+    { "id": "cover_latch",     "name": "Cover Magnetic Latch",          "shape": "cylinder", "position": [0.24, 0.33, 0],  "rotation": [1.5708, 0, 0],    "size": [0.006, 0.012], "material": "brushed steel",            "role": "Representative magnetic latch pin — one of several that hold the hero cover on.", "connections": ["external_cover"] }
   ]
 }
