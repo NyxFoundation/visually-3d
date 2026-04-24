@@ -4,8 +4,6 @@ import { LazyViewer } from './components/LazyViewer';
 import { SampleGallery, type SampleEntry } from './components/SampleGallery';
 import { MOCK_SCENE, type Part, type SceneDescriptor } from './types';
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8000';
-
 type LogEntry = {
   stream: 'system' | 'stdout' | 'stderr' | 'client';
   message: string;
@@ -49,7 +47,7 @@ function App() {
     let cancelled = false;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 1500);
-    fetch(`${API_BASE}/`, { signal: controller.signal })
+    fetch('/api/health', { signal: controller.signal })
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
       .then(() => {
         if (!cancelled) setBackend('available');
@@ -117,7 +115,7 @@ function App() {
 
     try {
       const body = value.startsWith('http://') || value.startsWith('https://') ? { url: value } : { machine_name: value };
-      const response = await fetch(`${API_BASE}/analyze/stream`, {
+      const response = await fetch('/api/analyze/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

@@ -1,0 +1,54 @@
+{
+  "name": "visually",
+  "version": "0.2.0",
+  "description": "Interactive 3D machinery visualization. Run `npx visually` to open a local GUI that speaks to your Claude CLI.",
+  "type": "module",
+  "bin": {
+    "visually": "./bin/visually.js"
+  },
+  "files": [
+    "bin",
+    "server",
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "dev:proxy": "vite --host 0.0.0.0 --mode proxy",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "start": "node bin/visually.js",
+    "start:no-open": "node bin/visually.js --no-open",
+    "deploy": "npm run build && npx wrangler pages deploy dist --project-name=visually",
+    "prepack": "npm run build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.4.2",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/three": "latest",
+    "@vitejs/plugin-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "three": "^0.181.2",
+    "typescript": "latest",
+    "vite": "latest"
+  },
+  "keywords": [
+    "3d",
+    "visualization",
+    "claude",
+    "threejs",
+    "react-three-fiber",
+    "cli"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NyxFoundation/visually.git"
+  }
+}
