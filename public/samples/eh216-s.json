@@ -1,0 +1,110 @@
+{
+  "machine_name": "EHang EH216-S Autonomous Aerial Vehicle",
+  "assembly_instructions": "Pilotless two-seat passenger eVTOL with a central spheroidal cabin perched on twin tubular landing skids. Eight tubular composite arms radiate horizontally from a central hub, each arm tip carrying a coaxial pair of brushless motors driving fixed-pitch propellers (16 rotors total). All major systems — propulsion, batteries, flight controllers, command-and-control link — are designed with full redundancy.",
+  "metadata": {
+    "reference": "https://www.ehang.com/news/990.html",
+    "domain": "urban-air-mobility",
+    "thumbnail_camera": [8, 5, 8],
+    "info": {
+      "japanese_name": "EH216-S 自動運転航空機",
+      "english_name": "EHang EH216-S Pilotless Passenger-Carrying eVTOL",
+      "summary": "Two-seat autonomous multirotor eVTOL air taxi from EHang — the world's first pilotless passenger-carrying aircraft to be granted a Type Certificate (CAAC, October 2023), followed by Production and Standard Airworthiness Certificates.",
+      "description": "The EH216-S is a passenger-carrying autonomous aerial vehicle (AAV) developed by Guangzhou EHang Intelligent Technology. It is a true \"drone-style\" flying car: a central spheroidal cabin seats two passengers, while eight tubular arms radiate from the hub, each arm tip mounting a coaxial pair of brushless motors driving fixed-pitch propellers — sixteen rotors in all. There is no onboard pilot and no flight stick: passengers select a destination on a 12-inch touchscreen and the aircraft executes a pre-cleared route under supervision from a ground command-and-control center. The Civil Aviation Administration of China (CAAC) accepted the type-certification application in January 2021 and issued the Type Certificate on 13 October 2023 — the world's first TC for a pilotless passenger-carrying eVTOL. A Production Certificate and a Standard Airworthiness Certificate followed in 2024, clearing the EH216-S for serial manufacture and commercial operation.",
+      "operator": "EHang AAV operators (Guangzhou, Hefei, and other Chinese cities)",
+      "contractor": "Guangzhou EHang Intelligent Technology Co., Ltd.",
+      "contract_date": "2021-01 (TC application accepted) · 2023-10-13 (Type Certificate)",
+      "contract_value": "Unit list price approx. US$410,000 (commercial)",
+      "status": "Type-, Production-, and Standard-Airworthiness-Certified by CAAC; in commercial service",
+      "facts": [
+        { "label": "Configuration", "value": "8 arms × 2 coaxial rotors = 16 propellers, all-electric" },
+        { "label": "Length × Width × Height", "value": "5.61 m × 5.73 m × 1.93 m" },
+        { "label": "Curb / Max takeoff weight", "value": "≈360 kg / 620 kg" },
+        { "label": "Payload", "value": "220 kg (2 passengers)" },
+        { "label": "Max speed / Cruise", "value": "130 km/h / ≈100 km/h" },
+        { "label": "Range / Endurance", "value": "30–35 km / ≈21 min" },
+        { "label": "Max altitude", "value": "3,000 m AMSL" },
+        { "label": "Battery recharge", "value": "≈2 hours" },
+        { "label": "Control", "value": "Pilotless; passenger touchscreen + ground command-and-control center" },
+        { "label": "Certifying body", "value": "Civil Aviation Administration of China (CAAC)" }
+      ],
+      "sources": [
+        { "title": "EHang — Successfully Obtains CAAC Type Certificate for EH216-S (official, 2023-10-13)", "url": "https://www.ehang.com/news/990.html" },
+        { "title": "EHang — Official EH216-S product/spec page", "url": "https://www.ehang.com/ehangaav" },
+        { "title": "EHang — Standard Airworthiness Certificate & Customer Delivery (official)", "url": "https://www.ehang.com/news/1021.html" },
+        { "title": "EHang — Production Certificate from CAAC (official)", "url": "https://www.ehang.com/news/1058.html" },
+        { "title": "New Atlas — A closer look at the EHang 216 pilotless air taxi (detailed specs)", "url": "https://newatlas.com/aircraft/ehang-216-pilotless-air-taxi-specs/" }
+      ]
+    }
+  },
+  "parts": [
+    { "id": "skid_left", "name": "Landing Skid (Port)", "shape": "box", "position": [0, 0.12, 0.75], "size": [2.2, 0.08, 0.08], "material": "carbon fiber", "role": "Tubular composite landing skid, port side. Spreads ground load and absorbs touchdown energy.", "connections": ["skid_cross_front", "skid_cross_rear", "strut_fl", "strut_rl"] },
+    { "id": "skid_right", "name": "Landing Skid (Starboard)", "shape": "box", "position": [0, 0.12, -0.75], "size": [2.2, 0.08, 0.08], "material": "carbon fiber", "role": "Tubular composite landing skid, starboard side.", "connections": ["skid_cross_front", "skid_cross_rear", "strut_fr", "strut_rr"] },
+    { "id": "skid_cross_front", "name": "Skid Cross-Tube (Front)", "shape": "box", "position": [0.85, 0.12, 0], "size": [0.08, 0.08, 1.5], "material": "carbon fiber", "role": "Forward cross-tube tying the two skids together.", "connections": ["skid_left", "skid_right"] },
+    { "id": "skid_cross_rear", "name": "Skid Cross-Tube (Rear)", "shape": "box", "position": [-0.85, 0.12, 0], "size": [0.08, 0.08, 1.5], "material": "carbon fiber", "role": "Aft cross-tube tying the two skids together.", "connections": ["skid_left", "skid_right"] },
+
+    { "id": "strut_fl", "name": "Cabin Strut (Front-Left)", "shape": "cylinder", "position": [0.7, 0.32, 0.55], "size": [0.04, 0.45], "material": "carbon fiber", "role": "Vertical strut connecting port skid to cabin floor.", "connections": ["skid_left", "cabin_floor"] },
+    { "id": "strut_fr", "name": "Cabin Strut (Front-Right)", "shape": "cylinder", "position": [0.7, 0.32, -0.55], "size": [0.04, 0.45], "material": "carbon fiber", "role": "Vertical strut connecting starboard skid to cabin floor.", "connections": ["skid_right", "cabin_floor"] },
+    { "id": "strut_rl", "name": "Cabin Strut (Rear-Left)", "shape": "cylinder", "position": [-0.7, 0.32, 0.55], "size": [0.04, 0.45], "material": "carbon fiber", "role": "Vertical strut connecting port skid to cabin floor.", "connections": ["skid_left", "cabin_floor"] },
+    { "id": "strut_rr", "name": "Cabin Strut (Rear-Right)", "shape": "cylinder", "position": [-0.7, 0.32, -0.55], "size": [0.04, 0.45], "material": "carbon fiber", "role": "Vertical strut connecting starboard skid to cabin floor.", "connections": ["skid_right", "cabin_floor"] },
+
+    { "id": "battery_pack", "name": "Battery Pack", "shape": "box", "position": [-0.2, 0.45, 0], "size": [1.4, 0.18, 1.0], "material": "black composite", "role": "Liquid-cooled lithium-polymer battery modules (full redundancy across independent power channels). ≈2 h recharge.", "connections": ["cabin_floor", "motor_n_top", "motor_ne_top", "motor_e_top", "motor_se_top", "motor_s_top", "motor_sw_top", "motor_w_top", "motor_nw_top", "motor_n_bot", "motor_ne_bot", "motor_e_bot", "motor_se_bot", "motor_s_bot", "motor_sw_bot", "motor_w_bot", "motor_nw_bot"] },
+    { "id": "cabin_floor", "name": "Cabin Floor Pan", "shape": "box", "position": [0, 0.6, 0], "size": [1.7, 0.08, 1.3], "material": "carbon fiber", "role": "Composite floor pan supporting the seats, battery, and cabin shell.", "connections": ["strut_fl", "strut_fr", "strut_rl", "strut_rr", "cabin_shell", "battery_pack", "avionics_bay"] },
+
+    { "id": "cabin_shell", "name": "Passenger Cabin Shell", "shape": "sphere", "position": [0.05, 1.0, 0], "size": [0.85], "material": "white composite", "role": "Spheroidal two-seat passenger cabin (composite monocoque). Seats two side-by-side; touchscreen on the centre console selects destination.", "connections": ["cabin_floor", "windshield", "door_port", "door_starboard", "rear_fairing", "hub", "antenna_top", "strobe_top"] },
+    { "id": "windshield", "name": "Panoramic Windshield", "shape": "box", "position": [0.85, 1.05, 0], "size": [0.05, 0.7, 1.1], "material": "glass display", "role": "Curved panoramic windshield giving forward visibility for both passengers.", "connections": ["cabin_shell"] },
+    { "id": "door_port", "name": "Gull-Wing Door (Port)", "shape": "box", "position": [0.05, 1.0, 0.82], "size": [0.95, 0.85, 0.08], "material": "white composite", "role": "Upward-hinged gull-wing passenger door, port side.", "connections": ["cabin_shell"] },
+    { "id": "door_starboard", "name": "Gull-Wing Door (Starboard)", "shape": "box", "position": [0.05, 1.0, -0.82], "size": [0.95, 0.85, 0.08], "material": "white composite", "role": "Upward-hinged gull-wing passenger door, starboard side.", "connections": ["cabin_shell"] },
+    { "id": "rear_fairing", "name": "Rear Avionics Fairing", "shape": "sphere", "position": [-0.85, 1.05, 0], "size": [0.45], "material": "white composite", "role": "Aerodynamic fairing covering the aft avionics bay and command-link antennas.", "connections": ["cabin_shell", "avionics_bay"] },
+    { "id": "avionics_bay", "name": "Avionics & Flight Control Bay", "shape": "box", "position": [-0.8, 0.7, 0], "size": [0.6, 0.3, 0.9], "material": "dark anodized aluminum", "role": "Triple-redundant flight controller, IMU stack, GNSS receivers, and 4G/5G command-and-control link.", "connections": ["rear_fairing", "cabin_floor"] },
+
+    { "id": "hub", "name": "Central Rotor Hub", "shape": "cylinder", "position": [0, 1.55, 0], "size": [0.55, 0.18], "material": "dark anodized aluminum", "role": "Structural hub above the cabin into which all eight arms key; routes power and signal cables to each motor pair.", "connections": ["cabin_shell", "arm_n", "arm_ne", "arm_e", "arm_se", "arm_s", "arm_sw", "arm_w", "arm_nw"] },
+
+    { "id": "arm_n", "name": "Arm (Forward)", "shape": "box", "position": [1.5, 1.55, 0], "size": [2.0, 0.12, 0.12], "material": "carbon fiber", "role": "Tubular composite arm radiating forward from the hub.", "connections": ["hub", "motor_n_top", "motor_n_bot"] },
+    { "id": "arm_ne", "name": "Arm (Forward-Port)", "shape": "box", "position": [1.0607, 1.55, 1.0607], "rotation": [0, -0.7854, 0], "size": [2.0, 0.12, 0.12], "material": "carbon fiber", "role": "Tubular composite arm, 45° forward-port.", "connections": ["hub", "motor_ne_top", "motor_ne_bot"] },
+    { "id": "arm_e", "name": "Arm (Port)", "shape": "box", "position": [0, 1.55, 1.5], "rotation": [0, -1.5708, 0], "size": [2.0, 0.12, 0.12], "material": "carbon fiber", "role": "Tubular composite arm, port (+Z).", "connections": ["hub", "motor_e_top", "motor_e_bot"] },
+    { "id": "arm_se", "name": "Arm (Aft-Port)", "shape": "box", "position": [-1.0607, 1.55, 1.0607], "rotation": [0, -2.3562, 0], "size": [2.0, 0.12, 0.12], "material": "carbon fiber", "role": "Tubular composite arm, 45° aft-port.", "connections": ["hub", "motor_se_top", "motor_se_bot"] },
+    { "id": "arm_s", "name": "Arm (Aft)", "shape": "box", "position": [-1.5, 1.55, 0], "rotation": [0, -3.1416, 0], "size": [2.0, 0.12, 0.12], "material": "carbon fiber", "role": "Tubular composite arm radiating aft from the hub.", "connections": ["hub", "motor_s_top", "motor_s_bot"] },
+    { "id": "arm_sw", "name": "Arm (Aft-Starboard)", "shape": "box", "position": [-1.0607, 1.55, -1.0607], "rotation": [0, -3.927, 0], "size": [2.0, 0.12, 0.12], "material": "carbon fiber", "role": "Tubular composite arm, 45° aft-starboard.", "connections": ["hub", "motor_sw_top", "motor_sw_bot"] },
+    { "id": "arm_w", "name": "Arm (Starboard)", "shape": "box", "position": [0, 1.55, -1.5], "rotation": [0, -4.7124, 0], "size": [2.0, 0.12, 0.12], "material": "carbon fiber", "role": "Tubular composite arm, starboard (-Z).", "connections": ["hub", "motor_w_top", "motor_w_bot"] },
+    { "id": "arm_nw", "name": "Arm (Forward-Starboard)", "shape": "box", "position": [1.0607, 1.55, -1.0607], "rotation": [0, -5.4978, 0], "size": [2.0, 0.12, 0.12], "material": "carbon fiber", "role": "Tubular composite arm, 45° forward-starboard.", "connections": ["hub", "motor_nw_top", "motor_nw_bot"] },
+
+    { "id": "motor_n_top", "name": "Motor #1 (Forward, upper)", "shape": "cylinder", "position": [2.5, 1.72, 0], "size": [0.09, 0.16], "material": "brushed steel", "role": "Brushless DC outrunner driving the upper coaxial propeller on the forward arm.", "connections": ["arm_n", "prop_n_top", "battery_pack"] },
+    { "id": "motor_n_bot", "name": "Motor #2 (Forward, lower)", "shape": "cylinder", "position": [2.5, 1.38, 0], "size": [0.09, 0.16], "material": "brushed steel", "role": "Brushless DC outrunner driving the lower coaxial propeller on the forward arm.", "connections": ["arm_n", "prop_n_bot", "battery_pack"] },
+    { "id": "motor_ne_top", "name": "Motor #3 (Fwd-Port, upper)", "shape": "cylinder", "position": [1.7678, 1.72, 1.7678], "size": [0.09, 0.16], "material": "brushed steel", "role": "Upper coaxial motor on the forward-port arm.", "connections": ["arm_ne", "prop_ne_top", "battery_pack"] },
+    { "id": "motor_ne_bot", "name": "Motor #4 (Fwd-Port, lower)", "shape": "cylinder", "position": [1.7678, 1.38, 1.7678], "size": [0.09, 0.16], "material": "brushed steel", "role": "Lower coaxial motor on the forward-port arm.", "connections": ["arm_ne", "prop_ne_bot", "battery_pack"] },
+    { "id": "motor_e_top", "name": "Motor #5 (Port, upper)", "shape": "cylinder", "position": [0, 1.72, 2.5], "size": [0.09, 0.16], "material": "brushed steel", "role": "Upper coaxial motor on the port arm.", "connections": ["arm_e", "prop_e_top", "battery_pack"] },
+    { "id": "motor_e_bot", "name": "Motor #6 (Port, lower)", "shape": "cylinder", "position": [0, 1.38, 2.5], "size": [0.09, 0.16], "material": "brushed steel", "role": "Lower coaxial motor on the port arm.", "connections": ["arm_e", "prop_e_bot", "battery_pack"] },
+    { "id": "motor_se_top", "name": "Motor #7 (Aft-Port, upper)", "shape": "cylinder", "position": [-1.7678, 1.72, 1.7678], "size": [0.09, 0.16], "material": "brushed steel", "role": "Upper coaxial motor on the aft-port arm.", "connections": ["arm_se", "prop_se_top", "battery_pack"] },
+    { "id": "motor_se_bot", "name": "Motor #8 (Aft-Port, lower)", "shape": "cylinder", "position": [-1.7678, 1.38, 1.7678], "size": [0.09, 0.16], "material": "brushed steel", "role": "Lower coaxial motor on the aft-port arm.", "connections": ["arm_se", "prop_se_bot", "battery_pack"] },
+    { "id": "motor_s_top", "name": "Motor #9 (Aft, upper)", "shape": "cylinder", "position": [-2.5, 1.72, 0], "size": [0.09, 0.16], "material": "brushed steel", "role": "Upper coaxial motor on the aft arm.", "connections": ["arm_s", "prop_s_top", "battery_pack"] },
+    { "id": "motor_s_bot", "name": "Motor #10 (Aft, lower)", "shape": "cylinder", "position": [-2.5, 1.38, 0], "size": [0.09, 0.16], "material": "brushed steel", "role": "Lower coaxial motor on the aft arm.", "connections": ["arm_s", "prop_s_bot", "battery_pack"] },
+    { "id": "motor_sw_top", "name": "Motor #11 (Aft-Stbd, upper)", "shape": "cylinder", "position": [-1.7678, 1.72, -1.7678], "size": [0.09, 0.16], "material": "brushed steel", "role": "Upper coaxial motor on the aft-starboard arm.", "connections": ["arm_sw", "prop_sw_top", "battery_pack"] },
+    { "id": "motor_sw_bot", "name": "Motor #12 (Aft-Stbd, lower)", "shape": "cylinder", "position": [-1.7678, 1.38, -1.7678], "size": [0.09, 0.16], "material": "brushed steel", "role": "Lower coaxial motor on the aft-starboard arm.", "connections": ["arm_sw", "prop_sw_bot", "battery_pack"] },
+    { "id": "motor_w_top", "name": "Motor #13 (Stbd, upper)", "shape": "cylinder", "position": [0, 1.72, -2.5], "size": [0.09, 0.16], "material": "brushed steel", "role": "Upper coaxial motor on the starboard arm.", "connections": ["arm_w", "prop_w_top", "battery_pack"] },
+    { "id": "motor_w_bot", "name": "Motor #14 (Stbd, lower)", "shape": "cylinder", "position": [0, 1.38, -2.5], "size": [0.09, 0.16], "material": "brushed steel", "role": "Lower coaxial motor on the starboard arm.", "connections": ["arm_w", "prop_w_bot", "battery_pack"] },
+    { "id": "motor_nw_top", "name": "Motor #15 (Fwd-Stbd, upper)", "shape": "cylinder", "position": [1.7678, 1.72, -1.7678], "size": [0.09, 0.16], "material": "brushed steel", "role": "Upper coaxial motor on the forward-starboard arm.", "connections": ["arm_nw", "prop_nw_top", "battery_pack"] },
+    { "id": "motor_nw_bot", "name": "Motor #16 (Fwd-Stbd, lower)", "shape": "cylinder", "position": [1.7678, 1.38, -1.7678], "size": [0.09, 0.16], "material": "brushed steel", "role": "Lower coaxial motor on the forward-starboard arm.", "connections": ["arm_nw", "prop_nw_bot", "battery_pack"] },
+
+    { "id": "prop_n_top", "name": "Propeller #1 (Forward, upper)", "shape": "cylinder", "position": [2.5, 1.86, 0], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Upper fixed-pitch composite propeller, forward arm. Counter-rotating coaxial pair with prop_n_bot.", "connections": ["motor_n_top"] },
+    { "id": "prop_n_bot", "name": "Propeller #2 (Forward, lower)", "shape": "cylinder", "position": [2.5, 1.24, 0], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Lower fixed-pitch composite propeller, forward arm.", "connections": ["motor_n_bot"] },
+    { "id": "prop_ne_top", "name": "Propeller #3 (Fwd-Port, upper)", "shape": "cylinder", "position": [1.7678, 1.86, 1.7678], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Upper coaxial propeller on the forward-port arm.", "connections": ["motor_ne_top"] },
+    { "id": "prop_ne_bot", "name": "Propeller #4 (Fwd-Port, lower)", "shape": "cylinder", "position": [1.7678, 1.24, 1.7678], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Lower coaxial propeller on the forward-port arm.", "connections": ["motor_ne_bot"] },
+    { "id": "prop_e_top", "name": "Propeller #5 (Port, upper)", "shape": "cylinder", "position": [0, 1.86, 2.5], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Upper coaxial propeller on the port arm.", "connections": ["motor_e_top"] },
+    { "id": "prop_e_bot", "name": "Propeller #6 (Port, lower)", "shape": "cylinder", "position": [0, 1.24, 2.5], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Lower coaxial propeller on the port arm.", "connections": ["motor_e_bot"] },
+    { "id": "prop_se_top", "name": "Propeller #7 (Aft-Port, upper)", "shape": "cylinder", "position": [-1.7678, 1.86, 1.7678], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Upper coaxial propeller on the aft-port arm.", "connections": ["motor_se_top"] },
+    { "id": "prop_se_bot", "name": "Propeller #8 (Aft-Port, lower)", "shape": "cylinder", "position": [-1.7678, 1.24, 1.7678], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Lower coaxial propeller on the aft-port arm.", "connections": ["motor_se_bot"] },
+    { "id": "prop_s_top", "name": "Propeller #9 (Aft, upper)", "shape": "cylinder", "position": [-2.5, 1.86, 0], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Upper coaxial propeller on the aft arm.", "connections": ["motor_s_top"] },
+    { "id": "prop_s_bot", "name": "Propeller #10 (Aft, lower)", "shape": "cylinder", "position": [-2.5, 1.24, 0], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Lower coaxial propeller on the aft arm.", "connections": ["motor_s_bot"] },
+    { "id": "prop_sw_top", "name": "Propeller #11 (Aft-Stbd, upper)", "shape": "cylinder", "position": [-1.7678, 1.86, -1.7678], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Upper coaxial propeller on the aft-starboard arm.", "connections": ["motor_sw_top"] },
+    { "id": "prop_sw_bot", "name": "Propeller #12 (Aft-Stbd, lower)", "shape": "cylinder", "position": [-1.7678, 1.24, -1.7678], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Lower coaxial propeller on the aft-starboard arm.", "connections": ["motor_sw_bot"] },
+    { "id": "prop_w_top", "name": "Propeller #13 (Stbd, upper)", "shape": "cylinder", "position": [0, 1.86, -2.5], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Upper coaxial propeller on the starboard arm.", "connections": ["motor_w_top"] },
+    { "id": "prop_w_bot", "name": "Propeller #14 (Stbd, lower)", "shape": "cylinder", "position": [0, 1.24, -2.5], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Lower coaxial propeller on the starboard arm.", "connections": ["motor_w_bot"] },
+    { "id": "prop_nw_top", "name": "Propeller #15 (Fwd-Stbd, upper)", "shape": "cylinder", "position": [1.7678, 1.86, -1.7678], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Upper coaxial propeller on the forward-starboard arm.", "connections": ["motor_nw_top"] },
+    { "id": "prop_nw_bot", "name": "Propeller #16 (Fwd-Stbd, lower)", "shape": "cylinder", "position": [1.7678, 1.24, -1.7678], "size": [0.4, 0.025], "material": "carbon fiber", "role": "Lower coaxial propeller on the forward-starboard arm.", "connections": ["motor_nw_bot"] },
+
+    { "id": "antenna_top", "name": "Command-Link Antenna", "shape": "cylinder", "position": [-0.2, 1.95, 0], "size": [0.025, 0.35], "material": "brushed steel", "role": "4G/5G command-and-control link antenna to the EHang ground command center.", "connections": ["cabin_shell", "avionics_bay"] },
+    { "id": "strobe_top", "name": "Anti-Collision Strobe", "shape": "sphere", "position": [0.05, 1.88, 0], "size": [0.05], "material": "white composite", "role": "White anti-collision strobe atop the cabin.", "connections": ["cabin_shell"] },
+    { "id": "navlight_port", "name": "Navigation Light (Port, red)", "shape": "sphere", "position": [0, 1.55, 2.92], "size": [0.06], "material": "white composite", "role": "Red port navigation light at the port arm tip.", "connections": ["arm_e"] },
+    { "id": "navlight_stbd", "name": "Navigation Light (Starboard, green)", "shape": "sphere", "position": [0, 1.55, -2.92], "size": [0.06], "material": "white composite", "role": "Green starboard navigation light at the starboard arm tip.", "connections": ["arm_w"] }
+  ]
+}

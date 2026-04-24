@@ -27,6 +27,13 @@
       "subtitle": "5-inch racing drone with stacked flight controller",
       "path": "/samples/quadcopter.json",
       "accent": "#a855f7"
+    },
+    {
+      "id": "eh216-s",
+      "title": "EH216-S Flying Car",
+      "subtitle": "16-rotor pilotless eVTOL (EHang, world's first CAAC type-certified passenger drone)",
+      "path": "/samples/eh216-s.json",
+      "accent": "#34d399"
     }
   ]
 }
