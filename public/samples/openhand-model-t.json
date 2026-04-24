@@ -1,53 +1,64 @@
 {
   "machine_name": "Yale OpenHand Model T",
-  "assembly_instructions": "Tendon-driven, underactuated, 3D-printed four-fingered robotic hand. A rectangular palm/base plate houses a single actuator that pulls four flexible tendons through a central floating pulley tree. Each tendon runs along the underside of a printed finger (thumb opposed to three forward fingers), so a single motor input produces a conformal grasp — each finger stops independently as it meets the object. A cylindrical wrist connector bolts the base onto a robot arm; a cover plate + fasteners close out the actuator bay on top.",
+  "assembly_instructions": "Tendon-driven, underactuated 3D-printed robotic hand from Yale's GRAB Lab. Four fingers arranged in a 2+2 pincer: two fingers on each side of the palm, all extending forward. Each finger is printed in Nylon 12 as three visible segments (proximal, middle, distal) separated by live flexure hinges — no pin joints. A single DC actuator inside the palm pulls four Spectra tendons through a central floating pulley tree so the whole hand closes in a conformal grasp when any tendon reaches the end of travel. A cylindrical wrist connector at the rear bolts the hand onto a robot arm; a cover plate closes the palm actuator bay. A small cylindrical object sits in the grasp zone to show the pincer closing around it.",
   "metadata": {
     "reference": "https://www.eng.yale.edu/grablab/openhand/",
     "domain": "robotic-manipulation",
-    "thumbnail_camera": [0.55, 0.35, 0.55],
+    "thumbnail_camera": [0.4, 0.25, 0.4],
     "info": {
       "japanese_name": "イェール OpenHand モデルT",
       "english_name": "Yale OpenHand Model T",
       "summary": "Open-source, tendon-driven, underactuated four-fingered robotic hand from Yale's GRAB Lab. Single actuator drives all fingers through a floating pulley tree for adaptive grasping.",
-      "description": "The Model T is part of the Yale OpenHand Project — a family of open-source, low-cost, 3D-printed robotic hands designed by Aaron Dollar's GRAB Lab at Yale. The Model T pairs four underactuated fingers (one opposed thumb + three forward fingers) with a single motor that pulls four Spectra tendons through a floating pulley tree inside the palm. Because the pulley tree is mechanically floating, the tendons equalize tension across the four fingers — when one finger contacts an object, the others keep closing until they too make contact, producing a conformal grasp without any sensing. Finger joints are printed Nylon-12 'flexure' hinges rather than discrete pin joints, which drops the parts count and makes the whole hand robust to impact. All CAD, BOM, and build instructions are released under CC BY-NC 3.0 and have seeded dozens of academic variants.",
+      "description": "The Model T is part of the Yale OpenHand Project — a family of open-source, low-cost, 3D-printed robotic hands designed by Aaron Dollar's GRAB Lab at Yale. Model T uses a 2+2 pincer arrangement of four underactuated fingers; all four are driven from a single DC motor through a floating pulley tree that equalizes tendon tension. Because the pulley tree is mechanically floating, tendons equalize tension across the fingers — when one finger contacts an object, the others keep closing until they too make contact, producing a conformal grasp without any sensing. Finger joints are printed Nylon-12 flexure hinges rather than discrete pin joints, which drops the parts count and makes the whole hand robust to impact. All CAD, BOM, and build instructions are released under CC BY-NC 3.0 and have seeded dozens of academic variants.",
       "operator": "Yale GRAB Lab + the academic robotics community",
       "contractor": "Aaron Dollar / Yale GRAB Lab (OpenHand Project)",
       "contract_date": "OpenHand Project launched 2013; Model T widely built 2014 onward",
       "contract_value": "≈US$500 in parts (one motor + printed shells + Spectra tendon)",
       "status": "Open-source, widely replicated in research labs",
       "facts": [
-        { "label": "Configuration", "value": "1 actuator → 4 tendons → 4 fingers (thumb + 3 forward)" },
-        { "label": "Joints", "value": "Printed Nylon-12 flexure hinges (no pin joints)" },
-        { "label": "Coupling", "value": "Floating pulley tree equalizes tendon tension across fingers" },
-        { "label": "Construction", "value": "Fused-deposition 3D printing + off-the-shelf motor, Spectra line" },
-        { "label": "Footprint", "value": "≈0.25 m (L) × 0.15 m (W) × 0.10 m (H)" },
-        { "label": "License", "value": "CC BY-NC 3.0 (CAD, docs)" }
+        { "label": "Fingers",        "value": "4 — 2+2 pincer, each 3 visible segments (proximal + middle + distal)" },
+        { "label": "Joints",         "value": "Printed Nylon-12 flexure hinges (no pin joints)" },
+        { "label": "Actuation",      "value": "1 DC motor → floating pulley tree → 4 Spectra tendons" },
+        { "label": "Coupling",       "value": "Floating pulley tree equalizes tension across all four fingers" },
+        { "label": "Construction",   "value": "FDM/SLS 3D printing + off-the-shelf motor, Spectra line" },
+        { "label": "Footprint",      "value": "≈0.20 m (L) × 0.11 m (W) × 0.06 m (H)" },
+        { "label": "License",        "value": "CC BY-NC 3.0 (CAD, docs)" }
       ],
       "sources": [
-        { "title": "Yale OpenHand Project (GRAB Lab site)", "url": "https://www.eng.yale.edu/grablab/openhand/" },
-        { "title": "Ma & Dollar — 'An underactuated hand for efficient finger-gaiting'", "url": "https://www.eng.yale.edu/grablab/pubs/Ma_ICRA2013.pdf" }
+        { "title": "Yale OpenHand Project (GRAB Lab site)",               "url": "https://www.eng.yale.edu/grablab/openhand/" },
+        { "title": "Ma & Dollar — 'Underactuated hand for finger-gaiting'","url": "https://www.eng.yale.edu/grablab/pubs/Ma_ICRA2013.pdf" }
       ]
     }
   },
   "parts": [
-    { "id": "hand_base",       "name": "Palm / Base Plate",            "shape": "box",      "position": [0, 0.20, 0],        "size": [0.15, 0.06, 0.14],  "material": "white composite",       "role": "Printed Nylon-12 palm that houses the actuator and pulley tree and roots all four fingers.", "connections": ["wrist_connector", "thumb", "index_finger", "middle_finger", "ring_finger", "actuator", "pulley", "cover_plate"] },
+    { "id": "palm_base",        "name": "Palm / Base",                 "shape": "box",      "position": [0, 0.15, 0],           "size": [0.14, 0.06, 0.11], "material": "white composite",       "role": "Printed Nylon-12 palm shell — houses the actuator, pulley tree, and tendon routing.", "connections": ["wrist_connector", "actuator", "pulley_tree", "cover_plate", "f1_prox", "f2_prox", "f3_prox", "f4_prox"] },
+    { "id": "cover_plate",      "name": "Palm Cover Plate",            "shape": "box",      "position": [0, 0.185, 0],          "size": [0.125, 0.008, 0.10],"material": "white composite",      "role": "Printed cover that closes the top of the palm over the actuator bay.", "connections": ["palm_base"] },
+    { "id": "wrist_connector",  "name": "Wrist Connector",             "shape": "cylinder", "position": [-0.115, 0.15, 0], "rotation": [0, 0, 1.5708], "size": [0.035, 0.10], "material": "dark anodized aluminum","role": "Cylindrical adapter that bolts the hand to a robot-arm flange.", "connections": ["palm_base"] },
 
-    { "id": "wrist_connector", "name": "Wrist Connector",              "shape": "cylinder", "position": [-0.12, 0.20, 0],    "rotation": [0, 0, 1.5708],  "size": [0.035, 0.12],       "material": "dark anodized aluminum","role": "Cylindrical adapter that bolts the hand to a robot-arm flange.", "connections": ["hand_base"] },
+    { "id": "actuator",         "name": "Tendon Actuator (DC motor)",  "shape": "cylinder", "position": [-0.045, 0.15, 0], "rotation": [0, 0, 1.5708], "size": [0.022, 0.08], "material": "brushed steel",         "role": "Single geared DC motor + spool inside the palm — pulls all four tendons simultaneously.", "connections": ["palm_base", "pulley_tree"] },
+    { "id": "pulley_tree",      "name": "Floating Pulley Tree",        "shape": "cylinder", "position": [0.02, 0.15, 0],   "rotation": [0, 0, 1.5708], "size": [0.022, 0.018],"material": "dark anodized aluminum","role": "Free-floating two-stage pulley that equalizes tendon tension across the four fingers — the core of the underactuated mechanism.", "connections": ["actuator", "tendon_1", "tendon_2", "tendon_3", "tendon_4"] },
 
-    { "id": "thumb",           "name": "Thumb (opposed)",              "shape": "box",      "position": [0.05, 0.20, 0.12],  "size": [0.022, 0.022, 0.10],"material": "white composite",       "role": "Opposed thumb (one flexure-jointed finger) reaching across the grasp plane.", "connections": ["hand_base", "tendon_thumb"] },
-    { "id": "index_finger",    "name": "Index Finger",                 "shape": "box",      "position": [0.18, 0.20, 0.045], "size": [0.16, 0.022, 0.022],"material": "white composite",       "role": "Forward finger, three flexure-jointed segments printed as one part.", "connections": ["hand_base", "tendon_index"] },
-    { "id": "middle_finger",   "name": "Middle Finger",                "shape": "box",      "position": [0.19, 0.20, 0.015], "size": [0.18, 0.022, 0.022],"material": "white composite",       "role": "Forward finger, slightly longer than the index.", "connections": ["hand_base", "tendon_middle"] },
-    { "id": "ring_finger",     "name": "Ring Finger",                  "shape": "box",      "position": [0.175, 0.20, -0.025],"size": [0.15, 0.022, 0.022],"material": "white composite",      "role": "Forward finger, outboard of the middle.", "connections": ["hand_base", "tendon_ring"] },
+    { "id": "f1_prox",          "name": "Finger 1 — Proximal",         "shape": "box",      "position": [0.095, 0.15, 0.045],   "size": [0.040, 0.018, 0.018], "material": "white composite",   "role": "Outer-left finger, proximal segment. Flexure hinge connects to the middle segment.", "connections": ["palm_base", "f1_mid", "tendon_1"] },
+    { "id": "f1_mid",           "name": "Finger 1 — Middle",           "shape": "box",      "position": [0.135, 0.15, 0.045],   "size": [0.035, 0.016, 0.016], "material": "white composite",   "role": "Outer-left finger, middle segment.", "connections": ["f1_prox", "f1_dist", "tendon_1"] },
+    { "id": "f1_dist",          "name": "Finger 1 — Distal",           "shape": "box",      "position": [0.170, 0.15, 0.045],   "size": [0.028, 0.014, 0.014], "material": "white composite",   "role": "Outer-left finger tip. Tendon anchors here.", "connections": ["f1_mid", "tendon_1"] },
 
-    { "id": "actuator",        "name": "Tendon Actuator (motor)",      "shape": "cylinder", "position": [-0.05, 0.20, 0],    "rotation": [0, 0, 1.5708],  "size": [0.025, 0.09],       "material": "brushed steel",         "role": "Single geared DC motor + spool inside the palm — pulls all four tendons simultaneously.", "connections": ["hand_base", "pulley"] },
-    { "id": "pulley",          "name": "Floating Pulley Tree",         "shape": "cylinder", "position": [0.02, 0.20, 0],     "size": [0.025, 0.02],       "material": "dark anodized aluminum","role": "Free-floating two-stage pulley that equalizes tendon tension across the four fingers.", "connections": ["hand_base", "actuator", "tendon_thumb", "tendon_index", "tendon_middle", "tendon_ring"] },
+    { "id": "f2_prox",          "name": "Finger 2 — Proximal",         "shape": "box",      "position": [0.095, 0.15, 0.020],   "size": [0.040, 0.018, 0.018], "material": "white composite",   "role": "Inner-left finger, proximal segment.", "connections": ["palm_base", "f2_mid", "tendon_2"] },
+    { "id": "f2_mid",           "name": "Finger 2 — Middle",           "shape": "box",      "position": [0.135, 0.15, 0.020],   "size": [0.035, 0.016, 0.016], "material": "white composite",   "role": "Inner-left finger, middle segment.", "connections": ["f2_prox", "f2_dist", "tendon_2"] },
+    { "id": "f2_dist",          "name": "Finger 2 — Distal",           "shape": "box",      "position": [0.170, 0.15, 0.020],   "size": [0.028, 0.014, 0.014], "material": "white composite",   "role": "Inner-left finger tip.", "connections": ["f2_mid", "tendon_2"] },
 
-    { "id": "tendon_thumb",    "name": "Tendon — Thumb",               "shape": "cylinder", "position": [0.05, 0.192, 0.12], "rotation": [1.5708, 0, 0],  "size": [0.003, 0.10],       "material": "black composite",       "role": "Spectra tendon routed from the pulley tree along the underside of the thumb.", "connections": ["pulley", "thumb"] },
-    { "id": "tendon_index",    "name": "Tendon — Index",               "shape": "cylinder", "position": [0.18, 0.192, 0.045],"rotation": [0, 0, 1.5708],  "size": [0.003, 0.16],       "material": "black composite",       "role": "Spectra tendon routed along the underside of the index finger.", "connections": ["pulley", "index_finger"] },
-    { "id": "tendon_middle",   "name": "Tendon — Middle",              "shape": "cylinder", "position": [0.19, 0.192, 0.015],"rotation": [0, 0, 1.5708],  "size": [0.003, 0.18],       "material": "black composite",       "role": "Spectra tendon routed along the underside of the middle finger.", "connections": ["pulley", "middle_finger"] },
-    { "id": "tendon_ring",     "name": "Tendon — Ring",                "shape": "cylinder", "position": [0.175, 0.192, -0.025],"rotation": [0, 0, 1.5708],"size": [0.003, 0.15],       "material": "black composite",       "role": "Spectra tendon routed along the underside of the ring finger.", "connections": ["pulley", "ring_finger"] },
+    { "id": "f3_prox",          "name": "Finger 3 — Proximal",         "shape": "box",      "position": [0.095, 0.15, -0.020],  "size": [0.040, 0.018, 0.018], "material": "white composite",   "role": "Inner-right finger, proximal segment.", "connections": ["palm_base", "f3_mid", "tendon_3"] },
+    { "id": "f3_mid",           "name": "Finger 3 — Middle",           "shape": "box",      "position": [0.135, 0.15, -0.020],  "size": [0.035, 0.016, 0.016], "material": "white composite",   "role": "Inner-right finger, middle segment.", "connections": ["f3_prox", "f3_dist", "tendon_3"] },
+    { "id": "f3_dist",          "name": "Finger 3 — Distal",           "shape": "box",      "position": [0.170, 0.15, -0.020],  "size": [0.028, 0.014, 0.014], "material": "white composite",   "role": "Inner-right finger tip.", "connections": ["f3_mid", "tendon_3"] },
 
-    { "id": "cover_plate",     "name": "Cover Plate",                  "shape": "box",      "position": [-0.01, 0.245, 0],   "size": [0.13, 0.015, 0.13], "material": "white composite",       "role": "Printed cover that closes off the actuator bay on top of the palm.", "connections": ["hand_base", "fastener"] },
-    { "id": "fastener",        "name": "Fastener (representative)",    "shape": "cylinder", "position": [-0.04, 0.258, 0.04],"size": [0.004, 0.02],       "material": "brushed steel",         "role": "Representative M2 bolt; the real assembly uses several around the cover-plate perimeter.", "connections": ["cover_plate"] }
+    { "id": "f4_prox",          "name": "Finger 4 — Proximal",         "shape": "box",      "position": [0.095, 0.15, -0.045],  "size": [0.040, 0.018, 0.018], "material": "white composite",   "role": "Outer-right finger, proximal segment.", "connections": ["palm_base", "f4_mid", "tendon_4"] },
+    { "id": "f4_mid",           "name": "Finger 4 — Middle",           "shape": "box",      "position": [0.135, 0.15, -0.045],  "size": [0.035, 0.016, 0.016], "material": "white composite",   "role": "Outer-right finger, middle segment.", "connections": ["f4_prox", "f4_dist", "tendon_4"] },
+    { "id": "f4_dist",          "name": "Finger 4 — Distal",           "shape": "box",      "position": [0.170, 0.15, -0.045],  "size": [0.028, 0.014, 0.014], "material": "white composite",   "role": "Outer-right finger tip.", "connections": ["f4_mid", "tendon_4"] },
+
+    { "id": "tendon_1",         "name": "Tendon (Finger 1)",           "shape": "cylinder", "position": [0.130, 0.141, 0.045],  "rotation": [0, 0, 1.5708], "size": [0.002, 0.11], "material": "black composite",         "role": "Spectra tendon running along the underside of finger 1 from the pulley tree to the distal anchor.", "connections": ["pulley_tree"] },
+    { "id": "tendon_2",         "name": "Tendon (Finger 2)",           "shape": "cylinder", "position": [0.130, 0.141, 0.020],  "rotation": [0, 0, 1.5708], "size": [0.002, 0.11], "material": "black composite",         "role": "Spectra tendon along finger 2.", "connections": ["pulley_tree"] },
+    { "id": "tendon_3",         "name": "Tendon (Finger 3)",           "shape": "cylinder", "position": [0.130, 0.141, -0.020], "rotation": [0, 0, 1.5708], "size": [0.002, 0.11], "material": "black composite",         "role": "Spectra tendon along finger 3.", "connections": ["pulley_tree"] },
+    { "id": "tendon_4",         "name": "Tendon (Finger 4)",           "shape": "cylinder", "position": [0.130, 0.141, -0.045], "rotation": [0, 0, 1.5708], "size": [0.002, 0.11], "material": "black composite",         "role": "Spectra tendon along finger 4.", "connections": ["pulley_tree"] },
+
+    { "id": "grasped_object",   "name": "Grasped Object (sample)",     "shape": "cylinder", "position": [0.145, 0.155, 0],                             "size": [0.016, 0.05], "material": "white composite",         "role": "Small cylindrical object (≈32 mm diameter) centered in the grasp zone, surrounded by the four fingertips.", "connections": ["f2_dist", "f3_dist"] }
   ]
 }
