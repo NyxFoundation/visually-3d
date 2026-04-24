@@ -1,16 +1,6 @@
 import React from 'react';
 import * as THREE from 'three';
-
-interface Part {
-  id: string;
-  name: string;
-  shape: 'box' | 'cylinder' | 'sphere' | 'complex';
-  position: [number, number, number];
-  size: number[];
-  material: string;
-  role: string;
-  connections?: string[];
-}
+import type { Part } from '../types';
 
 interface ConnectionsProps {
   parts: Part[];
@@ -18,37 +8,24 @@ interface ConnectionsProps {
 }
 
 export const Connections: React.FC<ConnectionsProps> = ({ parts, selectedPartId }) => {
-  const lines = [];
-  const partMap = new Map(parts.map(p => [p.id, p]));
+  const partMap = new Map(parts.map((part) => [part.id, part]));
+  const processed = new Set<string>();
+  const lines: React.ReactElement[] = [];
 
-  // To avoid drawing the same connection twice (A->B and B->A)
-  const processedConnections = new Set<string>();
-
-  parts.forEach(part => {
-    if (!part.connections) return;
-
-    part.connections.forEach(targetId => {
+  parts.forEach((part) => {
+    part.connections?.forEach((targetId) => {
       const target = partMap.get(targetId);
       if (!target) return;
-
-      // Create a unique key for the connection regardless of order
-      const connectionKey = [part.id, targetId].sort().join('-');
-      if (processedConnections.has(connectionKey)) return;
-      processedConnections.add(connectionKey);
-
-      const start = new THREE.Vector3(...part.position);
-      const end = new THREE.Vector3(...target.position);
-
-      // Highlight if either connected part is selected
-      const isHighlighted = selectedPartId === part.id || selectedPartId === targetId;
-
+      const key = [part.id, targetId].sort().join('-');
+      if (processed.has(key)) return;
+      processed.add(key);
       lines.push(
-        <Line 
-          key={connectionKey} 
-          start={start} 
-          end={end} 
-          highlighted={isHighlighted} 
-        />
+        <Line
+          key={key}
+          start={new THREE.Vector3(...part.position)}
+          end={new THREE.Vector3(...target.position)}
+          highlighted={selectedPartId === part.id || selectedPartId === targetId}
+        />,
       );
     });
   });
@@ -60,22 +37,17 @@ const Line: React.FC<{ start: THREE.Vector3; end: THREE.Vector3; highlighted: bo
   const distance = start.distanceTo(end);
   const center = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
   const direction = new THREE.Vector3().subVectors(end, start).normalize();
-  
-  // Calculate rotation to align cylinder with the line direction
-  const quaternion = new THREE.Quaternion().setFromUnitVectors(
-    new THREE.Vector3(0, 1, 0), 
-    direction
-  );
+  const quaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction);
 
   return (
     <mesh position={center} quaternion={quaternion}>
-      <cylinderGeometry args={[0.02, 0.02, distance]} />
-      <meshStandardMaterial 
-        color={highlighted ? '#00ffff' : '#ffffff'} 
-        emissive={highlighted ? '#00ffff' : '#444444'}
-        emissiveIntensity={highlighted ? 2 : 0.5}
-        opacity={0.4} 
-        transparent 
+      <cylinderGeometry args={[highlighted ? 0.035 : 0.018, highlighted ? 0.035 : 0.018, distance, 12]} />
+      <meshStandardMaterial
+        color={highlighted ? '#00e5ff' : '#d0d7de'}
+        emissive={highlighted ? '#00e5ff' : '#30363d'}
+        emissiveIntensity={highlighted ? 1.8 : 0.25}
+        opacity={highlighted ? 0.9 : 0.35}
+        transparent
       />
     </mesh>
   );

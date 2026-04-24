@@ -1,63 +1,85 @@
-from fastapi import FastAPI, HTTPException, Depends
+import json
+from typing import Any, List, Optional
+
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union
-from .analyst import analyze_machine
-from .auth import get_current_user
+
+try:
+    from .analyst import analyze_machine, build_prompt, claude_available, stream_claude
+except ImportError:  # Allows `uvicorn main:app` from apps/server during development.
+    from analyst import analyze_machine, build_prompt, claude_available, stream_claude
 
 
 app = FastAPI(title="Visually Backend")
 
-# --- CORS Configuration ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, replace with specific frontend URLs like ["http://localhost:5173", "http://localhost:3000"]
-    allow_credentials=True,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- Schemas based on shared/schema.json ---
 
 class Part(BaseModel):
     id: str = Field(..., description="Unique identifier for the part.")
     name: str = Field(..., description="Descriptive name of the part.")
-    shape: str = Field(..., description="The geometry type of the part. (box, cylinder, sphere, complex)")
-    position: List[float] = Field(..., min_items=3, max_items=3, description="[x, y, z] coordinates.")
-    size: List[float] = Field(..., min_items=1, description="Dimensions based on shape.")
-    material: str = Field(..., description="Material type or visual description of the part.")
-    role: str = Field(..., description="Functional explanation of what this part does in the machine.")
-    connections: Optional[List[str]] = Field(default=[], description="List of part IDs that this part is connected to.")
+    shape: str = Field(..., description="Geometry type: box, cylinder, sphere, or complex.")
+    position: List[float] = Field(..., min_length=3, max_length=3, description="[x, y, z] coordinates.")
+    size: List[float] = Field(..., min_length=1, description="Dimensions based on shape.")
+    material: str = Field(..., description="Material type or visual description.")
+    role: str = Field(..., description="Functional explanation.")
+    connections: List[str] = Field(default_factory=list, description="Connected part IDs.")
+
 
 class MachineSceneDescriptor(BaseModel):
-    machine_name: str = Field(..., description="The name of the machine being described.")
-    assembly_instructions: Optional[str] = Field(None, description="General description of how the machine is put together.")
-    metadata: Optional[dict] = Field(None, description="Any extra information related to the machine.")
-    parts: List[Part] = Field(..., description="A list of parts that make up the machine.")
+    machine_name: str
+    assembly_instructions: Optional[str] = None
+    metadata: Optional[dict[str, Any]] = None
+    parts: List[Part]
+
 
 class AnalyzeRequest(BaseModel):
     url: Optional[str] = None
     machine_name: Optional[str] = None
 
-# --- Endpoints ---
 
 @app.get("/")
 async def root():
-    """Health check endpoint."""
-    return {"status": "healthy", "message": "Visually Backend is running"}
+    return {
+        "status": "healthy",
+        "message": "Visually Backend is running",
+        "claude_cli_available": claude_available(),
+        "auth_mode": "local claude CLI via `claude -p`",
+    }
+
 
 @app.post("/analyze", response_model=MachineSceneDescriptor)
-async def analyze(request: AnalyzeRequest, user=Depends(get_current_user)):
-    """
-    Analyze a machine via URL or name using the AI analysis pipeline.
-    """
+async def analyze(request: AnalyzeRequest):
     try:
-        # Pass the user token to the analysis pipeline
-        result = await analyze_machine(url=request.url, machine_name=request.machine_name, token=user["token"])
+        result = await analyze_machine(url=request.url, machine_name=request.machine_name)
         return MachineSceneDescriptor(**result)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except RuntimeError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {exc}") from exc
+
+
+@app.post("/analyze/stream")
+async def analyze_stream(request: AnalyzeRequest):
+    async def event_generator():
+        try:
+            prompt = await build_prompt(url=request.url, machine_name=request.machine_name)
+            async for event in stream_claude(prompt):
+                yield f"event: {event['type']}\n"
+                yield "data: " + json.dumps(event, ensure_ascii=False) + "\n\n"
+        except Exception as exc:
+            payload = {"type": "error", "message": str(exc)}
+            yield "event: error\n"
+            yield "data: " + json.dumps(payload, ensure_ascii=False) + "\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")

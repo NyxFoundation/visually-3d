@@ -1,115 +1,84 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Grid, Stage } from '@react-three/drei';
+import { OrbitControls, Grid } from '@react-three/drei';
 import { Connections } from './Connections';
+import type { Part, SceneDescriptor } from '../types';
 
-interface Part {
-  id: string;
-  name: string;
-  shape: 'box' | 'cylinder' | 'sphere' | 'complex';
-  position: [number, number, number];
-  size: number[];
-  material: string;
-  role: string;
-  connections?: string[];
-}
-
-interface SceneDescriptor {
-  machine_name: string;
-  parts: Part[];
-}
-
-const ScenePart: React.FC<{ part: Part; onSelect: (part: Part) => void }> = ({ part, onSelect }) => {
-  const { shape, position, size } = part;
-  
-  // Default material properties
-  const materialProps = {
-    color: shape === 'complex' ? '#ff00ff' : '#888888',
-    metalness: 0.6,
-    roughness: 0.2,
-  };
-
-  switch (shape) {
-    case 'box':
-      return (
-        <mesh position={position} onClick={(e) => { e.stopPropagation(); onSelect(part); }}>
-          <boxGeometry args={size.length >= 3 ? size : [1, 1, 1]} />
-          <meshStandardMaterial {...materialProps} />
-        </mesh>
-      );
-    case 'cylinder':
-      return (
-        <mesh position={position} onClick={(e) => { e.stopPropagation(); onSelect(part); }}>
-          <cylinderGeometry args={size.length >= 2 ? [size[0], size[0], size[1]] : [0.5, 0.5, 1]} />
-          <meshStandardMaterial {...materialProps} />
-        </mesh>
-      );
-    case 'sphere':
-      return (
-        <mesh position={position} onClick={(e) => { e.stopPropagation(); onSelect(part); }}>
-          <sphereGeometry args={size.length >= 1 ? [size[0]] : [0.5]} />
-          <meshStandardMaterial {...materialProps} />
-        </mesh>
-      );
-    case 'complex':
-    default:
-      return (
-        <mesh position={position} onClick={(e) => { e.stopPropagation(); onSelect(part); }}>
-          <boxGeometry args={size.length >= 3 ? size : [1, 1, 1]} />
-          <meshStandardMaterial {...materialProps} />
-        </mesh>
-      );
-  }
+const materialColor = (material: string, shape: Part['shape']) => {
+  const lower = material.toLowerCase();
+  if (lower.includes('glass') || lower.includes('display')) return '#46b7ff';
+  if (lower.includes('steel') || lower.includes('aluminum') || lower.includes('metal')) return '#9ca3af';
+  if (lower.includes('rubber') || lower.includes('black')) return '#1f2937';
+  if (lower.includes('copper')) return '#b87333';
+  return shape === 'complex' ? '#a855f7' : '#8b949e';
 };
 
-export const Viewer: React.FC<{ scene: SceneDescriptor; onPartSelect: (part: Part) => void }> = ({ scene, onPartSelect }) => {
-  const [selectedPartId, setSelectedPartId] = React.useState<string | null>(null);
-
-  const handlePartSelect = (part: Part) => {
-    setSelectedPartId(part.id);
-    onPartSelect(part);
+const ScenePart: React.FC<{ part: Part; selected: boolean; onSelect: (part: Part) => void }> = ({ part, selected, onSelect }) => {
+  const materialProps = {
+    color: selected ? '#ffdd55' : materialColor(part.material, part.shape),
+    metalness: 0.45,
+    roughness: 0.35,
+    emissive: selected ? '#6b5200' : '#000000',
+    emissiveIntensity: selected ? 0.6 : 0,
   };
 
+  const click = (event: { stopPropagation: () => void }) => {
+    event.stopPropagation();
+    onSelect(part);
+  };
+
+  if (part.shape === 'cylinder') {
+    const [radius = 0.5, height = 1] = part.size;
+    return (
+      <mesh position={part.position} onClick={click}>
+        <cylinderGeometry args={[radius, radius, height, 32]} />
+        <meshStandardMaterial {...materialProps} />
+      </mesh>
+    );
+  }
+
+  if (part.shape === 'sphere') {
+    const [radius = 0.5] = part.size;
+    return (
+      <mesh position={part.position} onClick={click}>
+        <sphereGeometry args={[radius, 32, 16]} />
+        <meshStandardMaterial {...materialProps} />
+      </mesh>
+    );
+  }
+
+  const args: [number, number, number] = part.size.length >= 3 ? [part.size[0], part.size[1], part.size[2]] : [1, 1, 1];
   return (
-    <div style={{ width: '100%', height: '100vh', background: '#111' }}>
-      <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
-        <color attach="background" args={['#1a1a1a']} />
-        
-        {/* Lighting */}
-        <ambientLight intensity={0.5} />
-        <directionalLight 
-          position={[10, 10, 5]} 
-          intensity={1} 
-          castShadow 
-        />
-        <pointLight position={[-10, -10, -10]} intensity={0.5} />
-
-        {/* Navigation & Environment */}
-        <OrbitControls makeDefault />
-        <Grid 
-          infiniteGrid 
-          fadeDistance={20} 
-          fadeStrength={5} 
-          sectionColor="#333" 
-          cellColor="#444" 
-        />
-
-        {/* Parts Rendering */}
-        <group>
-          {scene.parts.map((part) => (
-            <ScenePart key={part.id} part={part} onSelect={handlePartSelect} />
-          ))}
-        </group>
-
-        {/* Connectivity Lines */}
-        <Connections parts={scene.parts} selectedPartId={selectedPartId || undefined} />
-
-        {/* Ground Plane for visual context */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]}>
-          <planeGeometry args={[100, 100]} />
-          <meshStandardMaterial color="#222" opacity={0.5} transparent />
-        </mesh>
-      </Canvas>
-    </div>
+    <mesh position={part.position} onClick={click}>
+      <boxGeometry args={args} />
+      <meshStandardMaterial {...materialProps} />
+    </mesh>
   );
 };
+
+export const Viewer: React.FC<{ scene: SceneDescriptor; selectedPartId?: string; onPartSelect: (part: Part) => void }> = ({
+  scene,
+  selectedPartId,
+  onPartSelect,
+}) => (
+  <div className="viewer">
+    <Canvas camera={{ position: [6, 5, 6], fov: 50 }}>
+      <color attach="background" args={['#101218']} />
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[10, 10, 6]} intensity={1.2} />
+      <pointLight position={[-8, 4, -8]} intensity={0.5} />
+      <OrbitControls makeDefault />
+      <Grid infiniteGrid fadeDistance={24} fadeStrength={4} sectionColor="#30363d" cellColor="#22272e" />
+      <group>
+        {scene.parts.map((part) => (
+          <ScenePart key={part.id} part={part} selected={part.id === selectedPartId} onSelect={onPartSelect} />
+        ))}
+      </group>
+      <Connections parts={scene.parts} selectedPartId={selectedPartId} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
+        <planeGeometry args={[80, 80]} />
+        <meshStandardMaterial color="#0d1117" opacity={0.45} transparent />
+      </mesh>
+    </Canvas>
+  </div>
+);

@@ -1,131 +1,127 @@
 import React, { useState } from 'react';
-import { Viewer } from './components/Viewer';
 import { PartInfo } from './components/PartInfo';
+import { Viewer } from './components/Viewer';
+import { MOCK_SCENE, type Part, type SceneDescriptor } from './types';
 
-const MOCK_SCENE = {
-  machine_name: "Demo Machine",
-  parts: [
-    {
-      id: "1",
-      name: "Base Plate",
-      shape: "box",
-      position: [0, 0, 0],
-      size: [5, 0.2, 5],
-      material: "steel",
-      role: "provides structural support"
-    },
-    {
-      id: "2",
-      name: "Main Pillar",
-      shape: "cylinder",
-      position: [0, 1, 0],
-      size: [0.5, 2],
-      material: "aluminum",
-      role: "central support column"
-    },
-    {
-      id: "3",
-      name: "Top Knob",
-      shape: "sphere",
-      position: [0, 2.5, 0],
-      size: [0.3],
-      material: "plastic",
-      role: "adjustment dial"
-    },
-    {
-      id: "4",
-      name: "Complex Component",
-      shape: "complex",
-      position: [2, 0.5, 2],
-      size: [0.8, 0.8, 0.8],
-      material: "unknown",
-      role: "advanced processing unit"
-    }
-  ]
+const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8000';
+
+type LogEntry = {
+  stream: 'system' | 'stdout' | 'stderr' | 'client';
+  message: string;
 };
 
+function parseSseChunk(buffer: string, onEvent: (event: string, data: string) => void): string {
+  const events = buffer.split('\n\n');
+  const remainder = events.pop() ?? '';
+  for (const rawEvent of events) {
+    let eventName = 'message';
+    const dataLines: string[] = [];
+    for (const line of rawEvent.split('\n')) {
+      if (line.startsWith('event:')) eventName = line.slice(6).trim();
+      if (line.startsWith('data:')) dataLines.push(line.slice(5).trimStart());
+    }
+    if (dataLines.length > 0) onEvent(eventName, dataLines.join('\n'));
+  }
+  return remainder;
+}
+
 function App() {
-  const [selectedPart, setSelectedPart] = useState<any>(null);
+  const [input, setInput] = useState('Electromagnetic interference situation awareness device');
+  const [scene, setScene] = useState<SceneDescriptor>(MOCK_SCENE);
+  const [selectedPart, setSelectedPart] = useState<Part | null>(null);
+  const [logs, setLogs] = useState<LogEntry[]>([
+    { stream: 'system', message: 'Ready. Backend will call the local authenticated `claude -p` command.' },
+  ]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [scene, setScene] = useState(MOCK_SCENE);
 
-  const handleAnalyze = async (url: string) => {
+  const appendLog = (entry: LogEntry) => setLogs((prev) => [...prev.slice(-300), entry]);
+
+  const handleAnalyze = async () => {
+    const value = input.trim();
+    if (!value) return;
+
     setIsLoading(true);
     setError(null);
+    setLogs([{ stream: 'client', message: `Submitting: ${value}` }]);
+
     try {
-      const response = await fetch('http://localhost:8000/analyze', {
+      const body = value.startsWith('http://') || value.startsWith('https://') ? { url: value } : { machine_name: value };
+      const response = await fetch(`${API_BASE}/analyze/stream`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer YOUR_API_KEY' },
-        body: JSON.stringify({ url })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
       });
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || 'Analysis failed');
+
+      if (!response.ok || !response.body) {
+        throw new Error(`Backend returned HTTP ${response.status}`);
       }
-      const data = await response.json();
-      setScene(data);
-    } catch (err: any) {
-      setError(err.message);
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      const onEvent = (eventName: string, data: string) => {
+        const payload = JSON.parse(data);
+        if (eventName === 'log') {
+          appendLog({ stream: payload.stream ?? 'system', message: payload.message ?? '' });
+        } else if (eventName === 'result') {
+          const nextScene = payload.data as SceneDescriptor;
+          setScene(nextScene);
+          setSelectedPart(null);
+          appendLog({ stream: 'system', message: `Rendered ${nextScene.parts.length} parts.` });
+        } else if (eventName === 'error') {
+          const message = payload.message ?? 'Unknown stream error';
+          setError(message);
+          appendLog({ stream: 'stderr', message });
+        }
+      };
+
+      while (true) {
+        const { done, value: chunk } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(chunk, { stream: true });
+        buffer = parseSseChunk(buffer, onEvent);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
+      appendLog({ stream: 'stderr', message });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="app-container" style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', backgroundColor: '#111' }}>
-      {/* Header & Instructions */}
-      <div style={{ position: 'absolute', top: 20, left: 20, color: 'white', zIndex: 10, pointerEvents: 'none', fontFamily: 'sans-serif' }}>
-        <h1 style={{ margin: 0 }}>{scene.machine_name}</h1>
-        <p style={{ margin: 0 }}>3D Visualization Preview</p>
-        <div style={{ marginTop: '10px', fontSize: '0.9rem', opacity: 0.8, pointerEvents: 'auto' }}>
-          <p>• Click a part to see details</p>
-          <p>• Rotate and zoom using the mouse</p>
-        </div>
-      </div>
+    <main className="app-shell">
+      <Viewer scene={scene} selectedPartId={selectedPart?.id} onPartSelect={setSelectedPart} />
 
-      {/* Analysis Input */}
-      <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 10, display: 'flex', gap: '10px' }}>
-        <input 
-          type="text" 
-          placeholder="Enter machine URL..." 
-          style={{ padding: '8px', borderRadius: '4px', border: '1px solid #444', background: '#222', color: 'white' }}
-          onKeyDown={(e) => e.key === 'Enter' && handleAnalyze((e.target as HTMLInputElement).value)}
-        />
-        <button 
-          onClick={() => handleAnalyze('')} 
-          disabled={isLoading}
-          style={{ padding: '8px 16px', borderRadius: '4px', background: '#007bff', color: 'white', border: 'none', cursor: 'pointer' }}
-        >
-          {isLoading ? 'Analyzing...' : 'Analyze'}
-        </button>
-      </div>
-
-      {/* Error Overlay */}
-      {error && (
-        <div style={{ position: 'absolute', top: 80, right: 20, zIndex: 11, background: 'rgba(255,0,0,0.7)', color: 'white', padding: '10px', borderRadius: '4px', fontSize: '0.8rem' }}>
-          Error: {error}
+      <section className="topbar">
+        <div>
+          <h1>{scene.machine_name}</h1>
+          <p>Local-first 3D machinery visualization. No API key is stored; the backend runs your local Claude CLI.</p>
         </div>
-      )}
-
-      {/* Loading Overlay */}
-      {isLoading && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 20, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontFamily: 'sans-serif' }}>
-          <div style={{ textAlign: 'center' }}>
-            <div className="spinner" style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #3498db', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }}></div>
-            <p>AI is analyzing the machine components...</p>
-            <style>{` @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } `}</style>
-          </div>
+        <div className="input-row">
+          <input value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && handleAnalyze()} />
+          <button onClick={handleAnalyze} disabled={isLoading}>
+            {isLoading ? 'Analyzing…' : 'Analyze'}
+          </button>
         </div>
-      )}
-      
-      <Viewer scene={scene} onPartSelect={setSelectedPart} />
-      
-      <PartInfo 
-        part={selectedPart} 
-        onClose={() => setSelectedPart(null)} 
-      />
-    </div>
+      </section>
+
+      <section className="log-console">
+        <header>
+          <strong>Claude CLI stream</strong>
+          <span>{isLoading ? 'running' : 'idle'}</span>
+        </header>
+        <pre>
+          {logs.map((entry, index) => `[${entry.stream}] ${entry.message}`).join('')}
+        </pre>
+      </section>
+
+      {error ? <div className="error-toast">{error}</div> : null}
+      <PartInfo part={selectedPart} onClose={() => setSelectedPart(null)} />
+    </main>
   );
 }
 
