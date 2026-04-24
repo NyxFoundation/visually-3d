@@ -69,6 +69,13 @@
       "subtitle": "Single-motor, tendon-driven 4-finger underactuated robotic hand (Yale GRAB Lab)",
       "path": "/samples/openhand-model-t.json",
       "accent": "#e5e7eb"
+    },
+    {
+      "id": "prusa-i3-mk3s",
+      "title": "Original Prusa i3 MK3S+",
+      "subtitle": "Prusa Research bed-slinger FDM printer with Bondtech direct-drive extruder",
+      "path": "/samples/prusa-i3-mk3s.json",
+      "accent": "#ef4444"
     }
   ]
 }

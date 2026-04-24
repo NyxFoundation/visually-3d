@@ -27,7 +27,7 @@ becomes a thin box).
 - [x] **Yale OpenHand Model T** — tendon-driven underactuated 4-finger hand.
       https://www.eng.yale.edu/grablab/openhand/ — CC BY-NC 3.0.
       Slug: `openhand-model-t`.
-- [ ] **RepRap Prusa i3 MK3S+** — the specific Prusa FDM build.
+- [x] **RepRap Prusa i3 MK3S+** — the specific Prusa FDM build.
       https://reprap.org/wiki/Prusa_i3 — GFDL / GPL.
       Slug: `prusa-i3-mk3s` (the existing `3d-printer.json` is generic FDM).
 - [ ] **OreSat0 CubeSat** — 1U CubeSat with deployable solar panels.

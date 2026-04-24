@@ -1,0 +1,56 @@
+{
+  "machine_name": "Original Prusa i3 MK3S+",
+  "assembly_instructions": "Classic Prusa i3 'bed-slinger' layout. Two parallel M8 smooth rods mounted on a 2020 aluminium Y-base carry a Y-carriage with a removable magnetic heat bed on top. A single-sheet aluminium vertical frame stands at the rear and cantilevers the X-axis gantry; two Z-motors drive the gantry up and down. The X-carriage rides on the X-extrusion and carries the direct-drive extruder with its own NEMA17 motor; a 0.4 mm brass nozzle hangs below it. A top-mounted filament holder feeds the spool, and an LCD display on the Einsy case reports status.",
+  "metadata": {
+    "reference": "https://help.prusa3d.com/category/original-prusa-i3-mk3s_221",
+    "domain": "additive-manufacturing",
+    "thumbnail_camera": [1.1, 0.85, 1.1],
+    "info": {
+      "japanese_name": "Original Prusa i3 MK3S+",
+      "english_name": "Original Prusa i3 MK3S+ FDM 3D Printer",
+      "summary": "Flagship open-source bed-slinger FDM printer from Prusa Research. 250×210×210 mm build volume, direct-drive Bondtech extruder, magnetic removable spring-steel sheet, filament and power-loss sensors.",
+      "description": "The Original Prusa i3 MK3S+ is the production workhorse of the Prusa i3 family — itself a long-running open-source derivative of Josef Prusa's original RepRap i3. The printer follows the classic 'bed-slinger' kinematics: the heat bed moves on the Y axis along two parallel M8 smooth rods on a 2020 aluminium base, while a cantilevered single-sheet aluminium frame at the rear carries the XZ gantry. Two Z-motors with lead screws raise and lower the X-extrusion; the X-carriage rides on the extrusion and carries the MK3S+ direct-drive extruder with a Bondtech dual-gear feeder, an E3D V6-compatible hotend, and a 0.4 mm brass nozzle. The removable magnetic spring-steel PEI sheet on top of the heated bed lets prints pop off by flexing. Firmware, electronics (Einsy RAMBo with TMC2130 drivers), and full CAD are released on GitHub — the printer is one of the most-cloned FDM designs in existence.",
+      "operator": "Prusa Research customers + the wider open FDM community",
+      "contractor": "Prusa Research (Josef Prusa et al., Prague)",
+      "contract_date": "MK3S released Feb 2019 · MK3S+ upgrade released Oct 2020",
+      "contract_value": "≈US$1,000 kit / US$1,200 assembled (at launch)",
+      "status": "In production through MK4 successor; MK3S+ still sold/upgradable",
+      "facts": [
+        { "label": "Build volume", "value": "250 × 210 × 210 mm" },
+        { "label": "Filament", "value": "1.75 mm, direct-drive Bondtech extruder" },
+        { "label": "Hotend", "value": "E3D V6-compatible, 0.4 mm brass nozzle (swap-in)" },
+        { "label": "Heat bed", "value": "Magnetic base + removable PEI-coated spring-steel sheet" },
+        { "label": "Electronics", "value": "Einsy RAMBo with TMC2130 stealthChop drivers" },
+        { "label": "Sensors", "value": "SuperPINDA probe, filament sensor, power-loss recovery" },
+        { "label": "License", "value": "GPL-3.0 firmware · CC BY-SA 4.0 hardware" }
+      ],
+      "sources": [
+        { "title": "Prusa Research — i3 MK3S+ knowledge base", "url": "https://help.prusa3d.com/category/original-prusa-i3-mk3s_221" },
+        { "title": "Prusa Research — Original Prusa i3 MK3S+ product page", "url": "https://www.prusa3d.com/category/original-prusa-i3-mk3s/" },
+        { "title": "Prusa-Firmware GitHub", "url": "https://github.com/prusa3d/Prusa-Firmware" }
+      ]
+    }
+  },
+  "parts": [
+    { "id": "y_base",          "name": "Y-Axis Base (2020 extrusion)",   "shape": "box",      "position": [0, 0.08, 0],           "size": [0.42, 0.04, 0.50], "material": "dark anodized aluminum","role": "Aluminium-extrusion base that supports the Y-axis rods, the frame, and the Y motor.", "connections": ["rod_m8", "frame", "motor_y"] },
+
+    { "id": "rod_m8",          "name": "Y-Axis M8 Smooth Rod",           "shape": "cylinder", "position": [-0.14, 0.13, 0],       "rotation": [1.5708, 0, 0], "size": [0.0045, 0.50], "material": "brushed steel",         "role": "Hardened M8 smooth rod (one of two) guiding the Y-carriage along the bed-slinger axis.", "connections": ["y_base", "y_carriage"] },
+    { "id": "y_carriage",      "name": "Y-Carriage",                     "shape": "box",      "position": [0, 0.16, 0],           "size": [0.28, 0.02, 0.24], "material": "dark anodized aluminum","role": "Aluminium plate that rides on the two M8 rods and carries the heat bed.", "connections": ["rod_m8", "heat_bed", "motor_y"] },
+    { "id": "heat_bed",        "name": "Heat Bed + Spring-Steel Sheet",  "shape": "box",      "position": [0, 0.188, 0],          "size": [0.25, 0.018, 0.25],"material": "glass display",         "role": "MK52 magnetic heat bed with a removable PEI-coated spring-steel print sheet on top.", "connections": ["y_carriage"] },
+
+    { "id": "frame",           "name": "Single-Sheet Aluminium Frame",   "shape": "box",      "position": [0, 0.31, -0.22],       "size": [0.36, 0.42, 0.008],"material": "brushed steel",         "role": "Laser-cut single-sheet aluminium frame that cantilevers the X/Z axes off the Y base.", "connections": ["y_base", "xz_gantry", "motor_z", "filament_holder", "lcd_display"] },
+    { "id": "xz_gantry",       "name": "X-Axis Extrusion (XZ Gantry)",   "shape": "box",      "position": [0, 0.33, -0.17],       "size": [0.40, 0.03, 0.03], "material": "dark anodized aluminum","role": "Horizontal aluminium extrusion that rides up and down on the Z lead-screws and carries the X-carriage.", "connections": ["frame", "motor_x", "motor_z", "x_carriage"] },
+    { "id": "x_carriage",      "name": "X-Carriage",                     "shape": "box",      "position": [0, 0.33, -0.13],       "size": [0.08, 0.06, 0.06], "material": "dark anodized aluminum","role": "Carriage that slides along the X extrusion — the extruder assembly bolts to its front face.", "connections": ["xz_gantry", "extruder"] },
+
+    { "id": "extruder",        "name": "MK3S+ Direct-Drive Extruder",    "shape": "box",      "position": [0, 0.28, -0.08],       "size": [0.09, 0.11, 0.10], "material": "dark anodized aluminum","role": "Bondtech dual-gear direct-drive extruder + E3D V6 hotend.", "connections": ["x_carriage", "nozzle", "motor_e"] },
+    { "id": "nozzle",          "name": "Hotend Nozzle (0.4 mm brass)",   "shape": "cylinder", "position": [0, 0.215, -0.08],      "size": [0.006, 0.025], "material": "brass",                 "role": "0.4 mm brass nozzle for 1.75 mm filament; swappable for other diameters and hardened variants.", "connections": ["extruder"] },
+
+    { "id": "motor_x",         "name": "NEMA17 (X-axis)",                "shape": "cylinder", "position": [0.22, 0.33, -0.17],    "rotation": [0, 0, 1.5708], "size": [0.021, 0.04],  "material": "brushed steel",         "role": "NEMA17 stepper on the right end of the X extrusion — drives the X-carriage via a belt.", "connections": ["xz_gantry"] },
+    { "id": "motor_y",         "name": "NEMA17 (Y-axis)",                "shape": "cylinder", "position": [0, 0.12, -0.28],       "rotation": [1.5708, 0, 0], "size": [0.021, 0.04],  "material": "brushed steel",         "role": "NEMA17 stepper at the rear of the Y base — drives the Y-carriage belt.", "connections": ["y_base", "y_carriage"] },
+    { "id": "motor_z",         "name": "NEMA17 (Z-axis, representative)","shape": "cylinder", "position": [-0.17, 0.50, -0.22],   "size": [0.021, 0.04],  "material": "brushed steel",         "role": "NEMA17 stepper at the top-left of the frame — one of two Z motors driving the lead screws. Right-side Z motor is identical.", "connections": ["frame", "xz_gantry"] },
+    { "id": "motor_e",         "name": "NEMA17 (Extruder)",              "shape": "cylinder", "position": [0.04, 0.305, -0.04],   "rotation": [1.5708, 0, 0], "size": [0.021, 0.035], "material": "brushed steel",         "role": "NEMA17 stepper on the extruder body — direct-drives the Bondtech feeder gears.", "connections": ["extruder"] },
+
+    { "id": "filament_holder", "name": "Spool Holder",                   "shape": "box",      "position": [0, 0.56, -0.10],       "size": [0.08, 0.04, 0.20], "material": "dark anodized aluminum","role": "Spool holder bolted to the top of the frame; carries a 1 kg filament spool feeding down into the extruder.", "connections": ["frame", "extruder"] },
+    { "id": "lcd_display",     "name": "LCD Control Panel",              "shape": "box",      "position": [0.22, 0.22, -0.19],    "size": [0.11, 0.07, 0.02], "material": "glass display",         "role": "Monochrome LCD + rotary encoder on the Einsy case; prints, leveling, and diagnostics menu.", "connections": ["frame"] }
+  ]
+}
