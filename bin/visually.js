@@ -221,7 +221,7 @@ async function main() {
 
   const banner = [
     '',
-    '  visually — interactive 3D machinery visualization',
+    '  visually-3d — interactive 3D machinery visualization',
     `  → ${url}`,
     `  → claude CLI: ${hasClaude ? 'detected' : 'NOT FOUND (gallery-only; install Claude CLI to analyze new machines)'}`,
     '  → Ctrl+C to stop',

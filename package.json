@@ -1,10 +1,10 @@
 {
-  "name": "visually",
+  "name": "visually-3d",
   "version": "0.2.0",
-  "description": "Interactive 3D machinery visualization. Run `npx visually` to open a local GUI that speaks to your Claude CLI.",
+  "description": "Interactive 3D machinery visualization. Run `npx visually-3d` to open a local GUI that speaks to your Claude CLI.",
   "type": "module",
   "bin": {
-    "visually": "./bin/visually.js"
+    "visually-3d": "./bin/visually.js"
   },
   "files": [
     "bin",
@@ -49,6 +49,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NyxFoundation/visually.git"
+    "url": "git+https://github.com/NyxFoundation/visually-3d.git"
   }
 }

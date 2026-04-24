@@ -1,6 +1,7 @@
 node_modules/
 dist/
 *.tsbuildinfo
+*.tgz
 __pycache__/
 *.py[cod]
 .venv/

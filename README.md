@@ -1,9 +1,9 @@
-# visually
+# visually-3d
 
 Interactive 3D machinery visualization, driven by your local Claude CLI.
 
 ```bash
-npx visually
+npx visually-3d
 ```
 
 That's it — it opens a browser window at `http://localhost:3131`. Type a machine name or paste a URL; `visually` runs `claude -p` locally and renders the result as an inspectable 3D scene. If you haven't installed or authenticated the Claude CLI, the sample gallery still works.
@@ -33,14 +33,14 @@ claude --version
 ### One-shot (recommended)
 
 ```bash
-npx visually
+npx visually-3d
 ```
 
 ### Persistent install
 
 ```bash
-npm install -g visually
-visually
+npm install -g visually-3d
+visually-3d
 ```
 
 ### From source
