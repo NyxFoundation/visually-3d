@@ -1,0 +1,24 @@
+{
+  "machine_name": "FPV Racing Quadcopter",
+  "assembly_instructions": "Carbon-fiber X-frame with four brushless motors at the arm tips; flight controller stack centered on the frame; battery mounted on top; camera canted forward.",
+  "metadata": {
+    "domain": "aerial-robotics",
+    "thumbnail_camera": [3.5, 2.5, 3.5]
+  },
+  "parts": [
+    { "id": "frame", "name": "Carbon X-Frame", "shape": "box", "position": [0, 0.2, 0], "size": [2.8, 0.08, 0.5], "material": "carbon fiber", "role": "Primary arm running front-left to rear-right.", "connections": ["arm_cross", "fc_stack", "battery", "camera"] },
+    { "id": "arm_cross", "name": "Cross Arm", "shape": "box", "position": [0, 0.2, 0], "size": [0.5, 0.08, 2.8], "material": "carbon fiber", "role": "Perpendicular arm running front-right to rear-left.", "connections": ["frame", "motor_fl", "motor_fr", "motor_rl", "motor_rr"] },
+    { "id": "motor_fl", "name": "Motor (Front-Left)", "shape": "cylinder", "position": [-1.1, 0.32, -1.1], "size": [0.18, 0.22], "material": "brushed steel", "role": "2207 2400 KV brushless motor.", "connections": ["arm_cross", "prop_fl"] },
+    { "id": "motor_fr", "name": "Motor (Front-Right)", "shape": "cylinder", "position": [1.1, 0.32, -1.1], "size": [0.18, 0.22], "material": "brushed steel", "role": "2207 2400 KV brushless motor.", "connections": ["arm_cross", "prop_fr"] },
+    { "id": "motor_rl", "name": "Motor (Rear-Left)", "shape": "cylinder", "position": [-1.1, 0.32, 1.1], "size": [0.18, 0.22], "material": "brushed steel", "role": "2207 2400 KV brushless motor.", "connections": ["arm_cross", "prop_rl"] },
+    { "id": "motor_rr", "name": "Motor (Rear-Right)", "shape": "cylinder", "position": [1.1, 0.32, 1.1], "size": [0.18, 0.22], "material": "brushed steel", "role": "2207 2400 KV brushless motor.", "connections": ["arm_cross", "prop_rr"] },
+    { "id": "prop_fl", "name": "Propeller (Front-Left)", "shape": "cylinder", "position": [-1.1, 0.48, -1.1], "size": [0.9, 0.02], "material": "black composite", "role": "5-inch tri-blade, spinning CCW.", "connections": ["motor_fl"] },
+    { "id": "prop_fr", "name": "Propeller (Front-Right)", "shape": "cylinder", "position": [1.1, 0.48, -1.1], "size": [0.9, 0.02], "material": "black composite", "role": "5-inch tri-blade, spinning CW.", "connections": ["motor_fr"] },
+    { "id": "prop_rl", "name": "Propeller (Rear-Left)", "shape": "cylinder", "position": [-1.1, 0.48, 1.1], "size": [0.9, 0.02], "material": "black composite", "role": "5-inch tri-blade, spinning CW.", "connections": ["motor_rl"] },
+    { "id": "prop_rr", "name": "Propeller (Rear-Right)", "shape": "cylinder", "position": [1.1, 0.48, 1.1], "size": [0.9, 0.02], "material": "black composite", "role": "5-inch tri-blade, spinning CCW.", "connections": ["motor_rr"] },
+    { "id": "fc_stack", "name": "Flight Controller Stack", "shape": "box", "position": [0, 0.45, 0], "size": [0.45, 0.22, 0.45], "material": "dark anodized aluminum", "role": "FC + 4-in-1 ESC + VTX stacked on 30.5mm standoffs.", "connections": ["frame", "motor_fl", "motor_fr", "motor_rl", "motor_rr", "antenna", "camera"] },
+    { "id": "battery", "name": "LiPo Battery", "shape": "box", "position": [0, 0.72, 0], "size": [1.1, 0.3, 0.4], "material": "black composite", "role": "6S 1300 mAh high-discharge pack.", "connections": ["frame", "fc_stack"] },
+    { "id": "camera", "name": "FPV Camera", "shape": "box", "position": [-1.1, 0.5, 0], "size": [0.25, 0.25, 0.35], "material": "black composite", "role": "Analog CMOS camera canted 30 degrees forward.", "connections": ["frame", "fc_stack"] },
+    { "id": "antenna", "name": "VTX Antenna", "shape": "cylinder", "position": [1.2, 0.9, 0], "size": [0.04, 0.9], "material": "white composite", "role": "5.8 GHz circular-polarized video transmitter antenna.", "connections": ["fc_stack"] }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "samples": [
+    {
+      "id": "em-detection-truck",
+      "title": "EM Detection Truck",
+      "subtitle": "Mobile RF survey vehicle with mast-mounted antennas",
+      "path": "/samples/em-detection-truck.json",
+      "accent": "#58a6ff"
+    },
+    {
+      "id": "3d-printer",
+      "title": "Desktop 3D Printer",
+      "subtitle": "Cubic FDM frame, heated bed, X-Y gantry",
+      "path": "/samples/3d-printer.json",
+      "accent": "#f59e0b"
+    },
+    {
+      "id": "quadcopter",
+      "title": "FPV Quadcopter",
+      "subtitle": "5-inch racing drone with stacked flight controller",
+      "path": "/samples/quadcopter.json",
+      "accent": "#a855f7"
+    }
+  ]
+}

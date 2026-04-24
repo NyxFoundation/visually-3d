@@ -1,0 +1,26 @@
+{
+  "machine_name": "Electromagnetic Interference Detection Truck",
+  "assembly_instructions": "Mobile RF survey rig. Antennas high for line-of-sight; signal processors centered in the cabin; power and storage low for mass balance.",
+  "metadata": {
+    "reference": "https://jm2040.blogspot.com/2021/07/blog-post.html",
+    "domain": "rf-survey",
+    "thumbnail_camera": [9, 5, 9]
+  },
+  "parts": [
+    { "id": "chassis", "name": "Truck Chassis", "shape": "box", "position": [0, 0.55, 0], "size": [6, 0.3, 2.4], "material": "painted steel", "role": "Vehicle frame carrying all mounted equipment.", "connections": ["cabin", "rack", "generator", "wheel_fl", "wheel_fr", "wheel_rl", "wheel_rr"] },
+    { "id": "cabin", "name": "Operator Cabin", "shape": "box", "position": [-1.9, 1.5, 0], "size": [2.1, 1.4, 2.2], "material": "painted steel", "role": "Driver and operator space with displays.", "connections": ["chassis", "rack"] },
+    { "id": "rack", "name": "Instrument Rack", "shape": "box", "position": [0.6, 1.35, 0], "size": [2.0, 1.3, 1.8], "material": "dark anodized aluminum", "role": "19-inch rack for spectrum analyzers and SDRs.", "connections": ["cabin", "sdr", "spectrum_analyzer", "power_dist", "antenna_mast"] },
+    { "id": "spectrum_analyzer", "name": "Spectrum Analyzer", "shape": "box", "position": [0.6, 1.65, 0.55], "size": [0.9, 0.22, 0.5], "material": "dark anodized aluminum", "role": "Real-time spectrum visualization 9 kHz - 26 GHz.", "connections": ["rack", "antenna_wide"] },
+    { "id": "sdr", "name": "Software Defined Radio", "shape": "box", "position": [0.6, 1.35, 0.55], "size": [0.7, 0.2, 0.5], "material": "dark anodized aluminum", "role": "Wideband IQ capture for offline analysis.", "connections": ["rack", "antenna_dipole"] },
+    { "id": "power_dist", "name": "Power Distribution Unit", "shape": "box", "position": [0.6, 1.05, -0.55], "size": [0.9, 0.2, 0.5], "material": "black composite", "role": "Isolated AC/DC distribution for sensitive RF equipment.", "connections": ["rack", "generator"] },
+    { "id": "generator", "name": "Auxiliary Generator", "shape": "box", "position": [2.1, 1.0, 0], "size": [1.0, 0.6, 1.2], "material": "painted steel", "role": "Inverter generator providing clean mains while parked.", "connections": ["chassis", "power_dist"] },
+    { "id": "antenna_mast", "name": "Telescopic Mast", "shape": "cylinder", "position": [0.6, 3.5, 0], "size": [0.08, 3.6], "material": "fiberglass", "role": "Pneumatic mast lifting antennas above the vehicle.", "connections": ["rack", "antenna_wide", "antenna_dipole", "antenna_gps"] },
+    { "id": "antenna_wide", "name": "Wideband Discone Antenna", "shape": "cylinder", "position": [0.6, 5.5, 0], "size": [0.45, 0.55], "material": "brushed steel", "role": "Omnidirectional 25 MHz - 3 GHz reception.", "connections": ["antenna_mast", "spectrum_analyzer"] },
+    { "id": "antenna_dipole", "name": "Log-Periodic Dipole", "shape": "box", "position": [0.2, 5.95, 0], "size": [1.3, 0.05, 0.4], "material": "brushed steel", "role": "Directional 500 MHz - 6 GHz for bearing estimation.", "connections": ["antenna_mast", "sdr"] },
+    { "id": "antenna_gps", "name": "GNSS Reference Antenna", "shape": "sphere", "position": [0.6, 6.35, 0], "size": [0.14], "material": "white composite", "role": "Geotagging captures with centimeter accuracy.", "connections": ["antenna_mast"] },
+    { "id": "wheel_fl", "name": "Wheel FL", "shape": "cylinder", "position": [-2.0, 0.45, -1.25], "rotation": [1.5707963, 0, 0], "size": [0.45, 0.3], "material": "rubber", "role": "Front left wheel.", "connections": ["chassis"] },
+    { "id": "wheel_fr", "name": "Wheel FR", "shape": "cylinder", "position": [-2.0, 0.45, 1.25], "rotation": [1.5707963, 0, 0], "size": [0.45, 0.3], "material": "rubber", "role": "Front right wheel.", "connections": ["chassis"] },
+    { "id": "wheel_rl", "name": "Wheel RL", "shape": "cylinder", "position": [2.0, 0.45, -1.25], "rotation": [1.5707963, 0, 0], "size": [0.45, 0.3], "material": "rubber", "role": "Rear left wheel.", "connections": ["chassis"] },
+    { "id": "wheel_rr", "name": "Wheel RR", "shape": "cylinder", "position": [2.0, 0.45, 1.25], "rotation": [1.5707963, 0, 0], "size": [0.45, 0.3], "material": "rubber", "role": "Rear right wheel.", "connections": ["chassis"] }
+  ]
+}

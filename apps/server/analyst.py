@@ -18,6 +18,7 @@ Output ONLY a JSON object that strictly follows this TypeScript shape:
       "name": string,
       "shape": "box" | "cylinder" | "sphere" | "complex",
       "position": [number, number, number],
+      "rotation"?: [number, number, number],
       "size": number[],
       "material": string,
       "role": string,
@@ -32,6 +33,7 @@ Use these visualization heuristics:
 3. Encode signal flow in connections: sensor/antenna -> processor/control unit -> interface/display.
 4. If mounted on a vehicle/truck, include a chassis or mounting plate base.
 5. Keep dimensions plausible and non-zero. Use y as vertical height for Three.js.
+6. Cylinder geometry defaults to the Y axis. To lay a cylinder along Z (e.g., wheels), set rotation: [1.5707963, 0, 0]. To lay along X (e.g., side-mounted spools), set rotation: [0, 0, 1.5707963].
 """
 
 

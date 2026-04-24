@@ -1,0 +1,22 @@
+{
+  "machine_name": "Desktop FDM 3D Printer",
+  "assembly_instructions": "Cubic frame with vertical Z-rails at corners; gantry carries the print head along X-Y; heated bed rises on the Z axis; filament spool feeds from the side.",
+  "metadata": {
+    "domain": "additive-manufacturing",
+    "thumbnail_camera": [4.5, 3.5, 4.5]
+  },
+  "parts": [
+    { "id": "base", "name": "Base Frame", "shape": "box", "position": [0, 0.15, 0], "size": [3.4, 0.3, 3.4], "material": "black composite", "role": "Rigid bottom frame housing electronics and PSU.", "connections": ["rail_fl", "rail_fr", "rail_rl", "rail_rr", "psu", "control_panel", "bed"] },
+    { "id": "rail_fl", "name": "Z Rail (Front-Left)", "shape": "cylinder", "position": [-1.5, 1.9, -1.5], "size": [0.08, 3.6], "material": "brushed steel", "role": "Linear guide for gantry motion.", "connections": ["base", "gantry"] },
+    { "id": "rail_fr", "name": "Z Rail (Front-Right)", "shape": "cylinder", "position": [1.5, 1.9, -1.5], "size": [0.08, 3.6], "material": "brushed steel", "role": "Linear guide for gantry motion.", "connections": ["base", "gantry"] },
+    { "id": "rail_rl", "name": "Z Rail (Rear-Left)", "shape": "cylinder", "position": [-1.5, 1.9, 1.5], "size": [0.08, 3.6], "material": "brushed steel", "role": "Linear guide for gantry motion.", "connections": ["base", "gantry"] },
+    { "id": "rail_rr", "name": "Z Rail (Rear-Right)", "shape": "cylinder", "position": [1.5, 1.9, 1.5], "size": [0.08, 3.6], "material": "brushed steel", "role": "Linear guide for gantry motion.", "connections": ["base", "gantry"] },
+    { "id": "gantry", "name": "X-Y Gantry", "shape": "box", "position": [0, 2.8, 0], "size": [3.2, 0.15, 3.2], "material": "dark anodized aluminum", "role": "Horizontal frame carrying the print head.", "connections": ["rail_fl", "rail_fr", "rail_rl", "rail_rr", "print_head"] },
+    { "id": "print_head", "name": "Print Head", "shape": "box", "position": [0.4, 2.55, 0.2], "size": [0.5, 0.55, 0.5], "material": "dark anodized aluminum", "role": "Hotend extruder assembly with cooling fan.", "connections": ["gantry", "nozzle"] },
+    { "id": "nozzle", "name": "Hotend Nozzle", "shape": "cylinder", "position": [0.4, 2.2, 0.2], "size": [0.05, 0.15], "material": "brass", "role": "0.4 mm brass nozzle for 1.75 mm filament.", "connections": ["print_head"] },
+    { "id": "bed", "name": "Heated Print Bed", "shape": "box", "position": [0, 0.95, 0], "size": [2.6, 0.08, 2.6], "material": "glass display", "role": "Borosilicate glass over silicone heater, 235×235 mm.", "connections": ["base"] },
+    { "id": "spool", "name": "Filament Spool", "shape": "cylinder", "position": [2.3, 2.8, -2.0], "rotation": [0, 0, 1.5707963], "size": [0.55, 0.3], "material": "white composite", "role": "1 kg PLA spool on side-mounted holder.", "connections": ["gantry"] },
+    { "id": "control_panel", "name": "LCD Control Panel", "shape": "box", "position": [0, 0.6, -1.85], "size": [1.0, 0.5, 0.1], "material": "glass display", "role": "Touch screen for prints, leveling, diagnostics.", "connections": ["base"] },
+    { "id": "psu", "name": "24V Power Supply", "shape": "box", "position": [-1.2, 0.45, 1.35], "size": [0.9, 0.3, 0.5], "material": "brushed steel", "role": "350W switching PSU powering heaters and motors.", "connections": ["base"] }
+  ]
+}

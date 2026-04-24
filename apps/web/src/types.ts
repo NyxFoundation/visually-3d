@@ -3,6 +3,7 @@ export interface Part {
   name: string;
   shape: 'box' | 'cylinder' | 'sphere' | 'complex';
   position: [number, number, number];
+  rotation?: [number, number, number];
   size: number[];
   material: string;
   role: string;
