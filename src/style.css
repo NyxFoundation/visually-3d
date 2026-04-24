@@ -788,6 +788,13 @@ button, input {
 .gallery__thumb .viewer {
   position: absolute;
   inset: 0;
+  /* Thumbnails are non-interactive: taps fall through to the card button
+     and vertical touch scrolling of the drawer is not eaten by the canvas. */
+  pointer-events: none;
+}
+
+.gallery__thumb .viewer canvas {
+  touch-action: auto;
 }
 
 .gallery__thumb-fallback {
