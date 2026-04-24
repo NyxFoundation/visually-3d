@@ -1,0 +1,50 @@
+{
+  "machine_name": "50 kW Open-Source Wind Turbine",
+  "assembly_instructions": "Horizontal-axis wind turbine on a concrete foundation pad. A tall cylindrical tower rises from the pad and is held vertical by guy wires. A yaw bearing at the tower top carries a nacelle mount, a DC generator nacelle, a spherical rotor hub, and three slender blades at 120° around the hub. A tail vane projects rearward to weathervane the turbine into the wind; an anemometer-style sensor sits atop the nacelle. A power cable runs down the tower to a ground-level battery bank with a blocking diode.",
+  "metadata": {
+    "reference": "https://wiki.opensourceecology.org/wiki/Wind_Turbine",
+    "domain": "renewable-energy",
+    "thumbnail_camera": [8.0, 6.5, 8.0],
+    "info": {
+      "japanese_name": "50 kW オープンソース風力タービン",
+      "english_name": "Open Source Ecology 50 kW Wind Turbine",
+      "summary": "Horizontal-axis, three-blade wind turbine on a guyed lattice/tube tower. Part of OSE's Global Village Construction Set as the renewable-electricity prime mover.",
+      "description": "The OSE 50 kW wind turbine is a community-scale, three-blade horizontal-axis wind turbine (HAWT) published as part of the Global Village Construction Set. The rotor captures wind via three composite blades bolted to a central hub; the hub turns a direct-drive DC generator housed in the nacelle at the top of a tall tower. A tail vane behind the nacelle aligns the rotor into the wind by weathervaning around a yaw bearing, and a cup-style anemometer on the nacelle roof reports wind speed for cut-in/cut-out control. Direct-current output flows down a cable routed along the tower to a ground-level battery bank, through a blocking diode that prevents the battery from back-driving the generator in calm conditions. The tower is stabilized by guy wires anchored in the concrete foundation pad; OSE's documentation is released under CC BY-SA 4.0.",
+      "operator": "OSE community builders and off-grid installations",
+      "contractor": "Open Source Ecology",
+      "contract_date": "GVCS roadmap (design released 2011, iterated since)",
+      "contract_value": "Target ≈US$20k in materials (self-build)",
+      "status": "Design / small-scale builds; 50 kW class is the roadmap target",
+      "facts": [
+        { "label": "Configuration", "value": "Three-blade horizontal-axis (upwind, free-yaw tail vane)" },
+        { "label": "Rated power", "value": "≈50 kW" },
+        { "label": "Drivetrain", "value": "Direct-drive DC generator (no gearbox)" },
+        { "label": "Tower", "value": "Guyed tubular/lattice tower with concrete foundation pad" },
+        { "label": "Output", "value": "DC → battery bank (with series blocking diode)" },
+        { "label": "Control", "value": "Passive yaw via tail vane; furling / anemometer cut-out" },
+        { "label": "License", "value": "CC BY-SA 4.0 (design docs)" }
+      ],
+      "sources": [
+        { "title": "OSE Wiki — Wind Turbine", "url": "https://wiki.opensourceecology.org/wiki/Wind_Turbine" },
+        { "title": "OSE — Global Village Construction Set overview", "url": "https://www.opensourceecology.org/gvcs/" }
+      ]
+    }
+  },
+  "parts": [
+    { "id": "tower_base",  "name": "Concrete Tower Base",  "shape": "box",      "position": [0, 0.15, 0], "size": [1.6, 0.30, 1.6], "material": "concrete",              "role": "Reinforced concrete foundation pad that anchors the tower and the guy-wire turnbuckles.", "connections": ["tower", "guy_wire"] },
+    { "id": "tower",       "name": "Tower",                "shape": "cylinder", "position": [0, 3.65, 0], "size": [0.12, 7.00],     "material": "welded steel",          "role": "Tapered tube/lattice tower lifting the rotor into cleaner airflow above terrain turbulence.", "connections": ["tower_base", "bearing", "wire", "guy_wire"] },
+    { "id": "bearing",     "name": "Yaw Bearing",          "shape": "cylinder", "position": [0, 7.22, 0], "size": [0.18, 0.08],     "material": "brushed steel",         "role": "Large-diameter thrust bearing at the tower top that lets the nacelle weathervane freely.", "connections": ["tower", "mount"] },
+    { "id": "mount",       "name": "Nacelle Mount",        "shape": "box",      "position": [0, 7.37, 0], "size": [0.32, 0.18, 0.30], "material": "dark anodized aluminum", "role": "Machined yaw-axis mount block that carries the nacelle and tail.", "connections": ["bearing", "generator", "tail"] },
+    { "id": "generator",   "name": "DC Generator Nacelle", "shape": "box",      "position": [0, 7.62, 0], "size": [0.40, 0.34, 0.36], "material": "dark anodized aluminum", "role": "Direct-drive DC generator. Converts rotor torque into electrical current.", "connections": ["mount", "hub", "wire", "sensor"] },
+    { "id": "hub",         "name": "Rotor Hub",            "shape": "sphere",   "position": [0.40, 7.62, 0], "size": [0.12],        "material": "brushed steel",         "role": "Central rotor hub. Blades bolt on at 120° spacing; torque transfers into the generator shaft.", "connections": ["generator", "blade_1", "blade_2", "blade_3"] },
+    { "id": "blade_1",     "name": "Blade #1 (up)",        "shape": "cylinder", "position": [0.40, 8.82, 0],        "rotation": [0, 0, 0],       "size": [0.04, 2.40], "material": "fiberglass", "role": "Composite aerodynamic blade. Pointing up in the reference pose.", "connections": ["hub"] },
+    { "id": "blade_2",     "name": "Blade #2 (120°)",      "shape": "cylinder", "position": [0.40, 7.02,  1.039],   "rotation": [2.0944, 0, 0],  "size": [0.04, 2.40], "material": "fiberglass", "role": "Composite aerodynamic blade at 120° around the hub.", "connections": ["hub"] },
+    { "id": "blade_3",     "name": "Blade #3 (240°)",      "shape": "cylinder", "position": [0.40, 7.02, -1.039],   "rotation": [4.1888, 0, 0],  "size": [0.04, 2.40], "material": "fiberglass", "role": "Composite aerodynamic blade at 240° around the hub.", "connections": ["hub"] },
+    { "id": "tail",        "name": "Tail Vane",            "shape": "box",      "position": [-0.55, 7.72, 0], "size": [0.55, 0.45, 0.04], "material": "fiberglass",            "role": "Rear vertical fin that yaws the rotor into the wind.", "connections": ["mount"] },
+    { "id": "sensor",      "name": "Anemometer / Wind Sensor", "shape": "box",  "position": [0, 7.88, 0],     "size": [0.08, 0.14, 0.08], "material": "dark anodized aluminum", "role": "Cup anemometer + wind-vane sensor. Feeds cut-in/cut-out logic and data logging.", "connections": ["generator"] },
+    { "id": "wire",        "name": "DC Power Cable",       "shape": "cylinder", "position": [0.20, 3.80, 0], "size": [0.025, 7.30], "material": "rubber",                "role": "Insulated DC feeder routed along the tower from the generator to the battery bank.", "connections": ["generator", "battery"] },
+    { "id": "battery",     "name": "Battery Bank",         "shape": "box",      "position": [2.80, 0.35, 0], "size": [0.60, 0.50, 0.70], "material": "black composite",       "role": "Ground-level battery bank that stores harvested energy.", "connections": ["wire", "diode"] },
+    { "id": "diode",       "name": "Blocking Diode",       "shape": "box",      "position": [2.80, 0.72, 0], "size": [0.18, 0.10, 0.12], "material": "dark anodized aluminum", "role": "Series blocking diode. Prevents the battery from back-driving the generator when wind drops.", "connections": ["battery"] },
+    { "id": "guy_wire",    "name": "Guy Wire (representative)", "shape": "cylinder", "position": [1.5, 2.5, 0], "rotation": [0, 0, -2.6012], "size": [0.015, 5.831], "material": "brushed steel", "role": "Steel guy wire from an upper tower collar to a ground anchor. Three such guys at 120° around the tower stabilize it against lateral wind loads; one is modeled here as representative.", "connections": ["tower", "tower_base"] }
+  ]
+}
