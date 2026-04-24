@@ -18,6 +18,12 @@ type SampleGalleryProps = {
 
 type CardState = 'idle' | 'visible' | 'loaded' | 'error';
 
+// Browsers cap concurrent WebGL contexts (Safari ≈ 8, Chrome 16). With one main
+// viewer plus a thumbnail per card, scrolling the gallery quickly exceeds that
+// cap and the oldest context — the main viewer — gets evicted, whiting it out.
+// So keep observing each card's visibility and unmount the thumbnail <Canvas>
+// when the card scrolls back off-screen.
+
 export const SampleGallery: React.FC<SampleGalleryProps> = ({ samples, activeId, onSelect }) => (
   <section className="gallery" aria-label="Sample machine visuals">
     <div className="gallery__header">
@@ -41,28 +47,25 @@ const SampleCard: React.FC<{
 }> = ({ sample, active, onSelect }) => {
   const ref = useRef<HTMLButtonElement>(null);
   const [state, setState] = useState<CardState>('idle');
+  const [inView, setInView] = useState(false);
   const [scene, setScene] = useState<SceneDescriptor | null>(null);
 
   useEffect(() => {
-    if (!ref.current || state !== 'idle') return;
+    if (!ref.current) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setState('visible');
-            observer.disconnect();
-            break;
-          }
-        }
+        const entry = entries[0];
+        if (!entry) return;
+        setInView(entry.isIntersecting);
       },
       { rootMargin: '200px' },
     );
     observer.observe(ref.current);
     return () => observer.disconnect();
-  }, [state]);
+  }, []);
 
   useEffect(() => {
-    if (state !== 'visible') return;
+    if (!inView || state !== 'idle') return;
     let cancelled = false;
     fetch(sample.path)
       .then((res) => {
@@ -81,7 +84,7 @@ const SampleCard: React.FC<{
     return () => {
       cancelled = true;
     };
-  }, [state, sample.path]);
+  }, [inView, state, sample.path]);
 
   const handleClick = () => {
     if (scene) onSelect(sample, scene);
@@ -98,7 +101,7 @@ const SampleCard: React.FC<{
       aria-pressed={active}
     >
       <div className="gallery__thumb">
-        {state === 'loaded' && scene ? (
+        {state === 'loaded' && scene && inView ? (
           <LazyViewer scene={scene} compact maxDpr={1.25} />
         ) : state === 'error' ? (
           <div className="gallery__thumb-fallback">failed to load</div>
