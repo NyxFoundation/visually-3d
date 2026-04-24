@@ -10,10 +10,42 @@ export interface Part {
   connections?: string[];
 }
 
+export interface SceneInfoSource {
+  title: string;
+  url: string;
+}
+
+export interface SceneInfoFact {
+  label: string;
+  value: string;
+}
+
+export interface SceneInfo {
+  japanese_name?: string;
+  english_name?: string;
+  summary?: string;
+  description?: string;
+  operator?: string;
+  contractor?: string;
+  contract_date?: string;
+  contract_value?: string;
+  status?: string;
+  facts?: SceneInfoFact[];
+  sources?: SceneInfoSource[];
+}
+
+export interface SceneMetadata {
+  reference?: string;
+  domain?: string;
+  thumbnail_camera?: [number, number, number];
+  info?: SceneInfo;
+  [key: string]: unknown;
+}
+
 export interface SceneDescriptor {
   machine_name: string;
   assembly_instructions?: string;
-  metadata?: Record<string, unknown>;
+  metadata?: SceneMetadata;
   parts: Part[];
 }
 

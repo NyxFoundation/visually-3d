@@ -12,6 +12,7 @@ const materialColor = (material: string, shape: Part['shape']): string => {
   if (lower.includes('brass')) return '#d4a657';
   if (lower.includes('copper')) return '#b87333';
   if (lower.includes('fiberglass')) return '#e8e8ea';
+  if (lower.includes('concrete')) return '#6e737b';
   if (lower.includes('white')) return '#f0f0f2';
   if (lower.includes('rubber') || lower.includes('black')) return '#1a1d24';
   if (lower.includes('anodized')) return '#3a3d44';
@@ -29,6 +30,7 @@ const materialPhysical = (material: string) => {
   if (lower.includes('anodized') || lower.includes('aluminum')) return { metalness: 0.7, roughness: 0.4 };
   if (lower.includes('steel') || lower.includes('forged')) return { metalness: 0.85, roughness: 0.35 };
   if (lower.includes('fiberglass')) return { metalness: 0.05, roughness: 0.6 };
+  if (lower.includes('concrete')) return { metalness: 0.0, roughness: 0.95 };
   if (lower.includes('composite')) return { metalness: 0.1, roughness: 0.65 };
   return { metalness: 0.5, roughness: 0.45 };
 };

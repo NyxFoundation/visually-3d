@@ -1,11 +1,18 @@
 {
   "samples": [
     {
-      "id": "em-detection-truck",
-      "title": "EM Detection Truck",
-      "subtitle": "Mobile RF survey vehicle with mast-mounted antennas",
-      "path": "/samples/em-detection-truck.json",
+      "id": "em-awareness-type1",
+      "title": "EM Awareness Device — Type 1",
+      "subtitle": "Fixed ground station (MHI, 2021) monitoring satellite EM interference",
+      "path": "/samples/em-awareness-type1.json",
       "accent": "#58a6ff"
+    },
+    {
+      "id": "em-awareness-type2",
+      "title": "EM Awareness Device — Type 2",
+      "subtitle": "Truck-mounted mobile variant (NEC + Isuzu GIGA, 2022–23)",
+      "path": "/samples/em-awareness-type2.json",
+      "accent": "#79c0ff"
     },
     {
       "id": "3d-printer",

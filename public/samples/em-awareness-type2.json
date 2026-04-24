@@ -1,0 +1,52 @@
+{
+  "machine_name": "EM Interference Awareness Device — Type 2 (Mobile)",
+  "assembly_instructions": "Mobile variant of Japan's satellite EM-interference awareness system. Mounted on an Isuzu GIGA truck: operator cabin forward, shelter module with equipment racks aft, telescoping antenna mast with wideband survey antennas, and a small steerable dish for satellite-link monitoring.",
+  "metadata": {
+    "reference": "https://jm2040.blogspot.com/2021/07/blog-post.html",
+    "domain": "satellite-rf-monitoring",
+    "thumbnail_camera": [10, 5.5, 10],
+    "info": {
+      "japanese_name": "電磁妨害状況把握装置2型",
+      "english_name": "Electromagnetic Interference Situation Awareness Device, Type 2",
+      "summary": "Truck-mounted version of the JASDF satellite EM-interference monitoring system, built by NEC and carried on eight Isuzu GIGA heavy trucks.",
+      "description": "Type 2 is the mobile variant of the 電磁妨害状況把握装置 family — a system Japan's Ministry of Defense procures to monitor electromagnetic interference targeting Japanese artificial satellites and to train and evaluate Air Self-Defense Force responses to jamming of communications satellites. Where Type 1 is a fixed ground installation, Type 2 is deployable: the sensor chain, signal-processing racks, and operator consoles ride in a shelter on a large Isuzu truck, letting units move the receiver close to the region of interest or disperse for survivability. The main equipment contract went to NEC in FY2022, and eight Isuzu GIGA trucks were contracted separately in FY2023 as the prime-mover platform.",
+      "operator": "Japan Air Self-Defense Force (JASDF)",
+      "contractor": "NEC Corporation (electronics) · Isuzu Motors (vehicles)",
+      "contract_date": "2022-03-30 (system) · 2023-03-23 (trucks)",
+      "contract_value": "¥3.98B (system) + ¥2.57B (initial costs) + ¥146M (8 trucks)",
+      "status": "Procured; fielded with JASDF",
+      "facts": [
+        { "label": "Type", "value": "Mobile / vehicle-mounted" },
+        { "label": "Platform", "value": "Isuzu GIGA heavy truck, 8 units" },
+        { "label": "Role", "value": "Detect and characterise EM interference against Japanese satellites" },
+        { "label": "Procuring body", "value": "Acquisition, Technology & Logistics Agency (防衛装備庁)" }
+      ],
+      "sources": [
+        { "title": "JM2040 — 防衛装備庁、電磁妨害状況把握装置を契約", "url": "https://jm2040.blogspot.com/2021/07/blog-post.html" }
+      ]
+    }
+  },
+  "parts": [
+    { "id": "chassis", "name": "Isuzu GIGA Chassis", "shape": "box", "position": [0, 0.55, 0], "size": [7.2, 0.3, 2.5], "material": "painted steel", "role": "Heavy-duty 10-ton truck chassis carrying the shelter and all mounted equipment.", "connections": ["cabin", "shelter", "generator", "wheel_fl", "wheel_fr", "wheel_ml", "wheel_mr", "wheel_rl", "wheel_rr"] },
+    { "id": "cabin", "name": "Driver Cabin", "shape": "box", "position": [-2.7, 1.6, 0], "size": [2.2, 1.6, 2.4], "material": "painted steel", "role": "Two-seat driver cabin for road transit.", "connections": ["chassis", "windshield"] },
+    { "id": "windshield", "name": "Windshield", "shape": "box", "position": [-1.6, 1.9, 0], "size": [0.05, 0.9, 2.1], "material": "glass display", "role": "Cabin windshield.", "connections": ["cabin"] },
+    { "id": "shelter", "name": "Equipment Shelter", "shape": "box", "position": [0.9, 1.9, 0], "size": [4.0, 2.2, 2.45], "material": "painted steel", "role": "EMI-shielded cargo-box shelter enclosing the signal-processing racks and operator consoles.", "connections": ["chassis", "rack", "console", "door"] },
+    { "id": "door", "name": "Rear Access Door", "shape": "box", "position": [2.95, 1.8, 0], "size": [0.06, 1.9, 1.4], "material": "painted steel", "role": "Rear personnel access door.", "connections": ["shelter"] },
+    { "id": "rack", "name": "Signal Processing Rack", "shape": "box", "position": [0.3, 1.9, 0.7], "size": [0.8, 1.8, 0.7], "material": "dark anodized aluminum", "role": "19-inch rack housing SDR receivers, spectrum analysers, and correlator hardware.", "connections": ["shelter", "console", "mast", "dish"] },
+    { "id": "console", "name": "Operator Console", "shape": "box", "position": [1.6, 1.3, -0.6], "size": [1.2, 0.2, 0.7], "material": "dark anodized aluminum", "role": "Analyst workstation for tasking, display, and tactical reporting.", "connections": ["shelter", "rack", "display"] },
+    { "id": "display", "name": "Console Display", "shape": "box", "position": [1.6, 1.9, -0.7], "size": [1.0, 0.7, 0.08], "material": "glass display", "role": "Waterfall / spectrum display.", "connections": ["console"] },
+    { "id": "generator", "name": "Auxiliary Generator", "shape": "box", "position": [3.2, 1.05, 0.9], "size": [0.9, 0.6, 1.0], "material": "painted steel", "role": "Diesel-driven inverter generator providing clean mains while stationary.", "connections": ["chassis", "rack"] },
+    { "id": "mast", "name": "Telescopic Antenna Mast", "shape": "cylinder", "position": [2.3, 4.0, 0.5], "size": [0.1, 4.2], "material": "fiberglass", "role": "Pneumatic mast lifting survey antennas above terrain clutter.", "connections": ["shelter", "rack", "ant_wide", "ant_log", "ant_gps"] },
+    { "id": "ant_wide", "name": "Wideband Discone", "shape": "cylinder", "position": [2.3, 6.3, 0.5], "size": [0.45, 0.5], "material": "brushed steel", "role": "Omnidirectional survey antenna, 25 MHz – 3 GHz.", "connections": ["mast"] },
+    { "id": "ant_log", "name": "Log-Periodic Array", "shape": "box", "position": [1.7, 6.8, 0.5], "size": [1.4, 0.05, 0.4], "material": "brushed steel", "role": "Directional L/S-band array for bearing estimation.", "connections": ["mast"] },
+    { "id": "ant_gps", "name": "GNSS Reference Antenna", "shape": "sphere", "position": [2.3, 7.2, 0.5], "size": [0.14], "material": "white composite", "role": "Time/position reference for coherent capture and geotagging.", "connections": ["mast"] },
+    { "id": "dish", "name": "Steerable Ku-Band Dish", "shape": "cylinder", "position": [0.4, 3.3, 0], "rotation": [1.5707963, 0, 0], "size": [0.9, 0.25], "material": "white composite", "role": "Steerable parabolic dish for direct monitoring of downlinks from Japanese communications satellites.", "connections": ["dish_pedestal", "rack"] },
+    { "id": "dish_pedestal", "name": "Az/El Pedestal", "shape": "cylinder", "position": [0.4, 3.05, 0], "size": [0.25, 0.3], "material": "dark anodized aluminum", "role": "Two-axis positioner aiming the dish at target spacecraft.", "connections": ["shelter", "dish"] },
+    { "id": "wheel_fl", "name": "Wheel FL", "shape": "cylinder", "position": [-2.6, 0.5, -1.25], "rotation": [1.5707963, 0, 0], "size": [0.5, 0.35], "material": "rubber", "role": "Front left wheel.", "connections": ["chassis"] },
+    { "id": "wheel_fr", "name": "Wheel FR", "shape": "cylinder", "position": [-2.6, 0.5, 1.25], "rotation": [1.5707963, 0, 0], "size": [0.5, 0.35], "material": "rubber", "role": "Front right wheel.", "connections": ["chassis"] },
+    { "id": "wheel_ml", "name": "Wheel ML", "shape": "cylinder", "position": [1.5, 0.5, -1.25], "rotation": [1.5707963, 0, 0], "size": [0.5, 0.35], "material": "rubber", "role": "Middle left wheel.", "connections": ["chassis"] },
+    { "id": "wheel_mr", "name": "Wheel MR", "shape": "cylinder", "position": [1.5, 0.5, 1.25], "rotation": [1.5707963, 0, 0], "size": [0.5, 0.35], "material": "rubber", "role": "Middle right wheel.", "connections": ["chassis"] },
+    { "id": "wheel_rl", "name": "Wheel RL", "shape": "cylinder", "position": [2.6, 0.5, -1.25], "rotation": [1.5707963, 0, 0], "size": [0.5, 0.35], "material": "rubber", "role": "Rear left wheel.", "connections": ["chassis"] },
+    { "id": "wheel_rr", "name": "Wheel RR", "shape": "cylinder", "position": [2.6, 0.5, 1.25], "rotation": [1.5707963, 0, 0], "size": [0.5, 0.35], "material": "rubber", "role": "Rear right wheel.", "connections": ["chassis"] }
+  ]
+}

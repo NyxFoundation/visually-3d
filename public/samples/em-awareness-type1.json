@@ -1,0 +1,61 @@
+{
+  "machine_name": "EM Interference Awareness Device — Type 1 (Fixed Station)",
+  "assembly_instructions": "Fixed ground installation of Japan's satellite EM-interference awareness system. A large steerable parabolic dish on a concrete pedestal performs primary satellite monitoring; a secondary panel array and mast-mounted wideband antennas perform survey and geolocation; an EMI-shielded operations shelter houses the signal-processing racks and operator consoles; a backup generator shed supplies conditioned power.",
+  "metadata": {
+    "reference": "https://jm2040.blogspot.com/2021/07/blog-post.html",
+    "domain": "satellite-rf-monitoring",
+    "thumbnail_camera": [14, 9, 14],
+    "info": {
+      "japanese_name": "電磁妨害状況把握装置1型",
+      "english_name": "Electromagnetic Interference Situation Awareness Device, Type 1",
+      "summary": "Stationary ground station built by Mitsubishi Heavy Industries to monitor electromagnetic interference against Japanese satellites and to train JASDF units in countering communications-satellite jamming.",
+      "description": "Type 1 is the fixed installation in the 電磁妨害状況把握装置 family — Japan's procurement of equipment to build situational awareness of electromagnetic interference targeting its artificial satellites. The system's mission is twofold: continuously observe the RF environment around Japanese spacecraft so that jamming or interference can be detected and characterised, and provide a training and evaluation capability for the Air Self-Defense Force against communications-satellite jamming. The prime contract went to Mitsubishi Heavy Industries in FY2021 (¥5.357B), and a follow-on function-enhancement contract was signed with MHI in FY2024. A companion mobile variant (Type 2) was contracted with NEC the following fiscal year.",
+      "operator": "Japan Air Self-Defense Force (JASDF)",
+      "contractor": "Mitsubishi Heavy Industries",
+      "contract_date": "2021-03-31 (initial) · 2024-09-24 (function enhancement)",
+      "contract_value": "¥5.357B (initial) + ¥0.309B (enhancement)",
+      "status": "Procured; in service",
+      "facts": [
+        { "label": "Type", "value": "Fixed ground installation" },
+        { "label": "Primary sensor", "value": "Large steerable parabolic dish" },
+        { "label": "Role", "value": "Detect, characterise, and train against EM interference to Japanese satellites" },
+        { "label": "Procuring body", "value": "Acquisition, Technology & Logistics Agency (防衛装備庁)" }
+      ],
+      "sources": [
+        { "title": "JM2040 — 防衛装備庁、電磁妨害状況把握装置を契約", "url": "https://jm2040.blogspot.com/2021/07/blog-post.html" }
+      ]
+    }
+  },
+  "parts": [
+    { "id": "pad", "name": "Concrete Apron", "shape": "box", "position": [0, 0.1, 0], "size": [22, 0.2, 16], "material": "concrete", "role": "Reinforced concrete pad supporting the station's structures and dish foundations.", "connections": ["dish_foundation", "shelter", "gen_shed", "mast", "panel_array", "fence_n", "fence_s", "fence_e", "fence_w"] },
+
+    { "id": "dish_foundation", "name": "Dish Foundation", "shape": "cylinder", "position": [-5, 1.1, 0], "size": [1.6, 2.0], "material": "concrete", "role": "Cylindrical reinforced-concrete foundation isolating the dish from ground vibration.", "connections": ["pad", "dish_pedestal"] },
+    { "id": "dish_pedestal", "name": "Az/El Pedestal", "shape": "box", "position": [-5, 2.5, 0], "size": [1.4, 1.2, 1.4], "material": "dark anodized aluminum", "role": "Two-axis positioner carrying the main dish, with azimuth and elevation drives.", "connections": ["dish_foundation", "dish_main", "rack_rf"] },
+    { "id": "dish_main", "name": "Primary Parabolic Dish", "shape": "cylinder", "position": [-5, 5.2, 0], "rotation": [1.5707963, 0, 0], "size": [3.6, 0.4], "material": "white composite", "role": "7.2 m steerable parabolic reflector; primary sensor for downlink monitoring of Japanese communications satellites.", "connections": ["dish_pedestal", "dish_feed"] },
+    { "id": "dish_feed", "name": "Dish Feed Horn", "shape": "cylinder", "position": [-5, 6.0, 1.8], "rotation": [1.5707963, 0, 0], "size": [0.25, 0.9], "material": "brushed steel", "role": "Cassegrain feed assembly at the focal point of the primary reflector.", "connections": ["dish_main"] },
+
+    { "id": "panel_array", "name": "Phased-Array Panel", "shape": "box", "position": [4, 3.0, -4], "rotation": [0, 0.5, 0], "size": [3.0, 3.0, 0.3], "material": "dark anodized aluminum", "role": "Stationary phased-array antenna for wide-sector interference survey.", "connections": ["pad", "panel_mount", "rack_rf"] },
+    { "id": "panel_mount", "name": "Array Support Frame", "shape": "box", "position": [4, 1.2, -4], "size": [3.2, 2.4, 0.4], "material": "painted steel", "role": "Tilt frame supporting the phased-array panel.", "connections": ["panel_array"] },
+
+    { "id": "mast", "name": "Antenna Mast", "shape": "cylinder", "position": [6, 4.0, 3], "size": [0.15, 8.0], "material": "fiberglass", "role": "Free-standing mast carrying wideband survey and reference antennas.", "connections": ["pad", "ant_wide", "ant_log", "ant_gps"] },
+    { "id": "ant_wide", "name": "Wideband Discone", "shape": "cylinder", "position": [6, 8.2, 3], "size": [0.6, 0.6], "material": "brushed steel", "role": "Omnidirectional wideband survey antenna, 25 MHz – 3 GHz.", "connections": ["mast"] },
+    { "id": "ant_log", "name": "Log-Periodic Array", "shape": "box", "position": [5.3, 8.7, 3], "size": [1.6, 0.05, 0.5], "material": "brushed steel", "role": "Directional array for bearing estimation across L/S band.", "connections": ["mast"] },
+    { "id": "ant_gps", "name": "GNSS Reference Antenna", "shape": "sphere", "position": [6, 9.2, 3], "size": [0.18], "material": "white composite", "role": "Time/position reference for coherent capture across receivers.", "connections": ["mast"] },
+
+    { "id": "shelter", "name": "Operations Shelter", "shape": "box", "position": [0, 1.6, 4], "size": [6.0, 2.8, 4.0], "material": "painted steel", "role": "EMI-shielded building housing racks, operator consoles, and crew workspace.", "connections": ["pad", "rack_rf", "rack_proc", "console", "shelter_door"] },
+    { "id": "shelter_door", "name": "Shelter Door", "shape": "box", "position": [-3.05, 1.4, 4], "size": [0.08, 2.0, 1.0], "material": "painted steel", "role": "Personnel access door.", "connections": ["shelter"] },
+    { "id": "rack_rf", "name": "RF Receiver Rack", "shape": "box", "position": [-2.0, 1.6, 4], "size": [0.9, 2.0, 0.8], "material": "dark anodized aluminum", "role": "Low-noise amplifiers, downconverters, and SDR receiver chain.", "connections": ["shelter", "dish_pedestal", "panel_array", "rack_proc"] },
+    { "id": "rack_proc", "name": "Signal Processing Rack", "shape": "box", "position": [-0.6, 1.6, 4], "size": [0.9, 2.0, 0.8], "material": "dark anodized aluminum", "role": "Correlator and spectral-analysis compute for interference classification and geolocation.", "connections": ["shelter", "rack_rf", "console"] },
+    { "id": "console", "name": "Operator Consoles", "shape": "box", "position": [1.5, 1.1, 4], "size": [2.0, 0.2, 0.9], "material": "dark anodized aluminum", "role": "Analyst workstations for monitoring, tasking, and reporting.", "connections": ["shelter", "rack_proc", "display"] },
+    { "id": "display", "name": "Console Display Wall", "shape": "box", "position": [1.5, 2.2, 4.45], "size": [2.0, 1.0, 0.08], "material": "glass display", "role": "Waterfall / spectrum / geolocation displays.", "connections": ["console"] },
+
+    { "id": "gen_shed", "name": "Generator Shed", "shape": "box", "position": [5, 1.3, 6.5], "size": [3.0, 2.2, 2.4], "material": "painted steel", "role": "Enclosure for the diesel backup generator and fuel tank.", "connections": ["pad", "generator", "power_unit"] },
+    { "id": "generator", "name": "Backup Generator", "shape": "box", "position": [5, 1.1, 6.2], "size": [1.6, 1.4, 0.9], "material": "painted steel", "role": "Diesel genset providing site power during grid outage.", "connections": ["gen_shed", "power_unit"] },
+    { "id": "power_unit", "name": "Power Conditioning Unit", "shape": "box", "position": [2.2, 1.4, 6.5], "size": [1.2, 1.8, 0.8], "material": "black composite", "role": "UPS and isolation transformer feeding clean mains to the receiver chain.", "connections": ["gen_shed", "rack_rf"] },
+
+    { "id": "fence_n", "name": "Perimeter Fence N", "shape": "box", "position": [0, 1.1, -7.9], "size": [22, 2.0, 0.1], "material": "painted steel", "role": "Security perimeter fence, north side.", "connections": ["pad"] },
+    { "id": "fence_s", "name": "Perimeter Fence S", "shape": "box", "position": [0, 1.1, 7.9], "size": [22, 2.0, 0.1], "material": "painted steel", "role": "Security perimeter fence, south side.", "connections": ["pad"] },
+    { "id": "fence_e", "name": "Perimeter Fence E", "shape": "box", "position": [10.9, 1.1, 0], "size": [0.1, 2.0, 16], "material": "painted steel", "role": "Security perimeter fence, east side.", "connections": ["pad"] },
+    { "id": "fence_w", "name": "Perimeter Fence W", "shape": "box", "position": [-10.9, 1.1, 0], "size": [0.1, 2.0, 16], "material": "painted steel", "role": "Security perimeter fence, west side.", "connections": ["pad"] }
+  ]
+}

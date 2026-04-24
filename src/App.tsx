@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PartInfo } from './components/PartInfo';
+import { InfoPanel } from './components/InfoPanel';
 import { LazyViewer } from './components/LazyViewer';
 import { SampleGallery, type SampleEntry } from './components/SampleGallery';
 import { MOCK_SCENE, type Part, type SceneDescriptor } from './types';
@@ -40,6 +41,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [showLogs, setShowLogs] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
 
   const appendLog = (entry: LogEntry) => setLogs((prev) => [...prev.slice(-300), entry]);
 
@@ -96,6 +98,7 @@ function App() {
     setScene(sampleScene);
     setActiveSampleId(sample.id);
     setSelectedPart(null);
+    setInfoOpen(false);
     setError(null);
     appendLog({ stream: 'system', message: `Loaded sample: ${sample.title}` });
   };
@@ -138,6 +141,7 @@ function App() {
           setScene(nextScene);
           setActiveSampleId(undefined);
           setSelectedPart(null);
+          setInfoOpen(false);
           appendLog({ stream: 'system', message: `Rendered ${nextScene.parts.length} parts.` });
         } else if (eventName === 'error') {
           const message = payload.message ?? 'Unknown stream error';
@@ -163,6 +167,12 @@ function App() {
 
   const showAnalyzeUI = backend === 'available';
   const logText = useMemo(() => logs.map((entry) => `[${entry.stream}] ${entry.message}`).join('\n'), [logs]);
+  const hasInfo = useMemo(() => {
+    const info = scene.metadata?.info;
+    return Boolean(
+      info || scene.assembly_instructions || scene.metadata?.reference,
+    );
+  }, [scene]);
 
   return (
     <main className="app-shell">
@@ -176,6 +186,19 @@ function App() {
             {scene.assembly_instructions ? <p>{scene.assembly_instructions}</p> : null}
           </div>
           <div className="hero__badges">
+            {hasInfo ? (
+              <button
+                type="button"
+                className="badge badge--info"
+                onClick={() => setInfoOpen((prev) => !prev)}
+                aria-expanded={infoOpen}
+                aria-controls="info-panel"
+                title="Show sources and basic info"
+              >
+                <span className="badge__icon" aria-hidden>i</span>
+                <span>info</span>
+              </button>
+            ) : null}
             <span className={`badge badge--${backend}`}>
               {backend === 'probing' ? 'probing backend…' : backend === 'available' ? 'local backend online' : 'gallery-only mode'}
             </span>
@@ -223,6 +246,7 @@ function App() {
         {error ? <div className="error-toast">{error}</div> : null}
 
         <PartInfo part={selectedPart} open={panelOpen && !!selectedPart} onClose={() => setPanelOpen(false)} />
+        <InfoPanel scene={scene} open={infoOpen} onClose={() => setInfoOpen(false)} />
       </div>
 
       {samples.length > 0 ? (
