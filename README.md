@@ -65,7 +65,7 @@ visually/
 ├── public/
 │   └── samples/*.json     Pre-baked showcase scenes
 ├── dist/                  Built frontend (shipped with the npm package)
-└── wrangler.toml          Optional Cloudflare Pages deploy for the gallery-only static demo
+└── wrangler.toml          Optional Cloudflare Workers deploy for the gallery-only static demo
 ```
 
 Request flow when you submit a machine:
@@ -102,19 +102,16 @@ Every scene is a [`MachineSceneDescriptor`](./docs/schema.json):
 
 Add a showcase: drop a JSON file under `public/samples/`, register it in `public/samples/index.json`, rebuild.
 
-## Deploy the gallery to Cloudflare Pages
+## Deploy the gallery to Cloudflare Workers
 
-The static bundle (gallery only — no server) deploys as-is:
+The static bundle (gallery only — no server, no Claude CLI) deploys as a Workers Static Assets site:
 
 ```bash
 npx wrangler login          # one-time
-npm run deploy              # builds + pushes dist/ to the "visually" Pages project
+npm run deploy              # builds + publishes dist/ to the "visually-3d" Worker
 ```
 
-Or wire up the GitHub repo in the Cloudflare Pages dashboard with:
-
-- Build command: `npm ci && npm run build`
-- Build output directory: `dist`
+The Worker is created on first deploy using `wrangler.toml`; no dashboard setup is required. It'll be reachable at `https://visually-3d.<your-subdomain>.workers.dev`.
 
 The deployed version detects the absence of `/api/health` and hides the Analyze input automatically.
 

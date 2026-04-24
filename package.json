@@ -21,7 +21,7 @@
     "preview": "vite preview --host 0.0.0.0",
     "start": "node bin/visually.js",
     "start:no-open": "node bin/visually.js --no-open",
-    "deploy": "npm run build && npx wrangler pages deploy dist --project-name=visually",
+    "deploy": "npm run build && npx wrangler deploy",
     "prepack": "npm run build"
   },
   "dependencies": {},
