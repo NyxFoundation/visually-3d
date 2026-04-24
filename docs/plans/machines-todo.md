@@ -24,7 +24,7 @@ becomes a thin box).
 - [x] **OpenROV 2.8** — open-source underwater ROV with acrylic e-tubes.
       https://github.com/OpenROV/openrov-hardware — CC BY-NC-SA 4.0.
       Slug: `openrov-2-8`.
-- [ ] **Yale OpenHand Model T** — tendon-driven underactuated 4-finger hand.
+- [x] **Yale OpenHand Model T** — tendon-driven underactuated 4-finger hand.
       https://www.eng.yale.edu/grablab/openhand/ — CC BY-NC 3.0.
       Slug: `openhand-model-t`.
 - [ ] **RepRap Prusa i3 MK3S+** — the specific Prusa FDM build.

@@ -62,6 +62,13 @@
       "subtitle": "Tethered open-source underwater ROV with acrylic e-tubes and 3-thruster drive",
       "path": "/samples/openrov-2-8.json",
       "accent": "#0ea5e9"
+    },
+    {
+      "id": "openhand-model-t",
+      "title": "Yale OpenHand Model T",
+      "subtitle": "Single-motor, tendon-driven 4-finger underactuated robotic hand (Yale GRAB Lab)",
+      "path": "/samples/openhand-model-t.json",
+      "accent": "#e5e7eb"
     }
   ]
 }
