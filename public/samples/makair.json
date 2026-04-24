@@ -1,0 +1,57 @@
+{
+  "machine_name": "MakAir Open-Source Emergency Ventilator",
+  "assembly_instructions": "Compact open-source emergency ventilator in a ≈20×20×20 cm enclosure. The base casing carries two stage plates — a pneumatics stage (blower, piping, filters, valves) on one half and an electronics stage (control boards, plugs, cooling) on the other. Air flows from the exterior air plug through the blower-input filter into the blower, then through a connector pipe into an oxygen mixer, past a pressure valve, through a patient filter, and out to the patient. An exhaust filter handles return air. A fan holder at the rear keeps the electronics bay cool.",
+  "metadata": {
+    "reference": "https://github.com/makers-for-life/makair",
+    "domain": "medical-devices",
+    "thumbnail_camera": [0.50, 0.35, 0.50],
+    "info": {
+      "japanese_name": "MakAir オープンソース人工呼吸器",
+      "english_name": "MakAir Open-Source Emergency Ventilator",
+      "summary": "Emergency-grade, open-hardware ventilator designed by the Makers-For-Life collective during the COVID-19 pandemic. Targeted at hospital shortages in low-resource settings.",
+      "description": "MakAir is an open-source emergency ventilator designed in spring 2020 by Makers For Life, a volunteer collective of French engineers, medical professionals, and makers responding to the COVID-19 ventilator shortage. Unlike the one-off 'motor-compresses-an-AMBU-bag' prototypes that circulated early in the pandemic, MakAir is a compact, self-contained blower-based ventilator — a brushless blower draws ambient air through a HEPA filter, mixes it with optional supplemental oxygen in a passive mixer, meters it past a proportional pressure valve, and delivers it through a disposable patient filter to the patient circuit. A separate exhaust-return filter handles expired gas. All pneumatics live on one stage plate, all electronics (STM32 controller, motor driver, sensors, UI) on another. The enclosure is a ≈20 × 20 × 20 cm cube with a front touchscreen; CAD, firmware, and bill of materials are released under open licenses so hospitals can manufacture locally.",
+      "operator": "Field-deployed by Makers For Life partners and hospital maker-programs in 2020–21",
+      "contractor": "Makers For Life (volunteer French engineering/medical collective)",
+      "contract_date": "Initial release spring 2020; safety-iterated through 2021",
+      "contract_value": "Target ≈€500 in parts (self-build) vs. €20k+ for commercial ICU ventilators",
+      "status": "Open-source design; reference device certified for emergency use in several jurisdictions during COVID-19",
+      "facts": [
+        { "label": "Form factor",    "value": "≈20 × 20 × 20 cm enclosure" },
+        { "label": "Architecture",   "value": "Brushless blower + passive O₂ mixer + pressure-valve metering" },
+        { "label": "Control",        "value": "STM32-based controller, touchscreen UI" },
+        { "label": "Filters",        "value": "HEPA on blower intake, patient circuit, and exhaust return" },
+        { "label": "Oxygen",         "value": "Optional supplemental O₂ via the integrated mixer" },
+        { "label": "Alarms",         "value": "Pressure, flow, O₂, disconnection (required for emergency-use certification)" },
+        { "label": "License",        "value": "Open-source hardware + firmware (Makers-For-Life GitHub)" }
+      ],
+      "sources": [
+        { "title": "Makers For Life — MakAir on GitHub",     "url": "https://github.com/makers-for-life/makair" },
+        { "title": "Makers For Life — project site",          "url": "https://makers-for-life.org/" }
+      ]
+    }
+  },
+  "parts": [
+    { "id": "casing",                   "name": "Casing (Base Plate)",                "shape": "box",      "position": [0, 0.005, 0],           "size": [0.20, 0.010, 0.20], "material": "dark anodized aluminum", "role": "Outer enclosure floor — every internal stage bolts onto it. Side walls and top cover are removed here for inspectability.", "connections": ["pneumatics_stage", "electronics_stage", "air_plug", "electrical_plugs"] },
+
+    { "id": "pneumatics_stage",         "name": "Pneumatics Stage",                   "shape": "box",      "position": [-0.05, 0.015, 0],       "size": [0.080, 0.004, 0.180], "material": "dark anodized aluminum","role": "Raised floor plate on the pneumatics half — carries the blower, piping, filters, and valves.", "connections": ["casing", "blower_holder", "piping_holder", "filter_box_blower_in", "pressure_valve", "oxygen_mixer"] },
+    { "id": "electronics_stage",        "name": "Electronics Stage",                  "shape": "box",      "position": [ 0.05, 0.015, 0],       "size": [0.080, 0.004, 0.180], "material": "dark anodized aluminum","role": "Raised floor plate on the electronics half — carries the controller, motor driver, plugs, and cooling fan.", "connections": ["casing", "patient_filter_box", "filter_box_exhaust", "fan_holder", "electrical_plugs"] },
+
+    { "id": "blower_holder",            "name": "Blower Holder",                      "shape": "box",      "position": [-0.060, 0.055, -0.050], "size": [0.060, 0.070, 0.060], "material": "white composite",       "role": "Printed cradle that holds the brushless blower module and couples its output to the piping manifold.", "connections": ["pneumatics_stage", "piping_holder", "blower_to_o2_connector", "filter_box_blower_in"] },
+    { "id": "piping_holder",            "name": "Piping Holder",                      "shape": "cylinder", "position": [-0.020, 0.060, 0.050],  "rotation": [1.5708, 0, 0], "size": [0.015, 0.080],       "material": "brushed steel",         "role": "Cylindrical clamp that routes the flexible air hoses between the blower, mixer, and valves.", "connections": ["blower_holder", "pneumatics_stage"] },
+    { "id": "blower_to_o2_connector",   "name": "Blower → O₂-Mixer Connector",        "shape": "cylinder", "position": [-0.020, 0.080, -0.020], "rotation": [0, 0, 1.5708], "size": [0.012, 0.060],       "material": "brushed steel",         "role": "Machined connector linking the blower output pipe to the O₂ mixer input.", "connections": ["blower_holder", "oxygen_mixer"] },
+
+    { "id": "filter_box_blower_in",     "name": "Filter Box (Blower Intake)",         "shape": "box",      "position": [-0.070, 0.045, 0.075],  "size": [0.040, 0.050, 0.040], "material": "white composite",       "role": "HEPA filter on the blower-intake line — protects the blower and patient from room contaminants.", "connections": ["pneumatics_stage", "blower_holder", "filter_box_top_fit"] },
+    { "id": "filter_box_top_fit",       "name": "Filter Box Top Fit",                 "shape": "box",      "position": [-0.070, 0.075, 0.075],  "size": [0.042, 0.012, 0.042], "material": "white composite",       "role": "Snap-on top cap that holds the HEPA element in the blower-intake filter box.", "connections": ["filter_box_blower_in"] },
+
+    { "id": "oxygen_mixer",             "name": "Oxygen Mixer",                       "shape": "box",      "position": [-0.025, 0.050, 0.020],  "size": [0.045, 0.045, 0.045], "material": "forged steel",          "role": "Passive mixing chamber that blends room air from the blower with optional supplemental O₂.", "connections": ["blower_to_o2_connector", "pressure_valve"] },
+    { "id": "pressure_valve",           "name": "Pressure Valve",                     "shape": "box",      "position": [-0.025, 0.045, -0.050], "size": [0.045, 0.045, 0.040], "material": "forged steel",          "role": "Proportional pressure-control valve that meters the breath waveform into the patient circuit.", "connections": ["oxygen_mixer", "patient_filter_box"] },
+
+    { "id": "patient_filter_box",       "name": "Patient Filter Box",                 "shape": "box",      "position": [0.060, 0.045, 0.075],   "size": [0.050, 0.050, 0.050], "material": "white composite",       "role": "Disposable HEPA filter on the patient side — swapped between patients for cross-contamination control.", "connections": ["electronics_stage", "pressure_valve"] },
+    { "id": "filter_box_exhaust",       "name": "Filter Box (Exhaust Out)",           "shape": "box",      "position": [0.060, 0.045, -0.075],  "size": [0.045, 0.050, 0.040], "material": "white composite",       "role": "HEPA filter on the exhaust-return line — scrubs expired gas before it vents out of the device.", "connections": ["electronics_stage"] },
+
+    { "id": "fan_holder",               "name": "Fan Holder",                         "shape": "box",      "position": [0.060, 0.040, -0.025],  "size": [0.045, 0.045, 0.018], "material": "dark anodized aluminum","role": "Printed mount for the electronics-bay cooling fan.", "connections": ["electronics_stage"] },
+
+    { "id": "air_plug",                 "name": "Air Plug (external port)",           "shape": "cylinder", "position": [-0.095, 0.060, 0.080],  "rotation": [0, 0, 1.5708], "size": [0.010, 0.020],       "material": "brushed steel",         "role": "Pneumatic inlet/outlet quick-connect on the enclosure side wall.", "connections": ["casing", "blower_holder"] },
+    { "id": "electrical_plugs",         "name": "Electrical Plugs",                   "shape": "box",      "position": [0.095, 0.025, -0.080],  "size": [0.012, 0.035, 0.035], "material": "black composite",       "role": "Power inlet + service/data connectors on the rear of the electronics stage.", "connections": ["casing", "electronics_stage"] }
+  ]
+}
