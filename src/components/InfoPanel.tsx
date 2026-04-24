@@ -46,7 +46,7 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({ scene, open, onClose }) =>
       </div>
 
       {info?.description || scene.assembly_instructions ? (
-        <details className="info-panel__section info-panel__details">
+        <details className="info-panel__section info-panel__details" open>
           <summary>
             <h3>About</h3>
             <span className="info-panel__chevron" aria-hidden>▸</span>

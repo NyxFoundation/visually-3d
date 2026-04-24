@@ -42,6 +42,7 @@ function App() {
   const [showLogs, setShowLogs] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   const appendLog = (entry: LogEntry) => setLogs((prev) => [...prev.slice(-300), entry]);
 
@@ -99,6 +100,7 @@ function App() {
     setActiveSampleId(sample.id);
     setSelectedPart(null);
     setInfoOpen(false);
+    setGalleryOpen(false);
     setError(null);
     appendLog({ stream: 'system', message: `Loaded sample: ${sample.title}` });
   };
@@ -180,10 +182,25 @@ function App() {
         <LazyViewer scene={scene} selectedPartId={selectedPart?.id} onPartSelect={handlePartSelect} />
 
         <header className="hero" aria-label="Current machine">
-          <div className="hero__title">
-            <span className="hero__eyebrow">Visually</span>
-            <h1>{scene.machine_name}</h1>
-            {scene.assembly_instructions ? <p>{scene.assembly_instructions}</p> : null}
+          <div className="hero__group">
+            {samples.length > 0 ? (
+              <button
+                type="button"
+                className={`menu-toggle${galleryOpen ? ' menu-toggle--open' : ''}`}
+                onClick={() => setGalleryOpen((prev) => !prev)}
+                aria-label={galleryOpen ? 'Close samples drawer' : 'Open samples drawer'}
+                aria-expanded={galleryOpen}
+                aria-controls="gallery-drawer"
+              >
+                <span className="menu-toggle__icon" aria-hidden>
+                  <span /><span /><span />
+                </span>
+              </button>
+            ) : null}
+            <div className="hero__title">
+              <span className="hero__eyebrow">Visually</span>
+              <h1>{scene.machine_name}</h1>
+            </div>
           </div>
           <div className="hero__badges">
             {hasInfo ? (
@@ -247,11 +264,25 @@ function App() {
 
         <PartInfo part={selectedPart} open={panelOpen && !!selectedPart} onClose={() => setPanelOpen(false)} />
         <InfoPanel scene={scene} open={infoOpen} onClose={() => setInfoOpen(false)} />
-      </div>
 
-      {samples.length > 0 ? (
-        <SampleGallery samples={samples} activeId={activeSampleId} onSelect={handleSampleSelect} />
-      ) : null}
+        {samples.length > 0 ? (
+          <>
+            <div
+              className={`gallery-drawer__scrim${galleryOpen ? ' gallery-drawer__scrim--open' : ''}`}
+              onClick={() => setGalleryOpen(false)}
+              aria-hidden
+            />
+            <aside
+              id="gallery-drawer"
+              className={`gallery-drawer${galleryOpen ? ' gallery-drawer--open' : ''}`}
+              aria-hidden={!galleryOpen}
+              aria-label="Sample machines"
+            >
+              <SampleGallery samples={samples} activeId={activeSampleId} onSelect={handleSampleSelect} />
+            </aside>
+          </>
+        ) : null}
+      </div>
     </main>
   );
 }
