@@ -33,7 +33,7 @@ becomes a thin box).
 - [x] **OreSat0 CubeSat** — 1U CubeSat with deployable solar panels.
       https://github.com/oresat/oresat-structure — CERN OHL v2.
       Slug: `oresat0`.
-- [ ] **TABBY EVO** — Open Motors EV hardware platform.
+- [x] **TABBY EVO** — Open Motors EV hardware platform.
       https://www.openmotors.co/download/ — CC BY-SA 4.0.
       Slug: `tabby-evo`.
 - [ ] **Apollo Command & Service Module** — NASA CSM (conical CM + cylindrical SM).

@@ -83,6 +83,13 @@
       "subtitle": "PSAS open-hardware tech-demo CubeSat with deployable solar panels (2022)",
       "path": "/samples/oresat0.json",
       "accent": "#7c3aed"
+    },
+    {
+      "id": "tabby-evo",
+      "title": "TABBY EVO EV Platform",
+      "subtitle": "Open Motors open-source 'skateboard' EV chassis (Italy, 2016)",
+      "path": "/samples/tabby-evo.json",
+      "accent": "#14b8a6"
     }
   ]
 }

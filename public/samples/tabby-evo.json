@@ -1,0 +1,57 @@
+{
+  "machine_name": "TABBY EVO Open-Source EV Platform",
+  "assembly_instructions": "Skateboard-style open-source electric-vehicle chassis. A rectangular welded-steel floor frame sits on four wheels at the corners, each with its own shock-absorber and brake caliper. A rack-and-pinion steering bar spans the front. Flat battery modules are bolted under the floor. At the rear, a cylindrical electric motor feeds a reduction gearbox that drives a transverse drive shaft to the rear wheels. Motor controller, BMS, and a DC/DC converter are mounted on the floor between the driver compartment and the battery.",
+  "metadata": {
+    "reference": "https://www.openmotors.co/download/",
+    "domain": "electric-vehicles",
+    "thumbnail_camera": [4.5, 3.0, 4.5],
+    "info": {
+      "japanese_name": "TABBY EVO（オープンソース EV プラットフォーム）",
+      "english_name": "Open Motors TABBY EVO — Open-Source Electric Vehicle Platform",
+      "summary": "Italian-designed open-hardware 'skateboard' EV chassis. A modular, rolling platform intended as a starting point for EV startups, OEM concept builds, and university teaching.",
+      "description": "TABBY EVO is the second-generation open-source electric-vehicle platform from OSVehicle / Open Motors. It is a 'skateboard' rolling chassis — a welded-steel floor frame with suspension, steering, brakes, battery, motor, and electronics all pre-integrated, ready to take any body shell bolted on top. The architecture follows a rear-drive layout with a single cylindrical electric motor feeding a reduction gearbox and a transverse drive shaft to the rear wheels, while the battery pack sits flat under the floor between the front and rear axles. A motor controller, battery management system (BMS), and a DC/DC converter ride on the floor beside the battery. Full CAD, bill of materials, wiring diagrams, and assembly manuals are released under CC BY-SA 4.0 so that others can build, fork, or commercialize the platform.",
+      "operator": "Open Motors community + EV startups using TABBY as a reference chassis",
+      "contractor": "OSVehicle / Open Motors (Italy)",
+      "contract_date": "Released 2015–2016 (EVO is the second-generation iteration)",
+      "contract_value": "Reference BOM published; no fixed list price",
+      "status": "Open-source; documents and CAD archived and publicly downloadable",
+      "facts": [
+        { "label": "Length × Width × Height", "value": "2.33 m × 1.49 m × 1.38 m" },
+        { "label": "Architecture", "value": "'Skateboard' floor with rear-drive electric powertrain" },
+        { "label": "Seating", "value": "2 + (optional) 2 seats, body-shell dependent" },
+        { "label": "Powertrain", "value": "Electric motor → reduction gearbox → transverse drive shaft (rear wheels)" },
+        { "label": "Battery", "value": "Under-floor Li-ion pack + BMS" },
+        { "label": "Electronics", "value": "Motor controller + DC/DC converter on floor" },
+        { "label": "License", "value": "CC BY-SA 4.0 (all CAD, BOM, and docs)" }
+      ],
+      "sources": [
+        { "title": "Open Motors — downloads & documentation portal", "url": "https://www.openmotors.co/download/" },
+        { "title": "Open Motors — TABBY EVO product page", "url": "https://www.openmotors.co/tabbyevo/" }
+      ]
+    }
+  },
+  "parts": [
+    { "id": "chassis",            "name": "Skateboard Chassis",         "shape": "box",      "position": [0, 0.36, 0],           "size": [2.30, 0.10, 1.40], "material": "welded steel",          "role": "Welded-steel floor frame that unifies all subsystems and becomes the mounting surface for any body shell.", "connections": ["wheel_fl","wheel_fr","wheel_rl","wheel_rr","steering_system","suspension","brake","battery_pack","electric_motor","reduction_gearbox","motor_controller","bms","dc_dc_converter"] },
+
+    { "id": "wheel_fl", "name": "Wheel (Fwd-Left)",  "shape": "cylinder", "position": [ 0.85, 0.30,  0.72], "rotation": [1.5708, 0, 0], "size": [0.30, 0.18], "material": "rubber", "role": "Front-left wheel.",  "connections": ["chassis","suspension","brake","steering_system"] },
+    { "id": "wheel_fr", "name": "Wheel (Fwd-Right)", "shape": "cylinder", "position": [ 0.85, 0.30, -0.72], "rotation": [1.5708, 0, 0], "size": [0.30, 0.18], "material": "rubber", "role": "Front-right wheel.", "connections": ["chassis","steering_system"] },
+    { "id": "wheel_rl", "name": "Wheel (Rear-Left)", "shape": "cylinder", "position": [-0.85, 0.30,  0.72], "rotation": [1.5708, 0, 0], "size": [0.30, 0.18], "material": "rubber", "role": "Rear-left wheel, driven by the drive shaft.",  "connections": ["chassis","drive_shaft"] },
+    { "id": "wheel_rr", "name": "Wheel (Rear-Right)","shape": "cylinder", "position": [-0.85, 0.30, -0.72], "rotation": [1.5708, 0, 0], "size": [0.30, 0.18], "material": "rubber", "role": "Rear-right wheel, driven by the drive shaft.", "connections": ["chassis","drive_shaft"] },
+
+    { "id": "steering_system", "name": "Steering Rack", "shape": "cylinder", "position": [0.85, 0.35, 0], "rotation": [1.5708, 0, 0], "size": [0.025, 1.30], "material": "brushed steel", "role": "Rack-and-pinion steering bar between the two front wheels; steering column ties into the driver compartment above.", "connections": ["chassis","wheel_fl","wheel_fr"] },
+
+    { "id": "suspension", "name": "Suspension Strut (representative)", "shape": "cylinder", "position": [0.85, 0.48, 0.60], "size": [0.03, 0.35], "material": "dark anodized aluminum", "role": "Coil-over shock absorber at the front-left corner. All four corners carry one; shown here at the FL for clarity.", "connections": ["chassis","wheel_fl"] },
+
+    { "id": "brake", "name": "Brake Caliper + Disc (representative)", "shape": "box", "position": [0.85, 0.30, 0.55], "size": [0.04, 0.10, 0.08], "material": "forged steel", "role": "Disc brake at the front-left wheel (representative — all four corners carry one).", "connections": ["chassis","wheel_fl"] },
+
+    { "id": "battery_pack", "name": "Under-Floor Battery Pack", "shape": "box", "position": [0, 0.21, 0], "size": [1.60, 0.10, 1.10], "material": "dark anodized aluminum", "role": "Flat Li-ion battery pack bolted to the underside of the chassis between the axles.", "connections": ["chassis","bms","dc_dc_converter","motor_controller"] },
+
+    { "id": "electric_motor",   "name": "Electric Motor",       "shape": "cylinder", "position": [-0.88, 0.40, 0.20], "rotation": [1.5708, 0, 0], "size": [0.10, 0.30], "material": "brushed steel",         "role": "AC electric traction motor. Drives the rear axle through the reduction gearbox.", "connections": ["chassis","reduction_gearbox","motor_controller"] },
+    { "id": "reduction_gearbox","name": "Reduction Gearbox",    "shape": "box",      "position": [-0.88, 0.40, -0.05], "size": [0.28, 0.22, 0.22], "material": "dark anodized aluminum","role": "Single-speed reduction gearbox. Converts motor torque to wheel-level torque.", "connections": ["electric_motor","drive_shaft"] },
+    { "id": "drive_shaft",      "name": "Rear Drive Shaft",     "shape": "cylinder", "position": [-0.88, 0.30, 0], "rotation": [1.5708, 0, 0], "size": [0.025, 1.20], "material": "brushed steel",         "role": "Transverse drive shaft between the gearbox and the rear wheels.", "connections": ["reduction_gearbox","wheel_rl","wheel_rr"] },
+
+    { "id": "motor_controller", "name": "Motor Controller",     "shape": "box",      "position": [-0.40, 0.46, 0.40], "size": [0.26, 0.14, 0.28], "material": "dark anodized aluminum","role": "Three-phase inverter / motor controller. Converts DC battery power into the AC drive waveform.", "connections": ["chassis","battery_pack","electric_motor"] },
+    { "id": "bms",              "name": "Battery Management System", "shape": "box", "position": [0.20, 0.44, 0.40], "size": [0.26, 0.08, 0.16], "material": "dark anodized aluminum","role": "BMS — monitors per-cell voltage/temperature, balances cells, isolates the pack on faults.", "connections": ["chassis","battery_pack"] },
+    { "id": "dc_dc_converter",  "name": "DC/DC Converter",      "shape": "box",      "position": [0.20, 0.44, -0.40], "size": [0.22, 0.08, 0.16], "material": "dark anodized aluminum","role": "Steps the high-voltage traction pack down to 12 V for the low-voltage accessory bus.", "connections": ["chassis","battery_pack"] }
+  ]
+}
