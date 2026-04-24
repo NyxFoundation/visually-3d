@@ -45,7 +45,7 @@ becomes a thin box).
 - [x] **MakAir open-source ventilator** — motor-driven AMBU-bag ventilator.
       https://github.com/makers-for-life/makair — Public Domain License.
       Slug: `makair`.
-- [ ] **Open Bionics Hero Arm** — 3D-printed myoelectric prosthetic arm.
+- [x] **Open Bionics Hero Arm** — 3D-printed myoelectric prosthetic arm.
       https://openbionics.com/hero-arm/ — license TBC.
       Slug: `hero-arm`.
 

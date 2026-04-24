@@ -111,6 +111,13 @@
       "subtitle": "Makers-For-Life emergency ventilator (COVID-19, 2020) — blower + O₂ mixer + patient filter",
       "path": "/samples/makair.json",
       "accent": "#10b981"
+    },
+    {
+      "id": "hero-arm",
+      "title": "Open Bionics Hero Arm",
+      "subtitle": "3D-printed myoelectric prosthetic forearm with five independently driven fingers",
+      "path": "/samples/hero-arm.json",
+      "accent": "#fb7185"
     }
   ]
 }
