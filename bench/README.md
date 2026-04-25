@@ -101,12 +101,27 @@ python scripts/run_swebench.py \
     --agent openhands --model qwen-coder-32b --seed 1
 ```
 
+### Materialize task fixtures
+
+`scripts/fetch_swebench_fixtures.py` pulls SWE-bench Lite tasks from the
+HuggingFace datasets-server (no `datasets` package required) and writes one
+JSON per task into `fixtures/swebench_lite/`:
+
+```bash
+python scripts/fetch_swebench_fixtures.py            # default: 10 tasks, offset 0
+python scripts/fetch_swebench_fixtures.py -n 50      # next 50 tasks
+```
+
+The fetcher derives `candidate_files` from each task's gold patch and a
+`test_command` from `FAIL_TO_PASS`. Re-running is idempotent (skips existing
+fixtures unless `--force`).
+
 ### Drive the OSS baseline matrix (Phase-0)
 
 `scripts/run_baseline_oss.sh` sweeps (model × fixture × seed) for the OSS
 models on Ollama Cloud, skips runs whose `data/raw_runs/<run_id>.json`
 already exists, and clears the Phase-0 ≥10-run threshold out of the box
-(3 models × 4 seeds × 1 fixture = 12 runs):
+(3 models × 10 fetched fixtures × 1 seed = 30 runs):
 
 ```bash
 # Inspect the plan.

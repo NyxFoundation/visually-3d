@@ -12,8 +12,8 @@
 #
 # Flags / env (flag wins):
 #   --models     MODELS     comma-separated model ids       (default: qwen-coder-32b,gpt-oss-120b,deepseek-coder-7b)
-#   --seeds      SEEDS      comma-separated seeds            (default: 1,2,3,4)
-#   --fixtures   FIXTURES   comma-separated fixture paths    (default: fixtures/sample_swebench_task.json)
+#   --seeds      SEEDS      comma-separated seeds            (default: 1)
+#   --fixtures   FIXTURES   comma-separated fixture paths    (default: every fixtures/swebench_lite/*.json)
 #   --benchmark  BENCHMARK  swebench_lite|swebench_verified  (default: swebench_lite)
 #   --agent      AGENT      openhands|swe_agent              (default: openhands)
 #   --jobs       JOBS       parallel workers                 (default: 1)
@@ -27,8 +27,14 @@ bench_dir="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$bench_dir"
 
 MODELS="${MODELS:-qwen-coder-32b,gpt-oss-120b,deepseek-coder-7b}"
-SEEDS="${SEEDS:-1,2,3,4}"
-FIXTURES="${FIXTURES:-fixtures/sample_swebench_task.json}"
+SEEDS="${SEEDS:-1}"
+
+# Default fixture set: every JSON in fixtures/swebench_lite/ (populated by
+# scripts/fetch_swebench_fixtures.py). Falls back to the single hand-written
+# sample if the dir is empty so the script still runs in a fresh checkout.
+default_fixtures="$(find fixtures/swebench_lite -maxdepth 1 -name '*.json' 2>/dev/null | sort | paste -sd ',' -)"
+[[ -z "$default_fixtures" ]] && default_fixtures="fixtures/sample_swebench_task.json"
+FIXTURES="${FIXTURES:-$default_fixtures}"
 BENCHMARK="${BENCHMARK:-swebench_lite}"
 AGENT="${AGENT:-openhands}"
 JOBS="${JOBS:-1}"
