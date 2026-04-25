@@ -2,11 +2,18 @@
 # Notion spec section 3. Prices are reference-only — re-check vendor pages before running.
 #
 # `tier` matches the four-bucket plan: cheap_api / strong_api / strong_oss / small_oss.
+# `provider` selects the wire protocol in scripts/llm_client.py:
+#   - openai        → https://api.openai.com/v1/chat/completions  (env: OPENAI_API_KEY)
+#   - anthropic     → https://api.anthropic.com/v1/messages       (env: ANTHROPIC_API_KEY)
+#   - ollama_cloud  → https://ollama.com/v1/chat/completions      (env: OLLAMA_API_KEY)
+# `model` is the wire-format name sent to the provider; defaults to `id` if omitted.
 # `cost_per_mtok_in/out` are USD per 1M tokens; used by compute_metrics.py for cost reports.
+# OSS models on Ollama Cloud are billed per-subscription, not per-token, so cost is 0.
 
 models:
   - id: gpt-5-mini
     provider: openai
+    model: gpt-5-mini
     tier: cheap_api
     cost_per_mtok_in: 0.25
     cost_per_mtok_out: 2.00
@@ -14,6 +21,7 @@ models:
 
   - id: gpt-5
     provider: openai
+    model: gpt-5
     tier: strong_api
     cost_per_mtok_in: 1.25      # placeholder
     cost_per_mtok_out: 10.00    # placeholder
@@ -21,28 +29,40 @@ models:
 
   - id: claude-sonnet-4
     provider: anthropic
+    model: claude-sonnet-4-5
     tier: strong_api
     cost_per_mtok_in: 3.00
     cost_per_mtok_out: 15.00
     enabled: false
 
   - id: gemini-2.5-pro
-    provider: google
+    provider: openai          # routed through an OpenAI-compatible gateway
+    model: gemini-2.5-pro
     tier: strong_api
     cost_per_mtok_in: 1.25
     cost_per_mtok_out: 10.00    # placeholder
     enabled: false
 
   - id: qwen-coder-32b
-    provider: local
+    provider: ollama_cloud
+    model: qwen3-coder:480b-cloud
     tier: strong_oss
     cost_per_mtok_in: 0.0
     cost_per_mtok_out: 0.0
-    enabled: false
+    enabled: true
 
   - id: deepseek-coder-7b
-    provider: local
+    provider: ollama_cloud
+    model: deepseek-v3.1:671b-cloud
     tier: small_oss
     cost_per_mtok_in: 0.0
     cost_per_mtok_out: 0.0
-    enabled: false
+    enabled: true
+
+  - id: gpt-oss-120b
+    provider: ollama_cloud
+    model: gpt-oss:120b-cloud
+    tier: strong_oss
+    cost_per_mtok_in: 0.0
+    cost_per_mtok_out: 0.0
+    enabled: true

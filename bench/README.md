@@ -34,8 +34,13 @@ bench/
 └── docs/                      annotation guideline, study protocol, consent form
 ```
 
-`data/` and `outputs/` track only `.gitkeep` placeholders — generated artifacts
-are gitignored (see `bench/.gitignore`).
+**Artifact policy.** All text artifacts under `data/` and `outputs/` (JSON,
+JSONL, patches, metric reports) **are committed to git** so runs are cacheable
+and the experiment can be parallelized across machines and contributors —
+person A drives 50 SWE-bench tasks, pushes; person B pulls and drives 50 more
+without overlap; CI rolls up metrics on the union. Only large binaries
+(`data/screenshots/`) are gitignored — store a `manifest.json` next to them
+recording hash + remote URL until we wire up LFS.
 
 ## Quickstart
 
@@ -63,6 +68,59 @@ python scripts/compute_metrics.py
 
 You should see `data/events/demo_run.jsonl`, `data/graphs/demo_run.json`, and a
 metric summary on stdout.
+
+### Drive a real SWE-bench run
+
+`scripts/run_swebench.py` runs a minimal four-step coding-agent loop
+(plan → inspect → patch → evaluate) against a task fixture, calls a model via
+`scripts/llm_client.py`, writes the trace + run-meta, and shells out to
+`convert_to_events.py`. It does **not** apply the patch in a sandbox yet — that
+arrives once we vendor OpenHands.
+
+Set the API key for the provider you're targeting:
+
+```bash
+export OLLAMA_API_KEY=...   # OSS models (qwen-coder-32b, gpt-oss-120b, deepseek-coder-7b)
+export OPENAI_API_KEY=...   # gpt-5*, gemini-2.5-pro (via OpenAI-compatible gateway)
+export ANTHROPIC_API_KEY=...
+```
+
+Then:
+
+```bash
+# Offline smoke (no API key needed) — useful for hitting the ≥10-runs target.
+python scripts/run_swebench.py \
+    --benchmark swebench_lite \
+    --task-fixture fixtures/sample_swebench_task.json \
+    --agent openhands --model qwen-coder-32b --seed 1 --stub
+
+# Real call against Ollama Cloud.
+python scripts/run_swebench.py \
+    --benchmark swebench_lite \
+    --task-fixture fixtures/sample_swebench_task.json \
+    --agent openhands --model qwen-coder-32b --seed 1
+```
+
+### Drive the OSS baseline matrix (Phase-0)
+
+`scripts/run_baseline_oss.sh` sweeps (model × fixture × seed) for the OSS
+models on Ollama Cloud, skips runs whose `data/raw_runs/<run_id>.json`
+already exists, and clears the Phase-0 ≥10-run threshold out of the box
+(3 models × 4 seeds × 1 fixture = 12 runs):
+
+```bash
+# Inspect the plan.
+bench/scripts/run_baseline_oss.sh --dry-run
+
+# Offline smoke (no API key).
+bench/scripts/run_baseline_oss.sh --stub
+
+# Real Ollama Cloud run.
+OLLAMA_API_KEY=... bench/scripts/run_baseline_oss.sh --jobs 4
+```
+
+Override any axis via flag (`--models`, `--seeds`, `--fixtures`, `--benchmark`,
+`--agent`) or env var. Use `--force` to recompute cached runs.
 
 ## Phase 0 / Week 1–2 checklist
 
@@ -101,7 +159,9 @@ outputs/cost_reports/metrics.json
 
 These are the integration points with explicit `TODO(phase-0)` markers:
 
-- OpenHands / SWE-agent invocation in `run_swebench.py`.
+- Sandbox patch-apply + real test execution in `run_swebench.py`. The minimal
+  loop produces a diff and logs `test_result: skipped`; wiring the SWE-bench
+  Docker harness (or OpenHands' built-in runtime) flips that to passed/failed.
 - WebArena / BrowserGym container bring-up + agent loop in `run_webarena.py`.
 - Real schema validation. The schemas in `schemas/` are authoritative; wire
   `jsonschema` into `_common.py` once `requirements.txt` is installed.

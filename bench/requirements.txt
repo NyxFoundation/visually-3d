@@ -1,7 +1,9 @@
 # Visually-3D bench harness — minimum deps.
 # Heavy benchmark/agent frameworks (openhands, swe-bench, browsergym, webarena)
-# are installed separately per their upstream READMEs.
+# are installed separately per their upstream READMEs. The minimum coding-agent
+# loop in scripts/run_swebench.py only needs PyYAML — LLM HTTP calls go through
+# the stdlib (urllib) in scripts/llm_client.py.
 
-PyYAML>=6.0          # configs/*.yaml loading
+PyYAML>=6.0          # configs/*.yaml loading + llm_client model lookup
 jsonschema>=4.21     # validate run / event / annotation records
 pandas>=2.2          # cost_reports + metric tables (optional but useful)

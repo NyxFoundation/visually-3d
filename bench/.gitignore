@@ -1,19 +1,16 @@
-# Generated experiment artifacts — keep folder structure, ignore contents.
-data/raw_runs/*
-data/events/*
-data/annotations/*
-data/graphs/*
-data/screenshots/*
-data/patches/*
-outputs/ui_logs/*
-outputs/diagnosis_results/*
-outputs/repair_results/*
-outputs/cost_reports/*
+# Bench artifacts policy: text artifacts (JSON / JSONL / patches) ARE committed
+# so runs are cacheable and the experiment can be parallelized across machines
+# and contributors. Binary blobs (screenshots, DOM snapshots) are kept out of
+# git unless we wire up LFS — they live next to a JSON manifest that records
+# their hash + URL.
 
-# Re-include the placeholders so empty dirs persist in git.
-!**/.gitkeep
+# Binary / large artifacts — keep folder structure, ignore contents.
+data/screenshots/*
+!data/screenshots/.gitkeep
+!data/screenshots/**/manifest.json
 
 # Local overrides
 .env
 .env.local
 *.log
+__pycache__/

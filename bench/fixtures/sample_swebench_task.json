@@ -1,0 +1,12 @@
+{
+  "instance_id": "django__django-12345",
+  "repo": "django/django",
+  "base_commit": "0a4b13b48e7e4d2e7e36d0e23cb1bb2b6c0a9e3f",
+  "problem_statement": "QuerySet.order_by() loses ordering when chained with a select_related() that includes a related field. Steps to reproduce:\n\n  Author.objects.select_related('publisher').order_by('publisher__name').order_by('name')\n\nExpected: results sorted by name only (the second .order_by replaces the first per docs).\nActual: results are returned in the order of publisher__name. The second order_by() is silently dropped.",
+  "hints_text": "Likely culprit is QuerySet.order_by merging instead of replacing the order clauses when a related field is involved. See django/db/models/query.py.",
+  "candidate_files": [
+    "django/db/models/query.py",
+    "django/db/models/sql/query.py"
+  ],
+  "test_command": "python -m pytest tests/queries/test_qs.py::OrderingTests::test_chained_order_by_related -x"
+}
