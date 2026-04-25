@@ -119,23 +119,31 @@ fixtures unless `--force`).
 ### Drive the OSS baseline matrix (Phase-0)
 
 `scripts/run_baseline_oss.sh` sweeps (model × fixture × seed) for the OSS
-models on Ollama Cloud, skips runs whose `data/raw_runs/<run_id>.json`
-already exists, and clears the Phase-0 ≥10-run threshold out of the box
-(3 models × 10 fetched fixtures × 1 seed = 30 runs):
+models on Ollama Cloud, dispatches to the right driver based on `--benchmark`,
+skips cached runs, and clears the Phase-0 ≥10-run threshold out of the box
+(30 runs per benchmark):
 
 ```bash
-# Inspect the plan.
-bench/scripts/run_baseline_oss.sh --dry-run
-
-# Offline smoke (no API key).
-bench/scripts/run_baseline_oss.sh --stub
-
-# Real Ollama Cloud run.
+# Coding baseline (SWE-bench Lite, openhands agent shape, 4-step loop).
 OLLAMA_API_KEY=... bench/scripts/run_baseline_oss.sh --jobs 4
+
+# Web baseline (WebArena, react_browser shape, 5-step loop).
+OLLAMA_API_KEY=... bench/scripts/run_baseline_oss.sh --benchmark webarena --jobs 4
+
+# Inspect / smoke without any API key.
+bench/scripts/run_baseline_oss.sh --dry-run
+bench/scripts/run_baseline_oss.sh --stub
 ```
 
-Override any axis via flag (`--models`, `--seeds`, `--fixtures`, `--benchmark`,
+The driver, default agent, and default fixture dir all flow from
+`--benchmark`. Override any axis via flag (`--models`, `--seeds`, `--fixtures`,
 `--agent`) or env var. Use `--force` to recompute cached runs.
+
+Web fixtures live in `fixtures/webarena/` (10 hand-crafted tasks across
+shopping / shopping_admin / gitlab / reddit / maps / wikipedia / classifieds).
+The minimal web driver does **not** drive a real browser yet — it produces a
+plan→navigate→observe→act→eval LLM trace with `domain: "web"` events; wiring
+real BrowserGym + Playwright comes after the visualizer iteration.
 
 ## Phase 0 / Week 1–2 checklist
 
@@ -177,7 +185,10 @@ These are the integration points with explicit `TODO(phase-0)` markers:
 - Sandbox patch-apply + real test execution in `run_swebench.py`. The minimal
   loop produces a diff and logs `test_result: skipped`; wiring the SWE-bench
   Docker harness (or OpenHands' built-in runtime) flips that to passed/failed.
-- WebArena / BrowserGym container bring-up + agent loop in `run_webarena.py`.
+- Real browser execution in `run_webarena.py`. The minimal loop produces an
+  LLM-only trace with `domain: "web"` events; wiring BrowserGym + Playwright
+  + the WebArena Docker stack adds DOM/screenshot capture and real success
+  evaluation.
 - Real schema validation. The schemas in `schemas/` are authoritative; wire
   `jsonschema` into `_common.py` once `requirements.txt` is installed.
 - Annotation tooling (Section 8) — currently just a JSON Schema; build a small

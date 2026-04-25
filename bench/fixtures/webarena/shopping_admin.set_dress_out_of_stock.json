@@ -1,0 +1,10 @@
+{
+  "evaluation": {
+    "type": "field_equals",
+    "value": "stock_status=out_of_stock"
+  },
+  "intent": "Open the 'Summer Linen Dress' product page and set its stock status to Out of Stock.",
+  "site": "shopping_admin",
+  "start_url": "http://shopping-admin.demo/admin/catalog/product",
+  "task_id": "shopping_admin.set_dress_out_of_stock"
+}

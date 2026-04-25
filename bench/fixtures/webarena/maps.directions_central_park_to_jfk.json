@@ -1,0 +1,10 @@
+{
+  "evaluation": {
+    "type": "string_match",
+    "value": "estimated_minutes"
+  },
+  "intent": "Get driving directions from Central Park, NYC to JFK Airport and report the estimated travel time.",
+  "site": "maps",
+  "start_url": "http://maps.demo/directions",
+  "task_id": "maps.directions_central_park_to_jfk"
+}

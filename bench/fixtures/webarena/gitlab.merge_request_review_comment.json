@@ -1,0 +1,10 @@
+{
+  "evaluation": {
+    "type": "string_match",
+    "value": "LGTM, please squash"
+  },
+  "intent": "Find the most recent open merge request and leave a comment that reads 'LGTM, please squash before merging.'",
+  "site": "gitlab",
+  "start_url": "http://gitlab.demo/web-team/portal/-/merge_requests",
+  "task_id": "gitlab.merge_request_review_comment"
+}

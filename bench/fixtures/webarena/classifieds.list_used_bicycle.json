@@ -1,0 +1,10 @@
+{
+  "evaluation": {
+    "type": "url_contains",
+    "value": "/listing/"
+  },
+  "intent": "Create a new classifieds listing for a used red road bicycle, asking $250, in the Bicycles category.",
+  "site": "classifieds",
+  "start_url": "http://classifieds.demo/post",
+  "task_id": "classifieds.list_used_bicycle"
+}

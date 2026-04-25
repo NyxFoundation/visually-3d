@@ -1,0 +1,10 @@
+{
+  "evaluation": {
+    "type": "url_contains",
+    "value": "/comments/"
+  },
+  "intent": "Submit a new text post in learnpython titled 'Difference between list.append and list.extend?' with a one-paragraph body.",
+  "site": "reddit",
+  "start_url": "http://reddit.demo/f/learnpython/submit",
+  "task_id": "reddit.post_question_about_lists"
+}

@@ -1,0 +1,10 @@
+{
+  "evaluation": {
+    "type": "string_match",
+    "value": "top_rated_headphone_name"
+  },
+  "intent": "Sort headphones by customer rating descending and report the name and price of the top result.",
+  "site": "shopping",
+  "start_url": "http://shopping.demo/category/electronics/headphones",
+  "task_id": "shopping.review_top_rated_headphones"
+}

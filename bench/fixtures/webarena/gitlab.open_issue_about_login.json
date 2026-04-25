@@ -1,0 +1,10 @@
+{
+  "evaluation": {
+    "type": "url_contains",
+    "value": "/issues/"
+  },
+  "intent": "Open a new issue in the 'web-team/portal' project titled 'Login button unresponsive on Safari' assigned to user @qa.",
+  "site": "gitlab",
+  "start_url": "http://gitlab.demo/groups/web-team/-/issues",
+  "task_id": "gitlab.open_issue_about_login"
+}

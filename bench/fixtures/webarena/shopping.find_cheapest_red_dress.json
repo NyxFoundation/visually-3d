@@ -1,0 +1,10 @@
+{
+  "evaluation": {
+    "type": "url_contains",
+    "value": "/checkout/cart"
+  },
+  "intent": "Find the cheapest red dress that is currently in stock and add it to the cart.",
+  "site": "shopping",
+  "start_url": "http://shopping.demo/category/dresses",
+  "task_id": "shopping.find_cheapest_red_dress"
+}

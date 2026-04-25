@@ -130,6 +130,8 @@ def _classify_browser(action: str) -> str:
         return "observation"
     if a in {"plan", "think", "reason"}:
         return "llm_call"
+    if a in {"eval", "evaluate", "verify"}:
+        return "evaluation"
     return "tool_call"
 
 

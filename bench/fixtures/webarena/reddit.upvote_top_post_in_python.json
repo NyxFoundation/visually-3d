@@ -1,0 +1,10 @@
+{
+  "evaluation": {
+    "type": "field_equals",
+    "value": "vote_state=upvoted"
+  },
+  "intent": "Upvote the top post of the day in the python forum.",
+  "site": "reddit",
+  "start_url": "http://reddit.demo/f/python",
+  "task_id": "reddit.upvote_top_post_in_python"
+}

@@ -1,0 +1,10 @@
+{
+  "evaluation": {
+    "type": "string_match",
+    "value": "330"
+  },
+  "intent": "Look up the Eiffel Tower's article and report its total height in metres.",
+  "site": "wikipedia",
+  "start_url": "http://wikipedia.demo/wiki/Main_Page",
+  "task_id": "wikipedia.find_eiffel_tower_height"
+}
