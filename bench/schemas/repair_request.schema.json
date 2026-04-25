@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://visually-3d.local/schemas/repair_request.schema.json",
+  "title": "AI repair-suggestion input",
+  "description": "Structured causal-graph summary fed to the repair LLM. Mirrors Notion spec section 9 (input).",
+  "type": "object",
+  "required": ["task_summary", "failure_summary", "causal_graph_summary", "available_repair_actions"],
+  "properties": {
+    "task_summary": { "type": "string" },
+    "failure_summary": { "type": "string" },
+    "causal_graph_summary": {
+      "type": "object",
+      "required": ["first_failure_node"],
+      "properties": {
+        "first_failure_node": { "type": "string" },
+        "high_impact_nodes": { "type": "array", "items": { "type": "string" } },
+        "error_propagation_path": { "type": "array", "items": { "type": "string" } },
+        "cost_hotspots": { "type": "array", "items": { "type": "string" } },
+        "loop_segments": {
+          "type": "array",
+          "items": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "available_repair_actions": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

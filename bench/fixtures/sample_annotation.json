@@ -1,0 +1,12 @@
+{
+  "run_id": "demo_run",
+  "annotator_id": "fixture",
+  "is_repairable": true,
+  "root_cause_label": "insufficient_context",
+  "first_failure_event_id": "e_00001",
+  "propagated_failure_event_ids": ["e_00001", "e_00003", "e_00004", "e_00005", "e_00006"],
+  "repair_target_event_ids": ["e_00001"],
+  "recommended_repair_type": "add_test_first_strategy",
+  "annotation_confidence": 4,
+  "notes": "Agent grepped instead of opening the failing test first; never inspected test_chained_order_by_related before patching."
+}

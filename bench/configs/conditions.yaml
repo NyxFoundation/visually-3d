@@ -1,0 +1,26 @@
+# UI condition matrix for diagnosis user study.
+# Notion spec section 4.1.
+
+conditions:
+  - id: C0
+    name: Raw logs
+    description: Baseline — plain JSONL/text log viewer.
+  - id: C1
+    name: 2D trace
+    description: Timeline / DAG / LangSmith-style 2D trace.
+  - id: C2
+    name: AgentLens-like
+    description: Hierarchical temporal summary + cause trace, AgentLens-inspired.
+  - id: C3
+    name: Visually-3D
+    description: 3D causal failure visualization.
+  - id: C4
+    name: Visually-3D + AI repair
+    description: Visually-3D plus AI repair-suggestion panel.
+
+hypotheses:
+  H1: Visually-3D raises root-cause accuracy vs C0/C1.
+  H2: Visually-3D shortens diagnosis time.
+  H3: Visually-3D improves repair-policy validity.
+  H4: Visually-3D + AI repair raises post-repair success rate.
+  H5: Visually-3D reduces cost / latency / wasted retries.

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://visually-3d.local/schemas/run.schema.json",
+  "title": "Run-level metadata",
+  "description": "One record per agent execution. Mirrors Notion spec section 5.1.",
+  "type": "object",
+  "required": [
+    "run_id",
+    "benchmark",
+    "task_id",
+    "agent_framework",
+    "model",
+    "seed",
+    "start_time",
+    "success"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "description": "Stable identifier, convention: <bench>_<task>_<framework>_<model>_seed<n>."
+    },
+    "benchmark": {
+      "type": "string",
+      "enum": ["swebench_lite", "swebench_verified", "webarena", "browsergym", "other"]
+    },
+    "task_id": { "type": "string" },
+    "agent_framework": {
+      "type": "string",
+      "enum": ["openhands", "swe_agent", "autocoderover", "react_browser", "planner_executor", "other"]
+    },
+    "model": { "type": "string" },
+    "seed": { "type": "integer" },
+    "start_time": { "type": "string", "format": "date-time" },
+    "end_time": { "type": "string", "format": "date-time" },
+    "success": { "type": "boolean" },
+    "final_score": { "type": "number" },
+    "total_input_tokens": { "type": "integer", "minimum": 0 },
+    "total_output_tokens": { "type": "integer", "minimum": 0 },
+    "total_cost_usd": { "type": "number", "minimum": 0 },
+    "latency_sec": { "type": "number", "minimum": 0 }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://visually-3d.local/schemas/repair_response.schema.json",
+  "title": "AI repair-suggestion output",
+  "description": "Mirrors Notion spec section 9 (output).",
+  "type": "object",
+  "required": ["repair_type", "repair_patch", "rationale"],
+  "properties": {
+    "repair_type": { "type": "string" },
+    "repair_patch": {
+      "type": "object",
+      "description": "Concrete change. Shape depends on repair_type, e.g. {policy: '...'} or {prompt_delta: '...'}.",
+      "additionalProperties": true
+    },
+    "rationale": { "type": "string" },
+    "expected_effect": { "type": "string" },
+    "risk": { "type": "string" }
+  }
+}

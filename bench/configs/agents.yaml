@@ -1,0 +1,33 @@
+# Agent framework registry.
+# Notion spec section 2.
+
+agents:
+  - id: openhands
+    domain: coding
+    role: primary
+    repo: https://github.com/All-Hands-AI/OpenHands
+    enabled: true
+
+  - id: swe_agent
+    domain: coding
+    role: comparison
+    repo: https://github.com/SWE-agent/SWE-agent
+    enabled: false
+
+  - id: autocoderover
+    domain: coding
+    role: related_baseline
+    repo: https://github.com/nus-apr/auto-code-rover
+    enabled: false
+
+  - id: react_browser
+    domain: web
+    role: primary
+    description: Standard reason-act-observe browser agent built on BrowserGym.
+    enabled: true
+
+  - id: planner_executor
+    domain: web
+    role: comparison
+    description: Long-horizon planner + executor for state-tracking failures.
+    enabled: false

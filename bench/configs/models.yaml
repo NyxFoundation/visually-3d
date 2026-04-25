@@ -1,0 +1,48 @@
+# Model registry for Visually-3D experiments.
+# Notion spec section 3. Prices are reference-only — re-check vendor pages before running.
+#
+# `tier` matches the four-bucket plan: cheap_api / strong_api / strong_oss / small_oss.
+# `cost_per_mtok_in/out` are USD per 1M tokens; used by compute_metrics.py for cost reports.
+
+models:
+  - id: gpt-5-mini
+    provider: openai
+    tier: cheap_api
+    cost_per_mtok_in: 0.25
+    cost_per_mtok_out: 2.00
+    enabled: true
+
+  - id: gpt-5
+    provider: openai
+    tier: strong_api
+    cost_per_mtok_in: 1.25      # placeholder
+    cost_per_mtok_out: 10.00    # placeholder
+    enabled: false
+
+  - id: claude-sonnet-4
+    provider: anthropic
+    tier: strong_api
+    cost_per_mtok_in: 3.00
+    cost_per_mtok_out: 15.00
+    enabled: false
+
+  - id: gemini-2.5-pro
+    provider: google
+    tier: strong_api
+    cost_per_mtok_in: 1.25
+    cost_per_mtok_out: 10.00    # placeholder
+    enabled: false
+
+  - id: qwen-coder-32b
+    provider: local
+    tier: strong_oss
+    cost_per_mtok_in: 0.0
+    cost_per_mtok_out: 0.0
+    enabled: false
+
+  - id: deepseek-coder-7b
+    provider: local
+    tier: small_oss
+    cost_per_mtok_in: 0.0
+    cost_per_mtok_out: 0.0
+    enabled: false

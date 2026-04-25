@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://visually-3d.local/schemas/event.schema.json",
+  "title": "Event-level record",
+  "description": "One row per agent step. Mirrors Notion spec sections 5.2 and 5.3.",
+  "type": "object",
+  "required": ["event_id", "run_id", "timestamp", "step_index", "event_type"],
+  "properties": {
+    "event_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "step_index": { "type": "integer", "minimum": 0 },
+    "event_type": {
+      "type": "string",
+      "description": "Coarse-grained node type used for 3D layout (Notion section 6.1).",
+      "enum": ["llm_call", "tool_call", "observation", "action", "evaluation", "repair"]
+    },
+    "subtype": {
+      "type": "string",
+      "description": "Free-form refinement, e.g. read_file / grep / browser_click / form_input."
+    },
+    "input_summary": { "type": "string" },
+    "output_summary": { "type": "string" },
+    "raw_input_ref": { "type": "string", "description": "Pointer to large blob (s3://, file://, etc.)." },
+    "raw_output_ref": { "type": "string" },
+    "parent_event_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Predecessors in the causal DAG."
+    },
+    "dependency_type": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["temporal", "data", "decision", "environment", "error_propagation", "repair"]
+      }
+    },
+    "latency_ms": { "type": "integer", "minimum": 0 },
+    "input_tokens": { "type": "integer", "minimum": 0 },
+    "output_tokens": { "type": "integer", "minimum": 0 },
+    "estimated_cost_usd": { "type": "number", "minimum": 0 },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "error_flag": { "type": "boolean" },
+
+    "domain": {
+      "type": "string",
+      "enum": ["coding", "web"],
+      "description": "Selects which domain block below is meaningful."
+    },
+    "coding": {
+      "type": "object",
+      "properties": {
+        "repo": { "type": "string" },
+        "files_read": { "type": "array", "items": { "type": "string" } },
+        "files_edited": { "type": "array", "items": { "type": "string" } },
+        "tests_run": { "type": "array", "items": { "type": "string" } },
+        "test_result": { "type": "string", "enum": ["passed", "failed", "error", "skipped"] },
+        "patch_ref": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "web": {
+      "type": "object",
+      "properties": {
+        "url": { "type": "string" },
+        "action": { "type": "string" },
+        "target_element": { "type": "string" },
+        "screenshot_ref": { "type": "string" },
+        "dom_snapshot_ref": { "type": "string" },
+        "browser_state_hash": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,36 @@
+# Benchmark phase plan.
+# Notion spec section 1 — Pilot 0 / Pilot 1 / Main / Final.
+
+benchmarks:
+  swebench_lite:
+    type: coding
+    upstream: https://github.com/princeton-nlp/SWE-bench
+    total_tasks: 300
+    phases:
+      pilot_0:  { tasks: 20,  notes: "log format + 3D conversion sanity" }
+      pilot_1:  { tasks: 50,  notes: "failure-type distribution" }
+      main:     { tasks: 200, notes: "primary paper experiment" }
+      final:    { tasks: 300, notes: "pre-submission validation" }
+
+  swebench_verified:
+    type: coding
+    upstream: https://www.swebench.com/SWE-bench_Verified
+    total_tasks: 500
+    phases:
+      main:     { tasks: 200 }
+      final:    { tasks: 300 }
+
+  webarena:
+    type: web
+    upstream: https://webarena.dev
+    total_tasks: 812
+    phases:
+      pilot_0:  { tasks: 20,  notes: "env + screenshot capture sanity" }
+      pilot_1:  { tasks: 50 }
+      main:     { tasks: 200 }
+      final:    { tasks: 300 }
+
+  browsergym:
+    type: web
+    upstream: https://github.com/ServiceNow/BrowserGym
+    enabled: false

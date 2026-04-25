@@ -1,0 +1,19 @@
+# Generated experiment artifacts — keep folder structure, ignore contents.
+data/raw_runs/*
+data/events/*
+data/annotations/*
+data/graphs/*
+data/screenshots/*
+data/patches/*
+outputs/ui_logs/*
+outputs/diagnosis_results/*
+outputs/repair_results/*
+outputs/cost_reports/*
+
+# Re-include the placeholders so empty dirs persist in git.
+!**/.gitkeep
+
+# Local overrides
+.env
+.env.local
+*.log

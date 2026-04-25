@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://visually-3d.local/schemas/annotation.schema.json",
+  "title": "Failure-run annotation",
+  "description": "Human-supplied ground truth per failed run. Mirrors Notion spec sections 7 and 8.",
+  "type": "object",
+  "required": ["run_id", "is_repairable", "root_cause_label", "first_failure_event_id"],
+  "properties": {
+    "run_id": { "type": "string" },
+    "annotator_id": { "type": "string" },
+    "is_repairable": { "type": "boolean" },
+    "root_cause_label": {
+      "type": "string",
+      "enum": [
+        "file_localization_error",
+        "context_misuse",
+        "insufficient_context",
+        "test_misinterpretation",
+        "over_editing",
+        "under_editing",
+        "regression",
+        "loop",
+        "premature_finish",
+        "tool_error",
+        "navigation_error",
+        "observation_miss",
+        "wrong_click",
+        "form_error",
+        "state_tracking_error",
+        "goal_drift",
+        "tool_misuse"
+      ]
+    },
+    "first_failure_event_id": { "type": "string" },
+    "propagated_failure_event_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "repair_target_event_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "recommended_repair_type": {
+      "type": "string",
+      "enum": [
+        "prompt_repair",
+        "policy_repair",
+        "tool_repair",
+        "retrieval_repair",
+        "retry_repair",
+        "planning_repair",
+        "improve_file_search_policy",
+        "add_test_first_strategy",
+        "change_retrieval_top_k",
+        "change_tool_description",
+        "other"
+      ]
+    },
+    "annotation_confidence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "1=very low confidence, 5=very high."
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}
