@@ -1,123 +1,151 @@
 {
+  "categories": [
+    { "id": "all",           "label": "All" },
+    { "id": "vehicles",      "label": "Vehicles" },
+    { "id": "aerospace",     "label": "Aerospace" },
+    { "id": "robotics",      "label": "Robotics" },
+    { "id": "manufacturing", "label": "Manufacturing" },
+    { "id": "energy",        "label": "Energy" },
+    { "id": "medical",       "label": "Medical" },
+    { "id": "defense",       "label": "Defense / RF" },
+    { "id": "ml",            "label": "ML Architectures" }
+  ],
   "samples": [
     {
       "id": "em-awareness-type1",
       "title": "EM Awareness Device — Type 1",
       "subtitle": "Fixed ground station (MHI, 2021) monitoring satellite EM interference",
       "path": "/samples/em-awareness-type1.json",
-      "accent": "#58a6ff"
+      "accent": "#58a6ff",
+      "category": "defense"
     },
     {
       "id": "em-awareness-type2",
       "title": "EM Awareness Device — Type 2",
       "subtitle": "Truck-mounted mobile variant (NEC + Isuzu GIGA, 2022–23)",
       "path": "/samples/em-awareness-type2.json",
-      "accent": "#79c0ff"
+      "accent": "#79c0ff",
+      "category": "defense"
     },
     {
       "id": "3d-printer",
       "title": "Desktop 3D Printer",
       "subtitle": "Cubic FDM frame, heated bed, X-Y gantry",
       "path": "/samples/3d-printer.json",
-      "accent": "#f59e0b"
+      "accent": "#f59e0b",
+      "category": "manufacturing"
     },
     {
       "id": "quadcopter",
       "title": "FPV Quadcopter",
       "subtitle": "5-inch racing drone with stacked flight controller",
       "path": "/samples/quadcopter.json",
-      "accent": "#a855f7"
+      "accent": "#a855f7",
+      "category": "aerospace"
     },
     {
       "id": "eh216-s",
       "title": "EH216-S Flying Car",
       "subtitle": "16-rotor pilotless eVTOL (EHang, world's first CAAC type-certified passenger drone)",
       "path": "/samples/eh216-s.json",
-      "accent": "#34d399"
+      "accent": "#34d399",
+      "category": "aerospace"
     },
     {
       "id": "ceb-press",
       "title": "CEB Press — 'The Liberator'",
       "subtitle": "OSE open-source hydraulic press for compressed-earth building blocks",
       "path": "/samples/ceb-press.json",
-      "accent": "#b45309"
+      "accent": "#b45309",
+      "category": "manufacturing"
     },
     {
       "id": "lifetrac",
       "title": "LifeTrac Open-Source Tractor",
       "subtitle": "OSE bolt-together skid-steer tractor with modular PowerCube and universal tool bar",
       "path": "/samples/lifetrac.json",
-      "accent": "#ca8a04"
+      "accent": "#ca8a04",
+      "category": "vehicles"
     },
     {
       "id": "wind-turbine-50kw",
       "title": "50 kW Open-Source Wind Turbine",
       "subtitle": "Guyed HAWT with direct-drive DC generator and tail-vane yaw (OSE GVCS)",
       "path": "/samples/wind-turbine-50kw.json",
-      "accent": "#22d3ee"
+      "accent": "#22d3ee",
+      "category": "energy"
     },
     {
       "id": "openrov-2-8",
       "title": "OpenROV 2.8",
       "subtitle": "Tethered open-source underwater ROV with acrylic e-tubes and 3-thruster drive",
       "path": "/samples/openrov-2-8.json",
-      "accent": "#0ea5e9"
+      "accent": "#0ea5e9",
+      "category": "robotics"
     },
     {
       "id": "openhand-model-t",
       "title": "Yale OpenHand Model T",
       "subtitle": "Single-motor, tendon-driven 4-finger underactuated robotic hand (Yale GRAB Lab)",
       "path": "/samples/openhand-model-t.json",
-      "accent": "#e5e7eb"
+      "accent": "#e5e7eb",
+      "category": "robotics"
     },
     {
       "id": "prusa-i3-mk3s",
       "title": "Original Prusa i3 MK3S+",
       "subtitle": "Prusa Research bed-slinger FDM printer with Bondtech direct-drive extruder",
       "path": "/samples/prusa-i3-mk3s.json",
-      "accent": "#ef4444"
+      "accent": "#ef4444",
+      "category": "manufacturing"
     },
     {
       "id": "oresat0",
       "title": "OreSat0 1U CubeSat",
       "subtitle": "PSAS open-hardware tech-demo CubeSat with deployable solar panels (2022)",
       "path": "/samples/oresat0.json",
-      "accent": "#7c3aed"
+      "accent": "#7c3aed",
+      "category": "aerospace"
     },
     {
       "id": "tabby-evo",
       "title": "TABBY EVO EV Platform",
       "subtitle": "Open Motors open-source 'skateboard' EV chassis (Italy, 2016)",
       "path": "/samples/tabby-evo.json",
-      "accent": "#14b8a6"
+      "accent": "#14b8a6",
+      "category": "vehicles"
     },
     {
       "id": "apollo-csm",
       "title": "Apollo Command & Service Module",
       "subtitle": "NASA Apollo-program crewed spacecraft — conical CM atop cylindrical SM with SPS nozzle",
       "path": "/samples/apollo-csm.json",
-      "accent": "#f9fafb"
+      "accent": "#f9fafb",
+      "category": "aerospace"
     },
     {
       "id": "prr-s2",
       "title": "Pennsylvania Railroad S2",
       "subtitle": "One-off 1944 6-8-6 experimental steam-turbine locomotive (Baldwin + Westinghouse)",
       "path": "/samples/prr-s2.json",
-      "accent": "#334155"
+      "accent": "#334155",
+      "category": "vehicles"
     },
     {
       "id": "makair",
       "title": "MakAir Open-Source Ventilator",
       "subtitle": "Makers-For-Life emergency ventilator (COVID-19, 2020) — blower + O₂ mixer + patient filter",
       "path": "/samples/makair.json",
-      "accent": "#10b981"
+      "accent": "#10b981",
+      "category": "medical"
     },
     {
       "id": "hero-arm",
       "title": "Open Bionics Hero Arm",
       "subtitle": "3D-printed myoelectric prosthetic forearm with five independently driven fingers",
       "path": "/samples/hero-arm.json",
-      "accent": "#fb7185"
+      "accent": "#fb7185",
+      "category": "medical"
     }
   ]
 }

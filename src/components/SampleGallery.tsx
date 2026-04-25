@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { LazyViewer } from './LazyViewer';
 import type { SceneDescriptor } from '../types';
 
@@ -8,10 +8,17 @@ export type SampleEntry = {
   subtitle: string;
   path: string;
   accent: string;
+  category?: string;
+};
+
+export type SampleCategory = {
+  id: string;
+  label: string;
 };
 
 type SampleGalleryProps = {
   samples: SampleEntry[];
+  categories?: SampleCategory[];
   activeId?: string;
   onSelect: (sample: SampleEntry, scene: SceneDescriptor) => void;
 };
@@ -24,21 +31,78 @@ type CardState = 'idle' | 'visible' | 'loaded' | 'error';
 // So keep observing each card's visibility and unmount the thumbnail <Canvas>
 // when the card scrolls back off-screen.
 
-export const SampleGallery: React.FC<SampleGalleryProps> = ({ samples, activeId, onSelect }) => (
-  <section className="gallery" aria-label="Sample machine visuals">
-    <div className="gallery__header">
-      <div>
-        <h2>Sample Machines</h2>
-        <p>Tap a card to load the scene.</p>
+export const SampleGallery: React.FC<SampleGalleryProps> = ({ samples, categories, activeId, onSelect }) => {
+  const [query, setQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return samples.filter((sample) => {
+      if (activeCategory !== 'all' && sample.category !== activeCategory) return false;
+      if (!q) return true;
+      return sample.title.toLowerCase().includes(q) || sample.subtitle.toLowerCase().includes(q);
+    });
+  }, [samples, query, activeCategory]);
+
+  const visibleCategories = useMemo(() => {
+    if (categories && categories.length > 0) return categories;
+    // Fall back to deriving categories from sample data if index.json doesn't ship them.
+    const seen = new Set<string>();
+    const derived: SampleCategory[] = [{ id: 'all', label: 'All' }];
+    for (const s of samples) {
+      if (s.category && !seen.has(s.category)) {
+        seen.add(s.category);
+        derived.push({ id: s.category, label: s.category });
+      }
+    }
+    return derived;
+  }, [categories, samples]);
+
+  return (
+    <section className="gallery" aria-label="Sample machine visuals">
+      <div className="gallery__header">
+        <div>
+          <h2>Sample Machines</h2>
+          <p>Tap a card to load the scene.</p>
+        </div>
+        <input
+          type="search"
+          className="gallery__search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search by name or description…"
+          aria-label="Search samples"
+        />
+        <div className="gallery__chips" role="tablist" aria-label="Filter by category">
+          {visibleCategories.map((cat) => {
+            const active = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                className={`gallery__chip${active ? ' gallery__chip--active' : ''}`}
+                onClick={() => setActiveCategory(cat.id)}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
-    <div className="gallery__grid">
-      {samples.map((sample) => (
-        <SampleCard key={sample.id} sample={sample} active={sample.id === activeId} onSelect={onSelect} />
-      ))}
-    </div>
-  </section>
-);
+      {filtered.length === 0 ? (
+        <p className="gallery__empty">No samples match the current filter.</p>
+      ) : (
+        <div className="gallery__grid">
+          {filtered.map((sample) => (
+            <SampleCard key={sample.id} sample={sample} active={sample.id === activeId} onSelect={onSelect} />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+};
 
 const SampleCard: React.FC<{
   sample: SampleEntry;

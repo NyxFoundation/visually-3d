@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { PartInfo } from './components/PartInfo';
 import { InfoPanel } from './components/InfoPanel';
 import { LazyViewer } from './components/LazyViewer';
-import { SampleGallery, type SampleEntry } from './components/SampleGallery';
+import { SampleGallery, type SampleCategory, type SampleEntry } from './components/SampleGallery';
 import { MOCK_SCENE, type Part, type SceneDescriptor } from './types';
 
 type LogEntry = {
@@ -33,6 +33,7 @@ function App() {
   const [activeSampleId, setActiveSampleId] = useState<string | undefined>();
   const [selectedPart, setSelectedPart] = useState<Part | null>(null);
   const [samples, setSamples] = useState<SampleEntry[]>([]);
+  const [categories, setCategories] = useState<SampleCategory[]>([]);
   const [backend, setBackend] = useState<BackendStatus>('probing');
   const [logs, setLogs] = useState<LogEntry[]>([
     { stream: 'system', message: 'Ready.' },
@@ -70,12 +71,16 @@ function App() {
     let cancelled = false;
     fetch('/samples/index.json')
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then((data: { samples: SampleEntry[] }) => {
+      .then((data: { samples: SampleEntry[]; categories?: SampleCategory[] }) => {
         if (cancelled) return;
         setSamples(data.samples ?? []);
+        setCategories(data.categories ?? []);
       })
       .catch(() => {
-        if (!cancelled) setSamples([]);
+        if (!cancelled) {
+          setSamples([]);
+          setCategories([]);
+        }
       });
     return () => {
       cancelled = true;
@@ -278,7 +283,7 @@ function App() {
               aria-hidden={!galleryOpen}
               aria-label="Sample machines"
             >
-              <SampleGallery samples={samples} activeId={activeSampleId} onSelect={handleSampleSelect} />
+              <SampleGallery samples={samples} categories={categories} activeId={activeSampleId} onSelect={handleSampleSelect} />
             </aside>
           </>
         ) : null}
