@@ -1,0 +1,4 @@
+# Heavy upstream agent frameworks live here as git clones (or submodules) so
+# their multi-GB working trees don't bloat this repo. Track only this file.
+*
+!.gitignore

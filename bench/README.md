@@ -69,37 +69,52 @@ python scripts/compute_metrics.py
 You should see `data/events/demo_run.jsonl`, `data/graphs/demo_run.json`, and a
 metric summary on stdout.
 
-### Drive a real SWE-bench run
+### Drive a real SWE-bench run (via OpenHands)
 
-`scripts/run_swebench.py` runs a minimal four-step coding-agent loop
-(plan → inspect → patch → evaluate) against a task fixture, calls a model via
-`scripts/llm_client.py`, writes the trace + run-meta, and shells out to
-`convert_to_events.py`. It does **not** apply the patch in a sandbox yet — that
-arrives once we vendor OpenHands.
+`scripts/run_swebench.py` is a thin wrapper around OpenHands' upstream
+SWE-bench evaluator (`evaluation/benchmarks/swe_bench/scripts/run_infer.sh`).
+It generates a LiteLLM config block pointing at your provider, restricts the
+run to a single instance (via `INSTANCE_IDS`), parses the resulting trajectory
+back into our common schema, and writes the run-meta.
+
+One-time setup (heavy — needs Docker, ~1 GB+ disk per repo):
+
+```bash
+bench/scripts/setup_openhands.sh        # clones External/OpenHands at HEAD
+cd bench/external/OpenHands && make build
+docker info                              # confirm daemon is reachable
+```
 
 Set the API key for the provider you're targeting:
 
 ```bash
-export OLLAMA_API_KEY=...   # OSS models (qwen-coder-32b, gpt-oss-120b, deepseek-coder-7b)
-export OPENAI_API_KEY=...   # gpt-5*, gemini-2.5-pro (via OpenAI-compatible gateway)
+export OLLAMA_API_KEY=...    # OSS models (qwen-coder-32b, gpt-oss-120b, deepseek-coder-7b)
+export OPENAI_API_KEY=...    # gpt-5*, gemini-2.5-pro
 export ANTHROPIC_API_KEY=...
 ```
 
-Then:
+Then drive a single task:
 
 ```bash
-# Offline smoke (no API key needed) — useful for hitting the ≥10-runs target.
+# Offline smoke (no OpenHands, no Docker) — deterministic synthetic trace.
 python scripts/run_swebench.py \
     --benchmark swebench_lite \
-    --task-fixture fixtures/sample_swebench_task.json \
+    --task-fixture fixtures/swebench_lite/django__django-10914.json \
     --agent openhands --model qwen-coder-32b --seed 1 --stub
 
-# Real call against Ollama Cloud.
+# Real run against Ollama Cloud (requires OpenHands + Docker).
 python scripts/run_swebench.py \
     --benchmark swebench_lite \
-    --task-fixture fixtures/sample_swebench_task.json \
+    --task-fixture fixtures/swebench_lite/django__django-10914.json \
     --agent openhands --model qwen-coder-32b --seed 1
 ```
+
+> **Note on verification.** The wrapper itself was developed without a live
+> OpenHands install; the subprocess invocation, the trajectory-parsing field
+> names, and the output-discovery glob are best-effort against OpenHands'
+> current docs. Expect to tighten `trajectory_to_trace()` and
+> `find_openhands_output()` in `run_swebench.py` once you've driven the first
+> real instance end-to-end.
 
 ### Materialize task fixtures
 
@@ -182,9 +197,11 @@ outputs/cost_reports/metrics.json
 
 These are the integration points with explicit `TODO(phase-0)` markers:
 
-- Sandbox patch-apply + real test execution in `run_swebench.py`. The minimal
-  loop produces a diff and logs `test_result: skipped`; wiring the SWE-bench
-  Docker harness (or OpenHands' built-in runtime) flips that to passed/failed.
+- End-to-end verification of the OpenHands subprocess path in
+  `run_swebench.py`. The wrapper code is in place but was written without a
+  live OpenHands install; `trajectory_to_trace()` field names and the
+  `find_openhands_output()` glob need a real run to confirm. Until then,
+  `--stub` is the only path that's been smoke-tested in this repo.
 - Real browser execution in `run_webarena.py`. The minimal loop produces an
   LLM-only trace with `domain: "web"` events; wiring BrowserGym + Playwright
   + the WebArena Docker stack adds DOM/screenshot capture and real success

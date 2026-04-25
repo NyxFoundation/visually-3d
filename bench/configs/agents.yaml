@@ -6,6 +6,7 @@ agents:
     domain: coding
     role: primary
     repo: https://github.com/All-Hands-AI/OpenHands
+    setup: bench/scripts/setup_openhands.sh   # clones into bench/external/OpenHands
     enabled: true
 
   - id: swe_agent

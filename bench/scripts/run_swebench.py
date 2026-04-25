@@ -1,50 +1,49 @@
 #!/usr/bin/env python3
-"""Drive an SWE-bench Lite/Verified task through a minimal coding-agent loop.
+"""Drive a SWE-bench Lite/Verified task through OpenHands' SWE-bench evaluator.
 
-This is the Phase-0 minimum: a 4-step ReAct-shaped loop (plan → inspect →
-patch → evaluate) that produces a real LLM trace, writes the run meta, and
-shells out to convert_to_events.py. It does **not** run patches against the
-SWE-bench Docker images — that comes in Phase 1 once we vendor OpenHands or
-SWE-agent. The harness is deliberately small enough to drive 10+ runs in
-minutes for the Phase-0 acceptance check (README §"Phase 0 / Week 1–2").
+This is a thin wrapper around OpenHands' upstream
+`evaluation/benchmarks/swe_bench/scripts/run_infer.sh`. We delegate the
+sandboxed agent loop, Docker runtime, and trajectory format to OpenHands;
+this file just (a) generates the LiteLLM config pointing at the requested
+provider (Ollama Cloud / OpenAI / Anthropic), (b) restricts the run to a
+single SWE-bench instance, (c) parses the trajectory back into our common
+schema, and (d) writes the run-meta.
+
+Setup required (one-time):
+    bench/scripts/setup_openhands.sh    # clones External/OpenHands
+    cd bench/external/OpenHands && make build && docker info  # heavy
+
+Two modes:
+    --stub            deterministic synthetic trace, no OpenHands required
+                      (offline smoke for CI / pipeline shakedown).
+    default           shells out to OpenHands' run_infer.sh.
 
 Notion spec sections 1.1, 2.1, 5.1, 5.3, 13.
-
-Usage:
-    python scripts/run_swebench.py \\
-        --benchmark swebench_lite \\
-        --task-fixture fixtures/sample_swebench_task.json \\
-        --agent openhands \\
-        --model qwen-coder-32b \\
-        --seed 1
 """
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
-import textwrap
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from _common import DATA_DIR, RunPaths, load_json, write_jsonl
-from llm_client import LLMClientError, LLMResponse, complete, load_model_spec
+from _common import BENCH_ROOT, DATA_DIR, RunPaths, load_json, read_jsonl, write_jsonl
+from llm_client import load_model_spec
 
-STEP_PLAN = "plan"
-STEP_INSPECT = "read"
-STEP_PATCH = "edit"
-STEP_TEST = "test"
+OPENHANDS_DIR = BENCH_ROOT / "external" / "OpenHands"
+OPENHANDS_RUN_INFER = OPENHANDS_DIR / "evaluation/benchmarks/swe_bench/scripts/run_infer.sh"
+OPENHANDS_CONFIG_NAME = "bench_runtime"  # `[llm.bench_runtime]` block we generate
+OPENHANDS_OUTPUT_ROOT = OPENHANDS_DIR / "evaluation/evaluation_outputs/outputs"
 
-SYSTEM_PROMPT = textwrap.dedent(
-    """
-    You are a senior software engineer working on a SWE-bench task. You will
-    receive the bug report and a list of likely files. Respond concisely — no
-    preamble, no markdown headings — and stay under 200 words per turn unless
-    asked for a diff.
-    """
-).strip()
+ENV_KEY_BY_PROVIDER = {
+    "ollama_cloud": "OLLAMA_API_KEY",
+    "openai": "OPENAI_API_KEY",
+    "anthropic": "ANTHROPIC_API_KEY",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -54,11 +53,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--agent", default="openhands", choices=["openhands", "swe_agent"])
     p.add_argument("--model", required=True, help="Model id from configs/models.yaml")
     p.add_argument("--seed", type=int, default=1)
-    p.add_argument("--max-tokens", type=int, default=1024)
-    p.add_argument("--temperature", type=float, default=0.2)
-    p.add_argument("--dry-run", action="store_true", help="Print the plan and exit without calling any model.")
-    p.add_argument("--stub", action="store_true", help="Skip LLM calls, write a deterministic synthetic trace (offline smoke).")
-    p.add_argument("--skip-if-cached", action="store_true", help="Exit 0 without doing work if data/raw_runs/<run_id>.json already exists.")
+    p.add_argument("--max-iter", type=int, default=30, help="Per-instance iteration cap passed to OpenHands.")
+    p.add_argument("--dry-run", action="store_true")
+    p.add_argument("--stub", action="store_true", help="Skip OpenHands; write a deterministic synthetic trace.")
+    p.add_argument("--skip-if-cached", action="store_true")
     return p.parse_args()
 
 
@@ -68,135 +66,169 @@ def make_run_id(args: argparse.Namespace, task_id: str) -> str:
 
 
 def trace_path(run_id: str) -> Path:
-    # Sits beside RunPaths.run_meta (which is <run_id>.json).
     return DATA_DIR / "raw_runs" / f"{run_id}.trace.jsonl"
 
 
-def build_messages(task: dict[str, Any], step: str, prior: list[dict[str, Any]]) -> list[dict[str, str]]:
-    user = [
-        f"Instance: {task.get('instance_id')}",
-        f"Repo: {task.get('repo')}",
-        f"Base commit: {task.get('base_commit')}",
-        "",
-        "Problem statement:",
-        task.get("problem_statement", "").strip(),
-    ]
-    hints = task.get("hints_text")
-    if hints:
-        user += ["", "Hints:", hints.strip()]
-    candidates = task.get("candidate_files") or []
-    if candidates:
-        user += ["", "Likely files: " + ", ".join(candidates)]
-
-    if prior:
-        user += ["", "Prior steps (most recent last):"]
-        for row in prior:
-            user.append(f"- [{row['action']}] {row.get('observation', '')[:200]}")
-
-    if step == STEP_PLAN:
-        user += [
-            "",
-            "Task: produce a 3-bullet plan for fixing this bug. Name the most",
-            "likely root-cause function and the file it lives in.",
-        ]
-    elif step == STEP_INSPECT:
-        user += [
-            "",
-            "Task: based on the plan, list up to 3 file paths you would open",
-            "first and one specific symbol you would look up in each. Format",
-            "as 'path :: symbol' on each line.",
-        ]
-    elif step == STEP_PATCH:
-        user += [
-            "",
-            "Task: produce a unified diff (git format) that fixes the bug.",
-            "Include only the changed hunks. No commentary, no prose.",
-        ]
-    elif step == STEP_TEST:
-        user += [
-            "",
-            "Task: state in one sentence whether you expect the test command",
-            f"`{task.get('test_command', '')}` to pass against your patch, and why.",
-        ]
-
+def stub_trace(task: dict[str, Any]) -> list[dict[str, Any]]:
+    """Deterministic 4-row trace for offline smoke / CI. Matches adapter_openhands."""
+    now = datetime.now(timezone.utc).isoformat()
+    files = task.get("candidate_files", []) or []
     return [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": "\n".join(user)},
+        {"timestamp": now, "action": "read", "args": "open issue body",
+         "observation": (task.get("problem_statement") or "")[:200],
+         "llm_metrics": {"input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}},
+        {"timestamp": now, "action": "grep", "args": "search likely symbol",
+         "observation": "stub: no real grep performed",
+         "llm_metrics": {"input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}},
+        {"timestamp": now, "action": "edit", "args": "stub patch",
+         "observation": "stub: no real edit performed",
+         "files_edited": files,
+         "llm_metrics": {"input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}},
+        {"timestamp": now, "action": "test", "args": task.get("test_command", ""),
+         "observation": "stub: tests not executed",
+         "tests_run": [task.get("test_command", "")], "test_result": "skipped",
+         "llm_metrics": {"input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}},
     ]
 
 
-def stub_response(step: str) -> LLMResponse:
-    canned = {
-        STEP_PLAN: "1. Trace order_by() chain merging in QuerySet.\n2. Inspect query.py:order_by.\n3. Replace prior ordering instead of appending.",
-        STEP_INSPECT: "django/db/models/query.py :: QuerySet.order_by\ndjango/db/models/sql/query.py :: Query.add_ordering",
-        STEP_PATCH: "--- a/django/db/models/query.py\n+++ b/django/db/models/query.py\n@@\n-        obj.query.add_ordering(*field_names)\n+        obj.query.clear_ordering(force=True)\n+        obj.query.add_ordering(*field_names)\n",
-        STEP_TEST: "Likely passes: clearing prior ordering before re-adding restores documented behavior.",
-    }
-    text = canned[step]
-    return LLMResponse(text=text, input_tokens=0, output_tokens=0, cost_usd=0.0, latency_ms=0, raw={"stub": True})
+def litellm_config_block(spec, api_key: str) -> str:
+    """Render a `[llm.<OPENHANDS_CONFIG_NAME>]` section for OpenHands' config.toml.
+
+    Ollama Cloud is OpenAI-compatible, so we use the litellm `openai/<model>`
+    convention with a custom `base_url`. Native OpenAI / Anthropic skip the
+    base_url and use their native litellm prefix.
+    """
+    if spec.provider == "ollama_cloud":
+        model = f"openai/{spec.wire_model}"
+        base_url = "https://ollama.com/v1"
+    elif spec.provider == "openai":
+        model = spec.wire_model
+        base_url = ""
+    elif spec.provider == "anthropic":
+        model = f"anthropic/{spec.wire_model}"
+        base_url = ""
+    else:
+        raise SystemExit(f"unsupported provider for OpenHands: {spec.provider}")
+
+    lines = [f"[llm.{OPENHANDS_CONFIG_NAME}]", f'model = "{model}"', f'api_key = "{api_key}"']
+    if base_url:
+        lines.append(f'base_url = "{base_url}"')
+    return "\n".join(lines) + "\n"
 
 
-def step_to_action(step: str) -> str:
-    # Action names map cleanly to convert_to_events.adapter_openhands classification.
-    return step
+def write_openhands_config(spec, api_key: str) -> Path:
+    """Append our generated llm block to OpenHands' config.toml (preserving existing blocks)."""
+    config_path = OPENHANDS_DIR / "config.toml"
+    existing = config_path.read_text() if config_path.exists() else ""
+    block = litellm_config_block(spec, api_key)
+    # Strip any prior block we wrote so re-runs don't duplicate it.
+    marker = f"[llm.{OPENHANDS_CONFIG_NAME}]"
+    if marker in existing:
+        head, _, tail = existing.partition(marker)
+        # Drop everything from our block to the next [section] header.
+        rest = tail.split("\n[", 1)
+        existing = head + ("[" + rest[1] if len(rest) > 1 else "")
+    config_path.write_text(existing.rstrip() + "\n\n" + block)
+    return config_path
 
 
-def run_steps(
-    args: argparse.Namespace,
-    task: dict[str, Any],
-) -> tuple[list[dict[str, Any]], int, int, float]:
-    spec = None if args.stub else load_model_spec(args.model)
+def find_openhands_output() -> Path | None:
+    """OpenHands writes one output.jsonl per (agent, model, run) under evaluation_outputs/.
+    We mtime-sort and pick the newest, which is the run we just kicked off.
+    """
+    if not OPENHANDS_OUTPUT_ROOT.exists():
+        return None
+    candidates = sorted(OPENHANDS_OUTPUT_ROOT.rglob("output.jsonl"), key=lambda p: p.stat().st_mtime)
+    return candidates[-1] if candidates else None
+
+
+def trajectory_to_trace(record: dict[str, Any]) -> list[dict[str, Any]]:
+    """Map one OpenHands SWE-bench output row → adapter_openhands-shaped trace rows.
+
+    OpenHands' record carries `history` (list of action/observation events) plus
+    aggregate `metrics`. Field names track upstream — adjust here if they drift.
+    """
     rows: list[dict[str, Any]] = []
-    total_in = total_out = 0
-    total_cost = 0.0
+    history = record.get("history") or []
+    for ev in history:
+        if not isinstance(ev, dict):
+            continue
+        action = ev.get("action") or ev.get("event_type") or "observation"
+        rows.append({
+            "timestamp": ev.get("timestamp"),
+            "action": action,
+            "args": ev.get("args") or ev.get("thought") or "",
+            "observation": ev.get("observation") or ev.get("content") or "",
+            "files_read": ev.get("files_read") or [],
+            "files_edited": ev.get("files_edited") or [],
+            "tests_run": ev.get("tests_run") or [],
+            "test_result": ev.get("test_result"),
+            "latency_ms": ev.get("latency_ms"),
+            "llm_metrics": ev.get("llm_metrics") or {},
+            "error": ev.get("error"),
+        })
+    return rows
 
-    for step in (STEP_PLAN, STEP_INSPECT, STEP_PATCH, STEP_TEST):
-        ts = datetime.now(timezone.utc).isoformat()
-        messages = build_messages(task, step, rows)
-        if args.stub:
-            resp = stub_response(step)
-        else:
-            assert spec is not None
-            resp = complete(
-                spec,
-                messages,
-                max_tokens=args.max_tokens,
-                temperature=args.temperature,
-            )
 
-        files_field: dict[str, Any] = {}
-        if step == STEP_INSPECT:
-            files_field["files_read"] = task.get("candidate_files", [])
-        elif step == STEP_PATCH:
-            files_field["files_edited"] = task.get("candidate_files", [])
-        elif step == STEP_TEST:
-            files_field["tests_run"] = [task.get("test_command", "")]
-            files_field["test_result"] = "skipped"
+def run_via_openhands(args: argparse.Namespace, task: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Returns (trace_rows, openhands_record). Raises SystemExit on misconfig."""
+    if not OPENHANDS_RUN_INFER.exists():
+        raise SystemExit(
+            f"OpenHands not found at {OPENHANDS_DIR}.\n"
+            "Run: bench/scripts/setup_openhands.sh\n"
+            "Then follow the printed setup steps (poetry install + Docker).")
 
-        row = {
-            "timestamp": ts,
-            "action": step_to_action(step),
-            "args": messages[-1]["content"][:500],
-            "observation": resp.text,
-            "latency_ms": resp.latency_ms,
-            "llm_metrics": {
-                "input_tokens": resp.input_tokens,
-                "output_tokens": resp.output_tokens,
-                "cost_usd": resp.cost_usd,
-            },
-            **files_field,
-        }
-        rows.append(row)
-        total_in += resp.input_tokens
-        total_out += resp.output_tokens
-        total_cost += resp.cost_usd
+    spec = load_model_spec(args.model)
+    env_key = ENV_KEY_BY_PROVIDER.get(spec.provider)
+    api_key = os.environ.get(env_key or "")
+    if not api_key:
+        raise SystemExit(f"{env_key} not set; required for provider {spec.provider}")
 
-    return rows, total_in, total_out, total_cost
+    write_openhands_config(spec, api_key)
+
+    dataset = "princeton-nlp/SWE-bench_Lite" if args.benchmark == "swebench_lite" else "princeton-nlp/SWE-bench_Verified"
+    cmd = [
+        "bash", str(OPENHANDS_RUN_INFER),
+        f"llm.{OPENHANDS_CONFIG_NAME}",
+        "HEAD",
+        "CodeActAgent",
+        "1",                  # eval_limit
+        str(args.max_iter),
+        "1",                  # num_workers
+        dataset,
+        "test",
+    ]
+    # OpenHands honors INSTANCE_IDS to filter the dataset to a single task.
+    env = {**os.environ, "INSTANCE_IDS": task["instance_id"]}
+    print(f"[run_swebench] invoking OpenHands: {' '.join(cmd)}")
+    rc = subprocess.call(cmd, cwd=str(OPENHANDS_DIR), env=env)
+    if rc != 0:
+        raise SystemExit(f"OpenHands run_infer.sh exited with code {rc}")
+
+    out = find_openhands_output()
+    if not out:
+        raise SystemExit(
+            f"OpenHands ran but no output.jsonl found under {OPENHANDS_OUTPUT_ROOT}.\n"
+            "Check OpenHands logs and adjust find_openhands_output() if the layout changed.")
+
+    record = next(
+        (r for r in read_jsonl(out) if r.get("instance_id") == task["instance_id"]),
+        None,
+    )
+    if record is None:
+        raise SystemExit(f"output.jsonl at {out} contained no row for {task['instance_id']}")
+    return trajectory_to_trace(record), record
 
 
 def write_run_meta(args: argparse.Namespace, task: dict[str, Any], paths: RunPaths,
-                    rows: list[dict[str, Any]], total_in: int, total_out: int, total_cost: float,
-                    start: str) -> None:
+                   rows: list[dict[str, Any]], record: dict[str, Any] | None,
+                   start: str) -> None:
+    metrics = (record or {}).get("metrics") or {}
+    test_result = (record or {}).get("test_result") or {}
+    # OpenHands SWE-bench eval reports resolved=True/False after eval_infer.sh runs;
+    # before eval, success is unknown. Surface what we have.
+    success = test_result.get("resolved") if record else False
+
     meta = {
         "run_id": paths.run_id,
         "benchmark": args.benchmark,
@@ -206,13 +238,14 @@ def write_run_meta(args: argparse.Namespace, task: dict[str, Any], paths: RunPat
         "seed": args.seed,
         "start_time": start,
         "end_time": datetime.now(timezone.utc).isoformat(),
-        "success": False,  # Phase-0 driver does not actually run tests.
-        "total_input_tokens": total_in,
-        "total_output_tokens": total_out,
-        "total_cost_usd": round(total_cost, 6),
+        "success": success,
+        "total_input_tokens": int(metrics.get("input_tokens", 0)),
+        "total_output_tokens": int(metrics.get("output_tokens", 0)),
+        "total_cost_usd": float(metrics.get("cost_usd", 0.0)),
         "trace_path": str(trace_path(paths.run_id)),
         "events_path": str(paths.events),
         "n_steps": len(rows),
+        "openhands_output": str(record.get("_source_path")) if record and "_source_path" in record else None,
     }
     paths.run_meta.parent.mkdir(parents=True, exist_ok=True)
     paths.run_meta.write_text(json.dumps(meta, indent=2, sort_keys=True))
@@ -220,16 +253,10 @@ def write_run_meta(args: argparse.Namespace, task: dict[str, Any], paths: RunPat
 
 def maybe_convert_events(run_id: str) -> int:
     script = Path(__file__).with_name("convert_to_events.py")
-    cmd = [
-        sys.executable,
-        str(script),
-        "--input",
-        str(trace_path(run_id)),
-        "--run-id",
-        run_id,
-        "--adapter",
-        "openhands",
-    ]
+    cmd = [sys.executable, str(script),
+           "--input", str(trace_path(run_id)),
+           "--run-id", run_id,
+           "--adapter", "openhands"]
     return subprocess.call(cmd)
 
 
@@ -250,34 +277,29 @@ def main() -> int:
     start = datetime.now(timezone.utc).isoformat()
 
     if args.skip_if_cached and paths.run_meta.exists():
-        print(f"[run_swebench] {run_id}: cached, skipping (use --force-style flag to recompute)")
+        print(f"[run_swebench] {run_id}: cached, skipping")
         return 0
 
     if args.dry_run:
         print(json.dumps({
-            "run_id": run_id,
-            "benchmark": args.benchmark,
-            "task_id": task_id,
-            "agent_framework": args.agent,
-            "model": args.model,
-            "seed": args.seed,
+            "run_id": run_id, "benchmark": args.benchmark, "task_id": task_id,
+            "agent_framework": args.agent, "model": args.model, "seed": args.seed,
             "start_time": start,
-            "trace_path": str(trace_path(run_id)),
-            "events_path": str(paths.events),
+            "trace_path": str(trace_path(run_id)), "events_path": str(paths.events),
             "stub": args.stub,
+            "openhands_dir_present": OPENHANDS_RUN_INFER.exists(),
         }, indent=2))
         return 0
 
-    try:
-        rows, total_in, total_out, total_cost = run_steps(args, task)
-    except LLMClientError as exc:
-        print(f"[run_swebench] LLM call failed: {exc}", file=sys.stderr)
-        return 3
+    if args.stub:
+        rows = stub_trace(task)
+        record = None
+    else:
+        rows, record = run_via_openhands(args, task)
 
     write_jsonl(trace_path(run_id), rows)
-    write_run_meta(args, task, paths, rows, total_in, total_out, total_cost, start)
-    print(f"[run_swebench] {run_id}: {len(rows)} steps, "
-          f"{total_in}/{total_out} tok, ${total_cost:.4f}")
+    write_run_meta(args, task, paths, rows, record, start)
+    print(f"[run_swebench] {run_id}: {len(rows)} steps")
     print(f"  trace → {trace_path(run_id)}")
     print(f"  meta  → {paths.run_meta}")
 
