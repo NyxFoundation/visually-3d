@@ -94,18 +94,9 @@ def adapter_browsergym(rows: Iterable[dict[str, Any]], run_id: str) -> Iterator[
         prev_id = event_id
 
 
-def adapter_passthrough(rows: Iterable[dict[str, Any]], run_id: str) -> Iterator[dict[str, Any]]:
-    """For logs already in the common schema — re-stamp run_id and pass through."""
-    for row in rows:
-        out = dict(row)
-        out["run_id"] = run_id
-        yield out
-
-
 ADAPTERS: dict[str, Adapter] = {
     "openhands": adapter_openhands,
     "browsergym": adapter_browsergym,
-    "passthrough": adapter_passthrough,
 }
 
 

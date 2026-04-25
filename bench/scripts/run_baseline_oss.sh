@@ -60,13 +60,11 @@ case "$BENCHMARK" in
         DRIVER="scripts/run_swebench.py"
         : "${AGENT:=openhands}"
         fixture_dir="fixtures/swebench_lite"
-        fallback_fixture="fixtures/sample_swebench_task.json"
         ;;
     webarena|browsergym)
         DRIVER="scripts/run_webarena.py"
         : "${AGENT:=react_browser}"
         fixture_dir="fixtures/webarena"
-        fallback_fixture=""
         ;;
     *)
         echo "error: unknown benchmark '$BENCHMARK'" >&2
@@ -75,12 +73,11 @@ esac
 
 if [[ -z "$FIXTURES" ]]; then
     FIXTURES="$(find "$fixture_dir" -maxdepth 1 -name '*.json' 2>/dev/null | sort | paste -sd ',' -)"
-    if [[ -z "$FIXTURES" && -n "$fallback_fixture" ]]; then
-        FIXTURES="$fallback_fixture"
-    fi
 fi
 if [[ -z "$FIXTURES" ]]; then
     echo "error: no fixtures found under $fixture_dir/" >&2
+    [[ "$BENCHMARK" == "swebench_lite" ]] && \
+        echo "       run: python bench/scripts/fetch_swebench_fixtures.py" >&2
     exit 1
 fi
 
