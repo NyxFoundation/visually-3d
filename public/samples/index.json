@@ -146,6 +146,14 @@
       "path": "/samples/hero-arm.json",
       "accent": "#fb7185",
       "category": "medical"
+    },
+    {
+      "id": "deepseek-v4-pro",
+      "title": "DeepSeek-V4-Pro",
+      "subtitle": "1.6T-param MoE LM (49B activated) — hybrid CSA+HCA attention, 384 routed experts, mHC residual, MTP, Muon, 1M-token context",
+      "path": "/samples/deepseek-v4-pro.json",
+      "accent": "#7dd3fc",
+      "category": "ml"
     }
   ]
 }

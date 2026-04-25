@@ -1,0 +1,347 @@
+{
+  "machine_name": "DeepSeek-V4-Pro",
+  "assembly_instructions": "Vertical signal flow: input tokens enter at the base, pass through the embedding table, climb the manifold-constrained hyper-connection (mHC) residual rail through 61 Transformer blocks (first 2 are HCA-only, the remaining 59 interleave CSA and HCA), and exit through the prediction head plus a single Multi-Token Prediction module. The MoE bank to the right shows the per-block expert structure (1 shared + 384 routed, top-6 activation). The off-side optimiser stack indicates that Muon trains the bulk of weights while AdamW handles embedding, prediction head, mHC scalars, and RMSNorm. Quantisation discs sit under the components they apply to: FP4 under the routed experts and the indexer QK path; FP8/BF16 split next to the compressed KV cache. Faithful to DeepSeek-V4 paper §2 and §4.2.1.",
+  "metadata": {
+    "domain": "ml-architecture",
+    "reference": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+    "thumbnail_camera": [9, 8, 12],
+    "info": {
+      "english_name": "DeepSeek-V4-Pro (preview)",
+      "summary": "1.6T-parameter Mixture-of-Experts language model (49B activated per token) with a hybrid Compressed Sparse Attention (CSA) + Heavily Compressed Attention (HCA) backbone, manifold-constrained hyper-connections (mHC), Multi-Token Prediction (MTP), Muon optimiser, and FP4/FP8/BF16 mixed precision — natively supporting 1M-token context.",
+      "description": "DeepSeek-V4-Pro is the larger of two DeepSeek-V4 preview models from DeepSeek-AI. Compared with DeepSeek-V3 it (i) replaces conventional residual connections with mHC (residual stream expansion factor n_hc=4, Sinkhorn-Knopp projection iterations t_max=20), (ii) replaces the attention block with an interleaved hybrid of CSA (compression rate m=4, top-k=1024 selected compressed KV entries via a lightning indexer) and HCA (compression rate m'=128, dense over compressed entries), and (iii) trains with Muon for the bulk of parameters while keeping AdamW for embeddings, the prediction head, mHC scalars, and RMSNorm weights. The MoE FFN is unchanged from DeepSeekMoE except that affinity scores use Sqrt(Softplus(·)) and the first three MoE layers use Hash routing. Pre-trained on 33T tokens with sequence length warmed 4K → 16K → 64K → 1M.",
+      "facts": [
+        { "label": "total parameters",          "value": "1.6 T (49 B activated / token)" },
+        { "label": "context length",            "value": "1,048,576 tokens (native)" },
+        { "label": "transformer layers (L)",    "value": "61 (first 2 = HCA-only, rest interleave CSA/HCA)" },
+        { "label": "hidden dimension (d)",      "value": "7168" },
+        { "label": "vocabulary size",           "value": "128,000" },
+        { "label": "CSA compression rate (m)",  "value": "4" },
+        { "label": "CSA attention top-k",       "value": "1024" },
+        { "label": "CSA indexer query heads",   "value": "64 × 128-dim (FP4)" },
+        { "label": "HCA compression rate (m')", "value": "128" },
+        { "label": "query heads (n_h)",         "value": "128" },
+        { "label": "head dimension (c)",        "value": "512" },
+        { "label": "query compression (d_c)",   "value": "1536" },
+        { "label": "output projection groups",  "value": "g=16, d_g=1024" },
+        { "label": "sliding window (n_win)",    "value": "128" },
+        { "label": "MoE per layer",             "value": "1 shared + 384 routed experts (top-6)" },
+        { "label": "expert intermediate dim",   "value": "3072" },
+        { "label": "first MoE layers",          "value": "3 × Hash routing, then learned routing" },
+        { "label": "MTP depth",                 "value": "1" },
+        { "label": "mHC expansion (n_hc)",      "value": "4" },
+        { "label": "optimiser",                 "value": "Muon (bulk) + AdamW (embed / head / mHC scalars / RMSNorm)" },
+        { "label": "expert weight precision",   "value": "FP4 (quantisation-aware training)" },
+        { "label": "KV cache precision",        "value": "BF16 (RoPE dims) + FP8 (rest)" },
+        { "label": "training tokens",           "value": "33 T" }
+      ],
+      "sources": [
+        { "title": "DeepSeek-V4 technical report (PDF)",       "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/resolve/main/DeepSeek_V4.pdf" },
+        { "title": "DeepSeek-V4-Pro model card on HuggingFace", "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro" },
+        { "title": "DeepSeek-V3 paper (predecessor)",          "url": "https://arxiv.org/abs/2412.19437" }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "input_plate",
+      "name": "Input Tokens",
+      "shape": "box",
+      "position": [0, 0, 0],
+      "size": [4.5, 0.18, 2.4],
+      "material": "brushed graphite plate",
+      "role": "Token-ID stream entering the model. Documents are packed and sample-level attention masking is applied during pre-training (paper §4.1).",
+      "connections": ["embedding_table"]
+    },
+    {
+      "id": "embedding_table",
+      "name": "Embedding Table (V=128K, d=7168)",
+      "shape": "box",
+      "position": [0, 0.55, 0],
+      "size": [4.0, 0.35, 2.0],
+      "material": "indigo glass slab",
+      "role": "Trainable token embedding lookup; vocabulary 128K (inherited from DeepSeek-V3 tokenizer with extra special tokens). Updated by AdamW.",
+      "connections": ["mhc_residual_pipe"]
+    },
+    {
+      "id": "mhc_residual_pipe",
+      "name": "mHC Residual Stream (n_hc=4)",
+      "shape": "cylinder",
+      "position": [0, 5.6, 0],
+      "size": [0.18, 9.8],
+      "material": "translucent cyan polymer",
+      "role": "Manifold-constrained hyper-connection residual stream of width n_hc·d running through every block. The residual mapping B_l is projected onto the doubly-stochastic Birkhoff polytope by 20 Sinkhorn-Knopp iterations (paper §2.2).",
+      "connections": ["embedding_table", "block_01_hca", "block_02_hca", "block_03_csa", "block_04_hca", "block_05_csa", "block_06_hca", "block_07_csa", "block_08_hca", "block_60_csa", "block_61_hca", "prediction_head"]
+    },
+    {
+      "id": "layer_count_marker",
+      "name": "× 61 Transformer Layers",
+      "shape": "box",
+      "position": [-2.5, 5.6, 0],
+      "size": [0.05, 9.0, 0.8],
+      "material": "etched graphite gridline",
+      "role": "Visual stand-in for the 61-layer depth — only a representative subset of blocks is rendered; CSA and HCA alternate after the first 2 HCA-only layers."
+    },
+    {
+      "id": "block_01_hca",
+      "name": "Block 1 — HCA",
+      "shape": "box",
+      "position": [0, 1.4, 0],
+      "size": [3.4, 0.55, 1.5],
+      "material": "burgundy ceramic",
+      "role": "First Transformer block. Per paper §4.2.1, the first two layers of DeepSeek-V4-Pro use HCA only (m'=128), no CSA. mHC mixers wrap the attention sublayer.",
+      "connections": ["moe_routed_ring", "moe_shared_expert"]
+    },
+    {
+      "id": "block_02_hca",
+      "name": "Block 2 — HCA",
+      "shape": "box",
+      "position": [0, 2.1, 0],
+      "size": [3.4, 0.55, 1.5],
+      "material": "burgundy ceramic",
+      "role": "Second HCA-only block. After this layer the network switches to interleaved CSA / HCA.",
+      "connections": ["moe_hash_router"]
+    },
+    {
+      "id": "block_03_csa",
+      "name": "Block 3 — CSA (top-k=1024)",
+      "shape": "box",
+      "position": [0, 2.8, 0],
+      "size": [3.4, 0.55, 1.5],
+      "material": "cobalt aluminium",
+      "role": "First CSA block. Compresses every m=4 tokens of KV into one entry, then DeepSeek Sparse Attention selects top-1024 compressed entries via the lightning indexer.",
+      "connections": ["lightning_indexer", "compressed_kv_cache", "moe_hash_router"]
+    },
+    {
+      "id": "block_04_hca",
+      "name": "Block 4 — HCA",
+      "shape": "box",
+      "position": [0, 3.5, 0],
+      "size": [3.4, 0.55, 1.5],
+      "material": "burgundy ceramic",
+      "role": "HCA block in the interleaved region; m'=128 compression, dense attention over compressed entries."
+    },
+    {
+      "id": "block_05_csa",
+      "name": "Block 5 — CSA",
+      "shape": "box",
+      "position": [0, 4.2, 0],
+      "size": [3.4, 0.55, 1.5],
+      "material": "cobalt aluminium",
+      "role": "CSA block (interleaved). Shares the lightning indexer / sparse-selection design with block 3."
+    },
+    {
+      "id": "block_06_hca",
+      "name": "Block 6 — HCA",
+      "shape": "box",
+      "position": [0, 4.9, 0],
+      "size": [3.4, 0.55, 1.5],
+      "material": "burgundy ceramic",
+      "role": "HCA block (interleaved)."
+    },
+    {
+      "id": "block_07_csa",
+      "name": "Block 7 — CSA",
+      "shape": "box",
+      "position": [0, 5.6, 0],
+      "size": [3.4, 0.55, 1.5],
+      "material": "cobalt aluminium",
+      "role": "CSA block (interleaved). Mid-stack representative."
+    },
+    {
+      "id": "block_08_hca",
+      "name": "Block 8 — HCA",
+      "shape": "box",
+      "position": [0, 6.3, 0],
+      "size": [3.4, 0.55, 1.5],
+      "material": "burgundy ceramic",
+      "role": "HCA block (interleaved)."
+    },
+    {
+      "id": "block_60_csa",
+      "name": "Block 60 — CSA",
+      "shape": "box",
+      "position": [0, 7.6, 0],
+      "size": [3.4, 0.55, 1.5],
+      "material": "cobalt aluminium",
+      "role": "Penultimate CSA block. (Blocks 9–59 elided; the interleaved CSA/HCA pattern continues identically.)"
+    },
+    {
+      "id": "block_61_hca",
+      "name": "Block 61 — HCA (final)",
+      "shape": "box",
+      "position": [0, 8.3, 0],
+      "size": [3.4, 0.55, 1.5],
+      "material": "burgundy ceramic",
+      "role": "Final Transformer block before the prediction head."
+    },
+    {
+      "id": "lightning_indexer",
+      "name": "Lightning Indexer (FP4)",
+      "shape": "box",
+      "position": [2.4, 2.8, 0],
+      "size": [0.7, 0.4, 0.7],
+      "material": "neon-violet cast acrylic",
+      "role": "Per-CSA-block index-score generator with 64 indexer query heads of dim 128. Computes Σ w · ReLU(qᴵ · K^IComp) and feeds the top-k selector. Computed in FP4 precision for long-context throughput (paper §2.3.1, §2.3.4).",
+      "connections": ["block_03_csa", "compressed_kv_cache"]
+    },
+    {
+      "id": "compressed_kv_cache",
+      "name": "Compressed KV Cache (heterogeneous)",
+      "shape": "cylinder",
+      "position": [-3.2, 5.0, 0],
+      "size": [0.55, 6.0],
+      "material": "amber translucent silica",
+      "role": "Heterogeneous KV cache shared across attention sublayers. CSA holds n/m entries (m=4); HCA holds n/m'/blocks entries (m'=128). Entries cycle to on-disk storage for shared-prefix reuse (paper §3.6).",
+      "connections": ["sliding_window_kv", "kv_precision_disk"]
+    },
+    {
+      "id": "sliding_window_kv",
+      "name": "Sliding-Window KV (n_win=128)",
+      "shape": "cylinder",
+      "position": [-3.2, 8.4, 0],
+      "size": [0.45, 0.4],
+      "material": "polished gold disk",
+      "role": "Auxiliary uncompressed KV branch keeping the most recent 128 tokens at full resolution; concatenated with selected compressed entries inside CSA / HCA core attention."
+    },
+    {
+      "id": "kv_precision_disk",
+      "name": "KV precision: BF16 (RoPE) + FP8 (rest)",
+      "shape": "cylinder",
+      "position": [-3.2, 1.6, 0],
+      "size": [0.7, 0.18],
+      "material": "split bronze / silver inlay",
+      "role": "Storage-format marker: rotary-positional-embedding dims of every KV entry are stored in BF16; non-RoPE dims in FP8 — roughly halves cache size vs pure BF16 (paper §2.3.4)."
+    },
+    {
+      "id": "attention_sink",
+      "name": "Attention Sink Logits",
+      "shape": "sphere",
+      "position": [2.4, 5.6, 0.0],
+      "size": [0.18],
+      "material": "matte obsidian sphere",
+      "role": "Per-head learnable z'_h added to the softmax denominator so attention scores need not sum to 1 (paper §2.3.3)."
+    },
+    {
+      "id": "moe_routed_ring",
+      "name": "Routed Experts (384, top-6)",
+      "shape": "cylinder",
+      "position": [5.5, 4.8, 0],
+      "size": [2.0, 0.45],
+      "material": "iridescent micro-array",
+      "role": "Per-MoE-layer bank of 384 fine-grained routed experts (intermediate dim 3072). Each token activates the top-6 by affinity score Sqrt(Softplus(·)). FP4 quantisation-aware training is applied to expert weights.",
+      "connections": ["moe_router_topk", "fp4_expert_disk", "block_04_hca", "block_05_csa", "block_06_hca", "block_07_csa", "block_08_hca", "block_60_csa", "block_61_hca"]
+    },
+    {
+      "id": "moe_shared_expert",
+      "name": "Shared Expert (×1)",
+      "shape": "box",
+      "position": [5.5, 5.55, 0],
+      "size": [0.55, 0.55, 0.55],
+      "material": "polished platinum",
+      "role": "One shared expert per MoE layer, always active for every token; complements the 6 routed experts (DeepSeekMoE convention)."
+    },
+    {
+      "id": "moe_router_topk",
+      "name": "Top-6 Router (Sqrt∘Softplus)",
+      "shape": "cylinder",
+      "position": [5.5, 6.05, 0],
+      "size": [0.55, 0.18],
+      "material": "ruby-tinted glass disk",
+      "role": "Per-token affinity computation Sqrt(Softplus(·)) (changed from V3's Sigmoid). Auxiliary-loss-free load balancing with bias update speed 0.001 + tiny sequence-wise balance loss.",
+      "connections": ["moe_routed_ring"]
+    },
+    {
+      "id": "moe_hash_router",
+      "name": "Hash Router (first 3 MoE layers)",
+      "shape": "box",
+      "position": [3.4, 1.75, 1.4],
+      "size": [0.6, 0.35, 0.6],
+      "material": "speckled basalt cube",
+      "role": "First three MoE layers route by a fixed hash function over the input token ID rather than learned affinity (paper §2.1).",
+      "connections": ["block_02_hca", "block_03_csa"]
+    },
+    {
+      "id": "fp4_expert_disk",
+      "name": "FP4 Expert Weights",
+      "shape": "cylinder",
+      "position": [5.5, 4.32, 0],
+      "size": [2.05, 0.06],
+      "material": "rose-gold annulus",
+      "role": "Quantisation-aware-training disk under the routed expert bank: routed-expert GEMM weights and the indexer QK path are stored / computed in FP4 (paper §3.4)."
+    },
+    {
+      "id": "anticipatory_routing_marker",
+      "name": "Anticipatory Routing Δt",
+      "shape": "sphere",
+      "position": [5.5, 6.55, 0.0],
+      "size": [0.16],
+      "material": "warm copper marble",
+      "role": "Stability marker: routing indices are computed using historical params θ_{t-Δt} while features use θ_t. Activated automatically on loss-spike detection (paper §4.2.3)."
+    },
+    {
+      "id": "swiglu_clamp",
+      "name": "SwiGLU Clamp [-10, 10]",
+      "shape": "box",
+      "position": [5.5, 5.05, 1.6],
+      "size": [0.5, 0.18, 0.5],
+      "material": "amber gel block",
+      "role": "Outlier-suppression clamp on the SwiGLU activation inside expert FFNs: linear branch in [-10, 10], gate upper-bounded at 10 (paper §4.2.3)."
+    },
+    {
+      "id": "prediction_head",
+      "name": "LM Prediction Head",
+      "shape": "box",
+      "position": [0, 9.1, 0],
+      "size": [3.6, 0.4, 1.7],
+      "material": "white marble slab",
+      "role": "Tied / learned projection back to the 128K vocab. Updated by AdamW.",
+      "connections": ["mtp_module", "lm_loss"]
+    },
+    {
+      "id": "mtp_module",
+      "name": "MTP Module (depth=1)",
+      "shape": "box",
+      "position": [2.6, 9.7, 0],
+      "size": [1.6, 0.4, 1.4],
+      "material": "moss-green ceramic",
+      "role": "Single Multi-Token-Prediction module producing the +1-step auxiliary prediction. Configuration unchanged from DeepSeek-V3 (paper §2.1).",
+      "connections": ["mtp_loss"]
+    },
+    {
+      "id": "lm_loss",
+      "name": "LM Loss",
+      "shape": "sphere",
+      "position": [-1.4, 10.2, 0],
+      "size": [0.28],
+      "material": "incandescent ivory",
+      "role": "Primary cross-entropy training objective on the next-token distribution."
+    },
+    {
+      "id": "mtp_loss",
+      "name": "MTP Loss (weight 0.3 → 0.1)",
+      "shape": "sphere",
+      "position": [3.0, 10.6, 0],
+      "size": [0.24],
+      "material": "luminescent sage",
+      "role": "Auxiliary loss on the MTP module. Weight 0.3 for most of training, decayed to 0.1 once LR decay starts (paper §4.2.2)."
+    },
+    {
+      "id": "muon_optimizer",
+      "name": "Muon Optimizer",
+      "shape": "box",
+      "position": [-5.5, 5.0, 0],
+      "size": [1.6, 1.2, 1.0],
+      "material": "matte titanium block",
+      "role": "Trains the bulk of weights. Hybrid Newton-Schulz (10 iters, two coefficient stages), Nesterov momentum 0.95, RMS rescale 0.18, weight decay 0.1 (paper §2.4)."
+    },
+    {
+      "id": "adamw_optimizer",
+      "name": "AdamW Optimizer",
+      "shape": "box",
+      "position": [-5.5, 3.4, 0],
+      "size": [1.0, 0.7, 0.9],
+      "material": "anodised navy block",
+      "role": "Trains the embedding module, prediction head, mHC static biases / gating factors, and all RMSNorm weights. β1=0.9, β2=0.95, ε=1e-20, weight_decay=0.1 (paper §4.2.2)."
+    }
+  ]
+}
