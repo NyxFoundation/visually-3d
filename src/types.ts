@@ -1,4 +1,42 @@
-export interface Part {
+export type ComputeProfile =
+  | 'gpu-compute-bound'
+  | 'gpu-memory-bound'
+  | 'gpu-bandwidth-bound'
+  | 'memory-capacity-bound'
+  | 'communication-bound'
+  | 'host-cpu'
+  | 'storage-bound'
+  | 'mixed'
+  | 'negligible';
+
+export type Parallelism =
+  | 'embarrassingly-parallel'
+  | 'tensor-parallel'
+  | 'expert-parallel'
+  | 'data-parallel'
+  | 'pipeline-parallel'
+  | 'sequential'
+  | 'mostly-sequential'
+  | 'partially-parallel';
+
+export interface PartEngineering {
+  /** Where this part spends its budget on a real GPU node (H800/H100). */
+  compute_profile?: ComputeProfile;
+  /** Approximate FLOPs per token (forward, decode-step), as a string for readability. */
+  flops_per_token?: string;
+  /** Activation / weight / KV memory footprint (per token or per layer, labelled inline). */
+  memory_footprint?: string;
+  /** How this part parallelises across devices (or doesn't). */
+  parallelism?: Parallelism;
+  /** Pseudocode or a one-screen recipe so a CS student can scratch-build this part. */
+  algorithm?: string;
+  /** The first thing that hurts when you try to scale this part. */
+  bottleneck?: string;
+  /** Concrete improvement ideas (research directions, kernel work, scheduling tricks). */
+  improvement_ideas?: string[];
+}
+
+export interface Part extends PartEngineering {
   id: string;
   name: string;
   shape: 'box' | 'cylinder' | 'sphere' | 'complex';
@@ -20,6 +58,13 @@ export interface SceneInfoFact {
   value: string;
 }
 
+export interface VersionDiff {
+  /** Short tag, e.g. "vs DeepSeek-V3", "vs DeepSeek-V2", "vs GPT-4-class". */
+  versus: string;
+  /** Plain-English explanation of what changed and why it matters. */
+  delta: string;
+}
+
 export interface SceneInfo {
   japanese_name?: string;
   english_name?: string;
@@ -32,6 +77,8 @@ export interface SceneInfo {
   status?: string;
   facts?: SceneInfoFact[];
   sources?: SceneInfoSource[];
+  /** Version-to-version comparisons (e.g. against earlier DeepSeek models or peer GPT-class models). */
+  comparisons?: VersionDiff[];
 }
 
 export interface SceneMetadata {

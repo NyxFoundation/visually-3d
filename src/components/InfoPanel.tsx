@@ -79,6 +79,20 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({ scene, open, onClose }) =>
         </section>
       ) : null}
 
+      {info?.comparisons && info.comparisons.length > 0 ? (
+        <section className="info-panel__section">
+          <h3>How it differs</h3>
+          <ul className="info-panel__diffs">
+            {info.comparisons.map((diff, i) => (
+              <li key={i}>
+                <strong>{diff.versus}</strong>
+                <span>{diff.delta}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {info?.sources && info.sources.length > 0 ? (
         <section className="info-panel__section">
           <h3>Sources</h3>

@@ -1,14 +1,14 @@
 {
   "machine_name": "DeepSeek-V4-Pro",
-  "assembly_instructions": "Vertical signal flow: input tokens enter at the base, pass through the embedding table, climb the manifold-constrained hyper-connection (mHC) residual rail through 61 Transformer blocks (first 2 are HCA-only, the remaining 59 interleave CSA and HCA), and exit through the prediction head plus a single Multi-Token Prediction module. The MoE bank to the right shows the per-block expert structure (1 shared + 384 routed, top-6 activation). The off-side optimiser stack indicates that Muon trains the bulk of weights while AdamW handles embedding, prediction head, mHC scalars, and RMSNorm. Quantisation discs sit under the components they apply to: FP4 under the routed experts and the indexer QK path; FP8/BF16 split next to the compressed KV cache. Faithful to DeepSeek-V4 paper §2 and §4.2.1.",
+  "assembly_instructions": "Read it like a factory line. Tokens enter at the floor (X=0, Y=0) and climb the cyan mHC residual pillar through 61 Transformer blocks (8 are rendered; the rest are implied by the etched gridline). Two HCA-only blocks sit at the bottom, then CSA (cobalt) and HCA (burgundy) interleave to the top. To the right at X=4 sits an EXPLODED VIEW of one CSA block — RMSNorm → query down-proj → compressed KV proj → RoPE split → lightning indexer → top-k selector → attention sink → softmax → grouped output proj — so a student can see what's actually inside a single layer. The orange MoE bank further right shows the per-block expert structure (1 shared + 384 routed, top-6) plus router, hash router, group GEMM, and the all-to-all dispatch/combine ring that is the real wall-clock bottleneck. The amber pillar on the left is the heterogeneous KV cache; the half-bronze / half-silver disc under it is the BF16+FP8 storage format. The titanium / navy slabs on the far left are the optimisers (Muon for the bulk of weights, AdamW for embeddings, head, mHC scalars, RMSNorm). The translucent quad at X=8 marks the parallelism plan (TP × EP × PP × DP). Quantisation discs sit DIRECTLY UNDER the components they apply to: FP4 under the routed experts and the indexer QK path, BF16+FP8 under the KV cache. Click any part for FLOPs, memory, parallelism class, scratch-build pseudocode, the dominant bottleneck, and improvement ideas.",
   "metadata": {
     "domain": "ml-architecture",
     "reference": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
-    "thumbnail_camera": [9, 8, 12],
+    "thumbnail_camera": [12, 9, 14],
     "info": {
-      "english_name": "DeepSeek-V4-Pro (preview)",
-      "summary": "1.6T-parameter Mixture-of-Experts language model (49B activated per token) with a hybrid Compressed Sparse Attention (CSA) + Heavily Compressed Attention (HCA) backbone, manifold-constrained hyper-connections (mHC), Multi-Token Prediction (MTP), Muon optimiser, and FP4/FP8/BF16 mixed precision — natively supporting 1M-token context.",
-      "description": "DeepSeek-V4-Pro is the larger of two DeepSeek-V4 preview models from DeepSeek-AI. Compared with DeepSeek-V3 it (i) replaces conventional residual connections with mHC (residual stream expansion factor n_hc=4, Sinkhorn-Knopp projection iterations t_max=20), (ii) replaces the attention block with an interleaved hybrid of CSA (compression rate m=4, top-k=1024 selected compressed KV entries via a lightning indexer) and HCA (compression rate m'=128, dense over compressed entries), and (iii) trains with Muon for the bulk of parameters while keeping AdamW for embeddings, the prediction head, mHC scalars, and RMSNorm weights. The MoE FFN is unchanged from DeepSeekMoE except that affinity scores use Sqrt(Softplus(·)) and the first three MoE layers use Hash routing. Pre-trained on 33T tokens with sequence length warmed 4K → 16K → 64K → 1M.",
+      "english_name": "DeepSeek-V4-Pro (preview, exploded engineering view)",
+      "summary": "1.6T-parameter Mixture-of-Experts language model (49B activated per token) with a hybrid Compressed Sparse Attention (CSA) + Heavily Compressed Attention (HCA) backbone, manifold-constrained hyper-connections (mHC), Multi-Token Prediction (MTP), Muon optimiser, and FP4/FP8/BF16 mixed precision — natively supporting 1M-token context. This view annotates every part with its compute profile, memory footprint, parallelism class, scratch-build algorithm, bottleneck, and ideas for improving it.",
+      "description": "DeepSeek-V4-Pro is the larger of two DeepSeek-V4 preview models. Compared with V3 it (i) replaces conventional residual connections with mHC (residual stream expansion factor n_hc=4, Sinkhorn-Knopp projection iterations t_max=20), (ii) replaces the attention block with an interleaved hybrid of CSA (compression rate m=4, top-k=1024 selected compressed KV entries via a lightning indexer) and HCA (compression rate m'=128, dense over compressed entries), and (iii) trains with Muon for the bulk of parameters while keeping AdamW for embeddings, the prediction head, mHC scalars, and RMSNorm weights. The MoE FFN is unchanged from DeepSeekMoE except that affinity scores use Sqrt(Softplus(·)) and the first three MoE layers use Hash routing. Pre-trained on 33T tokens with sequence length warmed 4K → 16K → 64K → 1M.\n\nWhy each design choice exists, in one line:\n• mHC: lets gradients route through n_hc=4 parallel residual streams without exploding norms, fixing V3's deep-stack signal degradation.\n• CSA + HCA: makes attention scale sub-quadratically at 1M context — CSA does the long-range fetch, HCA does dense work over a 128× compressed view.\n• MoE FFN with shared expert: amortises capacity per token (49B activated of 1.6T total) — the shared expert is a stability anchor.\n• FP4 expert weights + FP8/BF16 KV: the two memory wins that make 1M context economical on H800-class hardware.\n• Muon: orthonormalised updates via Newton-Schulz, much better than AdamW for >100B-param matrices but unstable for small / 1-D tensors — hence the AdamW carve-out.",
       "facts": [
         { "label": "total parameters",          "value": "1.6 T (49 B activated / token)" },
         { "label": "context length",            "value": "1,048,576 tokens (native)" },
@@ -32,24 +32,55 @@
         { "label": "optimiser",                 "value": "Muon (bulk) + AdamW (embed / head / mHC scalars / RMSNorm)" },
         { "label": "expert weight precision",   "value": "FP4 (quantisation-aware training)" },
         { "label": "KV cache precision",        "value": "BF16 (RoPE dims) + FP8 (rest)" },
-        { "label": "training tokens",           "value": "33 T" }
+        { "label": "training tokens",           "value": "33 T" },
+        { "label": "decode KV / token",         "value": "≈ 70 KB / layer (CSA-compressed) vs ≈ 2.2 MB / layer dense — ~30× shrink" },
+        { "label": "decode FLOPs / token",      "value": "≈ 98 GFLOP (49B activated × 2)" }
+      ],
+      "comparisons": [
+        {
+          "versus": "vs DeepSeek-V1 (2024, 7B / 67B dense)",
+          "delta": "V1 was a vanilla dense LLaMA-style decoder with multi-head attention, RoPE, SwiGLU, RMSNorm, and AdamW. V4-Pro keeps the surface (RoPE, SwiGLU, RMSNorm) but replaces literally every load-bearing block: dense FFN → 384-routed-expert MoE, MHA → CSA+HCA hybrid, residual → mHC, AdamW → Muon (mostly), FP16 → FP4/FP8/BF16. Activated params per token are similar (~49B vs V1-67B's 67B) but total capacity is ~24× larger."
+        },
+        {
+          "versus": "vs DeepSeek-V2 (2024, 236B MoE, MLA attention)",
+          "delta": "V2 introduced Multi-Head Latent Attention (MLA) — a learned low-rank KV compression that already shrunk the cache ~7×. V4-Pro generalises that idea: CSA compresses every m=4 tokens AND sparsifies via a lightning indexer (top-k=1024), while HCA pushes compression to m'=128 on alternate layers. V2 used auxiliary-loss load balancing; V4-Pro uses auxiliary-loss-FREE balancing with a tiny bias-update rule. Routing affinity changed Sigmoid → Sqrt(Softplus(·))."
+        },
+        {
+          "versus": "vs DeepSeek-V3 (2024, 671B MoE, MLA + DeepSeekMoE)",
+          "delta": "V3 = direct predecessor. V4-Pro changes: (1) MLA → CSA+HCA hybrid (sub-quadratic at 1M ctx, V3 was still O(n²) over compressed latents), (2) plain residual + DualPipe → manifold-constrained hyper-connections (mHC, n_hc=4, 20 Sinkhorn-Knopp iters), (3) AdamW everywhere → Muon for matrix params + AdamW for the carve-out, (4) FP8 training → FP4 quantisation-aware training on routed experts and indexer QK, (5) routing function Sigmoid → Sqrt(Softplus(·)), (6) first 3 MoE layers switched to Hash routing for stability, (7) MTP weight schedule decays 0.3 → 0.1, (8) anticipatory routing (use θ_{t-Δt} for routing indices) added as automatic loss-spike fix."
+        },
+        {
+          "versus": "vs GPT-4-class dense / mixture (public consensus)",
+          "delta": "GPT-4 family is widely believed to be a dense or coarse-MoE Transformer with classical MHA/GQA, FlashAttention, fp16/bf16 weights, and AdamW-style optimisers. Versus that baseline V4-Pro is (a) much sparser per token (top-6 of 384 experts vs ~2-of-16 in rumoured GPT-4-MoE), (b) much more compressed in attention (≈30× smaller KV cache), (c) trained in lower precision (FP4 experts), (d) optimised with Muon rather than AdamW, and (e) explicitly engineered for 1M context as a first-class target rather than an after-training extension. Conceptually V4-Pro trades simplicity for sparsity at every level — sparse experts, sparse attention, sparse residual mixing — to push activated FLOPs / token down while keeping capacity high."
+        }
       ],
       "sources": [
         { "title": "DeepSeek-V4 technical report (PDF)",       "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/resolve/main/DeepSeek_V4.pdf" },
         { "title": "DeepSeek-V4-Pro model card on HuggingFace", "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro" },
-        { "title": "DeepSeek-V3 paper (predecessor)",          "url": "https://arxiv.org/abs/2412.19437" }
+        { "title": "DeepSeek-V3 paper (predecessor)",          "url": "https://arxiv.org/abs/2412.19437" },
+        { "title": "DeepSeek-V2 paper (MLA + DeepSeekMoE)",    "url": "https://arxiv.org/abs/2405.04434" },
+        { "title": "Muon optimizer (Jordan et al.)",           "url": "https://arxiv.org/abs/2502.16982" }
       ]
     }
   },
   "parts": [
     {
       "id": "input_plate",
-      "name": "Input Tokens",
+      "name": "Input Tokens (BPE IDs)",
       "shape": "box",
       "position": [0, 0, 0],
       "size": [4.5, 0.18, 2.4],
       "material": "brushed graphite plate",
-      "role": "Token-ID stream entering the model. Documents are packed and sample-level attention masking is applied during pre-training (paper §4.1).",
+      "role": "Token-ID stream entering the model. Documents are packed and sample-level attention masking is applied during pre-training (paper §4.1). One token = one int32 in the V=128K vocabulary.",
+      "compute_profile": "host-cpu",
+      "memory_footprint": "4 bytes / token (int32)",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "tokens = bpe.encode(text)        # CPU\nbatch = pack(tokens, max_len=4096)  # sample-aware mask\nmask  = sample_attention_mask(batch)",
+      "bottleneck": "CPU tokeniser throughput on the data loader, not the GPU.",
+      "improvement_ideas": [
+        "Tokenise off-host with a sharded Rust/Cython tokeniser (SentencePiece in C++).",
+        "Use packed-sequence with cumulative-seq-lengths to keep attention kernels happy."
+      ],
       "connections": ["embedding_table"]
     },
     {
@@ -59,7 +90,17 @@
       "position": [0, 0.55, 0],
       "size": [4.0, 0.35, 2.0],
       "material": "indigo glass slab",
-      "role": "Trainable token embedding lookup; vocabulary 128K (inherited from DeepSeek-V3 tokenizer with extra special tokens). Updated by AdamW.",
+      "role": "Trainable token-embedding lookup. Vocabulary 128K (inherited from V3 tokenizer with extra special tokens). Updated by AdamW, NOT Muon (Muon misbehaves on the embedding manifold).",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "0 (pure gather)",
+      "memory_footprint": "128K × 7168 × BF16 ≈ 1.83 GiB of weights",
+      "parallelism": "tensor-parallel",
+      "algorithm": "h0 = E[token_ids]      # gather, no FLOPs\n# E is sharded along V across TP ranks; an all-gather\n# is needed only for the tied LM head.",
+      "bottleneck": "Embedding lookup is bandwidth-bound and competes with the residual write — usually fused with the first RMSNorm.",
+      "improvement_ideas": [
+        "Shard E along the vocab axis and tie with the LM head to halve memory.",
+        "Store E in BF16 even when activations are FP8 — quantising embeddings hurts perplexity disproportionately."
+      ],
       "connections": ["mhc_residual_pipe"]
     },
     {
@@ -69,8 +110,37 @@
       "position": [0, 5.6, 0],
       "size": [0.18, 9.8],
       "material": "translucent cyan polymer",
-      "role": "Manifold-constrained hyper-connection residual stream of width n_hc·d running through every block. The residual mapping B_l is projected onto the doubly-stochastic Birkhoff polytope by 20 Sinkhorn-Knopp iterations (paper §2.2).",
+      "role": "Manifold-constrained hyper-connection residual stream of width n_hc·d running through every block. The residual mapping B_l is projected onto the doubly-stochastic Birkhoff polytope by 20 Sinkhorn-Knopp iterations (paper §2.2). Replaces the single dense residual of V1/V2/V3.",
+      "compute_profile": "gpu-memory-bound",
+      "flops_per_token": "0 for the carry, ~6·d² for each B_l mix (small)",
+      "memory_footprint": "n_hc × d × dtype = 4 × 7168 × 2B ≈ 57 KB / token / layer",
+      "parallelism": "tensor-parallel",
+      "algorithm": "# inside layer l\nx_in = mhc_unmix(R)                # linear, learned\ny    = sublayer(RMSNorm(x_in))     # attention OR FFN\nR    = mhc_mix(R, x_in, y, B_l)    # B_l projected onto Birkhoff polytope",
+      "bottleneck": "Adds ~4× memory on the residual carry vs vanilla. Sinkhorn-Knopp on B_l adds 20 small matmuls per layer.",
+      "improvement_ideas": [
+        "Cache the Sinkhorn output between forward and backward — it's deterministic from B_l.",
+        "Fuse mhc_mix / mhc_unmix with RMSNorm to keep the residual in registers."
+      ],
       "connections": ["embedding_table", "block_01_hca", "block_02_hca", "block_03_csa", "block_04_hca", "block_05_csa", "block_06_hca", "block_07_csa", "block_08_hca", "block_60_csa", "block_61_hca", "prediction_head"]
+    },
+    {
+      "id": "sinkhorn_wheel",
+      "name": "Sinkhorn-Knopp Projector (t_max=20)",
+      "shape": "cylinder",
+      "position": [-0.7, 5.6, 0],
+      "size": [0.22, 0.5],
+      "material": "polished pewter ring",
+      "role": "Per-block iterative row/column normaliser that pushes the mHC mix matrix B_l onto the doubly-stochastic Birkhoff polytope (paper §2.2). 20 alternating row/col rescales per layer.",
+      "compute_profile": "negligible",
+      "flops_per_token": "~0 (operates on n_hc × n_hc = 4 × 4 matrices)",
+      "memory_footprint": "16 floats / layer",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "B = B_raw\nfor _ in range(20):\n    B = B / B.sum(axis=1, keepdim=True)  # row normalise\n    B = B / B.sum(axis=0, keepdim=True)  # col normalise\nreturn B",
+      "bottleneck": "Not a bottleneck at inference; the BACKWARD through 20 iterations matters at training time and benefits from analytic differentiation.",
+      "improvement_ideas": [
+        "Use the implicit-function theorem instead of unrolling 20 iters in autograd.",
+        "Replace with a closed-form projection (Sinkhorn limit) when iterations converge."
+      ]
     },
     {
       "id": "layer_count_marker",
@@ -79,8 +149,14 @@
       "position": [-2.5, 5.6, 0],
       "size": [0.05, 9.0, 0.8],
       "material": "etched graphite gridline",
-      "role": "Visual stand-in for the 61-layer depth — only a representative subset of blocks is rendered; CSA and HCA alternate after the first 2 HCA-only layers."
+      "role": "Visual stand-in for the 61-layer depth — only a representative subset of blocks is rendered; CSA and HCA alternate after the first 2 HCA-only layers.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "memory_footprint": "61 × per-layer activations dominates training memory — see activation-checkpointing.",
+      "algorithm": "# the actual layer loop:\nfor l in range(L=61):\n    is_csa = (l >= 2) and (l % 2 == 0)\n    h = block(h, type='csa' if is_csa else 'hca')",
+      "bottleneck": "Pipeline bubble — with 61 layers spread across PP=8 stages you pay ~7 microbatches of pipeline stall per step unless you use DualPipe / 1F1B / interleaved scheduling."
     },
+
     {
       "id": "block_01_hca",
       "name": "Block 1 — HCA",
@@ -88,7 +164,12 @@
       "position": [0, 1.4, 0],
       "size": [3.4, 0.55, 1.5],
       "material": "burgundy ceramic",
-      "role": "First Transformer block. Per paper §4.2.1, the first two layers of DeepSeek-V4-Pro use HCA only (m'=128), no CSA. mHC mixers wrap the attention sublayer.",
+      "role": "First Transformer block. Per paper §4.2.1, the first two layers of V4-Pro use HCA only (m'=128), no CSA. mHC mixers wrap the attention sublayer.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 0.45 GFLOP (HCA path) + FFN below",
+      "memory_footprint": "Attention activations + KV slice (compressed at m'=128).",
+      "parallelism": "tensor-parallel",
+      "bottleneck": "First two layers are special-cased; load-balancing the layer schedule across PP stages is awkward.",
       "connections": ["moe_routed_ring", "moe_shared_expert"]
     },
     {
@@ -98,7 +179,9 @@
       "position": [0, 2.1, 0],
       "size": [3.4, 0.55, 1.5],
       "material": "burgundy ceramic",
-      "role": "Second HCA-only block. After this layer the network switches to interleaved CSA / HCA.",
+      "role": "Second HCA-only block. After this layer the network switches to interleaved CSA / HCA. Its FFN is one of the 3 hash-routed MoE layers.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
       "connections": ["moe_hash_router"]
     },
     {
@@ -108,8 +191,11 @@
       "position": [0, 2.8, 0],
       "size": [3.4, 0.55, 1.5],
       "material": "cobalt aluminium",
-      "role": "First CSA block. Compresses every m=4 tokens of KV into one entry, then DeepSeek Sparse Attention selects top-1024 compressed entries via the lightning indexer.",
-      "connections": ["lightning_indexer", "compressed_kv_cache", "moe_hash_router"]
+      "role": "First CSA block. Compresses every m=4 tokens of KV into one entry, then DeepSeek Sparse Attention selects top-1024 compressed entries via the lightning indexer. Exploded into sub-components on the right at X=4.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "≈ 0.15 GFLOP at 1M ctx (vs ~525 GFLOP for dense MHA at the same ctx)",
+      "parallelism": "tensor-parallel",
+      "connections": ["lightning_indexer", "compressed_kv_cache", "moe_hash_router", "csa_inside_norm", "csa_inside_qproj"]
     },
     {
       "id": "block_04_hca",
@@ -118,7 +204,9 @@
       "position": [0, 3.5, 0],
       "size": [3.4, 0.55, 1.5],
       "material": "burgundy ceramic",
-      "role": "HCA block in the interleaved region; m'=128 compression, dense attention over compressed entries."
+      "role": "HCA block in the interleaved region; m'=128 compression, dense attention over compressed entries. Exploded into sub-components on the LEFT-back face at X=-2.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel"
     },
     {
       "id": "block_05_csa",
@@ -127,7 +215,9 @@
       "position": [0, 4.2, 0],
       "size": [3.4, 0.55, 1.5],
       "material": "cobalt aluminium",
-      "role": "CSA block (interleaved). Shares the lightning indexer / sparse-selection design with block 3."
+      "role": "CSA block (interleaved). Shares the lightning indexer / sparse-selection design with block 3.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel"
     },
     {
       "id": "block_06_hca",
@@ -136,7 +226,9 @@
       "position": [0, 4.9, 0],
       "size": [3.4, 0.55, 1.5],
       "material": "burgundy ceramic",
-      "role": "HCA block (interleaved)."
+      "role": "HCA block (interleaved).",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel"
     },
     {
       "id": "block_07_csa",
@@ -145,7 +237,9 @@
       "position": [0, 5.6, 0],
       "size": [3.4, 0.55, 1.5],
       "material": "cobalt aluminium",
-      "role": "CSA block (interleaved). Mid-stack representative."
+      "role": "CSA block (interleaved). Mid-stack representative.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel"
     },
     {
       "id": "block_08_hca",
@@ -154,7 +248,9 @@
       "position": [0, 6.3, 0],
       "size": [3.4, 0.55, 1.5],
       "material": "burgundy ceramic",
-      "role": "HCA block (interleaved)."
+      "role": "HCA block (interleaved).",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel"
     },
     {
       "id": "block_60_csa",
@@ -163,7 +259,9 @@
       "position": [0, 7.6, 0],
       "size": [3.4, 0.55, 1.5],
       "material": "cobalt aluminium",
-      "role": "Penultimate CSA block. (Blocks 9–59 elided; the interleaved CSA/HCA pattern continues identically.)"
+      "role": "Penultimate CSA block. (Blocks 9–59 elided; the interleaved CSA/HCA pattern continues identically.)",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel"
     },
     {
       "id": "block_61_hca",
@@ -172,17 +270,148 @@
       "position": [0, 8.3, 0],
       "size": [3.4, 0.55, 1.5],
       "material": "burgundy ceramic",
-      "role": "Final Transformer block before the prediction head."
+      "role": "Final Transformer block before the prediction head.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel"
+    },
+
+    {
+      "id": "csa_inside_norm",
+      "name": "CSA · pre-RMSNorm",
+      "shape": "box",
+      "position": [4.5, 2.3, 0],
+      "size": [0.6, 0.18, 0.6],
+      "material": "matte ivory tile",
+      "role": "RMSNorm applied to the residual carry before the CSA sublayer. Affine scale γ ∈ R^d is one of the few 1-D params trained by AdamW (not Muon).",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "≈ 4·d ≈ 28K FLOP",
+      "memory_footprint": "γ: 7168 × BF16 = 14 KB",
+      "parallelism": "tensor-parallel",
+      "algorithm": "rms = sqrt(mean(x*x) + eps)\nx_hat = x / rms\ny     = γ * x_hat            # γ trained by AdamW",
+      "bottleneck": "Memory-bandwidth bound; almost always fused into the next GEMM.",
+      "connections": ["csa_inside_qproj"]
     },
     {
+      "id": "csa_inside_qproj",
+      "name": "CSA · Query Down-Proj (W^DQ, W^UQ, R^Q)",
+      "shape": "box",
+      "position": [4.5, 2.7, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "anodised aluminium tile",
+      "role": "Two-stage query projection: down to d_c=1536, then up to n_h=128 heads × c=512. The RoPE rotary fraction is split off into R^Q for positional encoding.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·d·d_c + 2·d_c·n_h·c ≈ 220 MFLOP",
+      "memory_footprint": "W^DQ + W^UQ ≈ 11M + 100M params per layer (BF16, ≈ 220 MB)",
+      "parallelism": "tensor-parallel",
+      "algorithm": "q_lat   = x @ W_DQ          # [B,T, d_c]\nq_heads = q_lat @ W_UQ      # [B,T, n_h, c]\nq_rope, q_nope = split(q_heads, c_rope)\nq_rope  = apply_rope(q_rope, pos)",
+      "bottleneck": "Compute-bound at training; at decode the W^UQ projection becomes the per-token GEMM hotspot.",
+      "connections": ["csa_inside_kv_compress"]
+    },
+    {
+      "id": "csa_inside_kv_compress",
+      "name": "CSA · Compressed KV Proj (W^DKV, m=4)",
+      "shape": "box",
+      "position": [4.5, 3.1, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "frosted teal acrylic",
+      "role": "Down-projection of K/V into a shared latent of width c_kv, then compression of every m=4 tokens into ONE compressed KV entry. This is what makes CSA's cache ~m× smaller than dense.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "≈ 2·d·c_kv ≈ 22 MFLOP (only at write time)",
+      "memory_footprint": "compressed KV: n/m × c_kv × FP8 ≈ 70 KB / layer / token-equivalent",
+      "parallelism": "tensor-parallel",
+      "algorithm": "kv_lat = x @ W_DKV                 # [B,T, c_kv]\nfor block in chunks_of(kv_lat, m=4):\n    cKV.append(compress(block))    # mean-pool / learned\n# write compressed entry to the KV cache",
+      "bottleneck": "HBM-write bandwidth at long context; the actual compression is cheap.",
+      "improvement_ideas": [
+        "Quantise compressed entries to FP8 immediately to halve write bandwidth.",
+        "Use a learned 1×m conv as the compressor instead of mean-pool — small quality win."
+      ],
+      "connections": ["compressed_kv_cache", "csa_inside_indexer"]
+    },
+    {
+      "id": "csa_inside_indexer",
+      "name": "CSA · Lightning Indexer (FP4)",
+      "shape": "box",
+      "position": [4.5, 3.5, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "neon-violet cast acrylic",
+      "role": "64 indexer query heads × 128 dim, FP4. For each token computes index scores against ALL compressed KV entries: s_t,j = Σ_h w_h · ReLU(qᴵ_h,t · K^IComp_h,j). Output feeds the top-k selector.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2 · 64 · 128 · (n/m) at 1M ctx with m=4 → ≈ 4.2 GFLOP / layer",
+      "memory_footprint": "indexer K^IComp cache: 64 × 128 × FP4 / compressed token",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "q_idx = (x @ W_IQ).reshape(64, 128)             # FP4 GEMM\nscores = relu(q_idx @ K_idx_cache.T) @ w_h       # [n/m]\n# scores: per-compressed-entry relevance",
+      "bottleneck": "Even at FP4 the indexer GEMM dominates CSA's compute budget at million-token context. Heavily optimised with paged KV layouts.",
+      "improvement_ideas": [
+        "Batch-merge the indexer GEMM across attention heads (already done).",
+        "Use product quantisation on K^IComp for sub-FP4 footprint at the cost of recall.",
+        "Replace ReLU with squared-ReLU — paper hints at minor quality wins."
+      ],
+      "connections": ["csa_inside_topk"]
+    },
+    {
+      "id": "csa_inside_topk",
+      "name": "CSA · Top-k Selector (k=1024)",
+      "shape": "box",
+      "position": [4.5, 3.9, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "polished obsidian tile",
+      "role": "Selects the k=1024 highest-scoring compressed KV entries from the indexer scores. Builds a sparse gather index for the dense attention kernel below.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "≈ O(n/m · log k) for radix top-k",
+      "memory_footprint": "1024 indices (int32) per query token = 4 KB",
+      "parallelism": "partially-parallel",
+      "algorithm": "idx = topk(scores, k=1024).indices   # radix or bitonic\nK_sel, V_sel = gather(K_cache, idx), gather(V_cache, idx)",
+      "bottleneck": "Top-k itself is fast; the resulting gather is irregular — needs page-aligned KV layouts to avoid trashing HBM.",
+      "improvement_ideas": [
+        "Approximate top-k with bucket-sort to avoid the global sort.",
+        "Use block-sparse attention with paged KV (vLLM-style) to make the gather aligned."
+      ],
+      "connections": ["csa_inside_attn"]
+    },
+    {
+      "id": "csa_inside_attn",
+      "name": "CSA · Sparse Attention Kernel (+sink)",
+      "shape": "box",
+      "position": [4.5, 4.3, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "midnight blue tile",
+      "role": "Dense FlashAttention-2 kernel applied over the 1024 selected compressed entries plus the n_win=128 sliding-window tail. The attention sink z'_h is added to the softmax denominator.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·n_h·c·(k+n_win) ≈ 2·128·512·1152 ≈ 150 MFLOP",
+      "memory_footprint": "On-chip SRAM tile only (FlashAttention)",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "K_full = concat(K_sel, K_win)             # 1024 + 128\nV_full = concat(V_sel, V_win)\nlogits = (q_heads @ K_full.T) / sqrt(c)\n# attention sink: append a per-head learnable z'_h to the denominator\nattn   = softmax_with_sink(logits, z_h)\nout    = attn @ V_full                    # [B,T, n_h, c]",
+      "bottleneck": "FlashAttention is already near peak; the sparse layout's misaligned gathers cost ~10–20% vs dense same-size.",
+      "connections": ["csa_inside_oproj"]
+    },
+    {
+      "id": "csa_inside_oproj",
+      "name": "CSA · Grouped Output Proj (g=16, d_g=1024)",
+      "shape": "box",
+      "position": [4.5, 4.7, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "burnished bronze tile",
+      "role": "Output projection from heads back to d_model, but GROUPED into g=16 head-groups of size d_g=1024. Cuts the output GEMM to ~1/8 the cost of a dense WO.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·n_h·c·d/g ≈ 60 MFLOP",
+      "memory_footprint": "g groups × d_g × d ≈ 117 M params (BF16, ~234 MB)",
+      "parallelism": "tensor-parallel",
+      "algorithm": "groups = split(out, g=16)                # 8 heads / group\ny_groups = [g_i @ W_O[i] for i, g_i in enumerate(groups)]\ny = sum(y_groups)                        # add into residual",
+      "bottleneck": "Memory-bandwidth on the W_O slabs at small batch (decode).",
+      "connections": ["mhc_residual_pipe"]
+    },
+
+    {
       "id": "lightning_indexer",
-      "name": "Lightning Indexer (FP4)",
+      "name": "Lightning Indexer (shared FP4 path)",
       "shape": "box",
       "position": [2.4, 2.8, 0],
       "size": [0.7, 0.4, 0.7],
       "material": "neon-violet cast acrylic",
-      "role": "Per-CSA-block index-score generator with 64 indexer query heads of dim 128. Computes Σ w · ReLU(qᴵ · K^IComp) and feeds the top-k selector. Computed in FP4 precision for long-context throughput (paper §2.3.1, §2.3.4).",
-      "connections": ["block_03_csa", "compressed_kv_cache"]
+      "role": "Per-CSA-block index-score generator with 64 indexer query heads of dim 128. Computes Σ w · ReLU(qᴵ · K^IComp) and feeds the top-k selector. FP4 for long-context throughput (paper §2.3.1, §2.3.4). The exploded view at X=4 is the same component, sliced.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "embarrassingly-parallel",
+      "connections": ["block_03_csa", "compressed_kv_cache", "csa_inside_indexer"]
     },
     {
       "id": "compressed_kv_cache",
@@ -192,7 +421,17 @@
       "size": [0.55, 6.0],
       "material": "amber translucent silica",
       "role": "Heterogeneous KV cache shared across attention sublayers. CSA holds n/m entries (m=4); HCA holds n/m'/blocks entries (m'=128). Entries cycle to on-disk storage for shared-prefix reuse (paper §3.6).",
-      "connections": ["sliding_window_kv", "kv_precision_disk"]
+      "compute_profile": "memory-capacity-bound",
+      "memory_footprint": "≈ 70 KB / layer / token (CSA) + ≈ 2 KB / layer / token (HCA, m'=128). At 1M ctx and 61 layers ≈ 4.4 GiB / sequence — dense MHA would be ~140 GiB.",
+      "parallelism": "tensor-parallel",
+      "algorithm": "cache_layout = {\n  'csa': PagedKV(stride=m=4,   dtype=mixed(BF16_rope, FP8_rest)),\n  'hca': PagedKV(stride=m'=128, dtype=mixed(BF16_rope, FP8_rest)),\n}\n# write on prefill, read+gather on decode, page-out cold prefixes to NVMe",
+      "bottleneck": "HBM CAPACITY is the killer — sets the maximum batchable context length per GPU.",
+      "improvement_ideas": [
+        "Page cold prefixes to CPU / NVMe with prefetch (vLLM-style).",
+        "Cross-sequence prefix de-duplication (RadixAttention) to reuse system-prompt KV.",
+        "Push more dims to FP4 on the HCA branch (it's already heavily compressed)."
+      ],
+      "connections": ["sliding_window_kv", "kv_precision_disk", "csa_inside_kv_compress"]
     },
     {
       "id": "sliding_window_kv",
@@ -201,7 +440,11 @@
       "position": [-3.2, 8.4, 0],
       "size": [0.45, 0.4],
       "material": "polished gold disk",
-      "role": "Auxiliary uncompressed KV branch keeping the most recent 128 tokens at full resolution; concatenated with selected compressed entries inside CSA / HCA core attention."
+      "role": "Auxiliary uncompressed KV branch keeping the most recent 128 tokens at full resolution; concatenated with selected compressed entries inside CSA / HCA core attention.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "n_win × n_h × c × dtype × layers — small, fits in HBM easily.",
+      "parallelism": "tensor-parallel",
+      "algorithm": "win_buf = ring_buffer(K, V, size=128)\nattn_in = concat(K_selected, win_buf)"
     },
     {
       "id": "kv_precision_disk",
@@ -210,44 +453,81 @@
       "position": [-3.2, 1.6, 0],
       "size": [0.7, 0.18],
       "material": "split bronze / silver inlay",
-      "role": "Storage-format marker: rotary-positional-embedding dims of every KV entry are stored in BF16; non-RoPE dims in FP8 — roughly halves cache size vs pure BF16 (paper §2.3.4)."
+      "role": "Storage-format marker: rotary-positional-embedding dims of every KV entry are stored in BF16; non-RoPE dims in FP8 — roughly halves cache size vs pure BF16 (paper §2.3.4).",
+      "compute_profile": "negligible",
+      "memory_footprint": "≈ 0.5× of pure-BF16 KV with negligible quality loss.",
+      "parallelism": "tensor-parallel"
     },
     {
       "id": "attention_sink",
-      "name": "Attention Sink Logits",
+      "name": "Attention Sink Logits (z'_h)",
       "shape": "sphere",
       "position": [2.4, 5.6, 0.0],
       "size": [0.18],
       "material": "matte obsidian sphere",
-      "role": "Per-head learnable z'_h added to the softmax denominator so attention scores need not sum to 1 (paper §2.3.3)."
+      "role": "Per-head learnable z'_h added to the softmax denominator so attention scores need not sum to 1 (paper §2.3.3). Lets uninformative tokens 'attend to nothing' — fixes the StreamingLLM-style outlier problem at long context.",
+      "compute_profile": "negligible",
+      "memory_footprint": "n_h × layers × 2 B = 128 × 61 × 2 ≈ 16 KB total",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "denom = exp(z_h) + sum(exp(logits))\nattn  = exp(logits) / denom",
+      "improvement_ideas": [
+        "Learn a per-token sink alongside the per-head one — early evidence it helps stability at >256K ctx."
+      ]
     },
+
     {
       "id": "moe_routed_ring",
       "name": "Routed Experts (384, top-6)",
       "shape": "cylinder",
-      "position": [5.5, 4.8, 0],
+      "position": [6.5, 4.8, 0],
       "size": [2.0, 0.45],
       "material": "iridescent micro-array",
       "role": "Per-MoE-layer bank of 384 fine-grained routed experts (intermediate dim 3072). Each token activates the top-6 by affinity score Sqrt(Softplus(·)). FP4 quantisation-aware training is applied to expert weights.",
-      "connections": ["moe_router_topk", "fp4_expert_disk", "block_04_hca", "block_05_csa", "block_06_hca", "block_07_csa", "block_08_hca", "block_60_csa", "block_61_hca"]
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 6 × (2·d·d_ff·2) ≈ 6 × 88 MFLOP = 530 MFLOP / layer (top-6 SwiGLU)",
+      "memory_footprint": "384 × (2·d·d_ff in FP4) ≈ 21 GiB / layer (FP4); times 61 layers ≈ 1.3 TiB of expert weights — sharded by EP.",
+      "parallelism": "expert-parallel",
+      "algorithm": "# per token, top-6:\nfor e in routed[topk_idx]:\n    h_e = silu(x @ W_gate[e]) * (x @ W_up[e])\n    y  += w_topk * (h_e @ W_down[e])",
+      "bottleneck": "All-to-all expert dispatch — the network ring (NVLink/IB), not the GEMM, sets wall-clock. See moe_alltoall.",
+      "improvement_ideas": [
+        "Group GEMM (cuBLASLt grouped GEMM) to fuse all 6 expert calls into one launch.",
+        "Expert capacity-aware routing to keep tile sizes uniform.",
+        "Token-choice with capacity factor 1.0 + drop-and-recompute for stability under skew."
+      ],
+      "connections": ["moe_router_topk", "fp4_expert_disk", "moe_alltoall", "moe_group_gemm", "block_04_hca", "block_05_csa", "block_06_hca", "block_07_csa", "block_08_hca", "block_60_csa", "block_61_hca"]
     },
     {
       "id": "moe_shared_expert",
-      "name": "Shared Expert (×1)",
+      "name": "Shared Expert (×1, always-on)",
       "shape": "box",
-      "position": [5.5, 5.55, 0],
+      "position": [6.5, 5.55, 0],
       "size": [0.55, 0.55, 0.55],
       "material": "polished platinum",
-      "role": "One shared expert per MoE layer, always active for every token; complements the 6 routed experts (DeepSeekMoE convention)."
+      "role": "One shared expert per MoE layer, always active for every token; complements the 6 routed experts (DeepSeekMoE convention). Acts as a stability anchor and absorbs 'common' computation.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 88 MFLOP / layer (one SwiGLU FFN)",
+      "memory_footprint": "≈ 88 M params / layer × BF16 = 176 MB / layer",
+      "parallelism": "tensor-parallel",
+      "algorithm": "h_shared = silu(x @ W_gate_s) * (x @ W_up_s)\ny       += h_shared @ W_down_s"
     },
     {
       "id": "moe_router_topk",
       "name": "Top-6 Router (Sqrt∘Softplus)",
       "shape": "cylinder",
-      "position": [5.5, 6.05, 0],
+      "position": [6.5, 6.05, 0],
       "size": [0.55, 0.18],
       "material": "ruby-tinted glass disk",
-      "role": "Per-token affinity computation Sqrt(Softplus(·)) (changed from V3's Sigmoid). Auxiliary-loss-free load balancing with bias update speed 0.001 + tiny sequence-wise balance loss.",
+      "role": "Per-token affinity computation Sqrt(Softplus(·)) — changed from V3's Sigmoid. Auxiliary-loss-free load balancing with bias update speed 0.001 + tiny sequence-wise balance loss.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "≈ 2 · d · 384 ≈ 5.5 MFLOP",
+      "memory_footprint": "Router weights: d × 384 × BF16 ≈ 5.5 MB / layer.",
+      "parallelism": "tensor-parallel",
+      "algorithm": "logits = x @ W_router + b_balance     # b updated by a tiny rule\nscores = sqrt(softplus(logits))       # was sigmoid in V3\ntopk_idx, topk_w = topk(scores, 6)\ntopk_w = topk_w / topk_w.sum()        # renormalise",
+      "bottleneck": "Routing decisions are SEQUENTIAL with the all-to-all that follows — can't dispatch until indices are known.",
+      "improvement_ideas": [
+        "Anticipatory routing (already in V4-Pro) — see anticipatory_routing_marker.",
+        "Speculative dispatch: send to the most likely top-k while the real router finishes."
+      ],
       "connections": ["moe_routed_ring"]
     },
     {
@@ -257,44 +537,115 @@
       "position": [3.4, 1.75, 1.4],
       "size": [0.6, 0.35, 0.6],
       "material": "speckled basalt cube",
-      "role": "First three MoE layers route by a fixed hash function over the input token ID rather than learned affinity (paper §2.1).",
+      "role": "First three MoE layers route by a fixed hash function over the input token ID rather than learned affinity (paper §2.1). Hash routing avoids the chicken-and-egg of learning a router on top of an unstable early stack.",
+      "compute_profile": "negligible",
+      "flops_per_token": "≈ 0 (hash is one int op)",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "expert_id = murmur3(token_id) % 384\n# top-1, no learned weights, no balancing loss",
+      "improvement_ideas": [
+        "Schedule the hash → learned switch by training-loss plateau rather than fixed step."
+      ],
       "connections": ["block_02_hca", "block_03_csa"]
     },
     {
-      "id": "fp4_expert_disk",
-      "name": "FP4 Expert Weights",
+      "id": "moe_alltoall",
+      "name": "Expert All-to-All (dispatch + combine)",
       "shape": "cylinder",
-      "position": [5.5, 4.32, 0],
+      "position": [6.5, 6.6, 0],
+      "size": [1.0, 0.18],
+      "material": "copper coil ring",
+      "role": "Two NCCL all-to-all collectives per MoE layer: dispatch sends each token to its 6 chosen experts (across EP ranks), combine sums the per-expert outputs back. THIS is usually the wall-clock bottleneck, not the expert GEMM.",
+      "compute_profile": "communication-bound",
+      "memory_footprint": "Activation buffers: B·T·top_k·d / EP_size per rank.",
+      "parallelism": "expert-parallel",
+      "algorithm": "# dispatch\ngrouped = bucket_by_expert(x, topk_idx)\nrecv    = nccl.all_to_all(grouped)\n# expert compute (see moe_routed_ring)\n# combine\nout_grp = bucket_by_origin(expert_out)\nout     = nccl.all_to_all(out_grp)",
+      "bottleneck": "Network bisection bandwidth (NVLink + InfiniBand). Skewed routing turns it into stragglers.",
+      "improvement_ideas": [
+        "Overlap dispatch with the previous attention output projection (DualPipe / 1F1B).",
+        "Token-grouping by destination rank to coalesce sends.",
+        "Drop tokens above expert capacity and recompute under the shared expert."
+      ],
+      "connections": ["moe_routed_ring", "moe_group_gemm"]
+    },
+    {
+      "id": "moe_group_gemm",
+      "name": "Group GEMM (fused expert FFN)",
+      "shape": "box",
+      "position": [6.5, 4.0, 0],
+      "size": [1.6, 0.18, 1.0],
+      "material": "graphite heatsink",
+      "role": "Single grouped-GEMM kernel that runs all 6 (or capacity-padded N) per-token expert FFNs in one launch. Avoids 6× kernel-launch overhead and keeps SMs saturated.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "# pseudo-cuBLASLt grouped GEMM\nfor (group g of routed tokens):\n    Y_g = X_g @ W_gate[g]   # gate\n    H_g = silu(Y_g) * (X_g @ W_up[g])\n    O_g = H_g @ W_down[g]\n# all groups in one launch, padded to capacity",
+      "bottleneck": "Tile-shape mismatch when expert load is uneven — wastes SMs.",
+      "improvement_ideas": [
+        "Capacity factor + bin-packing to keep tile sizes uniform.",
+        "Use TMA-based MOE kernels on Hopper for async copy of weights."
+      ]
+    },
+    {
+      "id": "fp4_expert_disk",
+      "name": "FP4 Expert Weights (QAT)",
+      "shape": "cylinder",
+      "position": [6.5, 4.32, 0],
       "size": [2.05, 0.06],
       "material": "rose-gold annulus",
-      "role": "Quantisation-aware-training disk under the routed expert bank: routed-expert GEMM weights and the indexer QK path are stored / computed in FP4 (paper §3.4)."
+      "role": "Quantisation-aware-training disk under the routed expert bank: routed-expert GEMM weights and the indexer QK path are stored / computed in FP4 (paper §3.4). ~4× memory win over BF16, ~2× over FP8.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "Routed expert weights at FP4 ≈ 1.3 TB total (would be ~5 TB at BF16).",
+      "parallelism": "expert-parallel",
+      "algorithm": "# QAT: keep BF16 master weights, quantise to FP4 in forward\nW_q = quantize_e2m1(W_master, scale=group_per_block)\n# backward uses straight-through estimator with the quantiser",
+      "bottleneck": "FP4 GEMM kernels exist on Hopper/Blackwell; on older silicon you fall back to FP8 with larger memory.",
+      "improvement_ideas": [
+        "Per-group scaling factors (already used) to bound quantisation error.",
+        "Mixed FP4/FP6 for the most loss-sensitive experts."
+      ]
     },
     {
       "id": "anticipatory_routing_marker",
       "name": "Anticipatory Routing Δt",
       "shape": "sphere",
-      "position": [5.5, 6.55, 0.0],
+      "position": [6.5, 7.05, 0.0],
       "size": [0.16],
       "material": "warm copper marble",
-      "role": "Stability marker: routing indices are computed using historical params θ_{t-Δt} while features use θ_t. Activated automatically on loss-spike detection (paper §4.2.3)."
+      "role": "Stability marker: routing indices are computed using historical params θ_{t-Δt} while features use θ_t. Activated automatically on loss-spike detection (paper §4.2.3). Stops a routing oscillation before it cascades.",
+      "compute_profile": "negligible",
+      "memory_footprint": "Snapshot of router weights only — small.",
+      "parallelism": "data-parallel",
+      "algorithm": "if loss_spike():\n    use_router = θ_router[t - Δt]   # frozen snapshot\nelse:\n    use_router = θ_router[t]"
     },
     {
       "id": "swiglu_clamp",
       "name": "SwiGLU Clamp [-10, 10]",
       "shape": "box",
-      "position": [5.5, 5.05, 1.6],
+      "position": [6.5, 5.05, 1.6],
       "size": [0.5, 0.18, 0.5],
       "material": "amber gel block",
-      "role": "Outlier-suppression clamp on the SwiGLU activation inside expert FFNs: linear branch in [-10, 10], gate upper-bounded at 10 (paper §4.2.3)."
+      "role": "Outlier-suppression clamp on the SwiGLU activation inside expert FFNs: linear branch in [-10, 10], gate upper-bounded at 10 (paper §4.2.3). Keeps FP8/FP4 GEMMs from saturating on rare outlier activations.",
+      "compute_profile": "negligible",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "gate = clamp(x @ W_gate, max=10)\nlin  = clamp(x @ W_up,   min=-10, max=10)\nh    = silu(gate) * lin"
     },
+
     {
       "id": "prediction_head",
-      "name": "LM Prediction Head",
+      "name": "LM Prediction Head (tied)",
       "shape": "box",
       "position": [0, 9.1, 0],
       "size": [3.6, 0.4, 1.7],
       "material": "white marble slab",
       "role": "Tied / learned projection back to the 128K vocab. Updated by AdamW.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·d·V ≈ 1.83 GFLOP / token",
+      "memory_footprint": "Same as embedding (tied): 128K × 7168 × BF16 ≈ 1.83 GiB",
+      "parallelism": "tensor-parallel",
+      "algorithm": "logits = h_final @ E.T          # tied with embedding\np      = softmax(logits / T)",
+      "bottleneck": "At decode this single GEMM can rival a whole transformer block.",
+      "improvement_ideas": [
+        "Speculative decoding — predict k tokens with a draft model, verify with this head.",
+        "Top-k pruning on the vocab dimension before softmax for cheaper sampling."
+      ],
       "connections": ["mtp_module", "lm_loss"]
     },
     {
@@ -304,17 +655,27 @@
       "position": [2.6, 9.7, 0],
       "size": [1.6, 0.4, 1.4],
       "material": "moss-green ceramic",
-      "role": "Single Multi-Token-Prediction module producing the +1-step auxiliary prediction. Configuration unchanged from DeepSeek-V3 (paper §2.1).",
+      "role": "Single Multi-Token-Prediction module producing the +1-step auxiliary prediction. Configuration unchanged from V3 (paper §2.1). At inference, enables ~1.8× speculative decoding speedup.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ one extra transformer block + LM head",
+      "parallelism": "pipeline-parallel",
+      "algorithm": "# training: predict t+1 AND t+2 from h_t\nh_aux = mtp_block(h_final)\nlogits_aux = h_aux @ E.T\nloss_aux   = CE(logits_aux, target_t+2)",
+      "improvement_ideas": [
+        "Increase MTP depth to 2–3 to push speculative-decoding acceptance rate higher."
+      ],
       "connections": ["mtp_loss"]
     },
     {
       "id": "lm_loss",
-      "name": "LM Loss",
+      "name": "LM Loss (cross-entropy)",
       "shape": "sphere",
       "position": [-1.4, 10.2, 0],
       "size": [0.28],
       "material": "incandescent ivory",
-      "role": "Primary cross-entropy training objective on the next-token distribution."
+      "role": "Primary cross-entropy training objective on the next-token distribution.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "data-parallel",
+      "algorithm": "loss = -log p(target | context)\n# averaged over non-pad positions"
     },
     {
       "id": "mtp_loss",
@@ -323,25 +684,114 @@
       "position": [3.0, 10.6, 0],
       "size": [0.24],
       "material": "luminescent sage",
-      "role": "Auxiliary loss on the MTP module. Weight 0.3 for most of training, decayed to 0.1 once LR decay starts (paper §4.2.2)."
+      "role": "Auxiliary loss on the MTP module. Weight 0.3 for most of training, decayed to 0.1 once LR decay starts (paper §4.2.2). Decay prevents the MTP head from biasing late-stage features.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "data-parallel"
     },
+
     {
       "id": "muon_optimizer",
-      "name": "Muon Optimizer",
+      "name": "Muon Optimizer (matrix params)",
       "shape": "box",
-      "position": [-5.5, 5.0, 0],
+      "position": [-6.0, 5.0, 0],
       "size": [1.6, 1.2, 1.0],
       "material": "matte titanium block",
-      "role": "Trains the bulk of weights. Hybrid Newton-Schulz (10 iters, two coefficient stages), Nesterov momentum 0.95, RMS rescale 0.18, weight decay 0.1 (paper §2.4)."
+      "role": "Trains the bulk of weights. Hybrid Newton-Schulz (10 iters, two coefficient stages), Nesterov momentum 0.95, RMS rescale 0.18, weight decay 0.1 (paper §2.4). Orthonormalises the update direction — empirically much better than AdamW for matrix-shaped params >100B.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 10 × matmul-cost(W) per step (Newton-Schulz iterations)",
+      "memory_footprint": "Momentum state: 1× param size (Nesterov needs only one buffer, vs Adam's two)",
+      "parallelism": "data-parallel",
+      "algorithm": "# inputs: gradient G (matrix, m×n)\nM = β·M + G                     # Nesterov momentum, β=0.95\nU = newton_schulz(M, iters=10)  # orthonormalise: U ≈ M (M^T M)^{-1/2}\nW -= lr * (rms_scale · U + wd · W)",
+      "bottleneck": "Newton-Schulz adds ~10 GEMMs per parameter matrix per step — ~20% optimiser overhead.",
+      "improvement_ideas": [
+        "Cache the second-stage Newton-Schulz coefficients; they're the same every step.",
+        "Skip Newton-Schulz on tiny matrices (already done — they're routed to AdamW)."
+      ],
+      "connections": ["routed_to_muon"]
     },
     {
       "id": "adamw_optimizer",
-      "name": "AdamW Optimizer",
+      "name": "AdamW Optimizer (1-D + sensitive)",
       "shape": "box",
-      "position": [-5.5, 3.4, 0],
+      "position": [-6.0, 3.4, 0],
       "size": [1.0, 0.7, 0.9],
       "material": "anodised navy block",
-      "role": "Trains the embedding module, prediction head, mHC static biases / gating factors, and all RMSNorm weights. β1=0.9, β2=0.95, ε=1e-20, weight_decay=0.1 (paper §4.2.2)."
+      "role": "Trains the embedding module, prediction head, mHC static biases / gating factors, and all RMSNorm weights. β1=0.9, β2=0.95, ε=1e-20, weight_decay=0.1 (paper §4.2.2). Muon is unstable on 1-D / very-small / embedding-like params — AdamW takes the carve-out.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "Adam state: 2× param size (m and v).",
+      "parallelism": "data-parallel",
+      "algorithm": "m = β1·m + (1-β1)·g\nv = β2·v + (1-β2)·g²\nm̂, v̂ = bias_correct(m, v)\nW -= lr · m̂ / (√v̂ + ε) + wd · W",
+      "connections": ["routed_to_adamw"]
+    },
+    {
+      "id": "routed_to_muon",
+      "name": "Param-Class Router (→ Muon)",
+      "shape": "box",
+      "position": [-6.0, 6.1, 0],
+      "size": [1.0, 0.06, 0.6],
+      "material": "etched titanium plate",
+      "role": "Marks which parameter classes flow to Muon: all matrix-shaped weights inside attention, FFN, and the MoE expert / shared GEMMs.",
+      "compute_profile": "negligible",
+      "parallelism": "data-parallel"
+    },
+    {
+      "id": "routed_to_adamw",
+      "name": "Param-Class Router (→ AdamW)",
+      "shape": "box",
+      "position": [-6.0, 2.8, 0],
+      "size": [1.0, 0.06, 0.6],
+      "material": "etched navy plate",
+      "role": "Marks which parameter classes flow to AdamW: embedding, LM head, RMSNorm γ, mHC static scalars, attention sink z'_h, router bias.",
+      "compute_profile": "negligible",
+      "parallelism": "data-parallel"
+    },
+
+    {
+      "id": "parallelism_marker",
+      "name": "Parallelism Plan: TP × EP × PP × DP",
+      "shape": "box",
+      "position": [8.5, 5.0, 0],
+      "size": [1.4, 2.4, 0.8],
+      "material": "smoked acrylic translucent",
+      "role": "Translucent slab marking the multi-axis parallelism plan used to fit V4-Pro across an H800 cluster. Typical config: TP=8 (within node), EP=64 (across nodes for the 384 experts), PP=8 (DualPipe / 1F1B with 61 layers split across stages), DP=N (replicas of the whole plan). The exact numbers are deployment-specific.",
+      "compute_profile": "communication-bound",
+      "memory_footprint": "Total HBM = (param_shard + activation_shard + KV_shard + optimizer_shard) per rank.",
+      "parallelism": "pipeline-parallel",
+      "algorithm": "# global rank = (dp, pp, ep, tp)\n# attention/FFN GEMMs sharded by TP within node\n# experts assigned to EP groups across nodes\n# 61 layers split into PP stages via DualPipe / 1F1B\n# DP wraps everything for replication",
+      "bottleneck": "EP all-to-all (cross-node IB) and PP bubble are the wall-clock dominators.",
+      "improvement_ideas": [
+        "DualPipe to hide PP bubble.",
+        "ZeRO-1 across DP for optimiser-state sharding (Muon has only 1 buffer — cheap).",
+        "Overlap EP all-to-all with the attention output projection of the next layer."
+      ]
+    },
+    {
+      "id": "activation_checkpoint_marker",
+      "name": "Activation Checkpointing (selective)",
+      "shape": "box",
+      "position": [8.5, 2.6, 0],
+      "size": [1.4, 0.4, 0.8],
+      "material": "frosted blue lens",
+      "role": "Marks the selective-checkpoint policy: keep RMSNorm + attention scores, recompute FFN and MoE forward in backward. Trades ~30% extra compute for ~3× activation-memory savings.",
+      "compute_profile": "mixed",
+      "memory_footprint": "Without checkpointing: O(L · B · T · d) is the killer at 1M ctx — must checkpoint.",
+      "parallelism": "data-parallel",
+      "algorithm": "torch.utils.checkpoint(forward_block, x, ...)\n# saves x, recomputes forward in backward",
+      "improvement_ideas": [
+        "Recompute only the MoE expert FFNs (largest activation), keep attention scores."
+      ]
+    },
+    {
+      "id": "training_data_pipe",
+      "name": "33 T-token Training Corpus + Length Curriculum",
+      "shape": "box",
+      "position": [8.5, 0.3, 0],
+      "size": [1.4, 0.4, 0.8],
+      "material": "etched obsidian plate",
+      "role": "Pre-training data plate: 33 T tokens with sequence-length curriculum 4K → 16K → 64K → 1M. Long-context warming is what makes 1M context actually USABLE rather than just runnable.",
+      "compute_profile": "storage-bound",
+      "parallelism": "data-parallel",
+      "algorithm": "stages = [(4K, 0.6T), (16K, 0.2T), (64K, 0.15T), (1M, 0.05T)]\n# YaRN / NTK-aware scaling done implicitly by RoPE base growth"
     }
   ]
 }
