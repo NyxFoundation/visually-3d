@@ -1,0 +1,100 @@
+{
+  "machine_name": "Qwen3.6 (projected flagship)",
+  "assembly_instructions": "Read Qwen3.6 as the LIKELY next step beyond Qwen3-235B-A22B and the Qwen3-Next experiments: a HYBRID-ATTENTION MoE that adopts Qwen3-Next's Gated DeltaNet (linear attention) for most layers, with a few full-softmax layers preserved for associative recall. Tokens enter at the floor (X=0,Y=0) and climb the cyan residual pillar through 192 transformer blocks. Pattern: 3 LINEAR (Gated DeltaNet) blocks for every 1 SOFTMAX (Gated Attention) block. Linear blocks are pale-amber and carry a fixed-size recurrent state (the cyan torus at X=-2.5); softmax blocks are deep-crimson and use the conventional GQA KV cache (amber column at X=-3.5). To the right at X=6 sits the per-layer MoE FFN (256 routed experts, top-8, NO shared expert). Above the stack at X=4.5/Y=9.5 is Dual-Chunk Attention extended to 256K native + 1M YaRN. Click any part for details. THIS IS A FORWARD-LOOKING PROJECTION — numbers should be read as plausible extrapolation, not fact.",
+  "metadata": {
+    "domain": "ml-architecture",
+    "reference": "https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct",
+    "thumbnail_camera": [13, 9, 14],
+    "info": {
+      "english_name": "Qwen3.6 (projected flagship, ~480B-A30B hybrid-attention MoE)",
+      "summary": "PROJECTED next-generation flagship from Alibaba's Qwen team, extrapolated from the Qwen3 + Qwen3-Next research direction. No public paper at scene time. Best guess: scales Qwen3-Next's hybrid Gated DeltaNet (linear) + Gated Attention (softmax) pattern to flagship size. ~480B total / ~30B activated, 192 layers, 3:1 LINEAR:SOFTMAX attention ratio, 256 routed experts (top-8, no shared), QK-Norm + RoPE on softmax layers, MTP head, /think + /no_think modes preserved, 256K native context (1M with DCA + YaRN), 200+ languages. Treat numbers as plausible extrapolation, not fact.",
+      "description": "Qwen3.6 is presented here as a research-trajectory PROJECTION, not a paper. Where Qwen3-235B-A22B was full softmax + GQA(64/4) + 128 experts top-8, and where Qwen3-Next-80B-A3B introduced the Gated DeltaNet linear-attention + Gated Attention hybrid at small scale, Qwen3.6 likely (i) brings that hybrid to flagship scale (480B-A30B), (ii) doubles depth (94 → 192 layers — Qwen3-Next is already 48 layers narrow), (iii) doubles expert count (128 → 256), (iv) keeps GQA at extreme 16:1 in the few softmax layers, (v) adds an MTP head (Qwen3 lacked one; Qwen3-Coder added one — full family adoption), (vi) extends native context 32K → 256K with DCA + YaRN reaching 1M, (vii) keeps /think + /no_think system-tag modes.\n\nDesign rationale, in one line each:\n• Gated DeltaNet (linear): O(N) attention for 75% of layers — KV-cache memory scales with layer count, not context length, on those layers.\n• Keep some softmax: pure linear attention loses associative recall (the 'needle in a haystack' problem); 1-in-4 softmax layer restores it.\n• Doubled experts (256): adds capacity at the same active-FLOPs budget.\n• MTP added: ~1.8× speculative decoding for free.\n• 192 layers: Qwen3-Next showed deep-narrow scaling holds; flagship inherits.",
+      "facts": [
+        { "label": "status",                  "value": "PROJECTED / SPECULATIVE — no public paper" },
+        { "label": "total parameters",        "value": "≈ 480 B (≈ 30 B activated / token)" },
+        { "label": "context length",          "value": "256 K native, 1 M with DCA + YaRN" },
+        { "label": "transformer layers (L)",  "value": "192 (deep & narrow)" },
+        { "label": "hidden dimension (d)",    "value": "≈ 4096" },
+        { "label": "vocabulary size",         "value": "≈ 152K (Qwen tokeniser inherited)" },
+        { "label": "attention pattern",       "value": "3 LINEAR (Gated DeltaNet) : 1 SOFTMAX (Gated Attention)" },
+        { "label": "softmax heads",           "value": "64 Q / 4 KV (GQA, ratio 16 — kept from Qwen3)" },
+        { "label": "linear attention",        "value": "Gated DeltaNet (delta-rule + gating)" },
+        { "label": "MoE per layer",           "value": "256 routed experts (top-8, NO shared)" },
+        { "label": "expert intermediate dim", "value": "≈ 1536 (fine-grained)" },
+        { "label": "router gate",             "value": "Softmax + loss-free balance bias" },
+        { "label": "modes",                   "value": "/think and /no_think (shared weights)" },
+        { "label": "MTP depth",               "value": "1 (projected newly added at flagship)" },
+        { "label": "long-ctx extension",      "value": "DCA + YaRN (256K native → 1M)" },
+        { "label": "languages",               "value": "200+ (projected expansion from 119)" },
+        { "label": "training tokens",         "value": "~50 T (projection)" },
+        { "label": "optimiser",               "value": "AdamW" },
+        { "label": "precision",               "value": "FP8 GEMMs + BF16 master, INT4 KV (projected)" }
+      ],
+      "comparisons": [
+        {
+          "versus": "vs Qwen3-235B-A22B (real)",
+          "delta": "Qwen3-235B was full-softmax GQA(64/4) + 128 experts top-8 + no MTP, 94 layers. Projected Qwen3.6 doubles total params (235B → 480B), modestly grows activated (22B → 30B), DOUBLES depth (94 → 192), DOUBLES experts (128 → 256), introduces the 3:1 linear/softmax hybrid borrowed from Qwen3-Next, adds an MTP head, and pushes context from 32K-trained / 128K-extended to 256K-trained / 1M-extended. /think+/no_think modes preserved."
+        },
+        {
+          "versus": "vs Qwen3-Next-80B-A3B (the hybrid prototype)",
+          "delta": "Qwen3-Next was the small (80B-A3B) Qwen3 prototype that introduced Gated DeltaNet + Gated Attention at a 3:1 ratio over 48 layers. Qwen3.6 is the FLAGSHIP scaling of that recipe: 6× total params, 10× activated, 4× layers, but the same 3:1 hybrid pattern and the same DeltaNet kernel. Like Qwen3-Next, no shared expert."
+        },
+        {
+          "versus": "vs MiniMax-M2.7 (projected)",
+          "delta": "Both are hybrid-attention reasoning MoEs. MiniMax pushes lightning attention to extreme ratios (projected 11:1 lightning:softmax). Qwen3.6 stays moderate at 3:1 — more softmax layers means better short-context quality at higher long-context KV cost. Qwen3.6's linear kernel is Gated DeltaNet (delta-rule with gating); MiniMax uses the Transnormer-style right-product linear attention. Different bets on the linear-attention design space."
+        },
+        {
+          "versus": "vs DeepSeek-V4-Pro (1.6T-A49B sparse-attention MoE)",
+          "delta": "V4-Pro keeps full-softmax everywhere but compresses + sparsifies via CSA + HCA + lightning indexer + top-k=1024. Qwen3.6 takes the orthogonal route: replace 75% of attention with O(N) linear attention. Both reach 1M-class context but with different cost profiles — V4 is read-bandwidth-bound on the indexer GEMM, Qwen3.6 is sequential-state-update-bound on the DeltaNet layers."
+        }
+      ],
+      "sources": [
+        { "title": "Qwen3 technical report (predecessor)",   "url": "https://arxiv.org/abs/2505.09388" },
+        { "title": "Qwen3-Next-80B-A3B (the hybrid prototype)", "url": "https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct" },
+        { "title": "Gated DeltaNet (delta-rule + gating)",   "url": "https://arxiv.org/abs/2412.06464" },
+        { "title": "Dual-Chunk Attention",                   "url": "https://arxiv.org/abs/2402.17463" }
+      ]
+    }
+  },
+  "parts": [
+    { "id": "input_plate", "name": "Input Tokens (V≈152K, 200+ langs)", "shape": "box", "position": [0, 0, 0], "size": [4.0, 0.18, 2.2], "material": "brushed graphite plate", "role": "Multilingual BPE tokeniser inherited from Qwen3 (~152K vocab).", "compute_profile": "host-cpu", "parallelism": "embarrassingly-parallel", "connections": ["embedding_table"] },
+    { "id": "embedding_table", "name": "Embedding (V≈152K, d=4096)", "shape": "box", "position": [0, 0.55, 0], "size": [3.6, 0.32, 1.8], "material": "indigo glass slab", "role": "Tied embedding / LM head.", "compute_profile": "gpu-bandwidth-bound", "memory_footprint": "≈ 152K × 4096 × BF16 ≈ 1.24 GiB", "parallelism": "tensor-parallel", "connections": ["residual_pipe"] },
+    { "id": "residual_pipe", "name": "Residual Stream (d=4096, 192 layers)", "shape": "cylinder", "position": [0, 5.6, 0], "size": [0.18, 9.8], "material": "translucent cyan polymer", "role": "Pre-norm RMSNorm residual carry through 192 layers.", "compute_profile": "gpu-memory-bound", "parallelism": "tensor-parallel", "connections": ["embedding_table", "block_linear_1", "block_linear_2", "block_linear_3", "block_softmax_1", "block_linear_4", "block_linear_5", "block_softmax_2", "block_softmax_3", "prediction_head"] },
+    { "id": "layer_count_marker", "name": "× 192 Layers (3 LINEAR : 1 SOFTMAX)", "shape": "box", "position": [-2.3, 5.6, 0], "size": [0.05, 9.0, 0.7], "material": "etched graphite gridline", "role": "Marker: 192 layers = 144 Gated DeltaNet (linear) + 48 Gated Attention (softmax).", "compute_profile": "negligible", "parallelism": "pipeline-parallel" },
+
+    { "id": "block_linear_1", "name": "Block 1 — LINEAR (Gated DeltaNet)", "shape": "box", "position": [0, 1.4, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile", "role": "Gated DeltaNet block. Linear attention with delta-rule update + gating. NO KV cache — carries a recurrent state instead.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel", "connections": ["deltanet_state"] },
+    { "id": "block_linear_2", "name": "Block 2 — LINEAR", "shape": "box", "position": [0, 1.95, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile", "role": "Linear block 2.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_linear_3", "name": "Block 3 — LINEAR", "shape": "box", "position": [0, 2.5, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile", "role": "Linear block 3.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_softmax_1", "name": "Block 4 — SOFTMAX (Gated Attn)", "shape": "box", "position": [0, 3.1, 0], "size": [3.2, 0.55, 1.5], "material": "deep crimson tile", "role": "Gated Attention block — full softmax over the 256K context with a learned gate on the output. GQA(64/4). Carries the KV cache.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["softmax_kv_cache"] },
+    { "id": "block_linear_4", "name": "Block 5 — LINEAR", "shape": "box", "position": [0, 3.75, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile", "role": "Linear block 5.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_linear_5", "name": "Block 6 — LINEAR", "shape": "box", "position": [0, 4.3, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile", "role": "Linear block 6.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_softmax_2", "name": "Block 8 — SOFTMAX", "shape": "box", "position": [0, 4.95, 0], "size": [3.2, 0.55, 1.5], "material": "deep crimson tile", "role": "Second softmax block. (Layer 7 linear elided.)", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_softmax_3", "name": "Block 192 — SOFTMAX (final)", "shape": "box", "position": [0, 8.2, 0], "size": [3.2, 0.55, 1.5], "material": "deep crimson tile", "role": "Final softmax block before the LM head.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+
+    { "id": "deltanet_qkv_proj", "name": "DeltaNet · QKV + α-gate Proj", "shape": "box", "position": [-1.8, 2.85, 0], "size": [0.7, 0.22, 0.7], "material": "anodised aluminium tile", "role": "DeltaNet projects to Q, K, V plus a per-token gate α ∈ (0,1) that controls how much of the new K/V replaces the old in the recurrent state (the 'delta rule').", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "algorithm": "Q, K, V = projections(x)\nα      = sigmoid(x @ W_alpha)   # per-token gate", "connections": ["deltanet_kernel"] },
+    { "id": "deltanet_kernel", "name": "Gated DeltaNet Kernel", "shape": "box", "position": [-1.8, 3.3, 0], "size": [0.85, 0.28, 0.85], "material": "electric cyan tile", "role": "Linear attention with delta-rule update: S_t = (1 - α_t·K_t·K_t^T)·S_{t-1} + α_t·K_t·V_t^T. Per-token cost is O(d_k·d_v), independent of context length.", "compute_profile": "gpu-bandwidth-bound", "flops_per_token": "≈ 4·d_k·d_v ≈ low MFLOP — basically free vs softmax", "memory_footprint": "S: d_k × d_v per layer per sequence ≈ 1 MB / sequence / layer", "parallelism": "sequential", "algorithm": "# per token (decode):\nS = (I - α_t * outer(K_t, K_t)) @ S + α_t * outer(K_t, V_t)\nout_t = Q_t @ S\n# prefill: chunked-parallel over chunks, sequential across", "bottleneck": "Sequential along time at decode — chunked prefill recovers parallelism.", "improvement_ideas": ["FP8 state with periodic FP16 re-stabilisation.", "Multi-head DeltaNet with shared keys for cheaper updates."], "connections": ["deltanet_state", "deltanet_o_proj"] },
+    { "id": "deltanet_state", "name": "DeltaNet State (S, fixed-size)", "shape": "cylinder", "position": [-2.5, 4.6, 0], "size": [0.55, 0.55], "material": "electric cyan torus", "role": "Per-sequence per-layer recurrent state. Size INDEPENDENT of context length — what makes 1M context affordable on the 144 linear layers.", "compute_profile": "gpu-memory-bound", "memory_footprint": "≈ 1 MB per sequence per layer, regardless of T", "parallelism": "data-parallel" },
+    { "id": "deltanet_o_proj", "name": "DeltaNet · O-Projection", "shape": "box", "position": [-1.8, 3.95, 0], "size": [0.7, 0.22, 0.7], "material": "burnished bronze tile", "role": "Output projection back to d=4096.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["residual_pipe"] },
+
+    { "id": "softmax_qkv_proj", "name": "Softmax · QKV Proj (GQA 64/4) + Output Gate", "shape": "box", "position": [1.8, 4.0, 0], "size": [0.7, 0.22, 0.7], "material": "anodised aluminium tile", "role": "QKV for the 1-in-4 softmax layers. 64 Q heads share 4 KV heads. PROJECTED 'Gated Attention' adds a learned gate on the output (Qwen3-Next style).", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "algorithm": "Q, K, V = projections(x)\nQ, K = qk_rmsnorm(Q, K)\nQ, K = apply_rope(Q, K)\nattn = flash_attn(Q, K, V, mask=causal)\ngate = sigmoid(x @ W_gate)\nout  = gate * (attn @ W_O)", "connections": ["softmax_kv_cache"] },
+    { "id": "softmax_kv_cache", "name": "Softmax KV Cache (~48 layers only)", "shape": "cylinder", "position": [-3.5, 5.0, 0], "size": [0.55, 6.0], "material": "amber translucent silica", "role": "Standard GQA(4) KV cache for the 48 softmax layers. Linear layers carry no cache.", "compute_profile": "memory-capacity-bound", "memory_footprint": "≈ 1 KB / token / softmax-layer × 48 layers × 256K ctx ≈ 12 GiB / sequence", "parallelism": "tensor-parallel" },
+
+    { "id": "moe_router", "name": "Top-8 Softmax Router (loss-free balance)", "shape": "cylinder", "position": [6.0, 5.6, 0], "size": [0.55, 0.18], "material": "ruby-tinted glass disk", "role": "Per-token softmax over 256 experts, top-8.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel", "connections": ["moe_routed_ring", "moe_alltoall"] },
+    { "id": "moe_routed_ring", "name": "Routed Experts (256, top-8, NO shared)", "shape": "cylinder", "position": [6.0, 4.8, 0], "size": [1.9, 0.45], "material": "iridescent micro-array", "role": "Per-MoE-layer bank of 256 fine-grained SwiGLU experts. No shared expert (Qwen3 design preserved).", "compute_profile": "gpu-compute-bound", "flops_per_token": "≈ 8 × 3 × 2·d·d_ff ≈ 300 MFLOP / layer", "memory_footprint": "256 × 3·d·d_ff × BF16 ≈ 9.3 GiB / layer; 192 layers ≈ 1.78 TiB of routed FFN weights", "parallelism": "expert-parallel" },
+    { "id": "moe_alltoall", "name": "Expert All-to-All", "shape": "cylinder", "position": [6.0, 6.55, 0], "size": [1.0, 0.16], "material": "copper coil ring", "role": "NCCL all-to-all dispatch + combine.", "compute_profile": "communication-bound", "parallelism": "expert-parallel" },
+
+    { "id": "dca_module", "name": "Dual-Chunk Attention + YaRN (256K → 1M)", "shape": "box", "position": [4.5, 9.5, 0], "size": [1.6, 0.4, 1.2], "material": "frosted lavender glass", "role": "Inference-time context extension — applied only on the 48 softmax layers.", "compute_profile": "gpu-compute-bound", "parallelism": "embarrassingly-parallel" },
+    { "id": "mode_think", "name": "Mode: /think", "shape": "box", "position": [2.5, 8.5, 0], "size": [1.2, 0.3, 0.8], "material": "deep navy plate", "role": "Reasoning mode (preserved from Qwen3).", "compute_profile": "negligible", "parallelism": "data-parallel" },
+    { "id": "mode_no_think", "name": "Mode: /no_think", "shape": "box", "position": [3.9, 8.5, 0], "size": [1.2, 0.3, 0.8], "material": "matte navy plate", "role": "Direct-answer mode.", "compute_profile": "negligible", "parallelism": "data-parallel" },
+
+    { "id": "prediction_head", "name": "LM Head (tied)", "shape": "box", "position": [0, 9.05, 0], "size": [3.4, 0.4, 1.6], "material": "white marble slab", "role": "Tied projection back to ~152K vocab.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["mtp_head", "lm_loss"] },
+    { "id": "mtp_head", "name": "MTP Head (depth=1, projected newly added)", "shape": "box", "position": [2.5, 9.6, 0], "size": [1.4, 0.4, 1.0], "material": "moss-green ceramic", "role": "PROJECTED: Qwen3 didn't have MTP at flagship; Qwen3-Coder added one. Qwen3.6 likely brings it to the main flagship for ~1.8× speculative decoding.", "compute_profile": "gpu-compute-bound", "parallelism": "pipeline-parallel" },
+    { "id": "lm_loss", "name": "LM Loss", "shape": "sphere", "position": [-1.4, 10.0, 0], "size": [0.28], "material": "incandescent ivory", "role": "Pre-training next-token cross-entropy + RL post-train rewards.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "data-parallel" },
+
+    { "id": "optimizer_adamw", "name": "AdamW", "shape": "box", "position": [-6.0, 4.0, 0], "size": [1.4, 1.0, 1.0], "material": "anodised navy block", "role": "Single AdamW for all parameters. ZeRO-1 sharding across DP.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "data-parallel" },
+    { "id": "post_train_pipeline", "name": "Post-train: SFT + RLHF + Reasoning-RL + Long-Output RL", "shape": "box", "position": [-6.0, 6.5, 0], "size": [1.4, 0.6, 1.0], "material": "frosted teal block", "role": "Multi-stage post-training; projected addition of long-output RL specifically for /think mode at 1M context.", "compute_profile": "communication-bound", "parallelism": "data-parallel" },
+
+    { "id": "parallelism_marker", "name": "Parallelism Plan: TP × EP × PP × DP", "shape": "box", "position": [8.5, 5.0, 0], "size": [1.4, 2.4, 0.8], "material": "smoked acrylic translucent", "role": "Linear layers parallelise differently from softmax — sequence-parallel chunked prefill + state-passing across PP boundaries.", "compute_profile": "communication-bound", "parallelism": "pipeline-parallel" },
+    { "id": "training_data_pipe", "name": "~50 T-token Multilingual Corpus (200+ langs)", "shape": "box", "position": [8.5, 0.6, 0], "size": [1.4, 0.4, 0.8], "material": "etched obsidian plate", "role": "Projected pre-training corpus, expanded language coverage.", "compute_profile": "storage-bound", "parallelism": "data-parallel" }
+  ]
+}

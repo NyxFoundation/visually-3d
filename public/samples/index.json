@@ -186,6 +186,38 @@
       "path": "/samples/qwen3-235b.json",
       "accent": "#22d3ee",
       "category": "ml"
+    },
+    {
+      "id": "glm-5-1",
+      "title": "GLM-5.1 (projected)",
+      "subtitle": "PROJECTED Z.ai flagship — ~600B-A48B MoE, 128 layers, GQA+MLA, 256 routed + 1 shared expert, group-limited, depth-2 MTP, Muon, FP4 experts, 256K ctx",
+      "path": "/samples/glm-5-1.json",
+      "accent": "#c4b5fd",
+      "category": "ml"
+    },
+    {
+      "id": "gemma-4",
+      "title": "Gemma 4 (projected)",
+      "subtitle": "PROJECTED DeepMind flagship — ~70B dense, 80 layers, 7:1 LOCAL:GLOBAL with 512-window, native image+audio, 1M ctx, distilled from Gemini",
+      "path": "/samples/gemma-4.json",
+      "accent": "#86efac",
+      "category": "ml"
+    },
+    {
+      "id": "minimax-m2-7",
+      "title": "MiniMax-M2.7 (projected)",
+      "subtitle": "PROJECTED MiniMax flagship — ~720B-A55B reasoning MoE, 11:1 gated-lightning : sliding-softmax(4096), 64 experts top-3, 4M ctx, MARS RL",
+      "path": "/samples/minimax-m2-7.json",
+      "accent": "#fdba74",
+      "category": "ml"
+    },
+    {
+      "id": "qwen-3-6",
+      "title": "Qwen3.6 (projected)",
+      "subtitle": "PROJECTED Alibaba flagship — ~480B-A30B hybrid MoE, 192 layers, 3:1 Gated-DeltaNet : Gated-Attention, 256 experts top-8 (no shared), MTP, 256K→1M ctx",
+      "path": "/samples/qwen-3-6.json",
+      "accent": "#67e8f9",
+      "category": "ml"
     }
   ]
 }
