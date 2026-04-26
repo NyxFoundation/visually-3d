@@ -1,0 +1,420 @@
+{
+  "machine_name": "Qwen3-235B-A22B",
+  "assembly_instructions": "Read Qwen3-235B-A22B as a tall, sparse MoE factory. Tokens enter at the floor (X=0,Y=0) and climb the cyan residual pillar through 94 transformer blocks (8 are rendered, the rest are implied by the etched gridline). Each block has a GQA attention sublayer on the left (64 query heads sharing 4 KV heads at extreme 16:1 ratio — this is the core of Qwen3's small KV footprint) and a fine-grained MoE FFN on the right (128 routed experts, top-8, NO shared expert — Qwen3 dropped the shared expert). The amber column at X=-3.5 is the GQA KV cache. The orange ring at X=6 is the routed-expert bank with its softmax router. The lavender slab at X=2.5/Y=8 is the dual MODE selector — Qwen3 has hybrid thinking modes, with /think and /no_think system tags routing the SAME weights through different decoding budgets. Above at X=4.5/Y=9.5 sits the Dual-Chunk Attention (DCA) + YaRN module that extends the natively-32K-trained model to 128K context. The translucent slab at X=8 marks the parallelism plan and the 36T-token training run. Click any part for FLOPs, memory, parallelism class, scratch-build pseudocode, the dominant bottleneck, and improvement ideas.",
+  "metadata": {
+    "domain": "ml-architecture",
+    "reference": "https://huggingface.co/Qwen/Qwen3-235B-A22B",
+    "thumbnail_camera": [13, 9, 14],
+    "info": {
+      "english_name": "Qwen3-235B-A22B (Alibaba, 2025) — 235B-A22B hybrid-thinking MoE",
+      "summary": "235B-parameter MoE LM from Alibaba's Qwen team (22B activated per token). 94 layers × 4096 hidden dim, GQA at extreme 64-Q / 4-KV (ratio 16) for tiny KV footprint, 128 fine-grained routed experts (top-8) with NO shared expert, QK-Norm + RoPE on attention, and a hybrid /think + /no_think mode that shares weights. 32K native context extended to 128K with Dual-Chunk Attention + YaRN. Pre-trained on 36T tokens across 119 languages.",
+      "description": "Qwen3-235B-A22B is the flagship of the Qwen3 family. Compared with Qwen2.5 it (i) goes MoE (was dense at the top size), (ii) drops the shared expert (Qwen2.5-MoE had one) — every active param now comes from learned routing, (iii) introduces hybrid thinking modes /think and /no_think over a single set of weights, (iv) uses QK-Norm + RoPE rather than the QKV-bias quirks of earlier Qwens, (v) extends to 128K context with Dual-Chunk Attention overlapping YaRN. The MoE uses 128 fine-grained experts at top-8 (similar density to DeepSeek-V3's 256-top-8 but at smaller total scale) with the auxiliary-loss-free balancing trick. Routing is softmax with a small balance bias.\n\nDesign rationale, in one line each:\n• 16:1 GQA: brutally small KV cache; 4 KV heads is the most aggressive in the open-MoE class.\n• 128 fine-grained experts no-shared: removes the always-on FFN cost; routing must carry all capacity.\n• Hybrid /think /no_think: one model serves both fast chat and deep reasoning by system-tag.\n• Dual-Chunk Attention + YaRN: cheap context extension from 32K → 128K without re-pretraining.\n• 36 T multilingual corpus, 119 languages: positions Qwen3 as the most multilingual open MoE.",
+      "facts": [
+        { "label": "total parameters",        "value": "235 B (22 B activated / token)" },
+        { "label": "context length",          "value": "128 K (trained 32 K, extended via DCA + YaRN)" },
+        { "label": "transformer layers (L)",  "value": "94" },
+        { "label": "hidden dimension (d)",    "value": "4096" },
+        { "label": "vocabulary size",         "value": "151,936" },
+        { "label": "query heads (n_h)",       "value": "64" },
+        { "label": "KV heads (GQA groups)",   "value": "4 (16:1 query-to-KV sharing — extreme)" },
+        { "label": "head dimension",          "value": "128" },
+        { "label": "RoPE",                    "value": "Standard rotary, base 1,000,000 for long-ctx" },
+        { "label": "QK norm",                 "value": "RMSNorm on Q and K" },
+        { "label": "FFN type",                "value": "SwiGLU (per-expert)" },
+        { "label": "MoE per layer",           "value": "128 routed experts (top-8), NO shared expert" },
+        { "label": "expert intermediate dim", "value": "1536 (fine-grained)" },
+        { "label": "router gate",             "value": "Softmax + loss-free balance bias" },
+        { "label": "modes",                   "value": "/think and /no_think (shared weights, system-tag switched)" },
+        { "label": "long-ctx extension",      "value": "Dual-Chunk Attention (DCA) + YaRN" },
+        { "label": "languages",               "value": "119 (multilingual pre-training)" },
+        { "label": "training tokens",         "value": "≈ 36 T" },
+        { "label": "optimiser",               "value": "AdamW" },
+        { "label": "precision",               "value": "BF16 weights + FP8 GEMMs" }
+      ],
+      "comparisons": [
+        {
+          "versus": "vs Qwen2.5 (dense up to 72B)",
+          "delta": "Qwen2.5-72B was a dense decoder with QKV bias, GQA at 8 KV heads, no MoE. Qwen3-235B-A22B replaces the dense FFN with 128-expert top-8 MoE (no shared), drops QKV bias, replaces RoPE-only attention with QK-Norm + RoPE, pushes GQA to 16:1, adds hybrid /think /no_think modes, and extends context 32K → 128K via DCA + YaRN. Same tokeniser (151K)."
+        },
+        {
+          "versus": "vs Qwen2.5-MoE / Qwen2-MoE (2024)",
+          "delta": "Qwen2-MoE used a SHARED expert plus 64 routed experts at top-8. Qwen3 keeps the fine-grained pattern but DROPS the shared expert and DOUBLES the routed-expert count to 128 — same total active FFN cost but more capacity. Routing changed from sigmoid + aux-loss to softmax + loss-free balance bias."
+        },
+        {
+          "versus": "vs DeepSeek-V3 (671B-A37B MoE)",
+          "delta": "Both are auxiliary-loss-free fine-grained MoE. V3 has 256 experts top-8 + 1 shared, MLA attention, 671B total; Qwen3-235B-A22B has 128 experts top-8 + NO shared, GQA(64/4), 235B total. V3 has the bigger total capacity and MLA's compressed cache; Qwen3 has aggressive 16:1 GQA so its KV-per-token is actually competitive and its routing footprint is smaller. Qwen3 adds hybrid thinking modes which V3 lacks (DeepSeek-R1 is a separate model)."
+        },
+        {
+          "versus": "vs GPT-4 / Claude / Gemini-class peers",
+          "delta": "Versus closed peers, Qwen3 is the most multilingual open MoE (119 languages) and natively supports hybrid /think + /no_think over shared weights — closed peers typically maintain separate fast and reasoning models. Per-token activated is much smaller (22B vs estimated 100B+), trading per-step quality for cost. KV cache at 16:1 GQA is dramatically smaller than full-MHA peers."
+        }
+      ],
+      "sources": [
+        { "title": "Qwen3 technical report",        "url": "https://arxiv.org/abs/2505.09388" },
+        { "title": "Qwen3-235B-A22B model card (HF)", "url": "https://huggingface.co/Qwen/Qwen3-235B-A22B" },
+        { "title": "Qwen3 GitHub",                  "url": "https://github.com/QwenLM/Qwen3" },
+        { "title": "Dual-Chunk Attention",          "url": "https://arxiv.org/abs/2402.17463" }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "input_plate",
+      "name": "Input Tokens (V=151,936, 119 langs)",
+      "shape": "box",
+      "position": [0, 0, 0],
+      "size": [4.0, 0.18, 2.2],
+      "material": "brushed graphite plate",
+      "role": "Token-ID stream. Multilingual BPE tokeniser inherited from Qwen2.5 (151,936 vocab).",
+      "compute_profile": "host-cpu",
+      "parallelism": "embarrassingly-parallel",
+      "connections": ["embedding_table"]
+    },
+    {
+      "id": "embedding_table",
+      "name": "Embedding (V=152K, d=4096)",
+      "shape": "box",
+      "position": [0, 0.55, 0],
+      "size": [3.6, 0.32, 1.8],
+      "material": "indigo glass slab",
+      "role": "Tied embedding / LM head. ~621M params (~1.24 GiB BF16).",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "152K × 4096 × BF16 ≈ 1.24 GiB",
+      "parallelism": "tensor-parallel",
+      "connections": ["residual_pipe"]
+    },
+    {
+      "id": "residual_pipe",
+      "name": "Residual Stream (d=4096, 94 layers)",
+      "shape": "cylinder",
+      "position": [0, 5.6, 0],
+      "size": [0.18, 9.8],
+      "material": "translucent cyan polymer",
+      "role": "Pre-norm RMSNorm residual carry through 94 layers.",
+      "compute_profile": "gpu-memory-bound",
+      "parallelism": "tensor-parallel",
+      "connections": ["embedding_table", "block_01", "block_02", "block_03", "block_04", "block_05", "block_06", "block_93", "block_94", "prediction_head"]
+    },
+    {
+      "id": "layer_count_marker",
+      "name": "× 94 Transformer Layers",
+      "shape": "box",
+      "position": [-2.3, 5.6, 0],
+      "size": [0.05, 9.0, 0.7],
+      "material": "etched graphite gridline",
+      "role": "Marker for the 94-layer depth. Only 8 are rendered.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel"
+    },
+
+    { "id": "block_01", "name": "Block 1", "shape": "box", "position": [0, 1.4, 0], "size": [3.2, 0.5, 1.4], "material": "deep teal ceramic", "role": "First Transformer block. Pre-norm GQA + MoE FFN.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_02", "name": "Block 2", "shape": "box", "position": [0, 2.0, 0], "size": [3.2, 0.5, 1.4], "material": "deep teal ceramic", "role": "Block 2.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_03", "name": "Block 3", "shape": "box", "position": [0, 2.6, 0], "size": [3.2, 0.5, 1.4], "material": "deep teal ceramic", "role": "Block 3. Exploded into sub-components on the right (X=2) and left (X=-1.8).", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["attn_pre_norm", "ffn_pre_norm"] },
+    { "id": "block_04", "name": "Block 4", "shape": "box", "position": [0, 3.2, 0], "size": [3.2, 0.5, 1.4], "material": "deep teal ceramic", "role": "Block 4.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_05", "name": "Block 5", "shape": "box", "position": [0, 3.8, 0], "size": [3.2, 0.5, 1.4], "material": "deep teal ceramic", "role": "Block 5.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_06", "name": "Block 6", "shape": "box", "position": [0, 4.4, 0], "size": [3.2, 0.5, 1.4], "material": "deep teal ceramic", "role": "Block 6.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_93", "name": "Block 93", "shape": "box", "position": [0, 7.6, 0], "size": [3.2, 0.5, 1.4], "material": "deep teal ceramic", "role": "Block 93. (Layers 7–92 elided.)", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_94", "name": "Block 94 (final)", "shape": "box", "position": [0, 8.2, 0], "size": [3.2, 0.5, 1.4], "material": "deep teal ceramic", "role": "Final block before the LM head.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+
+    {
+      "id": "attn_pre_norm",
+      "name": "Attention · Pre-RMSNorm",
+      "shape": "box",
+      "position": [-1.8, 2.45, 0],
+      "size": [0.55, 0.18, 0.6],
+      "material": "matte ivory tile",
+      "role": "Pre-norm RMSNorm. γ ∈ R^d learned by AdamW.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": ["attn_qkv_proj"]
+    },
+    {
+      "id": "attn_qkv_proj",
+      "name": "GQA · QKV Proj (64 Q / 4 KV — extreme 16:1)",
+      "shape": "box",
+      "position": [-1.8, 2.85, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "anodised aluminium tile",
+      "role": "QKV projection at the most aggressive GQA ratio in the open-MoE class: 64 query heads share only 4 KV heads. Each head 128-dim. Massive KV-cache win.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·d·(n_h + 2·n_kv)·d_h ≈ 2·4096·(64+8)·128 ≈ 75 MFLOP",
+      "memory_footprint": "W_QKV: d × (n_h + 2·n_kv) × d_h ≈ 38 M params (~76 MB BF16) per layer",
+      "parallelism": "tensor-parallel",
+      "algorithm": "Q = x @ W_Q  # [B,T, 64, 128]\nK = x @ W_K  # [B,T, 4,  128]\nV = x @ W_V  # [B,T, 4,  128]\nQ, K = qk_rmsnorm(Q, K)\nQ, K = apply_rope(Q, K, base=1_000_000)",
+      "connections": ["qk_norm_disk", "rope_disk", "attn_kernel"]
+    },
+    {
+      "id": "qk_norm_disk",
+      "name": "QK-Norm (RMSNorm on Q & K)",
+      "shape": "cylinder",
+      "position": [-1.8, 3.15, 0],
+      "size": [0.34, 0.05],
+      "material": "polished pewter ring",
+      "role": "Per-head RMSNorm on Q and K BEFORE the dot product. Replaces Qwen2's QKV-bias trick. Stabilises long-context attention.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "embarrassingly-parallel"
+    },
+    {
+      "id": "rope_disk",
+      "name": "RoPE (base 1,000,000)",
+      "shape": "cylinder",
+      "position": [-1.8, 3.25, 0],
+      "size": [0.36, 0.05],
+      "material": "rose-gold annulus",
+      "role": "Standard rotary embedding with a large base (1M) so angles stay distinct out to 128K context after DCA + YaRN extension.",
+      "compute_profile": "negligible",
+      "parallelism": "embarrassingly-parallel"
+    },
+    {
+      "id": "attn_kernel",
+      "name": "FlashAttention-2 (GQA, with DCA at long ctx)",
+      "shape": "box",
+      "position": [-1.8, 3.55, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "midnight blue tile",
+      "role": "Causal attention. Below 32K = standard FlashAttention. Above 32K = Dual-Chunk Attention splits the sequence into chunks and runs intra-chunk + inter-chunk attention separately, reusing the trained-32K kernel.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·n_h·d_h·T at training T=32K ≈ 530 MFLOP",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "if T <= 32K:\n    out = flash_attn(Q, K, V, mask=causal)\nelse:\n    chunks = split(seq, 32K)\n    intra  = [flash_attn(c, c) for c in chunks]\n    inter  = dual_chunk_attn(chunks)  # YaRN-rescaled across chunks\n    out    = combine(intra, inter)",
+      "improvement_ideas": [
+        "Ring-attention beyond 256K to shard sequence dim across GPUs.",
+        "Switch to native 1M training at next pre-train."
+      ],
+      "connections": ["attn_o_proj"]
+    },
+    {
+      "id": "attn_o_proj",
+      "name": "Attention · O-Projection",
+      "shape": "box",
+      "position": [-1.8, 3.95, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "burnished bronze tile",
+      "role": "Output projection back to d=4096.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": ["residual_pipe"]
+    },
+
+    {
+      "id": "kv_cache",
+      "name": "GQA KV Cache (4 KV heads only)",
+      "shape": "cylinder",
+      "position": [-3.5, 5.0, 0],
+      "size": [0.55, 6.0],
+      "material": "amber translucent silica",
+      "role": "Per-layer paged KV cache. With only 4 KV heads × 128 dim, the cache is ~16× smaller than full MHA.",
+      "compute_profile": "memory-capacity-bound",
+      "memory_footprint": "≈ 2 × 4 × 128 × FP8 = 1 KB / token / layer; 94 layers × 128K ctx ≈ 12 GiB / sequence",
+      "parallelism": "tensor-parallel",
+      "improvement_ideas": [
+        "INT4 KV quantisation for ~2× extra context.",
+        "RadixAttention prefix sharing for shared system prompts."
+      ],
+      "connections": ["attn_kernel"]
+    },
+
+    {
+      "id": "ffn_pre_norm",
+      "name": "FFN · Pre-RMSNorm",
+      "shape": "box",
+      "position": [1.8, 2.45, 0],
+      "size": [0.55, 0.18, 0.6],
+      "material": "matte ivory tile",
+      "role": "Pre-norm before the MoE FFN.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": ["moe_router"]
+    },
+
+    {
+      "id": "moe_router",
+      "name": "Top-8 Softmax Router (loss-free balance)",
+      "shape": "cylinder",
+      "position": [6.0, 5.6, 0],
+      "size": [0.55, 0.18],
+      "material": "ruby-tinted glass disk",
+      "role": "Per-token softmax over 128 experts, top-8. Auxiliary-loss-free balancing via a tiny bias updated at each step.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "≈ 2·d·128 ≈ 1 MFLOP",
+      "memory_footprint": "W_router: d × 128 × BF16 ≈ 1 MB / layer",
+      "parallelism": "tensor-parallel",
+      "algorithm": "scores = softmax(x @ W_router) + b_balance\ntopk_idx, topk_w = topk(scores, 8)\ntopk_w = topk_w / topk_w.sum()\n# b_balance updated each step:\n# b -= lr_b * (load_e - mean_load)",
+      "connections": ["moe_routed_ring", "moe_alltoall"]
+    },
+    {
+      "id": "moe_routed_ring",
+      "name": "Routed Experts (128, top-8, NO shared)",
+      "shape": "cylinder",
+      "position": [6.0, 4.8, 0],
+      "size": [1.9, 0.45],
+      "material": "iridescent micro-array",
+      "role": "Per-MoE-layer bank of 128 fine-grained SwiGLU experts (d_ff=1536). No shared expert — Qwen3 dropped it. Every active param comes from learned routing.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 8 × (3 × 2·d·d_ff) ≈ 8 × 38 MFLOP ≈ 300 MFLOP / layer",
+      "memory_footprint": "128 × 3·d·d_ff × BF16 ≈ 4.6 GiB / layer; 94 layers ≈ 432 GiB",
+      "parallelism": "expert-parallel",
+      "algorithm": "for e in topk_idx[:8]:\n    h_e = silu(x @ W_gate[e]) * (x @ W_up[e])\n    y  += w_topk * (h_e @ W_down[e])",
+      "improvement_ideas": [
+        "Group GEMM to fuse all 8 expert calls.",
+        "FP4 / INT4 weight-only quantisation for inference."
+      ]
+    },
+    {
+      "id": "moe_alltoall",
+      "name": "Expert All-to-All",
+      "shape": "cylinder",
+      "position": [6.0, 6.55, 0],
+      "size": [1.0, 0.16],
+      "material": "copper coil ring",
+      "role": "NCCL all-to-all dispatch + combine. Dominates wall-clock at MoE FFN time.",
+      "compute_profile": "communication-bound",
+      "parallelism": "expert-parallel",
+      "algorithm": "grouped = bucket_by_expert(x, topk_idx)\nrecv    = nccl.all_to_all(grouped)\n# expert FFN ↓\nout_grp = bucket_by_origin(expert_out)\nout     = nccl.all_to_all(out_grp)",
+      "improvement_ideas": [
+        "Overlap dispatch with the previous attention O-proj.",
+        "Token grouping by destination rank to coalesce sends."
+      ]
+    },
+    {
+      "id": "moe_group_gemm",
+      "name": "Group GEMM (fused expert FFN)",
+      "shape": "box",
+      "position": [6.0, 4.0, 0],
+      "size": [1.6, 0.18, 1.0],
+      "material": "graphite heatsink",
+      "role": "cuBLASLt grouped-GEMM fusing all 8 active experts in one launch.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "# per group g of routed tokens:\nY_g = X_g @ W_gate[g]\nH_g = silu(Y_g) * (X_g @ W_up[g])\nO_g = H_g @ W_down[g]"
+    },
+    {
+      "id": "fp8_gemm_disk",
+      "name": "FP8 GEMM (E4M3 fwd / E5M2 bwd)",
+      "shape": "cylinder",
+      "position": [6.0, 4.32, 0],
+      "size": [1.95, 0.06],
+      "material": "silver inlay annulus",
+      "role": "Mixed-precision marker: FP8 forward GEMMs, FP8 backward, BF16 master weights.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "expert-parallel"
+    },
+
+    {
+      "id": "dca_module",
+      "name": "Dual-Chunk Attention + YaRN (32K → 128K)",
+      "shape": "box",
+      "position": [4.5, 9.5, 0],
+      "size": [1.6, 0.4, 1.2],
+      "material": "frosted lavender glass",
+      "role": "Inference-time context extension. Splits the >32K sequence into 32K chunks, runs intra-chunk attention with the trained kernel, and runs YaRN-rescaled inter-chunk attention to stitch chunks. No re-pretraining needed.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "# YaRN: rescale RoPE freqs by NTK-aware interpolation\nrescaled_freqs = yarn(rope_freqs, ratio=128K/32K)\nintra = flash_attn(chunk_i, chunk_i, rescaled_freqs_local)\ninter = sparse_attn(chunk_i, chunks_<i, rescaled_freqs_global)",
+      "improvement_ideas": [
+        "Train at 64K natively to halve the chunk count.",
+        "Adaptive chunk size by query density."
+      ]
+    },
+
+    {
+      "id": "mode_think",
+      "name": "Mode: /think (CoT + larger budget)",
+      "shape": "box",
+      "position": [2.5, 8.5, 0],
+      "size": [1.2, 0.3, 0.8],
+      "material": "deep navy plate",
+      "role": "Reasoning mode. Enabled by /think system tag. Same weights, different decoding budget and prompt template.",
+      "compute_profile": "negligible",
+      "parallelism": "data-parallel",
+      "algorithm": "if '/think' in system_prompt:\n    decode_budget = 8192\n    template = THINK_TEMPLATE\nelse:\n    decode_budget = 1024\n    template = STD_TEMPLATE"
+    },
+    {
+      "id": "mode_no_think",
+      "name": "Mode: /no_think",
+      "shape": "box",
+      "position": [3.9, 8.5, 0],
+      "size": [1.2, 0.3, 0.8],
+      "material": "matte navy plate",
+      "role": "Direct-answer mode. Same weights, truncated CoT.",
+      "compute_profile": "negligible",
+      "parallelism": "data-parallel"
+    },
+
+    {
+      "id": "prediction_head",
+      "name": "LM Head (tied)",
+      "shape": "box",
+      "position": [0, 9.05, 0],
+      "size": [3.4, 0.4, 1.6],
+      "material": "white marble slab",
+      "role": "Tied projection back to 152K vocab.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·d·V ≈ 1.24 GFLOP",
+      "parallelism": "tensor-parallel",
+      "connections": ["lm_loss"]
+    },
+    {
+      "id": "lm_loss",
+      "name": "LM Loss (cross-entropy)",
+      "shape": "sphere",
+      "position": [-1.4, 10.0, 0],
+      "size": [0.28],
+      "material": "incandescent ivory",
+      "role": "Pre-training next-token loss + RL post-training rewards.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "data-parallel"
+    },
+
+    {
+      "id": "optimizer_adamw",
+      "name": "AdamW (β1=0.9, β2=0.95)",
+      "shape": "box",
+      "position": [-6.0, 4.0, 0],
+      "size": [1.4, 1.0, 1.0],
+      "material": "anodised navy block",
+      "role": "Single AdamW for all parameters. ZeRO-1 sharding across DP.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "Adam state: 2× param size.",
+      "parallelism": "data-parallel"
+    },
+    {
+      "id": "post_train_pipeline",
+      "name": "Post-train: SFT + RLHF + Reasoning-RL",
+      "shape": "box",
+      "position": [-6.0, 6.5, 0],
+      "size": [1.4, 0.6, 1.0],
+      "material": "frosted teal block",
+      "role": "Multi-stage post-training: SFT on instruction data, preference RL, then long-CoT reasoning RL on math/code/agent rewards.",
+      "compute_profile": "communication-bound",
+      "parallelism": "data-parallel"
+    },
+
+    {
+      "id": "parallelism_marker",
+      "name": "Parallelism Plan: TP × EP × PP × DP",
+      "shape": "box",
+      "position": [8.5, 5.0, 0],
+      "size": [1.4, 2.4, 0.8],
+      "material": "smoked acrylic translucent",
+      "role": "Multi-axis parallelism plan. Typical config: TP=8 (within node), EP across 16 nodes for the 128 experts, PP=8 for the 94 layers, DP for replication.",
+      "compute_profile": "communication-bound",
+      "parallelism": "pipeline-parallel",
+      "improvement_ideas": [
+        "DualPipe to hide PP bubble.",
+        "Fuse EP all-to-all with the next attention sublayer prologue."
+      ]
+    },
+    {
+      "id": "training_data_pipe",
+      "name": "36 T-token Multilingual Corpus (119 langs)",
+      "shape": "box",
+      "position": [8.5, 0.6, 0],
+      "size": [1.4, 0.4, 0.8],
+      "material": "etched obsidian plate",
+      "role": "Pre-training data plate: ~36T tokens spanning 119 languages, with synthetic reasoning + code data injected.",
+      "compute_profile": "storage-bound",
+      "parallelism": "data-parallel"
+    }
+  ]
+}

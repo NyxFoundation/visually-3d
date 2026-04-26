@@ -1,0 +1,425 @@
+{
+  "machine_name": "Gemma 3 (27B)",
+  "assembly_instructions": "Read Gemma 3 as a DENSE multimodal stack. Tokens (and image patches!) enter at the floor (X=0,Y=0). Image inputs go through the SigLIP-400M vision encoder on the left at X=-5 — the orange Pan&Scan slicer fans non-square images into multiple 896×896 crops, each crop becomes 256 'soft tokens'. Text and image tokens are concatenated and climb the green residual pillar through 62 dense Transformer blocks. The killer Gemma-3 trick is the LOCAL : GLOBAL attention pattern, 5 LOCAL (sliding-window=1024, RoPE base 10K) blocks for every 1 GLOBAL block (full-context, RoPE base 1M). Local blocks are coloured pale-mint, global blocks are deep-emerald — count them on the side. Each block has dual RMSNorm (pre + post) on both attention and FFN, GQA (32 Q heads sharing 16 KV heads), QK-Norm in place of soft-cap, and a dense SwiGLU FFN (no MoE here — Gemma 3 is fully dense). The amber column on the left at X=-3 is the GQA KV cache, dramatically smaller because 5/6 of layers only ever cache a 1024-token window. The translucent slab at X=8 marks the parallelism plan + distillation-from-larger-teacher. Click any part for FLOPs, memory, parallelism class, scratch-build pseudocode, the dominant bottleneck, and improvement ideas.",
+  "metadata": {
+    "domain": "ml-architecture",
+    "reference": "https://ai.google.dev/gemma/docs/core",
+    "thumbnail_camera": [13, 9, 14],
+    "info": {
+      "english_name": "Gemma 3 27B (Google DeepMind, 2025) — dense multimodal",
+      "summary": "27B-parameter DENSE decoder-only multimodal LM from Google DeepMind. 62 layers × 5376 hidden dim, 32 query heads / 16 KV heads (GQA, ratio 2), SwiGLU FFN, dual RMSNorm (pre + post) on every sublayer, QK-Norm, and the signature 5:1 LOCAL-to-GLOBAL attention pattern (sliding-window 1024 + full-context). Vision through a frozen SigLIP-400M encoder with Pan-and-Scan, 896×896 crops, 256 soft-tokens per image. 128K context (32K for the 1B variant), trained on ~14T tokens with knowledge distillation from a larger teacher.",
+      "description": "Gemma 3 is the third generation of Google's open Gemma family. Compared with Gemma 2 it (i) goes multimodal via SigLIP + Pan&Scan, (ii) extends context 8K → 128K, (iii) replaces attention soft-cap with QK-Norm, (iv) uses an extreme 5:1 ratio of LOCAL (sliding-window) to GLOBAL attention layers — local layers do almost all the work, global layers carry long-range information. Local layers use RoPE base 10,000 (standard); global layers use RoPE base 1,000,000 to keep extrapolation clean to 128K. Both pre-norm AND post-norm RMSNorm are applied to attention and FFN — empirically improves training stability of fp16/bf16 deep stacks. The model is DENSE (no MoE) — every parameter activates for every token. Trained on ~14 T tokens via large-batch SGD with knowledge distillation from a larger Gemini teacher.\n\nDesign rationale, in one line each:\n• 5:1 local:global: makes long-context KV cheap because 5/6 of layers only need a 1024-token window.\n• QK-Norm: removes attention-logit blow-ups at long context without the soft-cap's training instability.\n• Dual norm (pre+post): cheap stability win for very deep stacks.\n• SigLIP + Pan&Scan: handles non-square / high-resolution images without resize artefacts.\n• Distillation from teacher: smaller models inherit teacher knowledge cheaply.",
+      "facts": [
+        { "label": "total parameters",         "value": "27 B (DENSE — no MoE)" },
+        { "label": "context length",           "value": "128 K (32 K for 1B variant)" },
+        { "label": "transformer layers (L)",   "value": "62" },
+        { "label": "hidden dimension (d)",     "value": "5376" },
+        { "label": "vocabulary size",          "value": "256,000 (multilingual SentencePiece)" },
+        { "label": "query heads (n_h)",        "value": "32" },
+        { "label": "KV heads (GQA groups)",    "value": "16 (ratio 2)" },
+        { "label": "head dimension",           "value": "128" },
+        { "label": "FFN intermediate dim",     "value": "21504 (SwiGLU, 4×d)" },
+        { "label": "attention pattern",        "value": "5 local : 1 global (sliding-window 1024 / full)" },
+        { "label": "RoPE base — local",        "value": "10,000" },
+        { "label": "RoPE base — global",       "value": "1,000,000" },
+        { "label": "QK norm",                  "value": "RMSNorm on Q and K (replaces soft-cap)" },
+        { "label": "norm placement",           "value": "Pre-norm AND post-norm RMSNorm on each sublayer" },
+        { "label": "vision encoder",           "value": "SigLIP-400M, frozen, 896×896 input" },
+        { "label": "image tokens",             "value": "256 soft-tokens per image crop" },
+        { "label": "image input",              "value": "Pan-and-Scan: non-square images sliced into multiple crops" },
+        { "label": "training tokens",          "value": "~14 T" },
+        { "label": "distillation",             "value": "Knowledge distillation from a larger Gemini teacher" },
+        { "label": "optimiser",                "value": "AdamW + large batch" },
+        { "label": "precision",                "value": "BF16 weights, BF16 / FP8 GEMMs" }
+      ],
+      "comparisons": [
+        {
+          "versus": "vs Gemma 2 (2024, 9B / 27B)",
+          "delta": "Gemma 2 was text-only with 8K context, alternating local-global attention at a milder ratio (1:1), used attention soft-cap (logit clipping) for stability, and pre-norm only. Gemma 3 keeps the dense architecture but adds vision (SigLIP + Pan&Scan), extends context to 128K, swaps soft-cap for QK-Norm, pushes the local:global ratio to 5:1 (massive KV win), and adds post-norm RMSNorm. Vocab 256K stays."
+        },
+        {
+          "versus": "vs Gemma 1 (2024, 2B / 7B)",
+          "delta": "Gemma 1 was vanilla text-only LLaMA-style: pre-norm RMSNorm, RoPE, SwiGLU, MHA. Gemma 3 keeps the surface but replaces literally every attention block with a 5:1 local-global GQA + QK-Norm + dual-norm hybrid, adds multimodal input via SigLIP, jumps from 8K to 128K context, uses distillation from a larger teacher, and is much wider/deeper at the 27B point."
+        },
+        {
+          "versus": "vs LLaMA-3 / Mistral-class peers",
+          "delta": "LLaMA-3 70B and Mistral-Large are GQA dense decoders with full-context attention and standard pre-norm. Gemma 3 trades width/depth for a smarter attention plan — 5/6 of its layers are local (1024-token window) so its KV cache is 5–10× smaller at 128K context for similar quality. It is also natively multimodal where most peers bolt vision on as a separate model."
+        },
+        {
+          "versus": "vs DeepSeek-V3 / GLM-4.5 (MoE peers)",
+          "delta": "Gemma 3 is fundamentally different: DENSE (every parameter active for every token) where V3/GLM are sparse MoE. Trade-off: at 27B Gemma 3 activates 27B per token (vs ~32B for GLM-4.5 at 355B total), so Gemma 3 hits more compute per token relative to capacity. Gemma 3 has no expert all-to-all bottleneck — single-node inference is dramatically simpler. It's also smaller in absolute capacity but matches MoE peers up to its size class because of the strong attention plan and distillation."
+        }
+      ],
+      "sources": [
+        { "title": "Gemma 3 Technical Report",         "url": "https://arxiv.org/abs/2503.19786" },
+        { "title": "Gemma 3 docs (ai.google.dev)",     "url": "https://ai.google.dev/gemma/docs/core" },
+        { "title": "Gemma 3 model card (HF)",          "url": "https://huggingface.co/google/gemma-3-27b-it" },
+        { "title": "SigLIP paper",                     "url": "https://arxiv.org/abs/2303.15343" }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "input_text",
+      "name": "Input Tokens (text, V=256K)",
+      "shape": "box",
+      "position": [0, 0, 0],
+      "size": [3.6, 0.18, 2.0],
+      "material": "brushed graphite plate",
+      "role": "Text input via the multilingual SentencePiece tokeniser (V=256K). Image tokens get prepended after the vision pipeline.",
+      "compute_profile": "host-cpu",
+      "memory_footprint": "4 B / token",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "tokens = sp.encode(text)  # SentencePiece, multilingual",
+      "connections": ["embedding_table"]
+    },
+    {
+      "id": "input_image",
+      "name": "Input Image",
+      "shape": "box",
+      "position": [-5.0, 0, 0],
+      "size": [1.6, 0.18, 1.6],
+      "material": "white-painted aluminium plate",
+      "role": "Raw image input. Variable resolution and aspect ratio.",
+      "compute_profile": "host-cpu",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "image: H x W x 3 RGB",
+      "connections": ["pan_and_scan"]
+    },
+    {
+      "id": "pan_and_scan",
+      "name": "Pan-and-Scan Slicer",
+      "shape": "cylinder",
+      "position": [-5.0, 0.7, 0],
+      "size": [0.7, 0.4],
+      "material": "warm orange acrylic disk",
+      "role": "Algorithm that splits non-square / high-resolution images into multiple 896×896 crops with overlap. Avoids the aspect-ratio distortion of naive resize.",
+      "compute_profile": "host-cpu",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "if aspect(img) > thresh:\n    crops = pan_and_scan(img, tile=896, overlap=…)\nelse:\n    crops = [resize(img, 896)]\n# each crop is processed independently",
+      "improvement_ideas": [
+        "Adaptive crop count based on image content (text-heavy vs natural)."
+      ],
+      "connections": ["siglip_encoder"]
+    },
+    {
+      "id": "siglip_encoder",
+      "name": "SigLIP-400M (frozen vision encoder)",
+      "shape": "box",
+      "position": [-5.0, 1.7, 0],
+      "size": [1.4, 1.0, 1.4],
+      "material": "ocean blue ceramic",
+      "role": "Frozen Sigmoid-Loss-Image-Pretraining ViT, 400M params, 14×14 patches → 64×64=4096 → MAP-pooled and projected to 256 'soft tokens' per crop.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 100 GFLOP per image crop (one-shot)",
+      "memory_footprint": "Frozen weights: ~800 MB (BF16)",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "patches = patchify(crop, 14)\nfeatures = vit(patches)               # 4096 patches\nsoft_tokens = average_pool(features)  # → 256 tokens",
+      "improvement_ideas": [
+        "Cache soft tokens for repeated images.",
+        "Replace MAP pooling with Q-Former for richer summarisation."
+      ],
+      "connections": ["soft_token_proj"]
+    },
+    {
+      "id": "soft_token_proj",
+      "name": "Vision-Text Projector",
+      "shape": "box",
+      "position": [-3.4, 1.7, 0],
+      "size": [0.6, 0.3, 0.6],
+      "material": "frosted teal acrylic",
+      "role": "Linear projector mapping SigLIP features into the LLM's d=5376 embedding space. 256 soft tokens per crop are inserted into the text stream at <image> placeholders.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "≈ 2·d_vision·d ≈ 11 MFLOP / soft-token",
+      "parallelism": "tensor-parallel",
+      "algorithm": "soft_h = soft_tokens @ W_proj   # → [256, 5376]\n# inserted at <image> position in the text sequence",
+      "connections": ["embedding_table"]
+    },
+    {
+      "id": "embedding_table",
+      "name": "Embedding (V=256K, d=5376)",
+      "shape": "box",
+      "position": [0, 0.55, 0],
+      "size": [3.4, 0.32, 1.8],
+      "material": "indigo glass slab",
+      "role": "Text token embedding lookup, tied with the LM head. 1.38 B params (~2.75 GiB BF16).",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "256K × 5376 × BF16 ≈ 2.75 GiB",
+      "parallelism": "tensor-parallel",
+      "algorithm": "h_text  = E[token_ids]\nh_input = interleave(h_text, h_image_soft)",
+      "connections": ["residual_pipe"]
+    },
+    {
+      "id": "residual_pipe",
+      "name": "Residual Stream (d=5376, 62 layers)",
+      "shape": "cylinder",
+      "position": [0, 5.6, 0],
+      "size": [0.18, 9.8],
+      "material": "translucent emerald polymer",
+      "role": "Pre-norm + post-norm residual carry. y = x + post_norm(sublayer(pre_norm(x))).",
+      "compute_profile": "gpu-memory-bound",
+      "parallelism": "tensor-parallel",
+      "algorithm": "x = x + post_attn(attn(pre_attn(x)))\nx = x + post_ffn(ffn(pre_ffn(x)))",
+      "connections": ["embedding_table", "block_local_1", "block_local_2", "block_local_3", "block_local_4", "block_local_5", "block_global_1", "block_local_6", "block_global_2", "prediction_head"]
+    },
+    {
+      "id": "layer_count_marker",
+      "name": "× 62 Layers (5 LOCAL : 1 GLOBAL pattern)",
+      "shape": "box",
+      "position": [-2.3, 5.6, 0],
+      "size": [0.05, 9.0, 0.7],
+      "material": "etched graphite gridline",
+      "role": "Marker for the 62-layer depth. Pattern repeats: L L L L L G L L L L L G ... — 5 local layers (sliding-window 1024) per 1 global layer (full context).",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel"
+    },
+
+    { "id": "block_local_1",  "name": "Block 1 — LOCAL (window=1024, RoPE 10K)",  "shape": "box", "position": [0, 1.4, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Local sliding-window attention block. Each token attends only to the previous 1024 tokens. RoPE base 10,000.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["attn_pre_norm", "attn_post_norm"] },
+    { "id": "block_local_2",  "name": "Block 2 — LOCAL",                            "shape": "box", "position": [0, 1.95, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Local block 2.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_local_3",  "name": "Block 3 — LOCAL",                            "shape": "box", "position": [0, 2.5, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Local block 3.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_local_4",  "name": "Block 4 — LOCAL",                            "shape": "box", "position": [0, 3.05, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Local block 4.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_local_5",  "name": "Block 5 — LOCAL",                            "shape": "box", "position": [0, 3.6, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Local block 5.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_global_1", "name": "Block 6 — GLOBAL (full ctx, RoPE 1M)",       "shape": "box", "position": [0, 4.2, 0], "size": [3.2, 0.55, 1.5], "material": "deep emerald ceramic", "role": "GLOBAL attention block — attends to the full context, uses RoPE base 1,000,000 to keep angles distinct out to 128K. ~6× bigger compute share at long ctx.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_local_6",  "name": "Block 7 — LOCAL",                            "shape": "box", "position": [0, 4.85, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Local block 7. Pattern resumes.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_global_2", "name": "Block 12 — GLOBAL (later in stack)",         "shape": "box", "position": [0, 5.5, 0], "size": [3.2, 0.55, 1.5], "material": "deep emerald ceramic", "role": "Another GLOBAL block. (Layers 8–11 elided.)", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_local_7",  "name": "Block 60 — LOCAL",                            "shape": "box", "position": [0, 7.6, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Late-stack local block. (Layers 13–59 elided.)", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_global_3", "name": "Block 62 — GLOBAL (final)",                  "shape": "box", "position": [0, 8.2, 0], "size": [3.2, 0.55, 1.5], "material": "deep emerald ceramic", "role": "Final block before the LM head — global, gives the head full-context summary.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+
+    {
+      "id": "attn_pre_norm",
+      "name": "Pre-Attn RMSNorm",
+      "shape": "box",
+      "position": [-1.8, 2.45, 0],
+      "size": [0.55, 0.18, 0.6],
+      "material": "matte ivory tile",
+      "role": "Pre-norm RMSNorm before attention. γ ∈ R^d learned.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "algorithm": "y = γ * x / sqrt(mean(x*x) + eps)",
+      "connections": ["attn_qkv_proj"]
+    },
+    {
+      "id": "attn_qkv_proj",
+      "name": "GQA · QKV Proj (32 Q / 16 KV)",
+      "shape": "box",
+      "position": [-1.8, 2.85, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "anodised aluminium tile",
+      "role": "Fused QKV projection. 32 query heads share 16 KV heads (group ratio 2). Each head is 128-dim.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·d·(n_h + 2·n_kv)·d_h ≈ 88 MFLOP",
+      "parallelism": "tensor-parallel",
+      "algorithm": "Q = x @ W_Q  # [B,T, 32, 128]\nK = x @ W_K  # [B,T, 16, 128]\nV = x @ W_V  # [B,T, 16, 128]\nQ, K = qk_rmsnorm(Q, K)\nQ, K = apply_rope(Q, K, base=10K_local OR 1M_global)",
+      "connections": ["qk_norm_disk", "rope_disk", "attn_kernel"]
+    },
+    {
+      "id": "qk_norm_disk",
+      "name": "QK-Norm (replaces soft-cap)",
+      "shape": "cylinder",
+      "position": [-1.8, 3.15, 0],
+      "size": [0.34, 0.05],
+      "material": "polished pewter ring",
+      "role": "RMSNorm on Q and K BEFORE the dot product. Cleaner long-context behaviour than Gemma-2's logit soft-cap.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "embarrassingly-parallel"
+    },
+    {
+      "id": "rope_disk",
+      "name": "RoPE (10K local / 1M global)",
+      "shape": "cylinder",
+      "position": [-1.8, 3.25, 0],
+      "size": [0.36, 0.05],
+      "material": "rose-gold annulus",
+      "role": "Two RoPE bases live in the model: 10K for local layers (standard), 1M for global layers (extends cleanly to 128K).",
+      "compute_profile": "negligible",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "freqs = base ** (-2*i/d)\nQ_rot = (Q[..., even] * cos) - (Q[..., odd] * sin)"
+    },
+    {
+      "id": "attn_kernel",
+      "name": "FlashAttention-2 (local OR global)",
+      "shape": "box",
+      "position": [-1.8, 3.55, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "midnight blue tile",
+      "role": "Same kernel, different mask. LOCAL layers apply a sliding-window mask (last 1024 tokens). GLOBAL layers apply a standard causal mask over the full context.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "Local: ≈ 2·n_h·d_h·1024 ≈ 8 MFLOP. Global: ≈ 2·n_h·d_h·T ≈ 1 GFLOP at T=128K.",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "if local:\n    mask = causal_sliding(window=1024)\nelse:\n    mask = causal()\nout = flash_attn(Q, K, V, mask=mask)",
+      "improvement_ideas": [
+        "Ring-attention sharding for global layers at >256K context.",
+        "Sparse global attention (e.g. BigBird) if context grows further."
+      ],
+      "connections": ["attn_o_proj"]
+    },
+    {
+      "id": "attn_o_proj",
+      "name": "Attention · O-Projection",
+      "shape": "box",
+      "position": [-1.8, 3.95, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "burnished bronze tile",
+      "role": "Output projection back to d=5376.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·n_h·d_h·d ≈ 44 MFLOP",
+      "parallelism": "tensor-parallel",
+      "connections": ["attn_post_norm"]
+    },
+    {
+      "id": "attn_post_norm",
+      "name": "Post-Attn RMSNorm",
+      "shape": "box",
+      "position": [-1.8, 4.25, 0],
+      "size": [0.55, 0.18, 0.6],
+      "material": "matte ivory tile",
+      "role": "POST-norm RMSNorm before adding back into the residual. Gemma-3 is one of the few models that does pre+post RMSNorm — small but consistent stability win.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "algorithm": "y = post_norm(o)\nresidual += y",
+      "connections": ["residual_pipe"]
+    },
+
+    {
+      "id": "kv_cache",
+      "name": "GQA KV Cache (5/6 layers windowed)",
+      "shape": "cylinder",
+      "position": [-3.4, 5.0, 0],
+      "size": [0.55, 6.0],
+      "material": "amber translucent silica",
+      "role": "Hetero KV cache. LOCAL layers (5/6 of total) only need to retain the last 1024 tokens — those layers' KV is essentially free at long context. GLOBAL layers (1/6) hold the full context but at a 16-head GQA rate.",
+      "compute_profile": "memory-capacity-bound",
+      "memory_footprint": "Local: 1024 × 16 × 128 × 2 × FP16 × ~52 layers ≈ 200 MB. Global: 128K × 16 × 128 × 2 × FP16 × ~10 layers ≈ 5 GB. Total much smaller than full-MHA.",
+      "parallelism": "tensor-parallel",
+      "algorithm": "for layer l:\n    if local(l): cache[l] = ring_buffer(K, V, size=1024)\n    else:        cache[l] = paged_kv(K, V)",
+      "improvement_ideas": [
+        "INT4 KV quantisation on global layers (where the bulk lives at 128K).",
+        "RadixAttention for shared system prompts."
+      ],
+      "connections": ["attn_kernel"]
+    },
+
+    {
+      "id": "ffn_pre_norm",
+      "name": "FFN · Pre-Norm RMSNorm",
+      "shape": "box",
+      "position": [1.8, 2.45, 0],
+      "size": [0.55, 0.18, 0.6],
+      "material": "matte ivory tile",
+      "role": "Pre-norm before the SwiGLU FFN.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": ["ffn_swiglu"]
+    },
+    {
+      "id": "ffn_swiglu",
+      "name": "SwiGLU FFN (d_ff = 21504, dense)",
+      "shape": "box",
+      "position": [1.8, 2.95, 0],
+      "size": [0.85, 0.45, 0.85],
+      "material": "iridescent silver-grey panel",
+      "role": "Dense SwiGLU FFN. NO MoE — every parameter activates for every token. d_ff = 21504 ≈ 4×d.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 3 × 2·d·d_ff ≈ 690 MFLOP / layer (largest single GEMM in the block)",
+      "memory_footprint": "3 × d × d_ff × BF16 ≈ 692 MB / layer; 62 layers ≈ 43 GB total FFN params",
+      "parallelism": "tensor-parallel",
+      "algorithm": "h = silu(x @ W_gate) * (x @ W_up)\ny = h @ W_down\nresidual += post_norm(y)",
+      "bottleneck": "Largest GEMM in the model — soaks tensor cores at training, becomes bandwidth-bound at decode (small batch).",
+      "improvement_ideas": [
+        "FP8 / FP4 weight quantisation for inference.",
+        "Sequence-parallel FFN to overlap with attention of the next layer."
+      ],
+      "connections": ["ffn_post_norm"]
+    },
+    {
+      "id": "ffn_post_norm",
+      "name": "FFN · Post-Norm RMSNorm",
+      "shape": "box",
+      "position": [1.8, 3.55, 0],
+      "size": [0.55, 0.18, 0.6],
+      "material": "matte ivory tile",
+      "role": "Post-norm RMSNorm before adding the FFN output back to the residual.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": ["residual_pipe"]
+    },
+
+    {
+      "id": "prediction_head",
+      "name": "LM Head (tied, V=256K)",
+      "shape": "box",
+      "position": [0, 9.05, 0],
+      "size": [3.4, 0.4, 1.6],
+      "material": "white marble slab",
+      "role": "Tied projection back to the 256K vocab.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·d·V ≈ 2.75 GFLOP",
+      "parallelism": "tensor-parallel",
+      "algorithm": "logits = h @ E.T\np      = softmax(logits / T)",
+      "connections": ["lm_loss"]
+    },
+    {
+      "id": "lm_loss",
+      "name": "LM Loss + Distillation Loss",
+      "shape": "sphere",
+      "position": [-1.4, 10.0, 0],
+      "size": [0.28],
+      "material": "incandescent ivory",
+      "role": "Cross-entropy on next-token PLUS KL-distillation against a larger teacher's softmax.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "data-parallel",
+      "algorithm": "loss = α·CE(logits, target) + (1-α)·KL(softmax(logits/T) || teacher_p)"
+    },
+    {
+      "id": "teacher_model",
+      "name": "Teacher (larger Gemini)",
+      "shape": "box",
+      "position": [3.0, 10.4, 0],
+      "size": [1.4, 0.5, 1.0],
+      "material": "polished obsidian slab",
+      "role": "Frozen larger Gemini model whose softmax outputs the student distils against. Crucial for matching MoE peers at 27B.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "data-parallel"
+    },
+
+    {
+      "id": "optimizer_adamw",
+      "name": "AdamW + large batch",
+      "shape": "box",
+      "position": [-6.0, 4.0, 0],
+      "size": [1.4, 1.0, 1.0],
+      "material": "anodised navy block",
+      "role": "AdamW with large batch (millions of tokens / step) on TPU pods. β1=0.9, β2=0.95.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "Adam state: 2× param size.",
+      "parallelism": "data-parallel"
+    },
+
+    {
+      "id": "parallelism_marker",
+      "name": "TPU-pod Parallelism (TP × DP × FSDP)",
+      "shape": "box",
+      "position": [8.5, 5.0, 0],
+      "size": [1.4, 2.4, 0.8],
+      "material": "smoked acrylic translucent",
+      "role": "Trained on TPU pods rather than GPUs. Plan: TP within pod-slice, FSDP for parameter/optimiser sharding, DP across pod-slices. No EP because the model is dense.",
+      "compute_profile": "communication-bound",
+      "parallelism": "data-parallel",
+      "improvement_ideas": [
+        "FSDP-2 with parameter prefetching.",
+        "Sequence-parallel norms to remove TP-replicated activations."
+      ]
+    },
+    {
+      "id": "training_data_pipe",
+      "name": "14 T-token Multilingual Corpus",
+      "shape": "box",
+      "position": [8.5, 0.6, 0],
+      "size": [1.4, 0.4, 0.8],
+      "material": "etched obsidian plate",
+      "role": "Pre-training data plate: ~14T tokens of multilingual text + interleaved image-text pairs for the vision-language phase.",
+      "compute_profile": "storage-bound",
+      "parallelism": "data-parallel"
+    }
+  ]
+}

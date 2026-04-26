@@ -1,0 +1,492 @@
+{
+  "machine_name": "GLM-4.5",
+  "assembly_instructions": "Read the GLM-4.5 stack as a TALL, NARROW factory: 96 transformer blocks climb the violet residual pillar at X=0 (8 are rendered, the rest are implied by the etched gridline). Every block has GQA attention (96 query heads sharing 8 KV heads) on the left half and a fine-grained MoE FFN on the right (1 shared + 160 routed experts, top-8) — both are exploded into sub-components in the side panels. The amber column at X=-3 is the GQA KV cache. The orange ring at X=6 is the routed-expert bank with its sigmoid router and group-limited dispatch (a token is allowed to land on experts in at most 4 of 8 device groups — this is what makes EP all-to-all manageable). The bronze cube at X=2.5/Y=8 is the MTP head used for speculative decoding. The two slabs in the upper-right are the dual MODE selectors (think / no-think) that share the same weights. The far-right translucent slab marks the parallelism plan. Click any part for FLOPs, memory, parallelism class, scratch-build pseudocode, the dominant bottleneck, and improvement ideas.",
+  "metadata": {
+    "domain": "ml-architecture",
+    "reference": "https://github.com/zai-org/GLM-4.5",
+    "thumbnail_camera": [12, 9, 14],
+    "info": {
+      "english_name": "GLM-4.5 (Z.ai, 2025) — 355B-A32B MoE",
+      "summary": "355B-parameter Mixture-of-Experts language model from Zhipu AI / Z.ai (32B activated per token). Deep-and-narrow design: 96 layers × 5120 hidden dim. GQA attention (96 Q heads / 8 KV heads, partial RoPE, QK-Norm), 160 routed + 1 shared expert per layer with sigmoid loss-free routing and group-limited top-8 dispatch, MTP head for speculative decoding, and a hybrid thinking / non-thinking mode that shares weights. Pre-trained on ~23 T tokens, post-trained for agentic + reasoning + coding with self-distillation RL.",
+      "description": "GLM-4.5 is Z.ai's flagship open MoE for the 'ARC' (Agentic, Reasoning, Coding) trinity. Compared with GLM-4 it is much sparser (only 32B of 355B activated per token), DEEPER (96 layers vs 40) but NARROWER (5120 hidden dim vs 6144), and adds first-class hybrid reasoning: a single set of weights answers either in 'think' or 'no-think' mode controlled by a system prompt. Routing uses a sigmoid gate with the auxiliary-loss-free bias trick (DeepSeek-V3 style) and an extra group-limit constraint (each token may activate experts on AT MOST 4 of 8 device groups), which keeps cross-node all-to-all bounded. QK-Norm + partial RoPE replace V3's full-RoPE on attention. A single Multi-Token Prediction head provides ~1.8× speculative decoding speedup. Training is 3-stage (general → reasoning → long-context) on ~23T tokens, with FP8 GEMMs and BF16 master weights.\n\nDesign rationale, in one line each:\n• Deep-narrow: more layers ≫ wider FFN per FLOP for reasoning tasks at fixed compute.\n• Group-limited routing: caps EP all-to-all bandwidth, the real bottleneck on H800-class clusters.\n• Hybrid think mode: avoids maintaining two separate models (chat + reasoning).\n• MTP head: free speculative decoding without a draft model.",
+      "facts": [
+        { "label": "total parameters",         "value": "355 B (32 B activated / token)" },
+        { "label": "context length",           "value": "128 K (trained 32 K, extended with YaRN)" },
+        { "label": "transformer layers (L)",   "value": "96 (deep & narrow)" },
+        { "label": "hidden dimension (d)",     "value": "5120" },
+        { "label": "vocabulary size",          "value": "151,552" },
+        { "label": "query heads (n_h)",        "value": "96" },
+        { "label": "KV heads (GQA groups)",    "value": "8 (12:1 query-to-KV sharing)" },
+        { "label": "head dimension",           "value": "128" },
+        { "label": "RoPE",                     "value": "Partial (half of head dims rotated)" },
+        { "label": "QK norm",                  "value": "RMSNorm on Q and K (replaces soft-cap)" },
+        { "label": "MoE per layer",            "value": "1 shared + 160 routed experts (top-8)" },
+        { "label": "expert intermediate dim",  "value": "1408 (fine-grained)" },
+        { "label": "router gate",              "value": "Sigmoid + loss-free balance bias" },
+        { "label": "group-limited routing",    "value": "≤ 4 of 8 device groups per token" },
+        { "label": "MTP depth",                "value": "1 (for speculative decoding)" },
+        { "label": "modes",                    "value": "think / no-think (shared weights, system-prompt switched)" },
+        { "label": "training tokens",          "value": "~23 T (3 stages: general → reasoning → long-ctx)" },
+        { "label": "optimiser",                "value": "AdamW (β1=0.9, β2=0.95)" },
+        { "label": "precision",                "value": "FP8 GEMMs + BF16 master weights" },
+        { "label": "post-training",            "value": "SFT + Self-distillation RL (slime)" }
+      ],
+      "comparisons": [
+        {
+          "versus": "vs GLM-4 (2024, dense 9B / 32B)",
+          "delta": "GLM-4 was a dense decoder (~32B at the upper end). GLM-4.5 jumps to a 355B sparse MoE with 32B activated — same per-token FLOPs but ~11× more capacity. Adds GQA (V4 was MHA), QK-Norm, partial RoPE, MTP, hybrid thinking, and the sigmoid loss-free balance trick. Vocabulary stays in the 150K range."
+        },
+        {
+          "versus": "vs ChatGLM2/3 (2023)",
+          "delta": "Two generations of pre-norm dense decoders with full RoPE and bilinear FFN. GLM-4.5 keeps RoPE (partial now) but otherwise replaces every load-bearing block: SwiGLU FFN → MoE with shared expert, MHA → GQA, plain attention → QK-Norm + partial-RoPE, SFT-only post-training → multi-stage RL with self-distillation. Goes from 32K → 128K context."
+        },
+        {
+          "versus": "vs DeepSeek-V3 (671B-A37B MoE)",
+          "delta": "Same family of ideas (MoE + shared expert + auxiliary-loss-free balancing + MTP) but tuned differently: GLM-4.5 is SMALLER (355B vs 671B), DEEPER (96 vs 61 layers), and uses GQA + partial RoPE + QK-Norm where V3 uses MLA. V3 has 256 experts top-8 with no group constraint; GLM-4.5 has 160 experts top-8 with group-limited routing (≤4 of 8 groups). V3 supports 128K via YaRN; GLM-4.5 also targets 128K. V3 trained in FP8 mixed; GLM-4.5 also uses FP8 GEMMs."
+        },
+        {
+          "versus": "vs Qwen3-235B-A22B & GPT-4-class peers",
+          "delta": "Versus Qwen3-235B-A22B: GLM-4.5 has more total params (355B vs 235B) and more activated (32B vs 22B), more layers (96 vs 94), but fewer experts (160 vs 128, both top-8). Both have hybrid thinking modes. Versus public GPT-4 estimates: GLM-4.5 is much sparser per token (32B activated vs estimated ~280B+ in GPT-4 dense or ~110B in rumoured GPT-4-MoE), uses GQA at extreme ratios (12:1) for cheaper KV, and is open-weight."
+        }
+      ],
+      "sources": [
+        { "title": "GLM-4.5 technical report",   "url": "https://arxiv.org/abs/2508.06471" },
+        { "title": "GLM-4.5 GitHub",             "url": "https://github.com/zai-org/GLM-4.5" },
+        { "title": "GLM-4.5 model card (HF)",    "url": "https://huggingface.co/zai-org/GLM-4.5" }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "input_plate",
+      "name": "Input Tokens (BPE)",
+      "shape": "box",
+      "position": [0, 0, 0],
+      "size": [4.2, 0.18, 2.4],
+      "material": "brushed graphite plate",
+      "role": "Token-ID stream (vocab=151,552). Pre-training corpora packed with sample-aware attention masking. Tokeniser is the GLM tiktoken-style BPE inherited from GLM-4.",
+      "compute_profile": "host-cpu",
+      "memory_footprint": "4 B / token (int32)",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "tokens = bpe.encode(text)\nbatch  = pack(tokens, max_len=32_768)\nmask   = sample_attention_mask(batch)",
+      "bottleneck": "Loader-side BPE throughput on the CPU.",
+      "connections": ["embedding_table"]
+    },
+    {
+      "id": "embedding_table",
+      "name": "Embedding (V=151K, d=5120)",
+      "shape": "box",
+      "position": [0, 0.55, 0],
+      "size": [3.8, 0.32, 2.0],
+      "material": "indigo glass slab",
+      "role": "Token-embedding lookup, tied with the LM head. ~776M params (BF16, ~1.55 GiB).",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "0 (gather)",
+      "memory_footprint": "151K × 5120 × BF16 ≈ 1.55 GiB",
+      "parallelism": "tensor-parallel",
+      "algorithm": "h0 = E[token_ids]   # gather, sharded on V across TP ranks",
+      "bottleneck": "HBM bandwidth on first-layer write.",
+      "connections": ["residual_pipe"]
+    },
+    {
+      "id": "residual_pipe",
+      "name": "Residual Stream (d=5120, 96 layers)",
+      "shape": "cylinder",
+      "position": [0, 5.6, 0],
+      "size": [0.18, 9.8],
+      "material": "translucent violet polymer",
+      "role": "Pre-norm residual stream carrying activations through all 96 blocks. Each block writes y = x + sublayer(RMSNorm(x)).",
+      "compute_profile": "gpu-memory-bound",
+      "memory_footprint": "B·T·d × dtype per layer of activation",
+      "parallelism": "tensor-parallel",
+      "algorithm": "x = x + attn(rmsnorm_pre(x))\nx = x + ffn(rmsnorm_post(x))",
+      "connections": ["embedding_table", "block_01", "block_02", "block_03", "block_04", "block_05", "block_06", "block_95", "block_96", "prediction_head"]
+    },
+    {
+      "id": "layer_count_marker",
+      "name": "× 96 Transformer Layers (deep & narrow)",
+      "shape": "box",
+      "position": [-2.3, 5.6, 0],
+      "size": [0.05, 9.0, 0.7],
+      "material": "etched graphite gridline",
+      "role": "Marker for the 96-layer depth — only 8 are rendered. Deep-narrow shape (96×5120) was chosen over wide-shallow (e.g. 48×8192) for reasoning quality at fixed FLOPs.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "bottleneck": "PP bubble — 96 layers across PP=8 stages cost ~7 microbatches of bubble unless DualPipe / 1F1B is used."
+    },
+
+    { "id": "block_01", "name": "Block 1", "shape": "box", "position": [0, 1.4, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst",  "role": "First Transformer block. Pre-norm GQA attention + MoE FFN, mHC-free (plain residual).", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_02", "name": "Block 2", "shape": "box", "position": [0, 2.0, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst",  "role": "Block 2. Identical layer recipe to block_01.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_03", "name": "Block 3", "shape": "box", "position": [0, 2.6, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst",  "role": "Block 3. Exploded into sub-components on the right (X=4) and left (X=-1.6).", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["attn_pre_norm", "ffn_post_norm"] },
+    { "id": "block_04", "name": "Block 4", "shape": "box", "position": [0, 3.2, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst",  "role": "Block 4.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_05", "name": "Block 5", "shape": "box", "position": [0, 3.8, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst",  "role": "Block 5.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_06", "name": "Block 6", "shape": "box", "position": [0, 4.4, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst",  "role": "Block 6.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_95", "name": "Block 95", "shape": "box", "position": [0, 7.6, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst", "role": "Block 95. (Layers 7–94 elided.)", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_96", "name": "Block 96 (final)", "shape": "box", "position": [0, 8.2, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst", "role": "Final block before the prediction head.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+
+    {
+      "id": "attn_pre_norm",
+      "name": "Attention · Pre-RMSNorm (γ)",
+      "shape": "box",
+      "position": [-1.8, 2.45, 0],
+      "size": [0.55, 0.18, 0.6],
+      "material": "matte ivory tile",
+      "role": "Pre-norm RMSNorm with a learned per-channel γ ∈ R^d. Trained by AdamW alongside everything else.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "γ: 5120 × BF16 ≈ 10 KB / layer",
+      "parallelism": "tensor-parallel",
+      "algorithm": "x_hat = x / sqrt(mean(x*x) + eps)\ny     = γ * x_hat",
+      "connections": ["attn_qkv_proj"]
+    },
+    {
+      "id": "attn_qkv_proj",
+      "name": "GQA · QKV Projection (96 Q, 8 KV)",
+      "shape": "box",
+      "position": [-1.8, 2.85, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "anodised aluminium tile",
+      "role": "Single fused QKV GEMM: Q is projected to 96 × 128-dim heads; K and V to only 8 × 128-dim heads (12-way KV sharing). This is the key to GLM-4.5's small KV footprint.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·d·(n_h + 2·n_kv)·d_h ≈ 65 MFLOP",
+      "memory_footprint": "W_QKV: d × (n_h + 2·n_kv) × d_h ≈ 64 M params (BF16, ~128 MB)",
+      "parallelism": "tensor-parallel",
+      "algorithm": "Q = x @ W_Q  # [B,T, 96, 128]\nK = x @ W_K  # [B,T, 8,  128]\nV = x @ W_V  # [B,T, 8,  128]\nQ, K = qk_rmsnorm(Q, K)        # QK-Norm\nQ, K = apply_partial_rope(Q, K) # half dims rotated",
+      "bottleneck": "Compute-bound at training; bandwidth-bound at decode (small batch).",
+      "connections": ["qk_norm_disk", "rope_disk", "attn_kernel"]
+    },
+    {
+      "id": "qk_norm_disk",
+      "name": "QK-Norm (RMSNorm on Q & K)",
+      "shape": "cylinder",
+      "position": [-1.8, 3.15, 0],
+      "size": [0.34, 0.05],
+      "material": "polished pewter ring",
+      "role": "Per-head RMSNorm on Q and K BEFORE the attention dot-product. Replaces V3-style logit soft-cap. Stabilises FP8 GEMMs and removes a class of attention spikes.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "Q = γ_q * Q / sqrt(mean(Q*Q, dim=-1) + eps)\nK = γ_k * K / sqrt(mean(K*K, dim=-1) + eps)"
+    },
+    {
+      "id": "rope_disk",
+      "name": "Partial RoPE (half-dim rotated)",
+      "shape": "cylinder",
+      "position": [-1.8, 3.25, 0],
+      "size": [0.36, 0.05],
+      "material": "rose-gold annulus",
+      "role": "Rotary position encoding applied to ONLY half of each head's channels; the other half stays positional-free. Cheaper than full RoPE and empirically equally good after QK-Norm.",
+      "compute_profile": "negligible",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "rope_dims = 64 of 128\nQ[..., :rope_dims], K[..., :rope_dims] = rotate(... , pos)"
+    },
+    {
+      "id": "attn_kernel",
+      "name": "FlashAttention-2 (GQA dense)",
+      "shape": "box",
+      "position": [-1.8, 3.55, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "midnight blue tile",
+      "role": "Dense FlashAttention over the full causal context (no sparsity at GLM-4.5; sparsity is reserved for the inference engine via paged KV).",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·n_h·d_h·T (training) ≈ ~3 GFLOP at T=32K",
+      "memory_footprint": "On-chip SRAM tile only",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "logits = (Q @ K.T) / sqrt(d_h)   # tile-streamed\nattn   = softmax(logits)\nout    = attn @ V",
+      "bottleneck": "O(T²) at long context — RING attention or local-global splits would help but GLM-4.5 stays dense.",
+      "connections": ["attn_o_proj"]
+    },
+    {
+      "id": "attn_o_proj",
+      "name": "Attention · O-Projection",
+      "shape": "box",
+      "position": [-1.8, 3.95, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "burnished bronze tile",
+      "role": "Output projection back to d=5120. Adds into the residual stream.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·n_h·d_h·d ≈ 125 MFLOP",
+      "memory_footprint": "n_h·d_h × d ≈ 63 M params (~126 MB BF16)",
+      "parallelism": "tensor-parallel",
+      "algorithm": "y = out_heads.flatten(-2) @ W_O\nresidual += y",
+      "connections": ["residual_pipe"]
+    },
+
+    {
+      "id": "kv_cache",
+      "name": "GQA KV Cache (8 KV heads)",
+      "shape": "cylinder",
+      "position": [-3.4, 5.0, 0],
+      "size": [0.55, 6.0],
+      "material": "amber translucent silica",
+      "role": "Per-layer paged KV cache. With only 8 KV heads (GQA group ratio 12), the cache is ~12× smaller than full MHA at the same context.",
+      "compute_profile": "memory-capacity-bound",
+      "memory_footprint": "≈ 2 × 8 × 128 × FP8 = 2 KB / token / layer; 96 layers × 128K ctx ≈ 25 GiB / sequence",
+      "parallelism": "tensor-parallel",
+      "algorithm": "cache = PagedKV(stride=1, dtype=FP8)\n# write on prefill, read on decode\n# evict-cold-prefix policy (e.g., RadixAttention)",
+      "bottleneck": "HBM capacity sets max batchable context per GPU.",
+      "improvement_ideas": [
+        "Quantise KV to INT4 with per-channel scales for ~2× more context.",
+        "RadixAttention for shared system prompts."
+      ],
+      "connections": ["attn_kernel"]
+    },
+
+    {
+      "id": "ffn_post_norm",
+      "name": "FFN · Post-Attn RMSNorm",
+      "shape": "box",
+      "position": [1.8, 2.45, 0],
+      "size": [0.55, 0.18, 0.6],
+      "material": "matte ivory tile",
+      "role": "Pre-norm RMSNorm before the MoE FFN sublayer.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "algorithm": "x_hat = x / sqrt(mean(x*x) + eps); y = γ * x_hat",
+      "connections": ["moe_router"]
+    },
+
+    {
+      "id": "moe_router",
+      "name": "Top-8 Sigmoid Router",
+      "shape": "cylinder",
+      "position": [6.0, 5.6, 0],
+      "size": [0.55, 0.18],
+      "material": "ruby-tinted glass disk",
+      "role": "Per-token affinity = sigmoid(x @ W_r) + b_balance. Top-8 of 160 routed experts. Auxiliary-loss-FREE: b_balance is updated by a tiny rule that nudges over-loaded experts down.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "≈ 2·d·160 ≈ 1.6 MFLOP",
+      "memory_footprint": "W_router: d × 160 × BF16 ≈ 1.6 MB / layer",
+      "parallelism": "tensor-parallel",
+      "algorithm": "scores = sigmoid(x @ W_router) + b_balance\ntopk_idx, topk_w = topk(scores, 8)\ntopk_w = topk_w / topk_w.sum()  # renormalise\n# b_balance updated each step:\n# b -= lr_b * (load_e - mean_load)",
+      "bottleneck": "Sequential with the all-to-all dispatch that follows.",
+      "improvement_ideas": [
+        "Speculative dispatch using a 1-step-stale router prediction.",
+        "Fuse with the FFN-pre-norm above (norm + router in one kernel)."
+      ],
+      "connections": ["moe_group_limit", "moe_routed_ring"]
+    },
+    {
+      "id": "moe_group_limit",
+      "name": "Group-Limited Dispatch (≤4 of 8 device groups)",
+      "shape": "cylinder",
+      "position": [6.0, 6.05, 0],
+      "size": [0.7, 0.12],
+      "material": "speckled basalt ring",
+      "role": "Constraint imposed on the top-8 selection: a single token may activate experts on at most 4 of 8 EP device groups. Bounds cross-node all-to-all traffic.",
+      "compute_profile": "negligible",
+      "parallelism": "expert-parallel",
+      "algorithm": "# during top-k pick:\nfor each token:\n    selected = []\n    groups_used = set()\n    for e in sorted_by_score:\n        if len(groups_used) >= 4 and group(e) not in groups_used:\n            continue\n        selected.append(e)\n        groups_used.add(group(e))\n        if len(selected) == 8: break",
+      "improvement_ideas": [
+        "Dynamic group budget — relax to 6 groups under low load, tighten to 3 under contention."
+      ]
+    },
+    {
+      "id": "moe_alltoall",
+      "name": "Expert All-to-All (dispatch + combine)",
+      "shape": "cylinder",
+      "position": [6.0, 6.55, 0],
+      "size": [1.0, 0.16],
+      "material": "copper coil ring",
+      "role": "Two NCCL all-to-all collectives per layer: dispatch tokens to chosen experts, then combine outputs back. The group-limit above keeps this bounded.",
+      "compute_profile": "communication-bound",
+      "parallelism": "expert-parallel",
+      "algorithm": "grouped = bucket_by_expert(x, topk_idx)\nrecv    = nccl.all_to_all(grouped)\n# expert FFN ↓\nout_grp = bucket_by_origin(expert_out)\nout     = nccl.all_to_all(out_grp)",
+      "bottleneck": "Cross-node InfiniBand bandwidth + skew-induced stragglers.",
+      "improvement_ideas": [
+        "Overlap dispatch with the previous attention O-proj.",
+        "Token grouping by destination rank to coalesce sends."
+      ],
+      "connections": ["moe_routed_ring", "moe_group_gemm"]
+    },
+    {
+      "id": "moe_routed_ring",
+      "name": "Routed Experts (160, top-8)",
+      "shape": "cylinder",
+      "position": [6.0, 4.8, 0],
+      "size": [1.9, 0.45],
+      "material": "iridescent micro-array",
+      "role": "Per-MoE-layer bank of 160 fine-grained SwiGLU experts (intermediate dim 1408). 8 active per token. FP8 GEMM with BF16 master weights.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 8 × (3 × 2·d·d_ff) ≈ 8 × 43 MFLOP ≈ 350 MFLOP / layer",
+      "memory_footprint": "160 × 3·d·d_ff × BF16 ≈ 11 GiB / layer of routed weights; 96 layers ≈ 1.05 TiB",
+      "parallelism": "expert-parallel",
+      "algorithm": "for e in topk_idx:\n    h_e = silu(x @ W_gate[e]) * (x @ W_up[e])\n    y  += w_topk * (h_e @ W_down[e])",
+      "improvement_ideas": [
+        "Group GEMM (next part) to fuse 8 expert calls.",
+        "FP4 QAT for further memory wins (DeepSeek-V4-style)."
+      ]
+    },
+    {
+      "id": "moe_shared_expert",
+      "name": "Shared Expert (×1, always-on)",
+      "shape": "box",
+      "position": [6.0, 5.55, 0],
+      "size": [0.55, 0.55, 0.55],
+      "material": "polished platinum",
+      "role": "One always-on expert that complements the 8 routed ones. Carries 'common' computation and stabilises routing in early training.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 3 × 2·d·d_ff ≈ 43 MFLOP / layer",
+      "parallelism": "tensor-parallel"
+    },
+    {
+      "id": "moe_group_gemm",
+      "name": "Group GEMM (fused expert FFN)",
+      "shape": "box",
+      "position": [6.0, 4.0, 0],
+      "size": [1.6, 0.18, 1.0],
+      "material": "graphite heatsink",
+      "role": "cuBLASLt grouped-GEMM kernel that runs all 8 (capacity-padded) experts in a single launch.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "# per group g in this layer:\nY_g = X_g @ W_gate[g]\nH_g = silu(Y_g) * (X_g @ W_up[g])\nO_g = H_g @ W_down[g]\n# all groups in one launch, padded to capacity"
+    },
+    {
+      "id": "fp8_gemm_disk",
+      "name": "FP8 GEMM (E4M3 forward / E5M2 backward)",
+      "shape": "cylinder",
+      "position": [6.0, 4.32, 0],
+      "size": [1.95, 0.06],
+      "material": "silver inlay annulus",
+      "role": "Mixed-precision marker: forward GEMMs in E4M3, backward in E5M2 (Hopper fp8). BF16 master weights kept for AdamW updates.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "FP8 weights ~2× smaller than BF16 in HBM during forward.",
+      "parallelism": "expert-parallel",
+      "algorithm": "W_fp8 = quantize(W_master, scale=group_per_block)\nactivations are dynamically scaled at GEMM boundaries"
+    },
+
+    {
+      "id": "prediction_head",
+      "name": "LM Head (tied with E)",
+      "shape": "box",
+      "position": [0, 9.05, 0],
+      "size": [3.4, 0.4, 1.6],
+      "material": "white marble slab",
+      "role": "Projection back to 151K vocab; tied with the embedding table. Trained by AdamW.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·d·V ≈ 1.55 GFLOP",
+      "memory_footprint": "Same tensor as the embedding table.",
+      "parallelism": "tensor-parallel",
+      "algorithm": "logits = h_final @ E.T\np      = softmax(logits / T)",
+      "improvement_ideas": [
+        "Speculative decoding via the MTP head.",
+        "Top-k prune before softmax for cheap sampling."
+      ],
+      "connections": ["mtp_head", "lm_loss"]
+    },
+    {
+      "id": "mtp_head",
+      "name": "MTP Head (depth=1, speculative decoding)",
+      "shape": "box",
+      "position": [2.5, 8.0, 0],
+      "size": [1.2, 0.4, 1.0],
+      "material": "moss-green ceramic",
+      "role": "Single Multi-Token-Prediction head trained jointly to predict t+1 alongside the main t head. At inference enables ~1.8× speculative decoding without a draft model.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ one extra block + LM head GEMM",
+      "parallelism": "pipeline-parallel",
+      "algorithm": "h_aux  = mtp_block(h_final)\nlogits_aux = h_aux @ E.T\nloss_aux   = CE(logits_aux, target_t+2)",
+      "connections": ["mtp_loss"]
+    },
+    {
+      "id": "lm_loss",
+      "name": "LM Loss (cross-entropy)",
+      "shape": "sphere",
+      "position": [-1.4, 10.0, 0],
+      "size": [0.28],
+      "material": "incandescent ivory",
+      "role": "Primary next-token cross-entropy loss.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "data-parallel"
+    },
+    {
+      "id": "mtp_loss",
+      "name": "MTP Loss (small weight)",
+      "shape": "sphere",
+      "position": [3.0, 10.4, 0],
+      "size": [0.22],
+      "material": "luminescent sage",
+      "role": "Auxiliary loss on the MTP head.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "data-parallel"
+    },
+
+    {
+      "id": "mode_think",
+      "name": "Mode: 'think' (CoT enabled)",
+      "shape": "box",
+      "position": [4.5, 9.6, 0],
+      "size": [1.2, 0.3, 0.8],
+      "material": "deep navy plate",
+      "role": "System-prompt-switched reasoning mode. Same weights as no-think; different system prompt + decoding budget. Selected automatically by classifier or explicitly.",
+      "compute_profile": "negligible",
+      "parallelism": "data-parallel",
+      "algorithm": "if mode == 'think':\n    prompt = THINKING_TEMPLATE + user\n    decode_budget = 8192   # CoT tokens\nelse:\n    prompt = STD_TEMPLATE + user\n    decode_budget = 1024"
+    },
+    {
+      "id": "mode_no_think",
+      "name": "Mode: 'no-think' (direct answer)",
+      "shape": "box",
+      "position": [5.9, 9.6, 0],
+      "size": [1.2, 0.3, 0.8],
+      "material": "matte navy plate",
+      "role": "Fast direct-answer mode. Uses the same weights but truncates CoT.",
+      "compute_profile": "negligible",
+      "parallelism": "data-parallel"
+    },
+
+    {
+      "id": "optimizer_adamw",
+      "name": "AdamW (β1=0.9, β2=0.95)",
+      "shape": "box",
+      "position": [-6.0, 4.0, 0],
+      "size": [1.4, 1.0, 1.0],
+      "material": "anodised navy block",
+      "role": "Single optimiser for the entire model. Adam state in FP32 with BF16 master weights. ZeRO-1 sharding across DP.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "Adam state: 2× param size (m and v).",
+      "parallelism": "data-parallel",
+      "algorithm": "m = β1·m + (1-β1)·g\nv = β2·v + (1-β2)·g²\nW -= lr · m̂ / (√v̂ + ε) + wd · W"
+    },
+
+    {
+      "id": "post_train_rl",
+      "name": "Self-distillation RL (slime)",
+      "shape": "box",
+      "position": [-6.0, 6.5, 0],
+      "size": [1.4, 0.6, 1.0],
+      "material": "frosted teal block",
+      "role": "Z.ai's 'slime' RL pipeline: SFT bootstrapping, then iterative self-distillation rollouts on agentic / reasoning / coding benchmarks. Uses GRPO-family losses.",
+      "compute_profile": "communication-bound",
+      "parallelism": "data-parallel",
+      "algorithm": "for round in range(R):\n    rollouts = sample(policy, prompts)\n    rewards  = score(rollouts, judge)\n    loss     = grpo_loss(rollouts, rewards)\n    policy.update(loss)"
+    },
+
+    {
+      "id": "parallelism_marker",
+      "name": "Parallelism Plan: TP × EP × PP × DP",
+      "shape": "box",
+      "position": [8.5, 5.0, 0],
+      "size": [1.4, 2.4, 0.8],
+      "material": "smoked acrylic translucent",
+      "role": "Multi-axis parallelism plan. Typical training config: TP=8 (within node), EP=8 (groups for the 160 experts), PP=8 (DualPipe/1F1B for 96 layers), DP=N replicas. The group-limited router caps EP all-to-all traffic.",
+      "compute_profile": "communication-bound",
+      "parallelism": "pipeline-parallel",
+      "algorithm": "rank = (dp, pp, ep, tp)\n# attention/FFN GEMMs sharded by TP within node\n# experts assigned to EP groups across nodes\n# group-limit: token can land on at most 4 of 8 EP groups\n# 96 layers split into PP stages via DualPipe / 1F1B",
+      "bottleneck": "EP all-to-all (cross-node IB) + PP bubble.",
+      "improvement_ideas": [
+        "DualPipe to hide PP bubble.",
+        "ZeRO-1 over DP for optimiser-state sharding."
+      ]
+    },
+    {
+      "id": "training_data_pipe",
+      "name": "23 T-token Corpus (3-stage curriculum)",
+      "shape": "box",
+      "position": [8.5, 0.6, 0],
+      "size": [1.4, 0.4, 0.8],
+      "material": "etched obsidian plate",
+      "role": "Pre-training data plate: ~23T tokens in 3 stages — general → reasoning-heavy → long-context (32K → 128K via YaRN).",
+      "compute_profile": "storage-bound",
+      "parallelism": "data-parallel"
+    }
+  ]
+}

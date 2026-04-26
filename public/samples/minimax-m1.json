@@ -1,0 +1,402 @@
+{
+  "machine_name": "MiniMax-M1",
+  "assembly_instructions": "Read MiniMax-M1 as a HYBRID-ATTENTION FACTORY. Tokens enter at the floor (X=0,Y=0) and climb the orange residual pillar through 80 transformer blocks. The killer trick: 7 LIGHTNING ATTENTION blocks (linear, O(N)) for every 1 SOFTMAX ATTENTION block. Lightning blocks are coloured pale-amber, softmax blocks are deep-crimson — count them. Lightning attention has NO KV cache (it carries a fixed-size linear-attention state instead, the cyan torus to the left at X=-2.5); softmax attention carries the conventional GQA KV cache (amber column at X=-3.5). To the right at X=6 sits the per-layer MoE FFN (1 shared + 32 routed experts, top-2). Above the stack at X=2/Y=9 is the CISPO RL trainer (red sphere) — MiniMax-M1's reasoning post-training algorithm (clipped sequence-level importance sampling). The translucent slab at X=8 marks the parallelism plan and the 41-day RL training run. Click any part for FLOPs, memory, parallelism class, scratch-build pseudocode, the dominant bottleneck, and improvement ideas.",
+  "metadata": {
+    "domain": "ml-architecture",
+    "reference": "https://huggingface.co/MiniMaxAI/MiniMax-M1-80k",
+    "thumbnail_camera": [13, 9, 14],
+    "info": {
+      "english_name": "MiniMax-M1 (MiniMax, 2025) — 456B-A45.9B hybrid-attention reasoning MoE",
+      "summary": "456B-parameter Mixture-of-Experts reasoning model from MiniMax (45.9B activated per token). The signature feature is a HYBRID attention stack: 7 LIGHTNING-attention layers (linear-time, no KV cache) for every 1 SOFTMAX-attention layer (standard GQA with KV cache). Built on MiniMax-Text-01, then post-trained with the new CISPO RL algorithm over 41 days on H800s. 1 M-token native input context, 80 K output budget for very long chains-of-thought.",
+      "description": "MiniMax-M1 is the reasoning-extension of MiniMax-Text-01. The two carry the same architecture: 80 transformer layers, hidden 6144, 32 routed experts + 1 shared with top-2 routing, but the attention is HYBRID — lightning-attention (linear) layers replace standard softmax attention 7-out-of-8 times. Lightning attention is the right-product / kernel form of linear attention: it maintains a fixed-size hidden state S ∈ R^{d_k × d_v} that is updated per token, so the per-token cost is O(d_k · d_v) regardless of context. Only the 1-in-8 softmax layers see the full O(T) attention, and they use GQA. The result: at 1M context the attention compute and KV memory are dominated by the 10 softmax layers, not the 70 lightning layers — which makes 1M context economical.\n\nM1 specifically adds reasoning via CISPO (Clipped IS-weight Policy Optimisation): a sequence-level importance-sampling RL with token-level clipping designed to handle very long rollouts (up to 80K output tokens) without the variance blow-up that kills naïve PPO/GRPO at this length.\n\nDesign rationale, in one line each:\n• Lightning attention: linear-time attention with fixed-size state — 1M context becomes affordable.\n• 7:1 hybrid: pure linear attention loses associative recall; the 1-in-8 softmax layer restores it.\n• Sparse MoE (32 experts top-2): cheap per-token capacity at large total scale.\n• CISPO RL over 41 days: the training time itself is a feature — long-horizon reasoning needs many rollout steps.",
+      "facts": [
+        { "label": "total parameters",        "value": "456 B (45.9 B activated / token)" },
+        { "label": "context length",          "value": "1,000,000 tokens (input) / 80,000 (output budget)" },
+        { "label": "transformer layers (L)",  "value": "80 (70 lightning + 10 softmax)" },
+        { "label": "hidden dimension (d)",    "value": "6144" },
+        { "label": "vocabulary size",         "value": "≈ 200,000" },
+        { "label": "attention pattern",       "value": "7 LIGHTNING (linear) : 1 SOFTMAX (GQA)" },
+        { "label": "softmax heads",           "value": "64 Q / 8 KV (GQA, ratio 8)" },
+        { "label": "lightning kernel",        "value": "Right-product linear attention, ReLU feature map" },
+        { "label": "MoE per layer",           "value": "1 shared + 32 routed experts (top-2)" },
+        { "label": "expert intermediate dim", "value": "9216" },
+        { "label": "router gate",             "value": "Softmax (token-choice, with capacity factor)" },
+        { "label": "post-training RL",        "value": "CISPO (Clipped IS Policy Optimisation)" },
+        { "label": "RL training duration",    "value": "~41 days on 512× H800" },
+        { "label": "RL reward sources",       "value": "Math, code, agentic tool-use, software engineering" },
+        { "label": "optimiser",               "value": "AdamW (β1=0.9, β2=0.95)" },
+        { "label": "precision",               "value": "BF16 weights + FP8 GEMMs" }
+      ],
+      "comparisons": [
+        {
+          "versus": "vs MiniMax-Text-01 (Jan 2025)",
+          "delta": "MiniMax-Text-01 introduced the 7:1 lightning/softmax hybrid and the 32-expert MoE. M1 keeps the architecture EXACTLY but adds a long, stable RL-for-reasoning phase using CISPO. M1-80k is the same base weights with a much larger output budget (80K tokens vs 8K) — the architecture had to support 1M input from day one for this to work."
+        },
+        {
+          "versus": "vs MiniMax-Text-01 base & abab models (2023–24)",
+          "delta": "abab-class models were standard MoE Transformers with full softmax attention. MiniMax-Text-01 swapped 7-out-of-8 attention layers for lightning-attention linear-time layers, which is the single biggest change in MiniMax's history. M1 inherits all of that and only changes the post-training pipeline."
+        },
+        {
+          "versus": "vs DeepSeek-V3 (671B-A37B MoE) and DeepSeek-R1",
+          "delta": "Both are MoE reasoning models. DeepSeek-V3/R1 use ALL softmax attention (MLA-compressed) — M1 uses 7/8 LINEAR attention. At 1M context, M1's KV footprint is ~10× smaller than V3's because 70 of 80 layers carry no KV cache at all. M1 is also smaller per token (45.9B activated vs 37B — comparable). DeepSeek-R1 trained with GRPO; M1 trained with CISPO designed for longer rollouts."
+        },
+        {
+          "versus": "vs GPT-4-class peers and Claude-3.5/Opus",
+          "delta": "Public consensus says GPT-4 and Claude families use full softmax attention (likely with FlashAttention + GQA) and dense or coarse-MoE FFNs. M1 sits at a different point: it gives up some short-context attention quality in exchange for native 1M-token input being affordable. For long-document reasoning that trade is worth it; for short interactive chat, full-softmax peers retain a quality edge."
+        }
+      ],
+      "sources": [
+        { "title": "MiniMax-M1 technical report",          "url": "https://arxiv.org/abs/2506.13585" },
+        { "title": "MiniMax-M1 model card (HF)",           "url": "https://huggingface.co/MiniMaxAI/MiniMax-M1-80k" },
+        { "title": "MiniMax-Text-01 technical report",     "url": "https://arxiv.org/abs/2501.08313" },
+        { "title": "Lightning Attention (Transnormer-2)",  "url": "https://arxiv.org/abs/2401.04658" }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "input_plate",
+      "name": "Input Tokens (V≈200K)",
+      "shape": "box",
+      "position": [0, 0, 0],
+      "size": [4.0, 0.18, 2.2],
+      "material": "brushed graphite plate",
+      "role": "Token-ID stream. Tokeniser is MiniMax's BPE (~200K vocab).",
+      "compute_profile": "host-cpu",
+      "parallelism": "embarrassingly-parallel",
+      "connections": ["embedding_table"]
+    },
+    {
+      "id": "embedding_table",
+      "name": "Embedding (V≈200K, d=6144)",
+      "shape": "box",
+      "position": [0, 0.55, 0],
+      "size": [3.6, 0.32, 1.8],
+      "material": "indigo glass slab",
+      "role": "Tied embedding / LM head. ~1.23B params (~2.46 GiB BF16).",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "200K × 6144 × BF16 ≈ 2.46 GiB",
+      "parallelism": "tensor-parallel",
+      "connections": ["residual_pipe"]
+    },
+    {
+      "id": "residual_pipe",
+      "name": "Residual Stream (d=6144, 80 layers)",
+      "shape": "cylinder",
+      "position": [0, 5.6, 0],
+      "size": [0.18, 9.8],
+      "material": "translucent amber polymer",
+      "role": "Pre-norm RMSNorm residual carry through all 80 layers.",
+      "compute_profile": "gpu-memory-bound",
+      "parallelism": "tensor-parallel",
+      "connections": ["embedding_table", "block_lightning_1", "block_lightning_2", "block_lightning_3", "block_lightning_4", "block_softmax_1", "block_lightning_5", "block_lightning_6", "block_softmax_2", "block_softmax_3", "prediction_head"]
+    },
+    {
+      "id": "layer_count_marker",
+      "name": "× 80 Layers (7 LIGHTNING : 1 SOFTMAX)",
+      "shape": "box",
+      "position": [-2.3, 5.6, 0],
+      "size": [0.05, 9.0, 0.7],
+      "material": "etched graphite gridline",
+      "role": "Marker for the 80-layer depth: 70 lightning + 10 softmax. Pattern: L L L L L L L S repeating 10 times.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel"
+    },
+
+    { "id": "block_lightning_1", "name": "Block 1 — LIGHTNING (linear)",   "shape": "box", "position": [0, 1.4, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile",  "role": "Lightning-attention block. O(d_k·d_v) per token, NO KV cache.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel", "connections": ["lightning_state"] },
+    { "id": "block_lightning_2", "name": "Block 2 — LIGHTNING",            "shape": "box", "position": [0, 1.95, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile",  "role": "Lightning block 2.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_lightning_3", "name": "Block 3 — LIGHTNING",            "shape": "box", "position": [0, 2.5, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile",  "role": "Lightning block 3.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_lightning_4", "name": "Block 4 — LIGHTNING",            "shape": "box", "position": [0, 3.05, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile",  "role": "Lightning block 4.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_softmax_1",   "name": "Block 8 — SOFTMAX (GQA, 1M ctx)", "shape": "box", "position": [0, 3.7, 0], "size": [3.2, 0.55, 1.5], "material": "deep crimson tile", "role": "SOFTMAX attention block — full causal softmax over the 1M-token context. Carries the GQA KV cache. Restores associative recall that lightning attention loses.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["softmax_kv_cache"] },
+    { "id": "block_lightning_5", "name": "Block 9 — LIGHTNING",            "shape": "box", "position": [0, 4.35, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile",  "role": "Lightning block 9. Pattern resumes.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_lightning_6", "name": "Block 10 — LIGHTNING",           "shape": "box", "position": [0, 4.9, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile",  "role": "Lightning block 10.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_softmax_2",   "name": "Block 16 — SOFTMAX",             "shape": "box", "position": [0, 5.55, 0], "size": [3.2, 0.55, 1.5], "material": "deep crimson tile", "role": "Second softmax block. (Layers 11–15 lightning, elided.)", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+    { "id": "block_softmax_3",   "name": "Block 80 — SOFTMAX (final)",      "shape": "box", "position": [0, 8.2, 0], "size": [3.2, 0.55, 1.5], "material": "deep crimson tile", "role": "Final softmax block before the LM head.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
+
+    {
+      "id": "lightning_pre_norm",
+      "name": "Lightning · Pre-RMSNorm",
+      "shape": "box",
+      "position": [-1.8, 2.45, 0],
+      "size": [0.55, 0.18, 0.6],
+      "material": "matte ivory tile",
+      "role": "Pre-norm before the lightning sublayer.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": ["lightning_qkv_proj"]
+    },
+    {
+      "id": "lightning_qkv_proj",
+      "name": "Lightning · QKV Proj (+ feature map ϕ)",
+      "shape": "box",
+      "position": [-1.8, 2.85, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "anodised aluminium tile",
+      "role": "Project x to Q, K, V then apply a non-negative feature map ϕ (e.g. ReLU or 1+ELU) so that the linear-attention kernel ϕ(Q)·ϕ(K)^T is positive.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·d·(2·d_k + d_v) ≈ 200 MFLOP",
+      "parallelism": "tensor-parallel",
+      "algorithm": "Q = ϕ(x @ W_Q)\nK = ϕ(x @ W_K)\nV = x @ W_V",
+      "connections": ["lightning_kernel"]
+    },
+    {
+      "id": "lightning_kernel",
+      "name": "Lightning Attention Kernel (right-product)",
+      "shape": "box",
+      "position": [-1.8, 3.3, 0],
+      "size": [0.85, 0.28, 0.85],
+      "material": "electric cyan tile",
+      "role": "The core trick: maintain a recurrent state S ∈ R^{d_k × d_v} and a normaliser z ∈ R^{d_k}. Each token updates S += K_t ⊗ V_t and outputs Q_t @ S / (Q_t @ z). Per-token cost is O(d_k · d_v) — INDEPENDENT of context length.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "≈ 4·d_k·d_v ≈ 200 KFLOP — basically free vs softmax attention",
+      "memory_footprint": "S: d_k × d_v × dtype per-layer-per-sequence = ~1 MB / sequence / layer",
+      "parallelism": "sequential",
+      "algorithm": "# during decode (per token):\nS += outer(K_t, V_t)        # O(d_k · d_v)\nz += K_t                    # O(d_k)\nout_t = (Q_t @ S) / (Q_t @ z + eps)\n\n# during prefill (chunked):\n# split into chunks, parallel intra-chunk softmax-style,\n# pass S, z forward across chunks.",
+      "bottleneck": "Sequential along time during decode — no across-token parallelism. Chunked prefill recovers parallelism for long inputs.",
+      "improvement_ideas": [
+        "Chunk-parallel prefill (already used) to hide the recurrence.",
+        "Replace ReLU feature map with a learnt gating (Mamba / GLA-style) for better recall.",
+        "Hybridise with sliding-window per-layer for cheap local attention."
+      ],
+      "connections": ["lightning_state", "lightning_o_proj"]
+    },
+    {
+      "id": "lightning_state",
+      "name": "Lightning State (S, z) — fixed size",
+      "shape": "cylinder",
+      "position": [-2.5, 4.6, 0],
+      "size": [0.55, 0.55],
+      "material": "electric cyan torus",
+      "role": "Per-sequence per-layer recurrent state S ∈ R^{d_k × d_v}. Replaces the KV cache for lightning layers. Crucially, its SIZE IS INDEPENDENT of context length — that is what makes 1M-token context economical.",
+      "compute_profile": "gpu-memory-bound",
+      "memory_footprint": "≈ 1–2 MB per sequence per layer (independent of T!) — vs ~2 KB / token / layer for GQA KV.",
+      "parallelism": "data-parallel",
+      "algorithm": "# state stays in HBM (or registers during chunk compute)\nS, z = zeros(d_k, d_v), zeros(d_k)",
+      "improvement_ideas": [
+        "Quantise S to FP8 between chunks.",
+        "Allow per-head state expansion (Mamba-like) for richer memory."
+      ]
+    },
+    {
+      "id": "lightning_o_proj",
+      "name": "Lightning · O-Projection",
+      "shape": "box",
+      "position": [-1.8, 3.95, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "burnished bronze tile",
+      "role": "Output projection from d_v back to d.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": ["residual_pipe"]
+    },
+
+    {
+      "id": "softmax_qkv_proj",
+      "name": "Softmax · QKV Proj (GQA 64/8)",
+      "shape": "box",
+      "position": [1.8, 4.0, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "anodised aluminium tile",
+      "role": "QKV projection for the 1-in-8 softmax layers. 64 query heads share 8 KV heads.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "algorithm": "Q = x @ W_Q  # 64 heads\nK = x @ W_K  # 8 heads (GQA)\nV = x @ W_V  # 8 heads\nQ, K = apply_rope(Q, K, pos)",
+      "connections": ["softmax_attn_kernel"]
+    },
+    {
+      "id": "softmax_attn_kernel",
+      "name": "Softmax Attention (FlashAttention-2)",
+      "shape": "box",
+      "position": [1.8, 4.4, 0],
+      "size": [0.85, 0.28, 0.85],
+      "material": "deep crimson tile",
+      "role": "Standard causal softmax attention over the full 1M-token context. Only runs in 10 of 80 layers.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·n_h·d_h·T at training (huge at 1M ctx)",
+      "memory_footprint": "On-chip SRAM tile only.",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "out = flash_attn(Q, K, V, mask=causal)",
+      "bottleneck": "These 10 layers dominate attention compute and KV memory at 1M context.",
+      "improvement_ideas": [
+        "Ring-attention sharding across sequence parallelism for these 10 layers.",
+        "Sparse top-k attention for these layers (DeepSeek-V4 style)."
+      ],
+      "connections": ["softmax_kv_cache", "softmax_o_proj"]
+    },
+    {
+      "id": "softmax_o_proj",
+      "name": "Softmax · O-Projection",
+      "shape": "box",
+      "position": [1.8, 4.8, 0],
+      "size": [0.7, 0.22, 0.7],
+      "material": "burnished bronze tile",
+      "role": "Output projection back to d.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": ["residual_pipe"]
+    },
+    {
+      "id": "softmax_kv_cache",
+      "name": "Softmax KV Cache (10 layers only)",
+      "shape": "cylinder",
+      "position": [-3.5, 5.0, 0],
+      "size": [0.55, 6.0],
+      "material": "amber translucent silica",
+      "role": "Standard GQA KV cache for the 10 softmax layers. Lightning layers carry no cache. Net result at 1M ctx: ~10× less KV memory than an all-softmax model.",
+      "compute_profile": "memory-capacity-bound",
+      "memory_footprint": "≈ 2 × 8 × 128 × FP16 = 4 KB / token / softmax-layer; 10 layers × 1M ctx ≈ 38 GiB / sequence",
+      "parallelism": "tensor-parallel"
+    },
+
+    {
+      "id": "moe_router",
+      "name": "Top-2 Router (softmax, capacity)",
+      "shape": "cylinder",
+      "position": [6.0, 5.6, 0],
+      "size": [0.55, 0.18],
+      "material": "ruby-tinted glass disk",
+      "role": "Per-token softmax router over 32 experts, top-2. Token-choice with capacity factor; tokens above capacity fall through to the shared expert.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "≈ 2·d·32 ≈ 0.4 MFLOP",
+      "parallelism": "tensor-parallel",
+      "algorithm": "scores = softmax(x @ W_router)\ntopk_idx, topk_w = topk(scores, 2)\n# capacity gate:\nif over_capacity(topk_idx[0]): drop_to_shared(token)",
+      "connections": ["moe_routed_ring", "moe_alltoall"]
+    },
+    {
+      "id": "moe_routed_ring",
+      "name": "Routed Experts (32, top-2, d_ff=9216)",
+      "shape": "cylinder",
+      "position": [6.0, 4.8, 0],
+      "size": [1.9, 0.45],
+      "material": "iridescent micro-array",
+      "role": "Per-MoE-layer bank of 32 SwiGLU experts (d_ff=9216 — much wider than DeepSeek's fine-grained 3072).",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2 × (3 × 2·d·d_ff) ≈ 680 MFLOP / layer",
+      "memory_footprint": "32 × 3·d·d_ff × BF16 ≈ 36 GiB / layer; 80 layers ≈ 2.85 TiB",
+      "parallelism": "expert-parallel",
+      "algorithm": "for e in topk_idx[:2]:\n    h_e = silu(x @ W_gate[e]) * (x @ W_up[e])\n    y  += w_topk * (h_e @ W_down[e])",
+      "improvement_ideas": [
+        "Group GEMM to fuse the two expert calls.",
+        "FP4 weight-only quantisation on the expert GEMMs."
+      ]
+    },
+    {
+      "id": "moe_shared_expert",
+      "name": "Shared Expert (×1)",
+      "shape": "box",
+      "position": [6.0, 5.55, 0],
+      "size": [0.55, 0.55, 0.55],
+      "material": "polished platinum",
+      "role": "Always-on expert that absorbs dropped tokens and common computation.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel"
+    },
+    {
+      "id": "moe_alltoall",
+      "name": "Expert All-to-All",
+      "shape": "cylinder",
+      "position": [6.0, 6.55, 0],
+      "size": [1.0, 0.16],
+      "material": "copper coil ring",
+      "role": "NCCL all-to-all dispatch + combine. Smaller than DeepSeek-V4 because top-2 (not top-8).",
+      "compute_profile": "communication-bound",
+      "parallelism": "expert-parallel",
+      "algorithm": "grouped = bucket_by_expert(x, topk_idx)\nrecv    = nccl.all_to_all(grouped)\n# expert FFN ↓\nout_grp = bucket_by_origin(expert_out)\nout     = nccl.all_to_all(out_grp)",
+      "improvement_ideas": [
+        "Fuse with attention O-proj of the previous layer."
+      ]
+    },
+
+    {
+      "id": "prediction_head",
+      "name": "LM Head (tied)",
+      "shape": "box",
+      "position": [0, 9.05, 0],
+      "size": [3.4, 0.4, 1.6],
+      "material": "white marble slab",
+      "role": "Tied projection back to ~200K vocab.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈ 2·d·V ≈ 2.5 GFLOP",
+      "parallelism": "tensor-parallel",
+      "connections": ["lm_loss"]
+    },
+    {
+      "id": "lm_loss",
+      "name": "LM Loss (cross-entropy)",
+      "shape": "sphere",
+      "position": [-1.4, 10.0, 0],
+      "size": [0.28],
+      "material": "incandescent ivory",
+      "role": "Pre-training next-token loss.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "data-parallel"
+    },
+
+    {
+      "id": "cispo_trainer",
+      "name": "CISPO RL Trainer (clipped IS, 80K rollouts)",
+      "shape": "sphere",
+      "position": [2.5, 10.4, 0],
+      "size": [0.4],
+      "material": "incandescent ruby",
+      "role": "Clipped IS-weight Policy Optimisation. Sequence-level importance ratio with token-level clipping bounds variance on very long (up to 80K-token) reasoning rollouts. The single biggest reason M1 can be RL-trained for 41 days without diverging.",
+      "compute_profile": "communication-bound",
+      "parallelism": "data-parallel",
+      "algorithm": "for batch in rollouts:\n    rho = pi_new(τ) / pi_old(τ)            # sequence-level IS\n    rho = clip(rho, 1-ε_low, 1+ε_high)\n    A   = reward_model(τ) - baseline\n    loss = -mean( clip_token(rho) * A )    # token-level clip\n    policy.update(loss)",
+      "improvement_ideas": [
+        "Adaptive clipping ε from rollout-length statistics.",
+        "Off-policy replay across multiple training rounds."
+      ]
+    },
+    {
+      "id": "reward_models",
+      "name": "Reward Models (math / code / agent / SWE)",
+      "shape": "box",
+      "position": [4.5, 10.4, 0],
+      "size": [1.2, 0.5, 0.9],
+      "material": "deep navy slab",
+      "role": "Domain-specific reward sources used during CISPO RL: verifiable math/code rewards + learned agentic and SWE-bench rewards.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "data-parallel"
+    },
+
+    {
+      "id": "optimizer_adamw",
+      "name": "AdamW (β1=0.9, β2=0.95)",
+      "shape": "box",
+      "position": [-6.0, 4.0, 0],
+      "size": [1.4, 1.0, 1.0],
+      "material": "anodised navy block",
+      "role": "Standard AdamW for both pre-training and RL. ZeRO-1 sharding across DP.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "Adam state: 2× param size.",
+      "parallelism": "data-parallel"
+    },
+
+    {
+      "id": "parallelism_marker",
+      "name": "TP × EP × PP × DP (training plan)",
+      "shape": "box",
+      "position": [8.5, 5.0, 0],
+      "size": [1.4, 2.4, 0.8],
+      "material": "smoked acrylic translucent",
+      "role": "Multi-axis parallelism plan. Lightning layers parallelise differently from softmax: lightning needs a sequence-parallel chunked prefill + state-passing across PP boundaries; softmax uses standard TP.",
+      "compute_profile": "communication-bound",
+      "parallelism": "pipeline-parallel",
+      "improvement_ideas": [
+        "Pipeline lightning state with the activation transfer at PP boundaries."
+      ]
+    },
+    {
+      "id": "training_data_pipe",
+      "name": "Pre-training Corpus + Long-CoT RL (41 days)",
+      "shape": "box",
+      "position": [8.5, 0.6, 0],
+      "size": [1.4, 0.4, 0.8],
+      "material": "etched obsidian plate",
+      "role": "Pre-training data plate inherited from MiniMax-Text-01. M1 adds a 41-day CISPO RL phase on math/code/agent/SWE rollouts with long chains-of-thought.",
+      "compute_profile": "storage-bound",
+      "parallelism": "data-parallel"
+    }
+  ]
+}

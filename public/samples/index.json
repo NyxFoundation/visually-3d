@@ -154,6 +154,38 @@
       "path": "/samples/deepseek-v4-pro.json",
       "accent": "#7dd3fc",
       "category": "ml"
+    },
+    {
+      "id": "glm-4-5",
+      "title": "GLM-4.5",
+      "subtitle": "Z.ai 355B-A32B MoE — 96 deep-narrow layers, GQA(96/8), 160 routed + 1 shared expert, group-limited routing, MTP, hybrid think/no-think",
+      "path": "/samples/glm-4-5.json",
+      "accent": "#a78bfa",
+      "category": "ml"
+    },
+    {
+      "id": "gemma-3-27b",
+      "title": "Gemma 3 (27B)",
+      "subtitle": "Google DeepMind dense 27B multimodal — 5:1 local/global GQA, QK-Norm, dual RMSNorm, SigLIP+Pan&Scan vision, 128K ctx",
+      "path": "/samples/gemma-3-27b.json",
+      "accent": "#34d399",
+      "category": "ml"
+    },
+    {
+      "id": "minimax-m1",
+      "title": "MiniMax-M1",
+      "subtitle": "MiniMax 456B-A45.9B reasoning MoE — 7:1 lightning(linear)/softmax attention hybrid, 32 experts top-2, 1M ctx, CISPO RL (41-day)",
+      "path": "/samples/minimax-m1.json",
+      "accent": "#fb923c",
+      "category": "ml"
+    },
+    {
+      "id": "qwen3-235b",
+      "title": "Qwen3-235B-A22B",
+      "subtitle": "Alibaba 235B-A22B MoE — 94 layers, GQA(64/4) at extreme 16:1, 128 experts top-8 (no shared), QK-Norm, /think+/no_think, DCA+YaRN to 128K, 119 langs",
+      "path": "/samples/qwen3-235b.json",
+      "accent": "#22d3ee",
+      "category": "ml"
     }
   ]
 }
