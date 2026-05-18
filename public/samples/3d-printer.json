@@ -1,6 +1,6 @@
 {
   "machine_name": "Desktop FDM 3D Printer",
-  "assembly_instructions": "1. Bolt the four rubber feet under the lower aluminum extrusion rectangle. 2. Assemble the lower frame from front, rear, left, and right 2020 extrusion rails and square it before tightening. 3. Fasten the four vertical 2020 corner posts to the lower frame. 4. Install the upper front, rear, left, and right extrusion rails to complete the cube frame. 5. Mount the two vertical Z guide rods and two Z lead screws to the base and upper frame, then couple the rear Z motor to the left lead screw and belt the right screw from the same drive. 6. Fit the bed carriage plate to the Z nuts and guide rods, add four leveling screws and springs, then fasten the heated bed and glass build plate above it. 7. Install left and right Y linear rails on the top side rails, then bolt the X gantry rail between their moving blocks. 8. Mount the X carriage on the X rail, attach the extruder body, heat sink, cooling fan, heater block, thermistor, and brass nozzle. 9. Mount the two XY stepper motors and four idler pulleys at the top frame corners, then tension the belt spans around the gantry and carriage. 10. Attach the spool bracket and spindle to the right side of the top frame, load the filament spool, and feed 1.75 mm filament through the PTFE tube into the extruder. 11. Install the PSU, controller board, display, and cable harness, then verify frame square, bed travel, nozzle clearance, and belt tension before first calibration.",
+  "assembly_instructions": "1. Press the four rubber feet into the underside of the lower frame corners and place the lower front, rear, left, and right 2020 extrusions on a flat bench. 2. Bolt the lower extrusion rectangle together, add the four corner gusset plates, and square the base before tightening. 3. Fasten the four vertical 2020 posts to the lower frame and attach the upper front, rear, left, and right extrusions to form the cube frame. 4. Install the Z guide rods, lower bearing blocks, top bearings, lead screws, motor coupler, and synchronizing belt so both screws rotate together. 5. Bolt the bed carriage strips to the Z nuts and guide-rod bearing blocks, then install the four leveling screws, compression springs, and thumb knobs. 6. Fit the cutaway heated aluminum bed, silicone heater pad, and glass build-plate strips on the leveling screws, leaving the center open in this instructional model to expose the under-bed hardware. 7. Mount the left and right Y linear rails on the top side extrusions and bolt the Y carriage blocks to the moving X gantry rail. 8. Attach the X linear guide to the gantry, install the X carriage bearing, carriage plate, belt clamps, and local strain-relief clamp. 9. Mount the two CoreXY stepper motors, motor drive pulleys, rear idlers, front idlers, and pulley shafts, then route and tension the front, rear, side, crossed, and short carriage-side belt spans around the carriage. 10. Assemble the hotend on the carriage by stacking the extruder body, Bowden coupler, PTFE collar, heat sink, fan, heater block, heater cartridge, thermistor, and downward brass nozzle. 11. Attach the side spool bracket, paired side plates, diagonal braces, spindle, spool hub, flanges, and filament coil, then route the filament through the guide eyelet and segmented PTFE Bowden tube into the coupler. 12. Install the PSU, controller board, terminal block, display, segmented cable chain, hotend heater wires, and bed heater leads, then verify frame square, Z bed motion, nozzle clearance, belt tension, cable bend radius, and electrical continuity before calibration.",
   "metadata": {
     "domain": "additive-manufacturing",
     "thumbnail_camera": [
@@ -13,16 +13,19 @@
       "Nominal build volume represented as 235 mm x 235 mm x 250 mm, a common desktop FDM size class.",
       "Frame members are modeled as 20 mm square aluminum extrusions, scaled to 3.4 m scene width for visibility while preserving relative proportions.",
       "Filament path is sized for 1.75 mm filament and terminates at a 0.4 mm brass nozzle.",
-      "Heated bed glass plate is modeled as 2.35 m x 2.35 m x 0.06 m, corresponding to a 235 mm square build surface at 10:1 display scale.",
+      "The build plate is shown as cutaway strips equivalent to a 235 mm x 235 mm x 4-6 mm glass sheet so the heater and leveling hardware remain visible.",
       "Spool is represented as a 200 mm diameter by 70 mm wide 1 kg PLA spool, scaled to the scene.",
       "Z screws are represented as paired 8 mm lead screws with anti-backlash nuts supporting the bed carriage.",
       "XY belt spans represent 6 mm GT2 timing belts commonly used on desktop printers.",
-      "PSU is labeled as a 24 V, 350 W supply typical for bed-heated FDM machines."
+      "PSU is labeled as a 24 V, 350 W supply typical for bed-heated FDM machines.",
+      "NEMA-17 stepper motors are represented as 42 mm square bodies, scaled consistently with the frame.",
+      "Linear guide rails are shown as narrow steel bars with distinct carriage blocks so the X and Y motion axes can be traced visually."
     ],
     "sources": [
       "Prusa Research, Original Prusa i3 MK3S+ handbook and technical specifications for 1.75 mm filament, 0.4 mm nozzle, and 250 mm class Z travel.",
       "Voron Design V2.4 assembly manual for CoreXY belt routing, 2020 extrusion frame construction, and stationary gantry layout.",
-      "Creality Ender-3 S1 specifications for 220-235 mm class heated bed and 24 V desktop printer electronics."
+      "Creality Ender-3 S1 specifications for 220-235 mm class heated bed and 24 V desktop printer electronics.",
+      "Gates Industrial, PowerGrip GT2 synchronous belt design data for small-pitch timing belt geometry."
     ]
   },
   "parts": [
@@ -49,7 +52,9 @@
         "foot_fr",
         "post_fl",
         "post_fr",
-        "display_bezel"
+        "display_bezel",
+        "gusset_front_left",
+        "gusset_front_right"
       ]
     },
     {
@@ -76,7 +81,9 @@
         "post_rl",
         "post_rr",
         "psu_shell",
-        "controller_board"
+        "controller_board",
+        "gusset_rear_left",
+        "gusset_rear_right"
       ]
     },
     {
@@ -99,7 +106,8 @@
         "base_front_rail",
         "base_rear_rail",
         "z_rod_left",
-        "z_leadscrew_left"
+        "z_leadscrew_left",
+        "z_lower_bearing_left"
       ]
     },
     {
@@ -123,7 +131,9 @@
         "base_rear_rail",
         "z_rod_right",
         "z_leadscrew_right",
-        "spool_lower_brace"
+        "spool_lower_brace",
+        "spool_lower_brace_rear",
+        "z_lower_bearing_right"
       ]
     },
     {
@@ -203,6 +213,94 @@
       ]
     },
     {
+      "id": "gusset_front_left",
+      "name": "Front Left Base Gusset Plate",
+      "shape": "box",
+      "position": [
+        -1.55,
+        0.32,
+        -1.55
+      ],
+      "size": [
+        0.34,
+        0.06,
+        0.34
+      ],
+      "material": "steel",
+      "role": "Flat corner plate that keeps the front-left lower extrusion joint square.",
+      "connections": [
+        "base_front_rail",
+        "base_left_rail",
+        "post_fl"
+      ]
+    },
+    {
+      "id": "gusset_front_right",
+      "name": "Front Right Base Gusset Plate",
+      "shape": "box",
+      "position": [
+        1.55,
+        0.32,
+        -1.55
+      ],
+      "size": [
+        0.34,
+        0.06,
+        0.34
+      ],
+      "material": "steel",
+      "role": "Flat corner plate that keeps the front-right lower extrusion joint square.",
+      "connections": [
+        "base_front_rail",
+        "base_right_rail",
+        "post_fr"
+      ]
+    },
+    {
+      "id": "gusset_rear_left",
+      "name": "Rear Left Base Gusset Plate",
+      "shape": "box",
+      "position": [
+        -1.55,
+        0.32,
+        1.55
+      ],
+      "size": [
+        0.34,
+        0.06,
+        0.34
+      ],
+      "material": "steel",
+      "role": "Flat corner plate that keeps the rear-left lower extrusion joint square.",
+      "connections": [
+        "base_rear_rail",
+        "base_left_rail",
+        "post_rl"
+      ]
+    },
+    {
+      "id": "gusset_rear_right",
+      "name": "Rear Right Base Gusset Plate",
+      "shape": "box",
+      "position": [
+        1.55,
+        0.32,
+        1.55
+      ],
+      "size": [
+        0.34,
+        0.06,
+        0.34
+      ],
+      "material": "steel",
+      "role": "Flat corner plate that keeps the rear-right lower extrusion joint square.",
+      "connections": [
+        "base_rear_rail",
+        "base_right_rail",
+        "post_rr"
+      ]
+    },
+    {
       "id": "post_fl",
       "name": "Front Left Vertical 2020 Post",
       "shape": "box",
@@ -221,7 +319,8 @@
       "connections": [
         "base_front_rail",
         "top_front_rail",
-        "top_left_rail"
+        "top_left_rail",
+        "gusset_front_left"
       ]
     },
     {
@@ -243,7 +342,8 @@
       "connections": [
         "base_front_rail",
         "top_front_rail",
-        "top_right_rail"
+        "top_right_rail",
+        "gusset_front_right"
       ]
     },
     {
@@ -265,7 +365,8 @@
       "connections": [
         "base_rear_rail",
         "top_rear_rail",
-        "top_left_rail"
+        "top_left_rail",
+        "gusset_rear_left"
       ]
     },
     {
@@ -287,7 +388,8 @@
       "connections": [
         "base_rear_rail",
         "top_rear_rail",
-        "top_right_rail"
+        "top_right_rail",
+        "gusset_rear_right"
       ]
     },
     {
@@ -329,13 +431,15 @@
         0.16
       ],
       "material": "dark anodized aluminum",
-      "role": "Top rear crossmember that supports the XY motors and rear belt span.",
+      "role": "Top rear crossmember that supports the XY motors, rear idlers, and rear belt span.",
       "connections": [
         "post_rl",
         "post_rr",
         "xy_motor_left",
         "xy_motor_right",
-        "belt_rear_span"
+        "belt_rear_span",
+        "idler_rear_left",
+        "idler_rear_right"
       ]
     },
     {
@@ -357,7 +461,8 @@
       "connections": [
         "post_fl",
         "post_rl",
-        "y_linear_rail_left"
+        "y_linear_rail_left",
+        "z_top_bearing_left"
       ]
     },
     {
@@ -380,7 +485,8 @@
         "post_fr",
         "post_rr",
         "y_linear_rail_right",
-        "spool_upper_bracket"
+        "spool_upper_bracket",
+        "z_top_bearing_right"
       ]
     },
     {
@@ -401,7 +507,8 @@
       "connections": [
         "base_left_rail",
         "top_left_rail",
-        "bed_carriage"
+        "bed_carriage_left_strip",
+        "z_lower_bearing_left"
       ]
     },
     {
@@ -422,7 +529,50 @@
       "connections": [
         "base_right_rail",
         "top_right_rail",
-        "bed_carriage"
+        "bed_carriage_right_strip",
+        "z_lower_bearing_right"
+      ]
+    },
+    {
+      "id": "z_lower_bearing_left",
+      "name": "Left Lower Z Rod Bearing Block",
+      "shape": "box",
+      "position": [
+        -1.25,
+        0.42,
+        1.25
+      ],
+      "size": [
+        0.28,
+        0.16,
+        0.28
+      ],
+      "material": "steel",
+      "role": "Lower bearing block that fixes the left vertical guide rod to the base frame.",
+      "connections": [
+        "base_left_rail",
+        "z_rod_left"
+      ]
+    },
+    {
+      "id": "z_lower_bearing_right",
+      "name": "Right Lower Z Rod Bearing Block",
+      "shape": "box",
+      "position": [
+        1.25,
+        0.42,
+        1.25
+      ],
+      "size": [
+        0.28,
+        0.16,
+        0.28
+      ],
+      "material": "steel",
+      "role": "Lower bearing block that fixes the right vertical guide rod to the base frame.",
+      "connections": [
+        "base_right_rail",
+        "z_rod_right"
       ]
     },
     {
@@ -444,7 +594,9 @@
         "base_left_rail",
         "top_left_rail",
         "z_nut_left",
-        "z_motor"
+        "z_motor",
+        "z_coupler_left",
+        "z_top_bearing_left"
       ]
     },
     {
@@ -466,7 +618,49 @@
         "base_right_rail",
         "top_right_rail",
         "z_nut_right",
-        "z_sync_belt"
+        "z_sync_belt",
+        "z_coupler_right",
+        "z_top_bearing_right"
+      ]
+    },
+    {
+      "id": "z_top_bearing_left",
+      "name": "Left Z Top Bearing",
+      "shape": "cylinder",
+      "position": [
+        -1.25,
+        2.92,
+        -1.25
+      ],
+      "size": [
+        0.12,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Upper bearing that keeps the left lead screw concentric with the frame.",
+      "connections": [
+        "top_left_rail",
+        "z_leadscrew_left"
+      ]
+    },
+    {
+      "id": "z_top_bearing_right",
+      "name": "Right Z Top Bearing",
+      "shape": "cylinder",
+      "position": [
+        1.25,
+        2.92,
+        -1.25
+      ],
+      "size": [
+        0.12,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Upper bearing that keeps the right lead screw concentric with the frame.",
+      "connections": [
+        "top_right_rail",
+        "z_leadscrew_right"
       ]
     },
     {
@@ -488,6 +682,47 @@
       "connections": [
         "base_rear_rail",
         "z_leadscrew_left",
+        "z_sync_belt",
+        "z_coupler_left"
+      ]
+    },
+    {
+      "id": "z_coupler_left",
+      "name": "Left Flexible Z Coupler",
+      "shape": "cylinder",
+      "position": [
+        -1.25,
+        0.73,
+        -1.25
+      ],
+      "size": [
+        0.08,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Flexible shaft coupler joining the Z motor output to the left lead screw.",
+      "connections": [
+        "z_motor",
+        "z_leadscrew_left"
+      ]
+    },
+    {
+      "id": "z_coupler_right",
+      "name": "Right Z Belt Pulley",
+      "shape": "cylinder",
+      "position": [
+        1.25,
+        0.58,
+        -1.25
+      ],
+      "size": [
+        0.11,
+        0.12
+      ],
+      "material": "brushed steel",
+      "role": "Pulley on the right lead screw that receives torque from the synchronizing belt.",
+      "connections": [
+        "z_leadscrew_right",
         "z_sync_belt"
       ]
     },
@@ -510,7 +745,8 @@
       "connections": [
         "z_leadscrew_left",
         "z_leadscrew_right",
-        "z_motor"
+        "z_motor",
+        "z_coupler_right"
       ]
     },
     {
@@ -530,7 +766,8 @@
       "role": "Threaded brass nut fixed to the carriage so the left lead screw can lift the bed.",
       "connections": [
         "z_leadscrew_left",
-        "bed_carriage"
+        "bed_carriage_front_strip",
+        "bed_carriage_left_strip"
       ]
     },
     {
@@ -550,98 +787,441 @@
       "role": "Threaded brass nut fixed to the carriage so the right lead screw can lift the bed.",
       "connections": [
         "z_leadscrew_right",
-        "bed_carriage"
+        "bed_carriage_front_strip",
+        "bed_carriage_right_strip"
       ]
     },
     {
-      "id": "bed_carriage",
-      "name": "Aluminum Bed Carriage Plate",
+      "id": "bed_carriage_front_strip",
+      "name": "Cutaway Bed Carriage Front Strip",
       "shape": "box",
       "position": [
         0,
         0.92,
-        0
+        -1.08
       ],
       "size": [
         2.55,
         0.08,
-        2.55
+        0.22
       ],
       "material": "aluminum",
-      "role": "Rigid moving plate that connects Z nuts, guide bearings, and bed leveling hardware.",
+      "role": "Front strip of the cutaway moving carriage exposing the Z nuts and underside hardware.",
       "connections": [
-        "z_rod_left",
-        "z_rod_right",
         "z_nut_left",
         "z_nut_right",
         "level_spring_fl",
         "level_spring_fr",
+        "bed_carriage_left_strip",
+        "bed_carriage_right_strip"
+      ]
+    },
+    {
+      "id": "bed_carriage_rear_strip",
+      "name": "Cutaway Bed Carriage Rear Strip",
+      "shape": "box",
+      "position": [
+        0,
+        0.92,
+        1.08
+      ],
+      "size": [
+        2.55,
+        0.08,
+        0.22
+      ],
+      "material": "aluminum",
+      "role": "Rear strip of the cutaway moving carriage supporting the rear leveling springs.",
+      "connections": [
+        "level_spring_rl",
+        "level_spring_rr",
+        "bed_carriage_left_strip",
+        "bed_carriage_right_strip"
+      ]
+    },
+    {
+      "id": "bed_carriage_left_strip",
+      "name": "Cutaway Bed Carriage Left Strip",
+      "shape": "box",
+      "position": [
+        -1.08,
+        0.92,
+        0
+      ],
+      "size": [
+        0.22,
+        0.08,
+        2.55
+      ],
+      "material": "aluminum",
+      "role": "Left side strip of the carriage connecting the guide rod bearing to the bed support frame.",
+      "connections": [
+        "z_rod_left",
+        "bed_carriage_front_strip",
+        "bed_carriage_rear_strip"
+      ]
+    },
+    {
+      "id": "bed_carriage_right_strip",
+      "name": "Cutaway Bed Carriage Right Strip",
+      "shape": "box",
+      "position": [
+        1.08,
+        0.92,
+        0
+      ],
+      "size": [
+        0.22,
+        0.08,
+        2.55
+      ],
+      "material": "aluminum",
+      "role": "Right side strip of the carriage connecting the guide rod bearing to the bed support frame.",
+      "connections": [
+        "z_rod_right",
+        "bed_carriage_front_strip",
+        "bed_carriage_rear_strip"
+      ]
+    },
+    {
+      "id": "heated_bed_front_strip",
+      "name": "Cutaway Heated Bed Front Strip",
+      "shape": "box",
+      "position": [
+        0,
+        1.08,
+        -1.08
+      ],
+      "size": [
+        2.4,
+        0.07,
+        0.24
+      ],
+      "material": "aluminum",
+      "role": "Front edge of the heated bed left in place while the center is cut away for visibility.",
+      "connections": [
+        "bed_carriage_front_strip",
+        "glass_plate_front_strip",
+        "bed_heater_pad_front_strip",
+        "level_spring_fl",
+        "level_spring_fr"
+      ]
+    },
+    {
+      "id": "heated_bed_rear_strip",
+      "name": "Cutaway Heated Bed Rear Strip",
+      "shape": "box",
+      "position": [
+        0,
+        1.08,
+        1.08
+      ],
+      "size": [
+        2.4,
+        0.07,
+        0.24
+      ],
+      "material": "aluminum",
+      "role": "Rear edge of the heated bed showing the full platform outline without hiding the carriage.",
+      "connections": [
+        "bed_carriage_rear_strip",
+        "glass_plate_rear_strip",
+        "bed_heater_pad_rear_strip",
         "level_spring_rl",
         "level_spring_rr"
       ]
     },
     {
-      "id": "heated_bed",
-      "name": "Heated Aluminum Bed",
+      "id": "heated_bed_left_strip",
+      "name": "Cutaway Heated Bed Left Strip",
       "shape": "box",
       "position": [
-        0,
+        -1.08,
         1.08,
         0
       ],
       "size": [
-        2.4,
+        0.24,
         0.07,
-        2.4
+        2
       ],
       "material": "aluminum",
-      "role": "Flat heated build platform that spreads heat under the removable glass plate.",
+      "role": "Left edge of the heated bed completing the visible cutaway build surface perimeter.",
       "connections": [
-        "bed_carriage",
-        "glass_build_plate",
-        "bed_heater_pad"
+        "bed_carriage_left_strip",
+        "glass_plate_left_strip",
+        "bed_heater_pad_left_strip"
       ]
     },
     {
-      "id": "bed_heater_pad",
-      "name": "Silicone Heater Pad",
+      "id": "heated_bed_right_strip",
+      "name": "Cutaway Heated Bed Right Strip",
+      "shape": "box",
+      "position": [
+        1.08,
+        1.08,
+        0
+      ],
+      "size": [
+        0.24,
+        0.07,
+        2
+      ],
+      "material": "aluminum",
+      "role": "Right edge of the heated bed completing the visible cutaway build surface perimeter.",
+      "connections": [
+        "bed_carriage_right_strip",
+        "glass_plate_right_strip",
+        "bed_heater_pad_right_strip"
+      ]
+    },
+    {
+      "id": "bed_heater_pad_front_strip",
+      "name": "Cutaway Silicone Heater Front Strip",
       "shape": "box",
       "position": [
         0,
         1.015,
-        0
+        -1.08
       ],
       "size": [
-        2.25,
+        2.2,
         0.035,
-        2.25
+        0.16
       ],
       "material": "rubber",
-      "role": "Flexible heater bonded under the bed to bring the build surface to printing temperature.",
+      "role": "Front section of the heater pad visible below the aluminum bed strip.",
       "connections": [
-        "heated_bed",
+        "heated_bed_front_strip",
         "controller_board",
         "psu_shell"
       ]
     },
     {
-      "id": "glass_build_plate",
-      "name": "Borosilicate Glass Build Plate",
+      "id": "bed_heater_pad_rear_strip",
+      "name": "Cutaway Silicone Heater Rear Strip",
+      "shape": "box",
+      "position": [
+        0,
+        1.015,
+        1.08
+      ],
+      "size": [
+        2.2,
+        0.035,
+        0.16
+      ],
+      "material": "rubber",
+      "role": "Rear section of the heater pad showing where bed heat is applied underneath.",
+      "connections": [
+        "heated_bed_rear_strip",
+        "bed_heater_lead_pair"
+      ]
+    },
+    {
+      "id": "bed_heater_pad_left_strip",
+      "name": "Cutaway Silicone Heater Left Strip",
+      "shape": "box",
+      "position": [
+        -1.08,
+        1.015,
+        0
+      ],
+      "size": [
+        0.16,
+        0.035,
+        1.9
+      ],
+      "material": "rubber",
+      "role": "Left section of the silicone heater pad exposed by the cutaway build surface.",
+      "connections": [
+        "heated_bed_left_strip",
+        "bed_heater_lead_pair"
+      ]
+    },
+    {
+      "id": "bed_heater_pad_right_strip",
+      "name": "Cutaway Silicone Heater Right Strip",
+      "shape": "box",
+      "position": [
+        1.08,
+        1.015,
+        0
+      ],
+      "size": [
+        0.16,
+        0.035,
+        1.9
+      ],
+      "material": "rubber",
+      "role": "Right section of the silicone heater pad exposed by the cutaway build surface.",
+      "connections": [
+        "heated_bed_right_strip",
+        "bed_heater_lead_pair"
+      ]
+    },
+    {
+      "id": "glass_plate_front_strip",
+      "name": "Cutaway Glass Build Plate Front Strip",
       "shape": "box",
       "position": [
         0,
         1.15,
-        0
+        -1.08
       ],
       "size": [
         2.35,
         0.055,
-        2.35
+        0.2
       ],
       "material": "glass display",
-      "role": "Removable flat glass surface that defines the 235 mm square print area.",
+      "role": "Front edge of the removable glass build surface, cut away to expose under-bed parts.",
       "connections": [
-        "heated_bed"
+        "heated_bed_front_strip"
+      ]
+    },
+    {
+      "id": "glass_plate_rear_strip",
+      "name": "Cutaway Glass Build Plate Rear Strip",
+      "shape": "box",
+      "position": [
+        0,
+        1.15,
+        1.08
+      ],
+      "size": [
+        2.35,
+        0.055,
+        0.2
+      ],
+      "material": "glass display",
+      "role": "Rear edge of the removable glass build surface showing the 235 mm class bed outline.",
+      "connections": [
+        "heated_bed_rear_strip"
+      ]
+    },
+    {
+      "id": "glass_plate_left_strip",
+      "name": "Cutaway Glass Build Plate Left Strip",
+      "shape": "box",
+      "position": [
+        -1.08,
+        1.15,
+        0
+      ],
+      "size": [
+        0.2,
+        0.055,
+        1.95
+      ],
+      "material": "glass display",
+      "role": "Left glass edge that keeps the build area recognizable while leaving the center open.",
+      "connections": [
+        "heated_bed_left_strip"
+      ]
+    },
+    {
+      "id": "glass_plate_right_strip",
+      "name": "Cutaway Glass Build Plate Right Strip",
+      "shape": "box",
+      "position": [
+        1.08,
+        1.15,
+        0
+      ],
+      "size": [
+        0.2,
+        0.055,
+        1.95
+      ],
+      "material": "glass display",
+      "role": "Right glass edge that keeps the build area recognizable while leaving the center open.",
+      "connections": [
+        "heated_bed_right_strip"
+      ]
+    },
+    {
+      "id": "level_screw_fl",
+      "name": "Front Left Leveling Screw",
+      "shape": "cylinder",
+      "position": [
+        -1,
+        0.99,
+        -1
+      ],
+      "size": [
+        0.025,
+        0.36
+      ],
+      "material": "steel",
+      "role": "Threaded screw passing through the front-left spring and setting local bed height.",
+      "connections": [
+        "level_spring_fl",
+        "level_knob_fl",
+        "heated_bed_front_strip"
+      ]
+    },
+    {
+      "id": "level_screw_fr",
+      "name": "Front Right Leveling Screw",
+      "shape": "cylinder",
+      "position": [
+        1,
+        0.99,
+        -1
+      ],
+      "size": [
+        0.025,
+        0.36
+      ],
+      "material": "steel",
+      "role": "Threaded screw passing through the front-right spring and setting local bed height.",
+      "connections": [
+        "level_spring_fr",
+        "level_knob_fr",
+        "heated_bed_front_strip"
+      ]
+    },
+    {
+      "id": "level_screw_rl",
+      "name": "Rear Left Leveling Screw",
+      "shape": "cylinder",
+      "position": [
+        -1,
+        0.99,
+        1
+      ],
+      "size": [
+        0.025,
+        0.36
+      ],
+      "material": "steel",
+      "role": "Threaded screw passing through the rear-left spring and setting local bed height.",
+      "connections": [
+        "level_spring_rl",
+        "level_knob_rl",
+        "heated_bed_rear_strip"
+      ]
+    },
+    {
+      "id": "level_screw_rr",
+      "name": "Rear Right Leveling Screw",
+      "shape": "cylinder",
+      "position": [
+        1,
+        0.99,
+        1
+      ],
+      "size": [
+        0.025,
+        0.36
+      ],
+      "material": "steel",
+      "role": "Threaded screw passing through the rear-right spring and setting local bed height.",
+      "connections": [
+        "level_spring_rr",
+        "level_knob_rr",
+        "heated_bed_rear_strip"
       ]
     },
     {
@@ -660,9 +1240,10 @@
       "material": "steel",
       "role": "Compression spring around the front-left leveling screw to preload the bed.",
       "connections": [
-        "bed_carriage",
-        "heated_bed",
-        "level_knob_fl"
+        "bed_carriage_front_strip",
+        "heated_bed_front_strip",
+        "level_knob_fl",
+        "level_screw_fl"
       ]
     },
     {
@@ -681,9 +1262,10 @@
       "material": "steel",
       "role": "Compression spring around the front-right leveling screw to preload the bed.",
       "connections": [
-        "bed_carriage",
-        "heated_bed",
-        "level_knob_fr"
+        "bed_carriage_front_strip",
+        "heated_bed_front_strip",
+        "level_knob_fr",
+        "level_screw_fr"
       ]
     },
     {
@@ -702,9 +1284,10 @@
       "material": "steel",
       "role": "Compression spring around the rear-left leveling screw to preload the bed.",
       "connections": [
-        "bed_carriage",
-        "heated_bed",
-        "level_knob_rl"
+        "bed_carriage_rear_strip",
+        "heated_bed_rear_strip",
+        "level_knob_rl",
+        "level_screw_rl"
       ]
     },
     {
@@ -723,9 +1306,10 @@
       "material": "steel",
       "role": "Compression spring around the rear-right leveling screw to preload the bed.",
       "connections": [
-        "bed_carriage",
-        "heated_bed",
-        "level_knob_rr"
+        "bed_carriage_rear_strip",
+        "heated_bed_rear_strip",
+        "level_knob_rr",
+        "level_screw_rr"
       ]
     },
     {
@@ -744,7 +1328,8 @@
       "material": "black composite",
       "role": "Thumb wheel that adjusts the front-left bed screw height.",
       "connections": [
-        "level_spring_fl"
+        "level_spring_fl",
+        "level_screw_fl"
       ]
     },
     {
@@ -763,7 +1348,8 @@
       "material": "black composite",
       "role": "Thumb wheel that adjusts the front-right bed screw height.",
       "connections": [
-        "level_spring_fr"
+        "level_spring_fr",
+        "level_screw_fr"
       ]
     },
     {
@@ -782,7 +1368,8 @@
       "material": "black composite",
       "role": "Thumb wheel that adjusts the rear-left bed screw height.",
       "connections": [
-        "level_spring_rl"
+        "level_spring_rl",
+        "level_screw_rl"
       ]
     },
     {
@@ -801,7 +1388,8 @@
       "material": "black composite",
       "role": "Thumb wheel that adjusts the rear-right bed screw height.",
       "connections": [
-        "level_spring_rr"
+        "level_spring_rr",
+        "level_screw_rr"
       ]
     },
     {
@@ -910,7 +1498,8 @@
         "y_carriage_left",
         "y_carriage_right",
         "x_linear_rail",
-        "x_carriage_plate"
+        "x_carriage_plate",
+        "cable_chain_link_6"
       ]
     },
     {
@@ -931,6 +1520,27 @@
       "role": "Steel guide on the X extrusion that constrains the print-head carriage.",
       "connections": [
         "x_gantry_rail",
+        "x_carriage_bearing"
+      ]
+    },
+    {
+      "id": "x_carriage_bearing",
+      "name": "X Linear Bearing Block",
+      "shape": "box",
+      "position": [
+        0.42,
+        2.91,
+        0.02
+      ],
+      "size": [
+        0.34,
+        0.12,
+        0.16
+      ],
+      "material": "steel",
+      "role": "Bearing block riding on the X linear rail and carrying the print-head plate.",
+      "connections": [
+        "x_linear_rail",
         "x_carriage_plate"
       ]
     },
@@ -951,10 +1561,61 @@
       "material": "aluminum",
       "role": "Moving plate that ties the belts, linear bearing, and hotend assembly together.",
       "connections": [
-        "x_linear_rail",
+        "x_carriage_bearing",
         "extruder_body",
         "belt_front_span",
-        "belt_rear_span"
+        "belt_rear_span",
+        "belt_clamp_upper",
+        "belt_clamp_lower",
+        "hotend_strain_relief"
+      ]
+    },
+    {
+      "id": "belt_clamp_upper",
+      "name": "Upper Belt Clamp on X Carriage",
+      "shape": "box",
+      "position": [
+        0.42,
+        2.96,
+        -0.18
+      ],
+      "size": [
+        0.34,
+        0.08,
+        0.06
+      ],
+      "material": "black composite",
+      "role": "Clamp block fastening the upper CoreXY belt run to the moving carriage.",
+      "connections": [
+        "x_carriage_plate",
+        "belt_front_span",
+        "belt_cross_left_to_carriage",
+        "belt_short_upper_left",
+        "belt_short_upper_right"
+      ]
+    },
+    {
+      "id": "belt_clamp_lower",
+      "name": "Lower Belt Clamp on X Carriage",
+      "shape": "box",
+      "position": [
+        0.42,
+        2.72,
+        -0.18
+      ],
+      "size": [
+        0.34,
+        0.08,
+        0.06
+      ],
+      "material": "black composite",
+      "role": "Clamp block fastening the lower CoreXY belt run to the moving carriage.",
+      "connections": [
+        "x_carriage_plate",
+        "belt_rear_span",
+        "belt_cross_right_to_carriage",
+        "belt_short_lower_left",
+        "belt_short_lower_right"
       ]
     },
     {
@@ -977,7 +1638,8 @@
         "x_carriage_plate",
         "heat_sink",
         "bowden_coupler",
-        "filament_strand"
+        "filament_feed_segment_hotend",
+        "ptfe_collar"
       ]
     },
     {
@@ -997,16 +1659,194 @@
       "role": "Threaded coupler that clamps the PTFE tube above the extruder body.",
       "connections": [
         "extruder_body",
-        "ptfe_tube"
+        "ptfe_tube_arc_5",
+        "ptfe_collar"
       ]
     },
     {
-      "id": "ptfe_tube",
-      "name": "Curved PTFE Filament Tube",
+      "id": "ptfe_collar",
+      "name": "Blue PTFE Retaining Collar",
+      "shape": "torus",
+      "position": [
+        0.42,
+        3.02,
+        -0.18
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        0.012
+      ],
+      "material": "fiberglass",
+      "role": "Small clip collar that locks the Bowden tube in the pneumatic coupler.",
+      "connections": [
+        "bowden_coupler",
+        "extruder_body",
+        "ptfe_tube_arc_5"
+      ]
+    },
+    {
+      "id": "ptfe_tube_arc_1",
+      "name": "Bowden Tube Arc Segment 1",
       "shape": "capsule",
       "position": [
-        1.38,
-        3.05,
+        1.74,
+        3.17,
+        -0.92
+      ],
+      "rotation": [
+        0.1,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.42
+      ],
+      "material": "white composite",
+      "role": "First short PTFE tube segment leaving the spool guide with a shallow downward bend.",
+      "connections": [
+        "spool_guide_eyelet",
+        "ptfe_support_clip",
+        "ptfe_tube_arc_2"
+      ]
+    },
+    {
+      "id": "ptfe_tube_arc_2",
+      "name": "Bowden Tube Arc Segment 2",
+      "shape": "capsule",
+      "position": [
+        1.45,
+        3.12,
+        -0.82
+      ],
+      "rotation": [
+        0.25,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.42
+      ],
+      "material": "white composite",
+      "role": "Second PTFE segment that makes the feed path visibly flexible instead of a rigid bar.",
+      "connections": [
+        "ptfe_tube_arc_1",
+        "ptfe_tube_arc_3",
+        "ptfe_support_clip"
+      ]
+    },
+    {
+      "id": "ptfe_tube_arc_3",
+      "name": "Bowden Tube Arc Segment 3",
+      "shape": "capsule",
+      "position": [
+        1.13,
+        3.06,
+        -0.64
+      ],
+      "rotation": [
+        0.42,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.45
+      ],
+      "material": "white composite",
+      "role": "Middle PTFE segment arcing inward from the right frame toward the print head.",
+      "connections": [
+        "ptfe_tube_arc_2",
+        "ptfe_tube_arc_4"
+      ]
+    },
+    {
+      "id": "ptfe_tube_arc_4",
+      "name": "Bowden Tube Arc Segment 4",
+      "shape": "capsule",
+      "position": [
+        0.82,
+        3,
+        -0.42
+      ],
+      "rotation": [
+        0.58,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.45
+      ],
+      "material": "white composite",
+      "role": "Lowering PTFE segment that routes the tube cleanly toward the hotend coupler.",
+      "connections": [
+        "ptfe_tube_arc_3",
+        "ptfe_tube_arc_5",
+        "filament_feed_segment_hotend"
+      ]
+    },
+    {
+      "id": "ptfe_tube_arc_5",
+      "name": "Bowden Tube Arc Segment 5",
+      "shape": "capsule",
+      "position": [
+        0.56,
+        2.98,
+        -0.27
+      ],
+      "rotation": [
+        0.78,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.32
+      ],
+      "material": "white composite",
+      "role": "Final short PTFE segment seated in the Bowden coupler above the extruder.",
+      "connections": [
+        "ptfe_tube_arc_4",
+        "bowden_coupler",
+        "ptfe_collar"
+      ]
+    },
+    {
+      "id": "ptfe_support_clip",
+      "name": "PTFE Tube Frame Clip",
+      "shape": "box",
+      "position": [
+        1.36,
+        3.18,
+        -0.95
+      ],
+      "size": [
+        0.18,
+        0.12,
+        0.1
+      ],
+      "material": "black composite",
+      "role": "Clip on the right top rail that prevents the Bowden tube from sagging into the gantry.",
+      "connections": [
+        "top_right_rail",
+        "ptfe_tube_arc_1",
+        "ptfe_tube_arc_2"
+      ]
+    },
+    {
+      "id": "filament_feed_segment_spool",
+      "name": "Filament Strand from Spool",
+      "shape": "capsule",
+      "position": [
+        2.18,
+        3.18,
         -0.95
       ],
       "rotation": [
@@ -1015,40 +1855,38 @@
         1.5708
       ],
       "size": [
-        0.035,
-        1.9
+        0.018,
+        0.62
       ],
-      "material": "white composite",
-      "role": "Visible Bowden tube spanning from the side spool area to the moving extruder.",
+      "material": "brass",
+      "role": "1.75 mm filament leaving the coil and entering the guide eyelet.",
       "connections": [
-        "bowden_coupler",
-        "spool_spindle",
-        "filament_strand"
+        "filament_coil",
+        "spool_guide_eyelet"
       ]
     },
     {
-      "id": "filament_strand",
-      "name": "Amber Filament Strand",
+      "id": "filament_feed_segment_hotend",
+      "name": "Filament Strand into Hotend",
       "shape": "capsule",
       "position": [
-        1.62,
-        2.88,
-        -1.15
+        0.72,
+        2.92,
+        -0.35
       ],
       "rotation": [
-        0,
+        0.35,
         0,
         1.5708
       ],
       "size": [
         0.018,
-        1.55
+        0.75
       ],
       "material": "brass",
-      "role": "1.75 mm filament path showing how material leaves the spool and enters the extruder.",
+      "role": "Visible filament section inside the final Bowden-tube run before the extruder body.",
       "connections": [
-        "spool_hub",
-        "ptfe_tube",
+        "ptfe_tube_arc_4",
         "extruder_body"
       ]
     },
@@ -1071,7 +1909,49 @@
       "connections": [
         "extruder_body",
         "cooling_fan",
-        "heater_block"
+        "heater_block",
+        "heat_sink_fin_1",
+        "heat_sink_fin_2"
+      ]
+    },
+    {
+      "id": "heat_sink_fin_1",
+      "name": "Upper Hotend Cooling Fin",
+      "shape": "box",
+      "position": [
+        0.42,
+        2.56,
+        -0.34
+      ],
+      "size": [
+        0.36,
+        0.035,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Thin fin increasing hotend heat-sink surface area for the cooling fan.",
+      "connections": [
+        "heat_sink"
+      ]
+    },
+    {
+      "id": "heat_sink_fin_2",
+      "name": "Lower Hotend Cooling Fin",
+      "shape": "box",
+      "position": [
+        0.42,
+        2.43,
+        -0.34
+      ],
+      "size": [
+        0.36,
+        0.035,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Second thin fin making the cold-side heat sink legible as a finned part.",
+      "connections": [
+        "heat_sink"
       ]
     },
     {
@@ -1118,6 +1998,52 @@
       "connections": [
         "heat_sink",
         "brass_nozzle",
+        "heater_wire",
+        "heater_cartridge",
+        "thermistor_bead"
+      ]
+    },
+    {
+      "id": "heater_cartridge",
+      "name": "Hotend Heater Cartridge",
+      "shape": "cylinder",
+      "position": [
+        0.53,
+        2.25,
+        -0.18
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.24
+      ],
+      "material": "brushed steel",
+      "role": "Cylindrical cartridge heater inserted through the brass heater block.",
+      "connections": [
+        "heater_block",
+        "heater_wire"
+      ]
+    },
+    {
+      "id": "thermistor_bead",
+      "name": "Hotend Thermistor Bead",
+      "shape": "sphere",
+      "position": [
+        0.28,
+        2.25,
+        -0.18
+      ],
+      "size": [
+        0.045
+      ],
+      "material": "copper",
+      "role": "Temperature sensor bead seated in the heater block for closed-loop nozzle control.",
+      "connections": [
+        "heater_block",
         "heater_wire"
       ]
     },
@@ -1167,7 +2093,33 @@
       "role": "Electrical leads carrying controlled power from the board to the hotend heater.",
       "connections": [
         "heater_block",
-        "controller_board"
+        "controller_board",
+        "cable_chain_link_6",
+        "heater_cartridge",
+        "thermistor_bead",
+        "hotend_strain_relief"
+      ]
+    },
+    {
+      "id": "hotend_strain_relief",
+      "name": "Hotend Cable Strain Relief Clamp",
+      "shape": "box",
+      "position": [
+        0.62,
+        2.72,
+        0.05
+      ],
+      "size": [
+        0.22,
+        0.1,
+        0.12
+      ],
+      "material": "black composite",
+      "role": "Clamp on the carriage that anchors heater and thermistor wires before they enter the drag chain.",
+      "connections": [
+        "x_carriage_plate",
+        "heater_wire",
+        "cable_chain_link_6"
       ]
     },
     {
@@ -1189,7 +2141,8 @@
       "connections": [
         "top_rear_rail",
         "belt_rear_span",
-        "belt_left_span"
+        "belt_left_span",
+        "motor_pulley_left"
       ]
     },
     {
@@ -1210,6 +2163,49 @@
       "role": "NEMA-17 motor driving the second CoreXY belt loop from the rear-right top corner.",
       "connections": [
         "top_rear_rail",
+        "belt_rear_span",
+        "belt_right_span",
+        "motor_pulley_right"
+      ]
+    },
+    {
+      "id": "motor_pulley_left",
+      "name": "Left Motor Drive Pulley",
+      "shape": "cylinder",
+      "position": [
+        -1.38,
+        3.05,
+        1.38
+      ],
+      "size": [
+        0.12,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Toothed pulley on the left motor shaft that drives the CoreXY belt.",
+      "connections": [
+        "xy_motor_left",
+        "belt_rear_span",
+        "belt_left_span"
+      ]
+    },
+    {
+      "id": "motor_pulley_right",
+      "name": "Right Motor Drive Pulley",
+      "shape": "cylinder",
+      "position": [
+        1.38,
+        3.05,
+        1.38
+      ],
+      "size": [
+        0.12,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Toothed pulley on the right motor shaft that drives the opposite CoreXY belt.",
+      "connections": [
+        "xy_motor_right",
         "belt_rear_span",
         "belt_right_span"
       ]
@@ -1232,7 +2228,28 @@
       "connections": [
         "top_front_rail",
         "belt_front_span",
-        "belt_left_span"
+        "belt_left_span",
+        "idler_front_left_shaft"
+      ]
+    },
+    {
+      "id": "idler_front_left_shaft",
+      "name": "Front Left Idler Shaft",
+      "shape": "cylinder",
+      "position": [
+        -1.38,
+        3.05,
+        -1.52
+      ],
+      "size": [
+        0.035,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Vertical shoulder bolt shaft that fixes the front-left idler to the top frame.",
+      "connections": [
+        "idler_front_left",
+        "top_front_rail"
       ]
     },
     {
@@ -1253,7 +2270,112 @@
       "connections": [
         "top_front_rail",
         "belt_front_span",
-        "belt_right_span"
+        "belt_right_span",
+        "idler_front_right_shaft"
+      ]
+    },
+    {
+      "id": "idler_front_right_shaft",
+      "name": "Front Right Idler Shaft",
+      "shape": "cylinder",
+      "position": [
+        1.38,
+        3.05,
+        -1.52
+      ],
+      "size": [
+        0.035,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Vertical shoulder bolt shaft that fixes the front-right idler to the top frame.",
+      "connections": [
+        "idler_front_right",
+        "top_front_rail"
+      ]
+    },
+    {
+      "id": "idler_rear_left",
+      "name": "Rear Left Belt Idler Pulley",
+      "shape": "torus",
+      "position": [
+        -1.1,
+        3.05,
+        1.52
+      ],
+      "size": [
+        0.14,
+        0.035
+      ],
+      "material": "steel",
+      "role": "Rear idler guiding the CoreXY belt between the motor pulley and carriage run.",
+      "connections": [
+        "top_rear_rail",
+        "belt_rear_span",
+        "belt_cross_left_to_carriage",
+        "idler_rear_left_shaft"
+      ]
+    },
+    {
+      "id": "idler_rear_left_shaft",
+      "name": "Rear Left Idler Shaft",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        3.05,
+        1.52
+      ],
+      "size": [
+        0.035,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Vertical shoulder bolt shaft that fixes the rear-left idler at the motor corner.",
+      "connections": [
+        "idler_rear_left",
+        "top_rear_rail"
+      ]
+    },
+    {
+      "id": "idler_rear_right",
+      "name": "Rear Right Belt Idler Pulley",
+      "shape": "torus",
+      "position": [
+        1.1,
+        3.05,
+        1.52
+      ],
+      "size": [
+        0.14,
+        0.035
+      ],
+      "material": "steel",
+      "role": "Rear idler guiding the opposite CoreXY belt between the motor pulley and carriage run.",
+      "connections": [
+        "top_rear_rail",
+        "belt_rear_span",
+        "belt_cross_right_to_carriage",
+        "idler_rear_right_shaft"
+      ]
+    },
+    {
+      "id": "idler_rear_right_shaft",
+      "name": "Rear Right Idler Shaft",
+      "shape": "cylinder",
+      "position": [
+        1.1,
+        3.05,
+        1.52
+      ],
+      "size": [
+        0.035,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Vertical shoulder bolt shaft that fixes the rear-right idler at the motor corner.",
+      "connections": [
+        "idler_rear_right",
+        "top_rear_rail"
       ]
     },
     {
@@ -1275,7 +2397,10 @@
       "connections": [
         "idler_front_left",
         "idler_front_right",
-        "x_carriage_plate"
+        "x_carriage_plate",
+        "belt_clamp_upper",
+        "belt_short_upper_left",
+        "belt_short_upper_right"
       ]
     },
     {
@@ -1297,7 +2422,13 @@
       "connections": [
         "xy_motor_left",
         "xy_motor_right",
-        "x_carriage_plate"
+        "x_carriage_plate",
+        "motor_pulley_left",
+        "motor_pulley_right",
+        "idler_rear_left",
+        "idler_rear_right",
+        "belt_short_lower_left",
+        "belt_short_lower_right"
       ]
     },
     {
@@ -1319,7 +2450,8 @@
       "connections": [
         "xy_motor_left",
         "idler_front_left",
-        "x_carriage_plate"
+        "x_carriage_plate",
+        "motor_pulley_left"
       ]
     },
     {
@@ -1341,7 +2473,172 @@
       "connections": [
         "xy_motor_right",
         "idler_front_right",
-        "x_carriage_plate"
+        "x_carriage_plate",
+        "motor_pulley_right"
+      ]
+    },
+    {
+      "id": "belt_cross_left_to_carriage",
+      "name": "Left Crossed CoreXY Belt Run",
+      "shape": "box",
+      "position": [
+        -0.34,
+        2.98,
+        0.65
+      ],
+      "rotation": [
+        0,
+        0.64,
+        0
+      ],
+      "size": [
+        1.7,
+        0.03,
+        0.05
+      ],
+      "material": "rubber",
+      "role": "Diagonal CoreXY belt segment crossing from rear-left idler toward the carriage clamp.",
+      "connections": [
+        "idler_rear_left",
+        "belt_clamp_upper",
+        "x_carriage_plate",
+        "belt_short_upper_left"
+      ]
+    },
+    {
+      "id": "belt_cross_right_to_carriage",
+      "name": "Right Crossed CoreXY Belt Run",
+      "shape": "box",
+      "position": [
+        0.74,
+        2.74,
+        0.65
+      ],
+      "rotation": [
+        0,
+        -0.64,
+        0
+      ],
+      "size": [
+        1.55,
+        0.03,
+        0.05
+      ],
+      "material": "rubber",
+      "role": "Diagonal CoreXY belt segment crossing from rear-right idler toward the lower carriage clamp.",
+      "connections": [
+        "idler_rear_right",
+        "belt_clamp_lower",
+        "x_carriage_plate",
+        "belt_short_lower_right"
+      ]
+    },
+    {
+      "id": "belt_short_upper_left",
+      "name": "Upper Left Carriage Belt Stub",
+      "shape": "box",
+      "position": [
+        0.18,
+        2.96,
+        -0.55
+      ],
+      "rotation": [
+        0,
+        -0.45,
+        0
+      ],
+      "size": [
+        0.68,
+        0.03,
+        0.05
+      ],
+      "material": "rubber",
+      "role": "Short angled belt run from the front span into the upper carriage clamp.",
+      "connections": [
+        "belt_front_span",
+        "belt_clamp_upper",
+        "belt_cross_left_to_carriage"
+      ]
+    },
+    {
+      "id": "belt_short_upper_right",
+      "name": "Upper Right Carriage Belt Stub",
+      "shape": "box",
+      "position": [
+        0.66,
+        2.96,
+        -0.55
+      ],
+      "rotation": [
+        0,
+        0.45,
+        0
+      ],
+      "size": [
+        0.68,
+        0.03,
+        0.05
+      ],
+      "material": "rubber",
+      "role": "Short angled return belt run from the upper carriage clamp back toward the front span.",
+      "connections": [
+        "belt_front_span",
+        "belt_clamp_upper",
+        "belt_right_span"
+      ]
+    },
+    {
+      "id": "belt_short_lower_left",
+      "name": "Lower Left Carriage Belt Stub",
+      "shape": "box",
+      "position": [
+        0.18,
+        2.72,
+        0.18
+      ],
+      "rotation": [
+        0,
+        0.42,
+        0
+      ],
+      "size": [
+        0.62,
+        0.03,
+        0.05
+      ],
+      "material": "rubber",
+      "role": "Short lower belt run showing the second CoreXY loop entering the carriage.",
+      "connections": [
+        "belt_rear_span",
+        "belt_clamp_lower",
+        "belt_left_span"
+      ]
+    },
+    {
+      "id": "belt_short_lower_right",
+      "name": "Lower Right Carriage Belt Stub",
+      "shape": "box",
+      "position": [
+        0.68,
+        2.72,
+        0.18
+      ],
+      "rotation": [
+        0,
+        -0.42,
+        0
+      ],
+      "size": [
+        0.62,
+        0.03,
+        0.05
+      ],
+      "material": "rubber",
+      "role": "Short lower return belt run that makes the paired CoreXY carriage connection explicit.",
+      "connections": [
+        "belt_rear_span",
+        "belt_clamp_lower",
+        "belt_cross_right_to_carriage"
       ]
     },
     {
@@ -1363,17 +2660,21 @@
       "connections": [
         "top_right_rail",
         "spool_spindle",
-        "spool_lower_brace"
+        "spool_lower_brace",
+        "spool_lower_brace_rear",
+        "spool_guide_eyelet",
+        "spool_side_plate_front",
+        "spool_side_plate_rear"
       ]
     },
     {
       "id": "spool_lower_brace",
-      "name": "Side Spool Diagonal Brace",
+      "name": "Front Side Spool Diagonal Brace",
       "shape": "box",
       "position": [
         1.88,
         2.6,
-        -0.95
+        -1.08
       ],
       "rotation": [
         0,
@@ -1386,10 +2687,92 @@
         0.12
       ],
       "material": "dark anodized aluminum",
-      "role": "Brace that triangulates the side spool holder back to the lower right frame.",
+      "role": "Front brace that triangulates the side spool holder back to the lower right frame.",
       "connections": [
         "base_right_rail",
-        "spool_upper_bracket"
+        "spool_upper_bracket",
+        "spool_side_plate_front"
+      ]
+    },
+    {
+      "id": "spool_lower_brace_rear",
+      "name": "Rear Side Spool Diagonal Brace",
+      "shape": "box",
+      "position": [
+        1.88,
+        2.6,
+        -0.82
+      ],
+      "rotation": [
+        0,
+        0,
+        0.42
+      ],
+      "size": [
+        0.12,
+        1,
+        0.12
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear brace paired with the front brace so the spool bracket resists twisting.",
+      "connections": [
+        "base_right_rail",
+        "spool_upper_bracket",
+        "spool_side_plate_rear"
+      ]
+    },
+    {
+      "id": "spool_side_plate_front",
+      "name": "Front Spool Bracket Side Plate",
+      "shape": "box",
+      "position": [
+        2.12,
+        3.02,
+        -1.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0.25
+      ],
+      "size": [
+        0.48,
+        0.08,
+        0.05
+      ],
+      "material": "steel",
+      "role": "Flat side plate tying the spindle support to the front diagonal brace.",
+      "connections": [
+        "spool_upper_bracket",
+        "spool_lower_brace",
+        "spool_spindle"
+      ]
+    },
+    {
+      "id": "spool_side_plate_rear",
+      "name": "Rear Spool Bracket Side Plate",
+      "shape": "box",
+      "position": [
+        2.12,
+        3.02,
+        -0.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0.25
+      ],
+      "size": [
+        0.48,
+        0.08,
+        0.05
+      ],
+      "material": "steel",
+      "role": "Rear side plate forming the second cheek of the spool spindle bracket.",
+      "connections": [
+        "spool_upper_bracket",
+        "spool_lower_brace_rear",
+        "spool_spindle"
       ]
     },
     {
@@ -1415,7 +2798,8 @@
       "connections": [
         "spool_upper_bracket",
         "spool_hub",
-        "ptfe_tube"
+        "spool_side_plate_front",
+        "spool_side_plate_rear"
       ]
     },
     {
@@ -1442,7 +2826,7 @@
         "spool_spindle",
         "spool_left_flange",
         "spool_right_flange",
-        "filament_strand"
+        "filament_coil"
       ]
     },
     {
@@ -1515,7 +2899,33 @@
       "role": "Coiled consumable filament wound around the spool hub before entering the Bowden tube.",
       "connections": [
         "spool_hub",
-        "filament_strand"
+        "filament_feed_segment_spool"
+      ]
+    },
+    {
+      "id": "spool_guide_eyelet",
+      "name": "Spool Filament Guide Eyelet",
+      "shape": "torus",
+      "position": [
+        1.92,
+        3.18,
+        -0.95
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.1,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Small guide ring aligning filament from the spool into the PTFE tube.",
+      "connections": [
+        "spool_upper_bracket",
+        "filament_feed_segment_spool",
+        "ptfe_tube_arc_1"
       ]
     },
     {
@@ -1579,7 +2989,32 @@
       "connections": [
         "base_rear_rail",
         "controller_board",
-        "bed_heater_pad"
+        "bed_heater_pad_front_strip",
+        "psu_fan_grille"
+      ]
+    },
+    {
+      "id": "psu_fan_grille",
+      "name": "Power Supply Fan Grille",
+      "shape": "torus",
+      "position": [
+        -1.45,
+        0.52,
+        1.2
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.14,
+        0.018
+      ],
+      "material": "black composite",
+      "role": "Circular fan grille showing the ventilated face of the power supply.",
+      "connections": [
+        "psu_shell"
       ]
     },
     {
@@ -1603,8 +3038,32 @@
         "display_bezel",
         "psu_shell",
         "heater_wire",
-        "bed_heater_pad",
-        "wire_harness"
+        "bed_heater_pad_front_strip",
+        "wire_harness",
+        "terminal_block"
+      ]
+    },
+    {
+      "id": "terminal_block",
+      "name": "Controller Screw Terminal Block",
+      "shape": "box",
+      "position": [
+        0.78,
+        0.48,
+        1.48
+      ],
+      "size": [
+        0.18,
+        0.12,
+        0.34
+      ],
+      "material": "brass",
+      "role": "Terminal strip where bed heater, hotend heater, and supply wires land on the controller.",
+      "connections": [
+        "controller_board",
+        "heater_wire",
+        "bed_heater_lead_pair",
+        "psu_shell"
       ]
     },
     {
@@ -1625,7 +3084,193 @@
       "connections": [
         "controller_board",
         "x_gantry_rail",
-        "heater_wire"
+        "heater_wire",
+        "cable_chain_link_1"
+      ]
+    },
+    {
+      "id": "cable_chain_link_1",
+      "name": "Cable Chain Link 1",
+      "shape": "box",
+      "position": [
+        0.62,
+        2.35,
+        1.22
+      ],
+      "rotation": [
+        0.25,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.1,
+        0.16
+      ],
+      "material": "black composite",
+      "role": "First drag-chain link anchored near the rear wiring harness.",
+      "connections": [
+        "wire_harness",
+        "cable_chain_link_2"
+      ]
+    },
+    {
+      "id": "cable_chain_link_2",
+      "name": "Cable Chain Link 2",
+      "shape": "box",
+      "position": [
+        0.6,
+        2.47,
+        1
+      ],
+      "rotation": [
+        0.45,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.1,
+        0.16
+      ],
+      "material": "black composite",
+      "role": "Second drag-chain link showing the controlled bend radius toward the gantry.",
+      "connections": [
+        "cable_chain_link_1",
+        "cable_chain_link_3"
+      ]
+    },
+    {
+      "id": "cable_chain_link_3",
+      "name": "Cable Chain Link 3",
+      "shape": "box",
+      "position": [
+        0.56,
+        2.58,
+        0.78
+      ],
+      "rotation": [
+        0.7,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.1,
+        0.16
+      ],
+      "material": "black composite",
+      "role": "Middle drag-chain link replacing the former single rigid cable capsule.",
+      "connections": [
+        "cable_chain_link_2",
+        "cable_chain_link_4"
+      ]
+    },
+    {
+      "id": "cable_chain_link_4",
+      "name": "Cable Chain Link 4",
+      "shape": "box",
+      "position": [
+        0.52,
+        2.65,
+        0.55
+      ],
+      "rotation": [
+        0.95,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.1,
+        0.16
+      ],
+      "material": "black composite",
+      "role": "Fourth drag-chain link continuing the curve toward the moving carriage.",
+      "connections": [
+        "cable_chain_link_3",
+        "cable_chain_link_5"
+      ]
+    },
+    {
+      "id": "cable_chain_link_5",
+      "name": "Cable Chain Link 5",
+      "shape": "box",
+      "position": [
+        0.48,
+        2.69,
+        0.32
+      ],
+      "rotation": [
+        1.2,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.1,
+        0.16
+      ],
+      "material": "black composite",
+      "role": "Fifth drag-chain link showing the flexible cable carrier before it reaches the hotend.",
+      "connections": [
+        "cable_chain_link_4",
+        "cable_chain_link_6"
+      ]
+    },
+    {
+      "id": "cable_chain_link_6",
+      "name": "Cable Chain Link 6",
+      "shape": "box",
+      "position": [
+        0.48,
+        2.7,
+        0.12
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.1,
+        0.16
+      ],
+      "material": "black composite",
+      "role": "Final drag-chain link fixed near the carriage strain relief.",
+      "connections": [
+        "cable_chain_link_5",
+        "hotend_strain_relief",
+        "heater_wire",
+        "x_gantry_rail"
+      ]
+    },
+    {
+      "id": "bed_heater_lead_pair",
+      "name": "Bed Heater Lead Pair",
+      "shape": "capsule",
+      "position": [
+        0.72,
+        0.76,
+        1.1
+      ],
+      "rotation": [
+        0.65,
+        0,
+        0
+      ],
+      "size": [
+        0.028,
+        0.88
+      ],
+      "material": "copper",
+      "role": "Copper power leads running from the controller terminals to the silicone bed heater.",
+      "connections": [
+        "terminal_block",
+        "bed_heater_pad_rear_strip",
+        "bed_heater_pad_left_strip",
+        "bed_heater_pad_right_strip"
       ]
     }
   ]

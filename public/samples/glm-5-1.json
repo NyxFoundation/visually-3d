@@ -1,33 +1,91 @@
 {
   "machine_name": "GLM-5.1 (projected flagship)",
-  "assembly_instructions": "Read GLM-5.1 as the LIKELY next step beyond GLM-4.5: same deep-narrow MoE shape, but PUSHED. 128 layers (+33%) climb the violet residual pillar. Each block has GQA-with-MLA-compressed-KV attention on the left (96 query heads sharing 8 KV heads, but with a learned KV down-projection that adopts DeepSeek's MLA trick on top of GQA), and a fine-grained MoE FFN on the right (1 shared + 256 routed experts, top-8) — note 256 experts vs GLM-4.5's 160. The orange ring at X=6 is the routed expert bank with the same group-limited dispatch (≤4 of 8 device groups) plus a NEW expert-overflow shared expert. The amber column at X=-3.5 is the compressed KV cache. The bronze cube at X=2.5/Y=8 is a depth-2 MTP head (was depth-1 in GLM-4.5) for stronger speculative decoding. The titanium slab on the far left is the Muon optimiser — adopted from DeepSeek-V4 for matrix params, with AdamW kept for embeddings/head/RMSNorm. Click any part for details. THIS IS A FORWARD-LOOKING PROJECTION — numbers should be read as plausible extrapolation, not fact.",
+  "assembly_instructions": "1. Bolt the base_frame to the floor plane with the left_upright, right_upright, rear_spine, lower_cross_rail, and upper_cross_rail to form an open inspection rack. 2. Mount input_plate on the front of the base frame, then set embedding_table directly above it and connect both to the residual_bus. 3. Install the residual_bus vertically through the centre and fasten layer_tray_001 through layer_tray_128_marker to it in order, leaving the exploded_block_064 tray pulled forward for inspection. 4. On the port/left lane of exploded_block_064, install attn_pre_norm, q_projection_bank, mla_down_projection, kv_latent_cache_a, kv_latent_cache_b, kv_up_projection, qk_rope_norm, flash_attention_core, and o_projection, then connect o_projection back to residual_bus. 5. On the starboard/right lane, install ffn_pre_norm, router_gate, group_limit_selector, expert_alltoall_bus, routed_expert_tile_a through routed_expert_tile_d, shared_expert, overflow_shared_expert, fp4_qat_plate, and moe_combine_gate, then connect moe_combine_gate back to residual_bus. 6. Install final_norm and prediction_head above the last tray, then attach mtp_block_1, mtp_block_2, primary_lm_loss, and mtp_loss_node to the output side. 7. Mount kv_memory_scale beside the cache pages, muon_optimizer and adamw_carveout on the service shelf, and parallelism_panel plus training_data_pipe on the rear right side. 8. Verify that every functional module has a visible parent connection, no part penetrates the ground plane, and the exposed exploded tray can be read from the ISO, front, side, and top views.",
   "metadata": {
     "domain": "ml-architecture",
     "reference": "https://github.com/zai-org/GLM-4.5",
-    "thumbnail_camera": [13, 9, 14],
+    "thumbnail_camera": [
+      13,
+      9,
+      14
+    ],
     "info": {
       "english_name": "GLM-5.1 (projected flagship, ~600B-A48B MoE)",
       "summary": "PROJECTED next-generation flagship from Zhipu / Z.ai, extrapolated from GLM-4.5's published research direction. No public paper at scene time. Best guess: ~600B total / ~48B activated, deep-narrow at 128 × 5760, GQA(96/8) augmented with an MLA-style compressed KV down-projection, 1 shared + 256 routed experts (top-8) with group-limited dispatch, depth-2 MTP for stronger speculative decoding, Muon optimiser adopted for the matrix bulk, FP4 QAT on routed experts, and 256K native context. Treat numbers as plausible extrapolation, not fact.",
       "description": "GLM-5.1 is presented here as a research-trajectory PROJECTION, not a paper. Where GLM-4.5 went deep-narrow with 96 layers / 5120 hidden / 160 experts top-8 + 1 shared + group-limited routing, GLM-5.1 likely (i) adds another ~33% depth (128 layers) and a small width bump (5760), (ii) doubles the routed-expert count (160 → 256) while keeping top-8 active, (iii) adopts an MLA-style learned KV compression on top of GQA — a known cross-pollination trick from DeepSeek-V3 — to halve KV memory at long context, (iv) raises MTP depth from 1 to 2 (small quality + speculative-decoding wins), (v) extends native context from 128K to 256K via training rather than YaRN, (vi) crosses over to the Muon optimiser for the matrix bulk after its DeepSeek-V4 success, while keeping AdamW for the carve-out (embed / head / RMSNorm / mHC scalars / router bias), and (vii) brings FP4 QAT to routed experts.\n\nDesign rationale, in one line each:\n• Deeper-narrower still: more layers > wider hidden for reasoning at fixed FLOPs.\n• 256 fine-grained experts: doubles capacity without changing the active-FLOPs budget.\n• MLA on top of GQA: stacks two KV-shrinking tricks for cheap 256K context.\n• Depth-2 MTP: ~2.4× speculative speedup vs depth-1.\n• Muon adoption: ~5–10% wall-clock saving at this scale per the V4 results.\n• FP4 experts: ~4× expert-weight memory shrink vs BF16.",
       "facts": [
-        { "label": "status",                  "value": "PROJECTED / SPECULATIVE — no public paper" },
-        { "label": "total parameters",        "value": "≈ 600 B (≈ 48 B activated / token)" },
-        { "label": "context length",          "value": "256 K (native), extendable" },
-        { "label": "transformer layers (L)",  "value": "128" },
-        { "label": "hidden dimension (d)",    "value": "5760" },
-        { "label": "vocabulary size",         "value": "≈ 152K (Qwen/GLM-tier multilingual)" },
-        { "label": "query heads (n_h)",       "value": "96" },
-        { "label": "KV heads (GQA)",          "value": "8 + MLA compressed latent (c_kv ≈ 768)" },
-        { "label": "MoE per layer",           "value": "1 shared + 256 routed (top-8)" },
-        { "label": "expert intermediate dim", "value": "≈ 1408 (fine-grained)" },
-        { "label": "router gate",             "value": "Sigmoid + loss-free balance bias" },
-        { "label": "group-limited routing",   "value": "≤ 4 of 8 device groups per token" },
-        { "label": "MTP depth",               "value": "2 (was 1 in GLM-4.5)" },
-        { "label": "modes",                   "value": "think / no-think (shared weights)" },
-        { "label": "optimiser (matrix bulk)", "value": "Muon (adopted from DeepSeek-V4)" },
-        { "label": "optimiser (carve-out)",   "value": "AdamW (embed / head / RMSNorm / scalars)" },
-        { "label": "expert weight precision", "value": "FP4 QAT" },
-        { "label": "training tokens",         "value": "~30 T (projection)" }
+        {
+          "label": "status",
+          "value": "PROJECTED / SPECULATIVE — no public paper"
+        },
+        {
+          "label": "total parameters",
+          "value": "≈ 600 B (≈ 48 B activated / token)"
+        },
+        {
+          "label": "context length",
+          "value": "256 K (native), extendable"
+        },
+        {
+          "label": "transformer layers (L)",
+          "value": "128"
+        },
+        {
+          "label": "hidden dimension (d)",
+          "value": "5760"
+        },
+        {
+          "label": "vocabulary size",
+          "value": "≈ 152K (Qwen/GLM-tier multilingual)"
+        },
+        {
+          "label": "query heads (n_h)",
+          "value": "96"
+        },
+        {
+          "label": "KV heads (GQA)",
+          "value": "8 + MLA compressed latent (c_kv ≈ 768)"
+        },
+        {
+          "label": "MoE per layer",
+          "value": "1 shared + 256 routed (top-8)"
+        },
+        {
+          "label": "expert intermediate dim",
+          "value": "≈ 1408 (fine-grained)"
+        },
+        {
+          "label": "router gate",
+          "value": "Sigmoid + loss-free balance bias"
+        },
+        {
+          "label": "group-limited routing",
+          "value": "≤ 4 of 8 device groups per token"
+        },
+        {
+          "label": "MTP depth",
+          "value": "2 (was 1 in GLM-4.5)"
+        },
+        {
+          "label": "modes",
+          "value": "think / no-think (shared weights)"
+        },
+        {
+          "label": "optimiser (matrix bulk)",
+          "value": "Muon (adopted from DeepSeek-V4)"
+        },
+        {
+          "label": "optimiser (carve-out)",
+          "value": "AdamW (embed / head / RMSNorm / scalars)"
+        },
+        {
+          "label": "expert weight precision",
+          "value": "FP4 QAT"
+        },
+        {
+          "label": "training tokens",
+          "value": "~30 T (projection)"
+        }
       ],
       "comparisons": [
         {
@@ -48,55 +106,1219 @@
         }
       ],
       "sources": [
-        { "title": "GLM-4.5 technical report (predecessor)",   "url": "https://arxiv.org/abs/2508.06471" },
-        { "title": "GLM-4.5 GitHub",                           "url": "https://github.com/zai-org/GLM-4.5" },
-        { "title": "DeepSeek-V3 (MLA reference)",              "url": "https://arxiv.org/abs/2412.19437" },
-        { "title": "Muon optimizer (Jordan et al.)",           "url": "https://arxiv.org/abs/2502.16982" }
+        {
+          "title": "GLM-4.5 technical report (predecessor)",
+          "url": "https://arxiv.org/abs/2508.06471"
+        },
+        {
+          "title": "GLM-4.5 GitHub",
+          "url": "https://github.com/zai-org/GLM-4.5"
+        },
+        {
+          "title": "DeepSeek-V3 (MLA reference)",
+          "url": "https://arxiv.org/abs/2412.19437"
+        },
+        {
+          "title": "Muon optimizer (Jordan et al.)",
+          "url": "https://arxiv.org/abs/2502.16982"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "input_plate", "name": "Input Tokens", "shape": "box", "position": [0, 0, 0], "size": [4.2, 0.18, 2.4], "material": "brushed graphite plate", "role": "Token-ID stream from the multilingual BPE tokeniser.", "compute_profile": "host-cpu", "parallelism": "embarrassingly-parallel", "connections": ["embedding_table"] },
-    { "id": "embedding_table", "name": "Embedding (V≈152K, d=5760)", "shape": "box", "position": [0, 0.55, 0], "size": [3.8, 0.32, 2.0], "material": "indigo glass slab", "role": "Tied embedding / LM head. Trained by AdamW (in the Muon carve-out).", "compute_profile": "gpu-bandwidth-bound", "memory_footprint": "≈ 152K × 5760 × BF16 ≈ 1.75 GiB", "parallelism": "tensor-parallel", "connections": ["residual_pipe"] },
-    { "id": "residual_pipe", "name": "Residual Stream (d=5760, 128 layers)", "shape": "cylinder", "position": [0, 5.6, 0], "size": [0.18, 9.8], "material": "translucent violet polymer", "role": "Pre-norm RMSNorm residual carry through 128 layers.", "compute_profile": "gpu-memory-bound", "parallelism": "tensor-parallel", "connections": ["embedding_table", "block_01", "block_02", "block_03", "block_04", "block_05", "block_127", "block_128", "prediction_head"] },
-    { "id": "layer_count_marker", "name": "× 128 Layers (deeper than GLM-4.5)", "shape": "box", "position": [-2.3, 5.6, 0], "size": [0.05, 9.0, 0.7], "material": "etched graphite gridline", "role": "Marker for the projected 128-layer depth (+33% vs GLM-4.5). Only 7 are rendered.", "compute_profile": "negligible", "parallelism": "pipeline-parallel" },
-
-    { "id": "block_01", "name": "Block 1", "shape": "box", "position": [0, 1.4, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst", "role": "First Transformer block.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_02", "name": "Block 2", "shape": "box", "position": [0, 2.0, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst", "role": "Block 2.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_03", "name": "Block 3 (exploded right at X=2)", "shape": "box", "position": [0, 2.6, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst", "role": "Block 3 — sub-components shown to the left and right.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["attn_pre_norm", "ffn_pre_norm"] },
-    { "id": "block_04", "name": "Block 4", "shape": "box", "position": [0, 3.2, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst", "role": "Block 4.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_05", "name": "Block 5", "shape": "box", "position": [0, 3.8, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst", "role": "Block 5.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_127", "name": "Block 127", "shape": "box", "position": [0, 7.6, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst", "role": "Block 127. (Layers 6–126 elided.)", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_128", "name": "Block 128 (final)", "shape": "box", "position": [0, 8.2, 0], "size": [3.2, 0.5, 1.4], "material": "deep amethyst", "role": "Final Transformer block.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-
-    { "id": "attn_pre_norm", "name": "Attention · Pre-RMSNorm", "shape": "box", "position": [-1.8, 2.45, 0], "size": [0.55, 0.18, 0.6], "material": "matte ivory tile", "role": "Pre-norm RMSNorm.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel", "connections": ["attn_qkv_proj"] },
-    { "id": "attn_qkv_proj", "name": "GQA + MLA · QKV Proj (96 Q / 8 KV / c_kv≈768)", "shape": "box", "position": [-1.8, 2.85, 0], "size": [0.7, 0.22, 0.7], "material": "anodised aluminium tile", "role": "Combined trick: GQA-shape (96 Q / 8 KV) on the surface, but K and V are computed via a LOW-RANK latent c_kv ≈ 768. Cache stores only the latent, decoder reconstructs full KV. Stacks two KV-shrinking ideas.", "compute_profile": "gpu-compute-bound", "flops_per_token": "≈ 2·d·c_kv + 2·c_kv·n_kv·d_h ≈ 100 MFLOP", "memory_footprint": "Cache: c_kv × FP8 ≈ 768 B / token / layer (~2× smaller than plain GQA(8))", "parallelism": "tensor-parallel", "algorithm": "Q       = x @ W_Q                  # full 96-head projection\nkv_lat  = x @ W_DKV                # [B,T, c_kv=768]   ← cached\nK_full  = kv_lat @ W_UK            # reconstruct on demand\nV_full  = kv_lat @ W_UV\nQ, K_full = qk_rmsnorm(Q, K_full)\nQ, K_full = apply_partial_rope(Q, K_full)", "connections": ["qk_norm_disk", "kv_cache", "attn_kernel"] },
-    { "id": "qk_norm_disk", "name": "QK-Norm + Partial RoPE", "shape": "cylinder", "position": [-1.8, 3.15, 0], "size": [0.34, 0.05], "material": "polished pewter ring", "role": "RMSNorm on Q & K + partial-RoPE (half head dims rotated). Inherited from GLM-4.5.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "embarrassingly-parallel" },
-    { "id": "attn_kernel", "name": "FlashAttention-3 (causal, 256K)", "shape": "box", "position": [-1.8, 3.55, 0], "size": [0.7, 0.22, 0.7], "material": "midnight blue tile", "role": "Standard causal attention; uses FlashAttention-3 with FP8 GEMMs on Hopper/Blackwell.", "compute_profile": "gpu-compute-bound", "parallelism": "embarrassingly-parallel", "connections": ["attn_o_proj"] },
-    { "id": "attn_o_proj", "name": "Attention · O-Projection", "shape": "box", "position": [-1.8, 3.95, 0], "size": [0.7, 0.22, 0.7], "material": "burnished bronze tile", "role": "Output projection back to d=5760.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["residual_pipe"] },
-
-    { "id": "kv_cache", "name": "MLA-Compressed KV Cache (latent, FP8)", "shape": "cylinder", "position": [-3.5, 5.0, 0], "size": [0.55, 6.0], "material": "amber translucent silica", "role": "Stores only the c_kv ≈ 768-dim latent per token per layer; full K/V reconstructed on read. ~2× smaller than GQA(8) at the same head count.", "compute_profile": "memory-capacity-bound", "memory_footprint": "≈ 768 B × FP8 / token / layer × 128 layers × 256K ctx ≈ 25 GiB / sequence", "parallelism": "tensor-parallel", "improvement_ideas": ["INT4 KV with per-channel scales for ~2× more context.", "Page cold prefixes to NVMe for shared system prompts."] },
-
-    { "id": "ffn_pre_norm", "name": "FFN · Pre-Norm RMSNorm", "shape": "box", "position": [1.8, 2.45, 0], "size": [0.55, 0.18, 0.6], "material": "matte ivory tile", "role": "Pre-norm before the MoE FFN.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel", "connections": ["moe_router"] },
-    { "id": "moe_router", "name": "Top-8 Sigmoid Router (loss-free balance)", "shape": "cylinder", "position": [6.0, 5.6, 0], "size": [0.55, 0.18], "material": "ruby-tinted glass disk", "role": "Per-token affinity = sigmoid(x @ W_r) + b_balance. Top-8 of 256 routed experts. Bias-update load balancing inherited from GLM-4.5.", "compute_profile": "gpu-bandwidth-bound", "flops_per_token": "≈ 2·d·256 ≈ 3 MFLOP", "parallelism": "tensor-parallel", "algorithm": "scores = sigmoid(x @ W_router) + b_balance\ntopk_idx, topk_w = topk(scores, 8)\ntopk_w = topk_w / topk_w.sum()\n# group-limited: at most 4 of 8 device groups", "connections": ["moe_group_limit", "moe_routed_ring"] },
-    { "id": "moe_group_limit", "name": "Group-Limited Dispatch (≤4 of 8)", "shape": "cylinder", "position": [6.0, 6.05, 0], "size": [0.7, 0.12], "material": "speckled basalt ring", "role": "Constraint that caps cross-node all-to-all bandwidth. Inherited from GLM-4.5.", "compute_profile": "negligible", "parallelism": "expert-parallel" },
-    { "id": "moe_alltoall", "name": "Expert All-to-All", "shape": "cylinder", "position": [6.0, 6.55, 0], "size": [1.0, 0.16], "material": "copper coil ring", "role": "NCCL all-to-all dispatch + combine, kept small by the group limit.", "compute_profile": "communication-bound", "parallelism": "expert-parallel", "connections": ["moe_routed_ring"] },
-    { "id": "moe_routed_ring", "name": "Routed Experts (256, top-8)", "shape": "cylinder", "position": [6.0, 4.8, 0], "size": [1.9, 0.45], "material": "iridescent micro-array", "role": "Per-MoE-layer bank of 256 fine-grained SwiGLU experts (d_ff ≈ 1408). 8 active per token. FP4 QAT weights.", "compute_profile": "gpu-compute-bound", "flops_per_token": "≈ 8 × 3 × 2·d·d_ff ≈ 400 MFLOP / layer", "memory_footprint": "256 × 3·d·d_ff × FP4 ≈ 6 GiB / layer; 128 layers ≈ 0.77 TiB of routed FFN weights", "parallelism": "expert-parallel", "improvement_ideas": ["Group GEMM to fuse 8 expert calls.", "Mixed FP4/FP6 for the most loss-sensitive experts."] },
-    { "id": "moe_shared_expert", "name": "Shared Expert (×1)", "shape": "box", "position": [6.0, 5.55, 0], "size": [0.55, 0.55, 0.55], "material": "polished platinum", "role": "Always-on expert that absorbs common computation and serves as overflow when capacity is hit.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "fp4_expert_disk", "name": "FP4 Expert Weights (QAT)", "shape": "cylinder", "position": [6.0, 4.32, 0], "size": [1.95, 0.06], "material": "rose-gold annulus", "role": "Quantisation-aware training disk under the routed-expert bank. ~4× memory shrink vs BF16.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "expert-parallel", "memory_footprint": "≈ 0.25× of BF16 on routed experts." },
-
-    { "id": "prediction_head", "name": "LM Head (tied)", "shape": "box", "position": [0, 9.05, 0], "size": [3.4, 0.4, 1.6], "material": "white marble slab", "role": "Tied projection back to ~152K vocab. Trained by AdamW (in the Muon carve-out).", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["mtp_head", "lm_loss"] },
-    { "id": "mtp_head", "name": "MTP Head (depth=2, projected)", "shape": "box", "position": [2.5, 8.0, 0], "size": [1.4, 0.4, 1.0], "material": "moss-green ceramic", "role": "Projection: GLM-5.1 likely raises MTP depth from 1 to 2. Predicts t+1 AND t+2 jointly. Speculative-decoding speedup ~2.4× (was ~1.8× with depth-1).", "compute_profile": "gpu-compute-bound", "parallelism": "pipeline-parallel", "algorithm": "for k in 1..2:\n    h_k     = mtp_block_k(h_final)\n    logits_k = h_k @ E.T\n    loss   += w_k * CE(logits_k, target_t+k)", "connections": ["mtp_loss"] },
-    { "id": "lm_loss", "name": "LM Loss", "shape": "sphere", "position": [-1.4, 10.0, 0], "size": [0.28], "material": "incandescent ivory", "role": "Primary next-token cross-entropy.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "data-parallel" },
-    { "id": "mtp_loss", "name": "MTP Loss (depth-2 weighted)", "shape": "sphere", "position": [3.0, 10.4, 0], "size": [0.22], "material": "luminescent sage", "role": "Auxiliary depth-2 MTP loss with decreasing weights for deeper steps.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "data-parallel" },
-
-    { "id": "mode_think", "name": "Mode: 'think'", "shape": "box", "position": [4.5, 9.6, 0], "size": [1.2, 0.3, 0.8], "material": "deep navy plate", "role": "Reasoning mode (system-prompt switched).", "compute_profile": "negligible", "parallelism": "data-parallel" },
-    { "id": "mode_no_think", "name": "Mode: 'no-think'", "shape": "box", "position": [5.9, 9.6, 0], "size": [1.2, 0.3, 0.8], "material": "matte navy plate", "role": "Direct-answer mode.", "compute_profile": "negligible", "parallelism": "data-parallel" },
-
-    { "id": "muon_optimizer", "name": "Muon (matrix bulk) — adopted from V4", "shape": "box", "position": [-6.0, 5.0, 0], "size": [1.6, 1.2, 1.0], "material": "matte titanium block", "role": "PROJECTED adoption of Muon for the matrix bulk after DeepSeek-V4's wins. Newton-Schulz orthonormalised updates, Nesterov 0.95.", "compute_profile": "gpu-compute-bound", "memory_footprint": "Momentum: 1× param size (cheaper than Adam's 2×).", "parallelism": "data-parallel", "algorithm": "M = β·M + G\nU = newton_schulz(M, iters=10)\nW -= lr * (rms_scale * U + wd * W)" },
-    { "id": "adamw_optimizer", "name": "AdamW (carve-out)", "shape": "box", "position": [-6.0, 3.4, 0], "size": [1.0, 0.7, 0.9], "material": "anodised navy block", "role": "Carve-out for embedding, prediction head, RMSNorm γ, router bias, attention sink, mHC scalars (if any).", "compute_profile": "gpu-bandwidth-bound", "parallelism": "data-parallel" },
-
-    { "id": "parallelism_marker", "name": "Parallelism Plan: TP × EP × PP × DP", "shape": "box", "position": [8.5, 5.0, 0], "size": [1.4, 2.4, 0.8], "material": "smoked acrylic translucent", "role": "Multi-axis parallelism plan. Group-limited routing keeps EP all-to-all bounded across 8 device groups.", "compute_profile": "communication-bound", "parallelism": "pipeline-parallel" },
-    { "id": "training_data_pipe", "name": "~30T-token Corpus + Long-CoT RL", "shape": "box", "position": [8.5, 0.6, 0], "size": [1.4, 0.4, 0.8], "material": "etched obsidian plate", "role": "Projected pre-training corpus + reasoning RL phase.", "compute_profile": "storage-bound", "parallelism": "data-parallel" }
+    {
+      "id": "base_frame",
+      "name": "Open Base Frame",
+      "shape": "box",
+      "position": [
+        0,
+        0.08,
+        0
+      ],
+      "size": [
+        8.8,
+        0.16,
+        3.2
+      ],
+      "material": "welded steel",
+      "role": "Grounded rack base that roots the full projected GLM-5.1 assembly and keeps every subsystem visible.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "left_upright",
+        "right_upright",
+        "rear_spine",
+        "input_plate",
+        "training_data_pipe"
+      ]
+    },
+    {
+      "id": "left_upright",
+      "name": "Port Upright Rail",
+      "shape": "box",
+      "position": [
+        -4.2,
+        4.5,
+        -1.45
+      ],
+      "size": [
+        0.14,
+        8.8,
+        0.14
+      ],
+      "material": "welded steel",
+      "role": "Left structural post that carries the attention and cache inspection lane.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "base_frame",
+        "upper_cross_rail",
+        "lower_cross_rail",
+        "kv_memory_scale"
+      ]
+    },
+    {
+      "id": "right_upright",
+      "name": "Starboard Upright Rail",
+      "shape": "box",
+      "position": [
+        4.2,
+        4.5,
+        -1.45
+      ],
+      "size": [
+        0.14,
+        8.8,
+        0.14
+      ],
+      "material": "welded steel",
+      "role": "Right structural post that carries the MoE, parallelism, and optimiser service lane.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "base_frame",
+        "upper_cross_rail",
+        "lower_cross_rail",
+        "parallelism_panel"
+      ]
+    },
+    {
+      "id": "rear_spine",
+      "name": "Rear Residual Spine Support",
+      "shape": "box",
+      "position": [
+        0,
+        4.7,
+        -1.6
+      ],
+      "size": [
+        0.18,
+        9,
+        0.18
+      ],
+      "material": "brushed steel",
+      "role": "Rear post aligning all visible layer trays to the central residual bus.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "base_frame",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "lower_cross_rail",
+      "name": "Lower Cross Rail",
+      "shape": "box",
+      "position": [
+        0,
+        1.15,
+        -1.45
+      ],
+      "size": [
+        8.5,
+        0.12,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Lower transverse rail that locates the input, embedding, and first layer trays.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "left_upright",
+        "right_upright",
+        "embedding_table"
+      ]
+    },
+    {
+      "id": "upper_cross_rail",
+      "name": "Upper Cross Rail",
+      "shape": "box",
+      "position": [
+        0,
+        8.85,
+        -1.45
+      ],
+      "size": [
+        8.5,
+        0.12,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Upper transverse rail that fixes the prediction and MTP head modules above the 128-layer stack.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "left_upright",
+        "right_upright",
+        "prediction_head"
+      ]
+    },
+    {
+      "id": "input_plate",
+      "name": "Input Tokens",
+      "shape": "box",
+      "position": [
+        -1.2,
+        0.32,
+        0.6
+      ],
+      "size": [
+        3.2,
+        0.22,
+        1.1
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Token-ID stream from the projected multilingual tokenizer enters the rack at floor level.",
+      "compute_profile": "host-cpu",
+      "parallelism": "embarrassingly-parallel",
+      "connections": [
+        "base_frame",
+        "embedding_table"
+      ]
+    },
+    {
+      "id": "embedding_table",
+      "name": "Embedding Table V≈152K by d=5760",
+      "shape": "box",
+      "position": [
+        -1.2,
+        0.78,
+        0.6
+      ],
+      "size": [
+        2.9,
+        0.26,
+        0.95
+      ],
+      "material": "glass display",
+      "role": "Tied embedding matrix converts token IDs to the 5760-wide residual stream and is trained by AdamW.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "≈152K × 5760 × BF16 ≈ 1.75 GiB",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "input_plate",
+        "residual_bus",
+        "lower_cross_rail"
+      ]
+    },
+    {
+      "id": "residual_bus",
+      "name": "Residual Bus d=5760",
+      "shape": "cylinder",
+      "position": [
+        0,
+        4.9,
+        0
+      ],
+      "size": [
+        0.16,
+        8.1
+      ],
+      "material": "aluminum",
+      "role": "Central residual stream carrying hidden states through the projected 128 pre-norm transformer layers.",
+      "compute_profile": "gpu-memory-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "rear_spine",
+        "embedding_table",
+        "layer_tray_001",
+        "layer_tray_016",
+        "layer_tray_032",
+        "exploded_block_064",
+        "layer_tray_080",
+        "layer_tray_096",
+        "layer_tray_112",
+        "layer_tray_128_marker",
+        "final_norm"
+      ]
+    },
+    {
+      "id": "layer_tray_001",
+      "name": "Layer Tray 1",
+      "shape": "box",
+      "position": [
+        0,
+        1.35,
+        0
+      ],
+      "size": [
+        2.65,
+        0.18,
+        1.05
+      ],
+      "material": "dark anodized aluminum",
+      "role": "First visible transformer tray; it establishes the repeated attention-plus-MoE layer pitch.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "residual_bus",
+        "layer_tray_016"
+      ]
+    },
+    {
+      "id": "layer_tray_016",
+      "name": "Layer Tray 16",
+      "shape": "box",
+      "position": [
+        0,
+        2.05,
+        0
+      ],
+      "size": [
+        2.65,
+        0.18,
+        1.05
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Representative early-depth transformer tray compressed from layers 2 through 16.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_tray_001",
+        "residual_bus",
+        "layer_tray_032"
+      ]
+    },
+    {
+      "id": "layer_tray_032",
+      "name": "Layer Tray 32",
+      "shape": "box",
+      "position": [
+        0,
+        2.75,
+        0
+      ],
+      "size": [
+        2.65,
+        0.18,
+        1.05
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Visible tray marking the first quarter of the projected 128-layer depth.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_tray_016",
+        "residual_bus",
+        "exploded_block_064"
+      ]
+    },
+    {
+      "id": "exploded_block_064",
+      "name": "Layer 64 Exploded Tray",
+      "shape": "box",
+      "position": [
+        0,
+        3.55,
+        0.45
+      ],
+      "size": [
+        2.85,
+        0.16,
+        1.25
+      ],
+      "material": "brushed steel",
+      "role": "Mid-stack transformer block pulled forward as an exploded cutaway so attention and MoE internals remain visible.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_tray_032",
+        "residual_bus",
+        "attn_pre_norm",
+        "ffn_pre_norm",
+        "layer_tray_080"
+      ]
+    },
+    {
+      "id": "layer_tray_080",
+      "name": "Layer Tray 80",
+      "shape": "box",
+      "position": [
+        0,
+        4.55,
+        0
+      ],
+      "size": [
+        2.65,
+        0.18,
+        1.05
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Visible tray marking the post-exploded depth section of the deep-narrow stack.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "exploded_block_064",
+        "residual_bus",
+        "layer_tray_096"
+      ]
+    },
+    {
+      "id": "layer_tray_096",
+      "name": "Layer Tray 96",
+      "shape": "box",
+      "position": [
+        0,
+        5.25,
+        0
+      ],
+      "size": [
+        2.65,
+        0.18,
+        1.05
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Visible tray corresponding to the full depth of GLM-4.5 before the projected GLM-5.1 extension.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_tray_080",
+        "residual_bus",
+        "layer_tray_112"
+      ]
+    },
+    {
+      "id": "layer_tray_112",
+      "name": "Layer Tray 112",
+      "shape": "box",
+      "position": [
+        0,
+        5.95,
+        0
+      ],
+      "size": [
+        2.65,
+        0.18,
+        1.05
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Visible tray in the projected extra-depth segment beyond GLM-4.5.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_tray_096",
+        "residual_bus",
+        "layer_tray_128_marker"
+      ]
+    },
+    {
+      "id": "layer_tray_128_marker",
+      "name": "Layer Tray 128 Final",
+      "shape": "box",
+      "position": [
+        0,
+        6.65,
+        0
+      ],
+      "size": [
+        2.65,
+        0.18,
+        1.05
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Final transformer tray completing the projected 128-layer residual tower.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_tray_112",
+        "residual_bus",
+        "final_norm"
+      ]
+    },
+    {
+      "id": "attn_pre_norm",
+      "name": "Attention Pre-RMSNorm",
+      "shape": "box",
+      "position": [
+        -2.2,
+        3.28,
+        0.45
+      ],
+      "size": [
+        0.72,
+        0.16,
+        0.5
+      ],
+      "material": "white composite",
+      "role": "Pre-normalises the residual stream before the attention projections in the exploded layer.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "exploded_block_064",
+        "q_projection_bank"
+      ]
+    },
+    {
+      "id": "q_projection_bank",
+      "name": "96-Head Q Projection Bank",
+      "shape": "box",
+      "position": [
+        -2.2,
+        3.68,
+        0.45
+      ],
+      "size": [
+        0.92,
+        0.2,
+        0.58
+      ],
+      "material": "aluminum",
+      "role": "Projects d=5760 hidden states into 96 query heads for dense causal attention.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "≈2·d·d for the query-side projection at model width",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "attn_pre_norm",
+        "mla_down_projection",
+        "qk_rope_norm"
+      ]
+    },
+    {
+      "id": "mla_down_projection",
+      "name": "MLA KV Down-Projection c_kv≈768",
+      "shape": "box",
+      "position": [
+        -3.35,
+        3.68,
+        0.45
+      ],
+      "size": [
+        0.9,
+        0.2,
+        0.58
+      ],
+      "material": "brushed steel",
+      "role": "Compresses K and V into a learned 768-dimensional latent so long-context cache storage is reduced.",
+      "compute_profile": "gpu-compute-bound",
+      "memory_footprint": "Stores c_kv≈768 latent bytes per token per layer before reconstruction",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "q_projection_bank",
+        "kv_latent_cache_a",
+        "kv_latent_cache_b",
+        "kv_up_projection"
+      ]
+    },
+    {
+      "id": "kv_latent_cache_a",
+      "name": "KV Latent Cache Page A",
+      "shape": "box",
+      "position": [
+        -4.25,
+        4.25,
+        0.15
+      ],
+      "size": [
+        0.38,
+        2.8,
+        0.55
+      ],
+      "material": "glass display",
+      "role": "First visible cache page stores MLA latent keys and values for the 256K native context window.",
+      "compute_profile": "memory-capacity-bound",
+      "memory_footprint": "≈25 GiB per 256K-token sequence across 128 layers at FP8 latent scale",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "mla_down_projection",
+        "kv_latent_cache_b",
+        "kv_memory_scale"
+      ]
+    },
+    {
+      "id": "kv_latent_cache_b",
+      "name": "KV Latent Cache Page B",
+      "shape": "box",
+      "position": [
+        -3.75,
+        4.25,
+        0.15
+      ],
+      "size": [
+        0.38,
+        2.8,
+        0.55
+      ],
+      "material": "glass display",
+      "role": "Second visible cache page shows the paged long-context memory path rather than hiding it in one cylinder.",
+      "compute_profile": "memory-capacity-bound",
+      "memory_footprint": "FP8 latent cache is projected at roughly half plain GQA(8) storage",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "kv_latent_cache_a",
+        "mla_down_projection",
+        "kv_up_projection"
+      ]
+    },
+    {
+      "id": "kv_up_projection",
+      "name": "KV Up-Projection Reconstructor",
+      "shape": "box",
+      "position": [
+        -3.35,
+        4.48,
+        0.45
+      ],
+      "size": [
+        0.9,
+        0.2,
+        0.58
+      ],
+      "material": "aluminum",
+      "role": "Reconstructs full K and V tensors from the cached MLA latent before attention scoring.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "kv_latent_cache_b",
+        "qk_rope_norm"
+      ]
+    },
+    {
+      "id": "qk_rope_norm",
+      "name": "QK-Norm and Partial RoPE",
+      "shape": "cylinder",
+      "position": [
+        -2.2,
+        4.15,
+        0.45
+      ],
+      "size": [
+        0.33,
+        0.08
+      ],
+      "material": "brass",
+      "role": "Applies QK RMSNorm and partial rotary position encoding before the attention kernel.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "embarrassingly-parallel",
+      "connections": [
+        "q_projection_bank",
+        "kv_up_projection",
+        "flash_attention_core"
+      ]
+    },
+    {
+      "id": "flash_attention_core",
+      "name": "FlashAttention-3 Causal Core",
+      "shape": "box",
+      "position": [
+        -2.2,
+        4.62,
+        0.45
+      ],
+      "size": [
+        0.98,
+        0.22,
+        0.62
+      ],
+      "material": "black composite",
+      "role": "Computes dense causal attention over the projected 256K context using tiled GPU kernels.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "embarrassingly-parallel",
+      "connections": [
+        "qk_rope_norm",
+        "o_projection"
+      ]
+    },
+    {
+      "id": "o_projection",
+      "name": "Attention O Projection",
+      "shape": "box",
+      "position": [
+        -2.2,
+        5.05,
+        0.45
+      ],
+      "size": [
+        0.92,
+        0.2,
+        0.58
+      ],
+      "material": "copper",
+      "role": "Projects attention output back to d=5760 and adds it to the residual bus.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "flash_attention_core",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "kv_memory_scale",
+      "name": "256K Context Scale Gauge",
+      "shape": "box",
+      "position": [
+        -4.55,
+        4.25,
+        0.9
+      ],
+      "size": [
+        0.08,
+        2.8,
+        0.55
+      ],
+      "material": "steel",
+      "role": "Vertical gauge annotates that the cache lane is sized for the projected 256K native context.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "left_upright",
+        "kv_latent_cache_a"
+      ]
+    },
+    {
+      "id": "ffn_pre_norm",
+      "name": "MoE FFN Pre-RMSNorm",
+      "shape": "box",
+      "position": [
+        2,
+        3.28,
+        0.45
+      ],
+      "size": [
+        0.72,
+        0.16,
+        0.5
+      ],
+      "material": "white composite",
+      "role": "Pre-normalises the residual stream before the routed SwiGLU expert layer.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "exploded_block_064",
+        "router_gate"
+      ]
+    },
+    {
+      "id": "router_gate",
+      "name": "Top-8 Sigmoid Router",
+      "shape": "cylinder",
+      "position": [
+        2.75,
+        3.7,
+        0.45
+      ],
+      "size": [
+        0.36,
+        0.12
+      ],
+      "material": "glass display",
+      "role": "Scores 256 routed experts and selects the top 8 with loss-free balance bias.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "≈2·5760·256 ≈3 MFLOP per token",
+      "parallelism": "tensor-parallel",
+      "algorithm": "scores=sigmoid(x@W_router)+b_balance; top8=topk(scores,8); weights=normalize(top8)",
+      "connections": [
+        "ffn_pre_norm",
+        "group_limit_selector"
+      ]
+    },
+    {
+      "id": "group_limit_selector",
+      "name": "≤4 of 8 Group Limiter",
+      "shape": "torus",
+      "position": [
+        3.35,
+        3.7,
+        0.45
+      ],
+      "size": [
+        0.42,
+        0.06
+      ],
+      "material": "rubber",
+      "role": "Constrains selected experts to at most four of eight device groups to bound all-to-all traffic.",
+      "compute_profile": "communication-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "router_gate",
+        "expert_alltoall_bus"
+      ]
+    },
+    {
+      "id": "expert_alltoall_bus",
+      "name": "Expert All-to-All Bus",
+      "shape": "cylinder",
+      "position": [
+        4,
+        3.7,
+        0.45
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.08,
+        1
+      ],
+      "material": "copper",
+      "role": "Dispatches token slices to expert-parallel shards and combines the returned activations.",
+      "compute_profile": "communication-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "group_limit_selector",
+        "routed_expert_tile_a",
+        "routed_expert_tile_b",
+        "routed_expert_tile_c",
+        "routed_expert_tile_d",
+        "shared_expert"
+      ]
+    },
+    {
+      "id": "routed_expert_tile_a",
+      "name": "Routed Expert Tile A 1-64",
+      "shape": "box",
+      "position": [
+        4.8,
+        3.15,
+        0.05
+      ],
+      "size": [
+        0.68,
+        0.34,
+        0.52
+      ],
+      "material": "aluminum",
+      "role": "Visible quarter of the 256 fine-grained SwiGLU expert bank, representing experts 1 through 64.",
+      "compute_profile": "gpu-compute-bound",
+      "memory_footprint": "64 experts × 3·5760·1408 FP4 weights in this visible quarter",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "expert_alltoall_bus",
+        "fp4_qat_plate",
+        "moe_combine_gate"
+      ]
+    },
+    {
+      "id": "routed_expert_tile_b",
+      "name": "Routed Expert Tile B 65-128",
+      "shape": "box",
+      "position": [
+        5.55,
+        3.15,
+        0.05
+      ],
+      "size": [
+        0.68,
+        0.34,
+        0.52
+      ],
+      "material": "aluminum",
+      "role": "Visible quarter of the routed expert bank, representing experts 65 through 128.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "expert_alltoall_bus",
+        "fp4_qat_plate",
+        "moe_combine_gate"
+      ]
+    },
+    {
+      "id": "routed_expert_tile_c",
+      "name": "Routed Expert Tile C 129-192",
+      "shape": "box",
+      "position": [
+        4.8,
+        3.85,
+        0.05
+      ],
+      "size": [
+        0.68,
+        0.34,
+        0.52
+      ],
+      "material": "aluminum",
+      "role": "Visible quarter of the routed expert bank, representing experts 129 through 192.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "expert_alltoall_bus",
+        "fp4_qat_plate",
+        "moe_combine_gate"
+      ]
+    },
+    {
+      "id": "routed_expert_tile_d",
+      "name": "Routed Expert Tile D 193-256",
+      "shape": "box",
+      "position": [
+        5.55,
+        3.85,
+        0.05
+      ],
+      "size": [
+        0.68,
+        0.34,
+        0.52
+      ],
+      "material": "aluminum",
+      "role": "Visible quarter of the routed expert bank, representing experts 193 through 256.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "Top-8 active experts cost ≈400 MFLOP per layer at d_ff≈1408",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "expert_alltoall_bus",
+        "fp4_qat_plate",
+        "moe_combine_gate"
+      ]
+    },
+    {
+      "id": "shared_expert",
+      "name": "Always-On Shared Expert",
+      "shape": "box",
+      "position": [
+        5.2,
+        4.45,
+        0.05
+      ],
+      "size": [
+        0.72,
+        0.3,
+        0.52
+      ],
+      "material": "brushed steel",
+      "role": "Single shared expert handles common computation for every token alongside the top-8 routed experts.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "expert_alltoall_bus",
+        "overflow_shared_expert",
+        "moe_combine_gate"
+      ]
+    },
+    {
+      "id": "overflow_shared_expert",
+      "name": "Capacity Overflow Shared Expert",
+      "shape": "box",
+      "position": [
+        6.05,
+        4.45,
+        0.05
+      ],
+      "size": [
+        0.58,
+        0.3,
+        0.52
+      ],
+      "material": "forged steel",
+      "role": "Projected overflow path absorbs tokens when routed expert capacity is saturated.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "shared_expert",
+        "moe_combine_gate"
+      ]
+    },
+    {
+      "id": "fp4_qat_plate",
+      "name": "FP4 QAT Expert Weight Plate",
+      "shape": "box",
+      "position": [
+        5.18,
+        2.72,
+        0.05
+      ],
+      "size": [
+        1.6,
+        0.12,
+        0.62
+      ],
+      "material": "brass",
+      "role": "Quantisation-aware FP4 plate marks the projected fourfold routed-expert weight memory reduction versus BF16.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "Routed FFN weights projected at roughly 0.25× BF16 storage",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "routed_expert_tile_a",
+        "routed_expert_tile_b",
+        "routed_expert_tile_c",
+        "routed_expert_tile_d"
+      ]
+    },
+    {
+      "id": "moe_combine_gate",
+      "name": "Weighted MoE Combine Gate",
+      "shape": "cylinder",
+      "position": [
+        3.35,
+        4.65,
+        0.45
+      ],
+      "size": [
+        0.34,
+        0.12
+      ],
+      "material": "copper",
+      "role": "Reweights and sums the eight routed expert outputs plus shared-expert output before the residual add.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "routed_expert_tile_a",
+        "routed_expert_tile_b",
+        "routed_expert_tile_c",
+        "routed_expert_tile_d",
+        "shared_expert",
+        "overflow_shared_expert",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "final_norm",
+      "name": "Final RMSNorm",
+      "shape": "box",
+      "position": [
+        0,
+        7.35,
+        0
+      ],
+      "size": [
+        2.2,
+        0.16,
+        0.85
+      ],
+      "material": "white composite",
+      "role": "Normalises the final residual state before tied vocabulary projection and MTP heads.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "layer_tray_128_marker",
+        "residual_bus",
+        "prediction_head"
+      ]
+    },
+    {
+      "id": "prediction_head",
+      "name": "Tied LM Head",
+      "shape": "box",
+      "position": [
+        0,
+        8.05,
+        0
+      ],
+      "size": [
+        2.8,
+        0.34,
+        1
+      ],
+      "material": "white composite",
+      "role": "Projects final hidden states back to the approximately 152K-token vocabulary using tied embedding weights.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "final_norm",
+        "embedding_table",
+        "primary_lm_loss",
+        "mtp_block_1"
+      ]
+    },
+    {
+      "id": "mtp_block_1",
+      "name": "MTP Block t+1",
+      "shape": "box",
+      "position": [
+        2.4,
+        8.1,
+        0.35
+      ],
+      "size": [
+        0.92,
+        0.28,
+        0.68
+      ],
+      "material": "carbon fiber",
+      "role": "First multi-token prediction block predicts the t+1 token for speculative decoding.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "prediction_head",
+        "mtp_block_2",
+        "mtp_loss_node"
+      ]
+    },
+    {
+      "id": "mtp_block_2",
+      "name": "MTP Block t+2",
+      "shape": "box",
+      "position": [
+        3.5,
+        8.1,
+        0.35
+      ],
+      "size": [
+        0.92,
+        0.28,
+        0.68
+      ],
+      "material": "carbon fiber",
+      "role": "Second multi-token prediction block extends the projected MTP depth to 2 for faster speculative decoding.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "pipeline-parallel",
+      "algorithm": "for k in 1..2: h_k=mtp_block_k(h_final); logits_k=h_k@E.T; loss+=w_k*CE(logits_k,target_t+k)",
+      "connections": [
+        "mtp_block_1",
+        "mtp_loss_node"
+      ]
+    },
+    {
+      "id": "primary_lm_loss",
+      "name": "Primary LM Loss",
+      "shape": "sphere",
+      "position": [
+        -1.55,
+        8.75,
+        0.15
+      ],
+      "size": [
+        0.22
+      ],
+      "material": "brass",
+      "role": "Primary next-token cross-entropy objective for the tied language-model head.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "data-parallel",
+      "connections": [
+        "prediction_head"
+      ]
+    },
+    {
+      "id": "mtp_loss_node",
+      "name": "Depth-2 MTP Loss",
+      "shape": "sphere",
+      "position": [
+        3,
+        8.75,
+        0.35
+      ],
+      "size": [
+        0.2
+      ],
+      "material": "brass",
+      "role": "Auxiliary weighted loss trains t+1 and t+2 prediction heads jointly with the main objective.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "data-parallel",
+      "connections": [
+        "mtp_block_1",
+        "mtp_block_2"
+      ]
+    },
+    {
+      "id": "muon_optimizer",
+      "name": "Muon Matrix Optimizer",
+      "shape": "box",
+      "position": [
+        -5.25,
+        6.85,
+        0.1
+      ],
+      "size": [
+        1.25,
+        0.7,
+        0.75
+      ],
+      "material": "brushed steel",
+      "role": "Projected Muon optimizer service module applies Newton-Schulz orthonormalised updates to matrix parameters.",
+      "compute_profile": "gpu-compute-bound",
+      "memory_footprint": "Uses one momentum buffer rather than AdamW's two moment buffers for matrix bulk",
+      "parallelism": "data-parallel",
+      "algorithm": "M=beta*M+G; U=newton_schulz(M,iters=10); W-=lr*(rms_scale*U+wd*W)",
+      "connections": [
+        "left_upright",
+        "adamw_carveout",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "adamw_carveout",
+      "name": "AdamW Carve-Out Optimizer",
+      "shape": "box",
+      "position": [
+        -5.25,
+        5.9,
+        0.1
+      ],
+      "size": [
+        1.05,
+        0.48,
+        0.7
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Keeps AdamW for embeddings, LM head, RMSNorm weights, router bias, attention sinks, and scalar carve-outs.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "data-parallel",
+      "connections": [
+        "muon_optimizer",
+        "embedding_table",
+        "prediction_head"
+      ]
+    },
+    {
+      "id": "parallelism_panel",
+      "name": "TP EP PP DP Parallelism Panel",
+      "shape": "box",
+      "position": [
+        6.35,
+        6,
+        0.1
+      ],
+      "size": [
+        1.2,
+        1.45,
+        0.12
+      ],
+      "material": "glass display",
+      "role": "Shows the tensor, expert, pipeline, and data parallel axes that make the projected MoE trainable.",
+      "compute_profile": "communication-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "right_upright",
+        "expert_alltoall_bus"
+      ]
+    },
+    {
+      "id": "training_data_pipe",
+      "name": "Training Data Pipe ~30T Tokens",
+      "shape": "cylinder",
+      "position": [
+        5.25,
+        0.42,
+        0.65
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.14,
+        1.5
+      ],
+      "material": "steel",
+      "role": "Floor-level intake pipe represents the projected roughly 30-trillion-token pretraining and reasoning-RL data stream.",
+      "compute_profile": "storage-bound",
+      "parallelism": "data-parallel",
+      "connections": [
+        "base_frame",
+        "input_plate"
+      ]
+    }
   ]
 }

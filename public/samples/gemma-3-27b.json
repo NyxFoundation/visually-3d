@@ -1,36 +1,138 @@
 {
   "machine_name": "Gemma 3 (27B)",
-  "assembly_instructions": "Read Gemma 3 as a DENSE multimodal stack. Tokens (and image patches!) enter at the floor (X=0,Y=0). Image inputs go through the SigLIP-400M vision encoder on the left at X=-5 — the orange Pan&Scan slicer fans non-square images into multiple 896×896 crops, each crop becomes 256 'soft tokens'. Text and image tokens are concatenated and climb the green residual pillar through 62 dense Transformer blocks. The killer Gemma-3 trick is the LOCAL : GLOBAL attention pattern, 5 LOCAL (sliding-window=1024, RoPE base 10K) blocks for every 1 GLOBAL block (full-context, RoPE base 1M). Local blocks are coloured pale-mint, global blocks are deep-emerald — count them on the side. Each block has dual RMSNorm (pre + post) on both attention and FFN, GQA (32 Q heads sharing 16 KV heads), QK-Norm in place of soft-cap, and a dense SwiGLU FFN (no MoE here — Gemma 3 is fully dense). The amber column on the left at X=-3 is the GQA KV cache, dramatically smaller because 5/6 of layers only ever cache a 1024-token window. The translucent slab at X=8 marks the parallelism plan + distillation-from-larger-teacher. Click any part for FLOPs, memory, parallelism class, scratch-build pseudocode, the dominant bottleneck, and improvement ideas.",
+  "assembly_instructions": [
+    "1. Bolt the thin base_floor plate to the ground plane; it is the root structural member and all other modules ultimately connect to it.",
+    "2. Install front_rail, rear_rail, left_rail, and right_rail on top of base_floor to mark the footprint of the open architecture frame.",
+    "3. Fasten post_front_left, post_front_right, post_back_left, and post_back_right to the rails, then attach top_bridge, top_rear_bridge, top_left_bridge, and top_right_bridge as perimeter rails rather than a roof.",
+    "4. Mount input_text_plate and embedding_table on the center front rail; text tokens enter the embedding table before rising through the residual spine.",
+    "5. Mount input_image_plate, pan_scan_turntable, siglip_encoder, crop_token_tiles, and vision_text_projector on the left branch, then connect the projector into embedding_table.",
+    "6. Install residual_pipe vertically through the open frame and connect embedding_table to it as the main inference data path.",
+    "7. Slide local_band_01 through local_band_10 and global_band_01 through global_band_02 onto the residual_pipe in the visible 5-local-to-1-global rhythm.",
+    "8. Bolt schedule_cartridge_01 through schedule_cartridge_12 to the rear-left service side; each cartridge represents one compact 5L+1G repeat, with the final cartridge noting the truncated 62-layer tail.",
+    "9. Attach layer_ruler_spine and the grouped 62_notch rail to the right service side so the total layer count is mechanically countable while the main stack remains open.",
+    "10. Attach the canonical exploded transformer cell around layer_window_slot: pre-attention norm, QKV projection, QK-Norm, RoPE, attention kernel, O-projection, attention post-norm, FFN pre-norm, SwiGLU FFN, and FFN post-norm.",
+    "11. Bolt kv_cache_window_column and kv_cache_global_column to the left service rail and connect both to attention_kernel to show the cheap local window cache and the smaller set of full-context global caches.",
+    "12. Mount prediction_head at the top of residual_pipe, then route student_logits_conduit from the head to loss_node.",
+    "13. Ground teacher_model, optimizer_adamw, training_data_pipe, and parallelism_plan on their own pedestals or rails.",
+    "14. Route teacher_logits_conduit into loss_node, loss_gradient_conduit from loss_node to optimizer_adamw, adamw_update_conduit from optimizer_adamw back to residual_pipe, and data_ingest_conduit from training_data_pipe to embedding_table."
+  ],
   "metadata": {
     "domain": "ml-architecture",
     "reference": "https://ai.google.dev/gemma/docs/core",
-    "thumbnail_camera": [13, 9, 14],
+    "thumbnail_camera": [
+      13,
+      9,
+      14
+    ],
     "info": {
       "english_name": "Gemma 3 27B (Google DeepMind, 2025) — dense multimodal",
       "summary": "27B-parameter DENSE decoder-only multimodal LM from Google DeepMind. 62 layers × 5376 hidden dim, 32 query heads / 16 KV heads (GQA, ratio 2), SwiGLU FFN, dual RMSNorm (pre + post) on every sublayer, QK-Norm, and the signature 5:1 LOCAL-to-GLOBAL attention pattern (sliding-window 1024 + full-context). Vision through a frozen SigLIP-400M encoder with Pan-and-Scan, 896×896 crops, 256 soft-tokens per image. 128K context (32K for the 1B variant), trained on ~14T tokens with knowledge distillation from a larger teacher.",
       "description": "Gemma 3 is the third generation of Google's open Gemma family. Compared with Gemma 2 it (i) goes multimodal via SigLIP + Pan&Scan, (ii) extends context 8K → 128K, (iii) replaces attention soft-cap with QK-Norm, (iv) uses an extreme 5:1 ratio of LOCAL (sliding-window) to GLOBAL attention layers — local layers do almost all the work, global layers carry long-range information. Local layers use RoPE base 10,000 (standard); global layers use RoPE base 1,000,000 to keep extrapolation clean to 128K. Both pre-norm AND post-norm RMSNorm are applied to attention and FFN — empirically improves training stability of fp16/bf16 deep stacks. The model is DENSE (no MoE) — every parameter activates for every token. Trained on ~14 T tokens via large-batch SGD with knowledge distillation from a larger Gemini teacher.\n\nDesign rationale, in one line each:\n• 5:1 local:global: makes long-context KV cheap because 5/6 of layers only need a 1024-token window.\n• QK-Norm: removes attention-logit blow-ups at long context without the soft-cap's training instability.\n• Dual norm (pre+post): cheap stability win for very deep stacks.\n• SigLIP + Pan&Scan: handles non-square / high-resolution images without resize artefacts.\n• Distillation from teacher: smaller models inherit teacher knowledge cheaply.",
       "facts": [
-        { "label": "total parameters",         "value": "27 B (DENSE — no MoE)" },
-        { "label": "context length",           "value": "128 K (32 K for 1B variant)" },
-        { "label": "transformer layers (L)",   "value": "62" },
-        { "label": "hidden dimension (d)",     "value": "5376" },
-        { "label": "vocabulary size",          "value": "256,000 (multilingual SentencePiece)" },
-        { "label": "query heads (n_h)",        "value": "32" },
-        { "label": "KV heads (GQA groups)",    "value": "16 (ratio 2)" },
-        { "label": "head dimension",           "value": "128" },
-        { "label": "FFN intermediate dim",     "value": "21504 (SwiGLU, 4×d)" },
-        { "label": "attention pattern",        "value": "5 local : 1 global (sliding-window 1024 / full)" },
-        { "label": "RoPE base — local",        "value": "10,000" },
-        { "label": "RoPE base — global",       "value": "1,000,000" },
-        { "label": "QK norm",                  "value": "RMSNorm on Q and K (replaces soft-cap)" },
-        { "label": "norm placement",           "value": "Pre-norm AND post-norm RMSNorm on each sublayer" },
-        { "label": "vision encoder",           "value": "SigLIP-400M, frozen, 896×896 input" },
-        { "label": "image tokens",             "value": "256 soft-tokens per image crop" },
-        { "label": "image input",              "value": "Pan-and-Scan: non-square images sliced into multiple crops" },
-        { "label": "training tokens",          "value": "~14 T" },
-        { "label": "distillation",             "value": "Knowledge distillation from a larger Gemini teacher" },
-        { "label": "optimiser",                "value": "AdamW + large batch" },
-        { "label": "precision",                "value": "BF16 weights, BF16 / FP8 GEMMs" }
+        {
+          "label": "total parameters",
+          "value": "27 B (DENSE — no MoE)"
+        },
+        {
+          "label": "context length",
+          "value": "128 K (32 K for 1B variant)"
+        },
+        {
+          "label": "transformer layers (L)",
+          "value": "62"
+        },
+        {
+          "label": "hidden dimension (d)",
+          "value": "5376"
+        },
+        {
+          "label": "vocabulary size",
+          "value": "256,000 (multilingual SentencePiece)"
+        },
+        {
+          "label": "query heads (n_h)",
+          "value": "32"
+        },
+        {
+          "label": "KV heads (GQA groups)",
+          "value": "16 (ratio 2)"
+        },
+        {
+          "label": "head dimension",
+          "value": "128"
+        },
+        {
+          "label": "FFN intermediate dim",
+          "value": "21504 (SwiGLU, 4×d)"
+        },
+        {
+          "label": "attention pattern",
+          "value": "5 local : 1 global (sliding-window 1024 / full)"
+        },
+        {
+          "label": "RoPE base — local",
+          "value": "10,000"
+        },
+        {
+          "label": "RoPE base — global",
+          "value": "1,000,000"
+        },
+        {
+          "label": "QK norm",
+          "value": "RMSNorm on Q and K (replaces soft-cap)"
+        },
+        {
+          "label": "norm placement",
+          "value": "Pre-norm AND post-norm RMSNorm on each sublayer"
+        },
+        {
+          "label": "vision encoder",
+          "value": "SigLIP-400M, frozen, 896×896 input"
+        },
+        {
+          "label": "image tokens",
+          "value": "256 soft-tokens per image crop"
+        },
+        {
+          "label": "image input",
+          "value": "Pan-and-Scan: non-square images sliced into multiple crops"
+        },
+        {
+          "label": "training tokens",
+          "value": "~14 T"
+        },
+        {
+          "label": "distillation",
+          "value": "Knowledge distillation from a larger Gemini teacher"
+        },
+        {
+          "label": "optimiser",
+          "value": "AdamW + large batch"
+        },
+        {
+          "label": "precision",
+          "value": "BF16 weights, BF16 / FP8 GEMMs"
+        },
+        {
+          "label": "scaled frame footprint",
+          "value": "7.6 m × 4.2 m base, 6.45 m top rail height"
+        },
+        {
+          "label": "visible stack scale",
+          "value": "12 primary layer bands over 4.15 m with a 62-notch side ruler"
+        },
+        {
+          "label": "schedule cartridge scale",
+          "value": "12 cartridges, each 0.38 m wide, representing 5 local + 1 global layers"
+        },
+        {
+          "label": "cache column scale",
+          "value": "local cache radius 0.24 m, global cache radius 0.18 m, both 4.5 m tall"
+        },
+        {
+          "label": "training loop scale",
+          "value": "0.08 m radius conduits route teacher logits, student logits, loss gradient, and AdamW update"
+        }
       ],
       "comparisons": [
         {
@@ -51,375 +153,2047 @@
         }
       ],
       "sources": [
-        { "title": "Gemma 3 Technical Report",         "url": "https://arxiv.org/abs/2503.19786" },
-        { "title": "Gemma 3 docs (ai.google.dev)",     "url": "https://ai.google.dev/gemma/docs/core" },
-        { "title": "Gemma 3 model card (HF)",          "url": "https://huggingface.co/google/gemma-3-27b-it" },
-        { "title": "SigLIP paper",                     "url": "https://arxiv.org/abs/2303.15343" }
+        {
+          "title": "Gemma 3 Technical Report",
+          "url": "https://arxiv.org/abs/2503.19786"
+        },
+        {
+          "title": "Gemma 3 docs (ai.google.dev)",
+          "url": "https://ai.google.dev/gemma/docs/core"
+        },
+        {
+          "title": "Gemma 3 model card (HF)",
+          "url": "https://huggingface.co/google/gemma-3-27b-it"
+        },
+        {
+          "title": "SigLIP paper",
+          "url": "https://arxiv.org/abs/2303.15343"
+        }
       ]
     }
   },
   "parts": [
     {
-      "id": "input_text",
-      "name": "Input Tokens (text, V=256K)",
+      "id": "base_floor",
+      "name": "Open Architecture Base Floor",
       "shape": "box",
-      "position": [0, 0, 0],
-      "size": [3.6, 0.18, 2.0],
-      "material": "brushed graphite plate",
-      "role": "Text input via the multilingual SentencePiece tokeniser (V=256K). Image tokens get prepended after the vision pipeline.",
+      "position": [
+        0,
+        0.05,
+        0
+      ],
+      "size": [
+        7.6,
+        0.1,
+        4.2
+      ],
+      "material": "brushed steel",
+      "role": "Thin grounded floor plate that roots the entire explanatory machine and prevents hidden chassis volume.",
+      "connections": [
+        "front_rail",
+        "rear_rail",
+        "left_rail",
+        "right_rail",
+        "input_text_plate",
+        "input_image_plate",
+        "optimizer_adamw",
+        "training_data_pipe",
+        "parallelism_plan",
+        "teacher_pedestal"
+      ]
+    },
+    {
+      "id": "front_rail",
+      "name": "Front Frame Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.18,
+        -1.9
+      ],
+      "size": [
+        6.4,
+        0.16,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Front rail carrying the text input, embedding table, and the visible lower edge of the transformer frame.",
+      "connections": [
+        "base_floor",
+        "post_front_left",
+        "post_front_right",
+        "embedding_table"
+      ]
+    },
+    {
+      "id": "rear_rail",
+      "name": "Rear Frame Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.18,
+        1.9
+      ],
+      "size": [
+        6.4,
+        0.16,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Rear rail keeps the open frame square while leaving the center visible from isometric and side views.",
+      "connections": [
+        "base_floor",
+        "post_back_left",
+        "post_back_right",
+        "schedule_cartridge_01"
+      ]
+    },
+    {
+      "id": "left_rail",
+      "name": "Left Service Rail",
+      "shape": "box",
+      "position": [
+        -3.2,
+        0.18,
+        0
+      ],
+      "size": [
+        0.12,
+        0.16,
+        3.8
+      ],
+      "material": "welded steel",
+      "role": "Left rail supports the vision branch, cache columns, and compact layer-schedule cartridges.",
+      "connections": [
+        "base_floor",
+        "post_front_left",
+        "post_back_left",
+        "kv_cache_window_column",
+        "kv_cache_global_column",
+        "schedule_cartridge_01"
+      ]
+    },
+    {
+      "id": "right_rail",
+      "name": "Right Compute Rail",
+      "shape": "box",
+      "position": [
+        3.2,
+        0.18,
+        0
+      ],
+      "size": [
+        0.12,
+        0.16,
+        3.8
+      ],
+      "material": "welded steel",
+      "role": "Right rail supports the exploded FFN side and the 62-notch layer ruler.",
+      "connections": [
+        "base_floor",
+        "post_front_right",
+        "post_back_right",
+        "ffn_swiglu",
+        "layer_ruler_spine"
+      ]
+    },
+    {
+      "id": "post_front_left",
+      "name": "Front Left Open-Frame Post",
+      "shape": "cylinder",
+      "position": [
+        -3.2,
+        3.3,
+        -1.9
+      ],
+      "size": [
+        0.08,
+        6.2
+      ],
+      "material": "welded steel",
+      "role": "Vertical post that holds the frame without forming an opaque wall over the internals.",
+      "connections": [
+        "front_rail",
+        "top_bridge",
+        "top_left_bridge"
+      ]
+    },
+    {
+      "id": "post_front_right",
+      "name": "Front Right Open-Frame Post",
+      "shape": "cylinder",
+      "position": [
+        3.2,
+        3.3,
+        -1.9
+      ],
+      "size": [
+        0.08,
+        6.2
+      ],
+      "material": "welded steel",
+      "role": "Vertical post that makes the tower readable as a built assembly rather than a stack of floating blocks.",
+      "connections": [
+        "front_rail",
+        "top_bridge",
+        "top_right_bridge"
+      ]
+    },
+    {
+      "id": "post_back_left",
+      "name": "Back Left Open-Frame Post",
+      "shape": "cylinder",
+      "position": [
+        -3.2,
+        3.3,
+        1.9
+      ],
+      "size": [
+        0.08,
+        6.2
+      ],
+      "material": "welded steel",
+      "role": "Rear post that braces the left service side while preserving X-ray visibility through the frame.",
+      "connections": [
+        "rear_rail",
+        "top_rear_bridge",
+        "top_left_bridge"
+      ]
+    },
+    {
+      "id": "post_back_right",
+      "name": "Back Right Open-Frame Post",
+      "shape": "cylinder",
+      "position": [
+        3.2,
+        3.3,
+        1.9
+      ],
+      "size": [
+        0.08,
+        6.2
+      ],
+      "material": "welded steel",
+      "role": "Rear post that braces the compute side and gives the model a clear mechanical assembly boundary.",
+      "connections": [
+        "rear_rail",
+        "top_rear_bridge",
+        "top_right_bridge"
+      ]
+    },
+    {
+      "id": "top_bridge",
+      "name": "Top Front Bridge Rail",
+      "shape": "box",
+      "position": [
+        0,
+        6.45,
+        -1.9
+      ],
+      "size": [
+        6.6,
+        0.16,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Front upper rail ties the two front posts while leaving the prediction head visible from above and ISO.",
+      "connections": [
+        "post_front_left",
+        "post_front_right",
+        "prediction_head"
+      ]
+    },
+    {
+      "id": "top_rear_bridge",
+      "name": "Top Rear Bridge Rail",
+      "shape": "box",
+      "position": [
+        0,
+        6.45,
+        1.9
+      ],
+      "size": [
+        6.6,
+        0.16,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Rear upper rail completes the open top frame without making an opaque roof.",
+      "connections": [
+        "post_back_left",
+        "post_back_right",
+        "top_left_bridge",
+        "top_right_bridge"
+      ]
+    },
+    {
+      "id": "top_left_bridge",
+      "name": "Top Left Side Rail",
+      "shape": "box",
+      "position": [
+        -3.2,
+        6.45,
+        0
+      ],
+      "size": [
+        0.12,
+        0.16,
+        3.9
+      ],
+      "material": "welded steel",
+      "role": "Left upper rail braces the cache and vision side while keeping the transformer interior exposed.",
+      "connections": [
+        "post_front_left",
+        "post_back_left",
+        "top_bridge",
+        "top_rear_bridge"
+      ]
+    },
+    {
+      "id": "top_right_bridge",
+      "name": "Top Right Side Rail",
+      "shape": "box",
+      "position": [
+        3.2,
+        6.45,
+        0
+      ],
+      "size": [
+        0.12,
+        0.16,
+        3.9
+      ],
+      "material": "welded steel",
+      "role": "Right upper rail braces the FFN side and ruler without covering the stack.",
+      "connections": [
+        "post_front_right",
+        "post_back_right",
+        "top_bridge",
+        "top_rear_bridge"
+      ]
+    },
+    {
+      "id": "input_text_plate",
+      "name": "Input Tokens Plate",
+      "shape": "box",
+      "position": [
+        0,
+        0.28,
+        -1.35
+      ],
+      "size": [
+        2.6,
+        0.18,
+        0.5
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Grounded plate where multilingual SentencePiece text tokens with vocabulary size 256K enter the model.",
       "compute_profile": "host-cpu",
       "memory_footprint": "4 B / token",
       "parallelism": "embarrassingly-parallel",
-      "algorithm": "tokens = sp.encode(text)  # SentencePiece, multilingual",
-      "connections": ["embedding_table"]
+      "algorithm": "tokens = sp.encode(text)",
+      "connections": [
+        "base_floor",
+        "embedding_table"
+      ]
     },
     {
-      "id": "input_image",
-      "name": "Input Image",
+      "id": "input_image_plate",
+      "name": "Input Image Plate",
       "shape": "box",
-      "position": [-5.0, 0, 0],
-      "size": [1.6, 0.18, 1.6],
-      "material": "white-painted aluminium plate",
-      "role": "Raw image input. Variable resolution and aspect ratio.",
+      "position": [
+        -4.8,
+        0.28,
+        -1
+      ],
+      "size": [
+        1.1,
+        0.18,
+        0.85
+      ],
+      "material": "white composite",
+      "role": "Grounded image input plate for variable-resolution RGB images before Pan-and-Scan cropping.",
       "compute_profile": "host-cpu",
       "parallelism": "embarrassingly-parallel",
       "algorithm": "image: H x W x 3 RGB",
-      "connections": ["pan_and_scan"]
+      "connections": [
+        "base_floor",
+        "pan_scan_turntable"
+      ]
     },
     {
-      "id": "pan_and_scan",
+      "id": "pan_scan_turntable",
       "name": "Pan-and-Scan Slicer",
       "shape": "cylinder",
-      "position": [-5.0, 0.7, 0],
-      "size": [0.7, 0.4],
-      "material": "warm orange acrylic disk",
-      "role": "Algorithm that splits non-square / high-resolution images into multiple 896×896 crops with overlap. Avoids the aspect-ratio distortion of naive resize.",
+      "position": [
+        -4.8,
+        0.65,
+        -1
+      ],
+      "size": [
+        0.48,
+        0.22
+      ],
+      "material": "brass",
+      "role": "Rotary slicer symbol showing non-square images split into overlapping 896 by 896 crops before encoding.",
       "compute_profile": "host-cpu",
       "parallelism": "embarrassingly-parallel",
-      "algorithm": "if aspect(img) > thresh:\n    crops = pan_and_scan(img, tile=896, overlap=…)\nelse:\n    crops = [resize(img, 896)]\n# each crop is processed independently",
-      "improvement_ideas": [
-        "Adaptive crop count based on image content (text-heavy vs natural)."
+      "algorithm": "crops = pan_and_scan(img, tile=896, overlap=True)",
+      "connections": [
+        "input_image_plate",
+        "siglip_encoder",
+        "crop_tile_1",
+        "crop_tile_2",
+        "crop_tile_3"
+      ]
+    },
+    {
+      "id": "crop_tile_1",
+      "name": "896 Crop Tile A",
+      "shape": "box",
+      "position": [
+        -5.35,
+        1.05,
+        -1.35
       ],
-      "connections": ["siglip_encoder"]
+      "size": [
+        0.5,
+        0.06,
+        0.5
+      ],
+      "material": "glass display",
+      "role": "First visible 896 by 896 crop emitted by Pan-and-Scan for independent SigLIP processing.",
+      "connections": [
+        "pan_scan_turntable",
+        "siglip_encoder"
+      ]
+    },
+    {
+      "id": "crop_tile_2",
+      "name": "896 Crop Tile B",
+      "shape": "box",
+      "position": [
+        -4.8,
+        1.15,
+        -1
+      ],
+      "size": [
+        0.5,
+        0.06,
+        0.5
+      ],
+      "material": "glass display",
+      "role": "Second visible 896 by 896 crop showing that multiple image windows can feed the same frozen encoder.",
+      "connections": [
+        "pan_scan_turntable",
+        "siglip_encoder"
+      ]
+    },
+    {
+      "id": "crop_tile_3",
+      "name": "896 Crop Tile C",
+      "shape": "box",
+      "position": [
+        -4.25,
+        1.25,
+        -0.65
+      ],
+      "size": [
+        0.5,
+        0.06,
+        0.5
+      ],
+      "material": "glass display",
+      "role": "Third visible crop tile making the Pan-and-Scan fan-out legible in the isometric render.",
+      "connections": [
+        "pan_scan_turntable",
+        "siglip_encoder"
+      ]
     },
     {
       "id": "siglip_encoder",
-      "name": "SigLIP-400M (frozen vision encoder)",
+      "name": "SigLIP-400M Frozen Vision Encoder",
       "shape": "box",
-      "position": [-5.0, 1.7, 0],
-      "size": [1.4, 1.0, 1.4],
-      "material": "ocean blue ceramic",
-      "role": "Frozen Sigmoid-Loss-Image-Pretraining ViT, 400M params, 14×14 patches → 64×64=4096 → MAP-pooled and projected to 256 'soft tokens' per crop.",
-      "compute_profile": "gpu-compute-bound",
-      "flops_per_token": "≈ 100 GFLOP per image crop (one-shot)",
-      "memory_footprint": "Frozen weights: ~800 MB (BF16)",
-      "parallelism": "embarrassingly-parallel",
-      "algorithm": "patches = patchify(crop, 14)\nfeatures = vit(patches)               # 4096 patches\nsoft_tokens = average_pool(features)  # → 256 tokens",
-      "improvement_ideas": [
-        "Cache soft tokens for repeated images.",
-        "Replace MAP pooling with Q-Former for richer summarisation."
+      "position": [
+        -4.8,
+        1.7,
+        -1
       ],
-      "connections": ["soft_token_proj"]
+      "size": [
+        1.2,
+        0.8,
+        0.8
+      ],
+      "material": "aluminum",
+      "role": "Frozen SigLIP ViT encoder that turns each 896 by 896 crop into features for 256 soft tokens.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "approximately 100 GFLOP per image crop",
+      "memory_footprint": "Frozen weights about 800 MB BF16",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "features = vit(patchify(crop, 14)); soft_tokens = pool(features)",
+      "connections": [
+        "crop_tile_1",
+        "crop_tile_2",
+        "crop_tile_3",
+        "vision_text_projector"
+      ]
     },
     {
-      "id": "soft_token_proj",
+      "id": "vision_text_projector",
       "name": "Vision-Text Projector",
       "shape": "box",
-      "position": [-3.4, 1.7, 0],
-      "size": [0.6, 0.3, 0.6],
-      "material": "frosted teal acrylic",
-      "role": "Linear projector mapping SigLIP features into the LLM's d=5376 embedding space. 256 soft tokens per crop are inserted into the text stream at <image> placeholders.",
+      "position": [
+        -3.4,
+        1.7,
+        -0.75
+      ],
+      "size": [
+        0.55,
+        0.42,
+        0.55
+      ],
+      "material": "aluminum",
+      "role": "Linear projector maps SigLIP crop features into the LLM hidden dimension d=5376.",
       "compute_profile": "gpu-bandwidth-bound",
-      "flops_per_token": "≈ 2·d_vision·d ≈ 11 MFLOP / soft-token",
+      "flops_per_token": "about 11 MFLOP per soft token",
       "parallelism": "tensor-parallel",
-      "algorithm": "soft_h = soft_tokens @ W_proj   # → [256, 5376]\n# inserted at <image> position in the text sequence",
-      "connections": ["embedding_table"]
+      "algorithm": "soft_h = soft_tokens @ W_proj",
+      "connections": [
+        "siglip_encoder",
+        "embedding_table"
+      ]
     },
     {
       "id": "embedding_table",
-      "name": "Embedding (V=256K, d=5376)",
+      "name": "Embedding Table V=256K d=5376",
       "shape": "box",
-      "position": [0, 0.55, 0],
-      "size": [3.4, 0.32, 1.8],
-      "material": "indigo glass slab",
-      "role": "Text token embedding lookup, tied with the LM head. 1.38 B params (~2.75 GiB BF16).",
+      "position": [
+        0,
+        0.62,
+        -1.05
+      ],
+      "size": [
+        2.7,
+        0.38,
+        0.7
+      ],
+      "material": "glass display",
+      "role": "Tied token embedding table that combines text embeddings and projected image soft tokens before the residual stream.",
       "compute_profile": "gpu-bandwidth-bound",
-      "memory_footprint": "256K × 5376 × BF16 ≈ 2.75 GiB",
+      "memory_footprint": "256000 x 5376 x BF16 is about 2.75 GiB",
       "parallelism": "tensor-parallel",
-      "algorithm": "h_text  = E[token_ids]\nh_input = interleave(h_text, h_image_soft)",
-      "connections": ["residual_pipe"]
+      "algorithm": "h_input = interleave(E[token_ids], h_image_soft)",
+      "connections": [
+        "front_rail",
+        "input_text_plate",
+        "vision_text_projector",
+        "residual_pipe",
+        "data_ingest_conduit"
+      ]
     },
     {
       "id": "residual_pipe",
-      "name": "Residual Stream (d=5376, 62 layers)",
+      "name": "Residual Stream d=5376",
       "shape": "cylinder",
-      "position": [0, 5.6, 0],
-      "size": [0.18, 9.8],
-      "material": "translucent emerald polymer",
-      "role": "Pre-norm + post-norm residual carry. y = x + post_norm(sublayer(pre_norm(x))).",
+      "position": [
+        0,
+        3.55,
+        0
+      ],
+      "size": [
+        0.11,
+        5.8
+      ],
+      "material": "brushed steel",
+      "role": "Central vertical residual bus carrying hidden state through 62 dense transformer layers.",
       "compute_profile": "gpu-memory-bound",
       "parallelism": "tensor-parallel",
-      "algorithm": "x = x + post_attn(attn(pre_attn(x)))\nx = x + post_ffn(ffn(pre_ffn(x)))",
-      "connections": ["embedding_table", "block_local_1", "block_local_2", "block_local_3", "block_local_4", "block_local_5", "block_global_1", "block_local_6", "block_global_2", "prediction_head"]
+      "algorithm": "x = x + post_attn(attn(pre_attn(x))); x = x + post_ffn(ffn(pre_ffn(x)))",
+      "connections": [
+        "embedding_table",
+        "local_band_01",
+        "local_band_02",
+        "local_band_03",
+        "local_band_04",
+        "local_band_05",
+        "global_band_01",
+        "local_band_06",
+        "local_band_07",
+        "local_band_08",
+        "local_band_09",
+        "local_band_10",
+        "global_band_02",
+        "prediction_head",
+        "adamw_update_conduit"
+      ]
     },
     {
-      "id": "layer_count_marker",
-      "name": "× 62 Layers (5 LOCAL : 1 GLOBAL pattern)",
+      "id": "layer_window_slot",
+      "name": "Exploded Canonical Transformer Slot",
       "shape": "box",
-      "position": [-2.3, 5.6, 0],
-      "size": [0.05, 9.0, 0.7],
-      "material": "etched graphite gridline",
-      "role": "Marker for the 62-layer depth. Pattern repeats: L L L L L G L L L L L G ... — 5 local layers (sliding-window 1024) per 1 global layer (full context).",
-      "compute_profile": "negligible",
-      "parallelism": "pipeline-parallel"
+      "position": [
+        0,
+        3.45,
+        0
+      ],
+      "size": [
+        0.18,
+        0.9,
+        1.7
+      ],
+      "material": "glass display",
+      "role": "Transparent visual slot that marks one opened transformer layer so its submodules can be inspected around the residual pipe.",
+      "connections": [
+        "residual_pipe",
+        "attn_pre_norm",
+        "ffn_pre_norm"
+      ]
     },
-
-    { "id": "block_local_1",  "name": "Block 1 — LOCAL (window=1024, RoPE 10K)",  "shape": "box", "position": [0, 1.4, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Local sliding-window attention block. Each token attends only to the previous 1024 tokens. RoPE base 10,000.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["attn_pre_norm", "attn_post_norm"] },
-    { "id": "block_local_2",  "name": "Block 2 — LOCAL",                            "shape": "box", "position": [0, 1.95, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Local block 2.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_local_3",  "name": "Block 3 — LOCAL",                            "shape": "box", "position": [0, 2.5, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Local block 3.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_local_4",  "name": "Block 4 — LOCAL",                            "shape": "box", "position": [0, 3.05, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Local block 4.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_local_5",  "name": "Block 5 — LOCAL",                            "shape": "box", "position": [0, 3.6, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Local block 5.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_global_1", "name": "Block 6 — GLOBAL (full ctx, RoPE 1M)",       "shape": "box", "position": [0, 4.2, 0], "size": [3.2, 0.55, 1.5], "material": "deep emerald ceramic", "role": "GLOBAL attention block — attends to the full context, uses RoPE base 1,000,000 to keep angles distinct out to 128K. ~6× bigger compute share at long ctx.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_local_6",  "name": "Block 7 — LOCAL",                            "shape": "box", "position": [0, 4.85, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Local block 7. Pattern resumes.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_global_2", "name": "Block 12 — GLOBAL (later in stack)",         "shape": "box", "position": [0, 5.5, 0], "size": [3.2, 0.55, 1.5], "material": "deep emerald ceramic", "role": "Another GLOBAL block. (Layers 8–11 elided.)", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_local_7",  "name": "Block 60 — LOCAL",                            "shape": "box", "position": [0, 7.6, 0], "size": [3.0, 0.45, 1.4], "material": "pale mint ceramic",   "role": "Late-stack local block. (Layers 13–59 elided.)", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_global_3", "name": "Block 62 — GLOBAL (final)",                  "shape": "box", "position": [0, 8.2, 0], "size": [3.2, 0.55, 1.5], "material": "deep emerald ceramic", "role": "Final block before the LM head — global, gives the head full-context summary.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-
+    {
+      "id": "local_band_01",
+      "name": "Local Layer Band 1",
+      "shape": "box",
+      "position": [
+        0,
+        1.15,
+        0
+      ],
+      "size": [
+        2.4,
+        0.22,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Visible local attention band representing a sliding-window layer with 1024-token context and RoPE base 10000.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "local_tick_01"
+      ]
+    },
+    {
+      "id": "local_band_02",
+      "name": "Local Layer Band 2",
+      "shape": "box",
+      "position": [
+        0,
+        1.52,
+        0
+      ],
+      "size": [
+        2.4,
+        0.22,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Second local band in the 5:1 local-to-global schedule; it caches only a 1024-token window.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "local_tick_02"
+      ]
+    },
+    {
+      "id": "local_band_03",
+      "name": "Local Layer Band 3",
+      "shape": "box",
+      "position": [
+        0,
+        1.89,
+        0
+      ],
+      "size": [
+        2.4,
+        0.22,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Third local band showing that most Gemma 3 layers avoid full-context attention cost.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "local_tick_03"
+      ]
+    },
+    {
+      "id": "local_band_04",
+      "name": "Local Layer Band 4",
+      "shape": "box",
+      "position": [
+        0,
+        2.26,
+        0
+      ],
+      "size": [
+        2.4,
+        0.22,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Fourth local band in the first visible 5-local group before a global layer appears.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "local_tick_04"
+      ]
+    },
+    {
+      "id": "local_band_05",
+      "name": "Local Layer Band 5",
+      "shape": "box",
+      "position": [
+        0,
+        2.63,
+        0
+      ],
+      "size": [
+        2.4,
+        0.22,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Fifth local band completing one local group before the full-context global band.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "local_tick_05"
+      ]
+    },
+    {
+      "id": "global_band_01",
+      "name": "Global Layer Band 6",
+      "shape": "box",
+      "position": [
+        0,
+        3,
+        0
+      ],
+      "size": [
+        2.7,
+        0.28,
+        1.25
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Full-context attention band using RoPE base 1000000 to carry long-range information across the 128K context.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "global_tick_01",
+        "layer_window_slot"
+      ]
+    },
+    {
+      "id": "local_band_06",
+      "name": "Local Layer Band 7",
+      "shape": "box",
+      "position": [
+        0,
+        3.42,
+        0
+      ],
+      "size": [
+        2.4,
+        0.22,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Local band after the global layer showing that the 5:1 pattern resumes instead of switching to full attention.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "local_tick_06"
+      ]
+    },
+    {
+      "id": "local_band_07",
+      "name": "Local Layer Band 8",
+      "shape": "box",
+      "position": [
+        0,
+        3.79,
+        0
+      ],
+      "size": [
+        2.4,
+        0.22,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Visible local band representing another windowed attention layer in the dense stack.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "local_tick_07"
+      ]
+    },
+    {
+      "id": "local_band_08",
+      "name": "Local Layer Band 9",
+      "shape": "box",
+      "position": [
+        0,
+        4.16,
+        0
+      ],
+      "size": [
+        2.4,
+        0.22,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Local sliding-window band that keeps decode memory low for five-sixths of the transformer layers.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "local_tick_08"
+      ]
+    },
+    {
+      "id": "local_band_09",
+      "name": "Local Layer Band 10",
+      "shape": "box",
+      "position": [
+        0,
+        4.53,
+        0
+      ],
+      "size": [
+        2.4,
+        0.22,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Local band in the second visible 5-local group before the next full-context global layer.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "local_tick_09"
+      ]
+    },
+    {
+      "id": "local_band_10",
+      "name": "Local Layer Band 11",
+      "shape": "box",
+      "position": [
+        0,
+        4.9,
+        0
+      ],
+      "size": [
+        2.4,
+        0.22,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Fifth local band of the second visible group, making the 5:1 cadence countable by eye.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "local_tick_10"
+      ]
+    },
+    {
+      "id": "global_band_02",
+      "name": "Global Layer Band 12",
+      "shape": "box",
+      "position": [
+        0,
+        5.3,
+        0
+      ],
+      "size": [
+        2.7,
+        0.28,
+        1.25
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second visible full-context band representing the repeated global layers through layer 62.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "global_tick_02"
+      ]
+    },
+    {
+      "id": "local_tick_01",
+      "name": "Local Count Tick 1",
+      "shape": "box",
+      "position": [
+        -1.55,
+        1.15,
+        0.8
+      ],
+      "size": [
+        0.32,
+        0.08,
+        0.12
+      ],
+      "material": "aluminum",
+      "role": "Small tick mark that helps count visible local layers without blocking the transformer bands.",
+      "connections": [
+        "local_band_01"
+      ]
+    },
+    {
+      "id": "local_tick_02",
+      "name": "Local Count Tick 2",
+      "shape": "box",
+      "position": [
+        -1.55,
+        1.52,
+        0.8
+      ],
+      "size": [
+        0.32,
+        0.08,
+        0.12
+      ],
+      "material": "aluminum",
+      "role": "Small tick mark for the second visible local layer in the 5:1 schedule.",
+      "connections": [
+        "local_band_02"
+      ]
+    },
+    {
+      "id": "local_tick_03",
+      "name": "Local Count Tick 3",
+      "shape": "box",
+      "position": [
+        -1.55,
+        1.89,
+        0.8
+      ],
+      "size": [
+        0.32,
+        0.08,
+        0.12
+      ],
+      "material": "aluminum",
+      "role": "Small tick mark for the third visible local layer in the countable schedule.",
+      "connections": [
+        "local_band_03"
+      ]
+    },
+    {
+      "id": "local_tick_04",
+      "name": "Local Count Tick 4",
+      "shape": "box",
+      "position": [
+        -1.55,
+        2.26,
+        0.8
+      ],
+      "size": [
+        0.32,
+        0.08,
+        0.12
+      ],
+      "material": "aluminum",
+      "role": "Small tick mark for the fourth visible local layer before the global band.",
+      "connections": [
+        "local_band_04"
+      ]
+    },
+    {
+      "id": "local_tick_05",
+      "name": "Local Count Tick 5",
+      "shape": "box",
+      "position": [
+        -1.55,
+        2.63,
+        0.8
+      ],
+      "size": [
+        0.32,
+        0.08,
+        0.12
+      ],
+      "material": "aluminum",
+      "role": "Small tick mark for the fifth local layer completing the local group.",
+      "connections": [
+        "local_band_05"
+      ]
+    },
+    {
+      "id": "global_tick_01",
+      "name": "Global Count Tick 1",
+      "shape": "box",
+      "position": [
+        -1.65,
+        3,
+        0.9
+      ],
+      "size": [
+        0.46,
+        0.1,
+        0.14
+      ],
+      "material": "copper",
+      "role": "Wider tick mark identifying the first visible global full-context layer.",
+      "connections": [
+        "global_band_01"
+      ]
+    },
+    {
+      "id": "local_tick_06",
+      "name": "Local Count Tick 6",
+      "shape": "box",
+      "position": [
+        -1.55,
+        3.42,
+        0.8
+      ],
+      "size": [
+        0.32,
+        0.08,
+        0.12
+      ],
+      "material": "aluminum",
+      "role": "Small tick mark showing the local pattern resumes after a global layer.",
+      "connections": [
+        "local_band_06"
+      ]
+    },
+    {
+      "id": "local_tick_07",
+      "name": "Local Count Tick 7",
+      "shape": "box",
+      "position": [
+        -1.55,
+        3.79,
+        0.8
+      ],
+      "size": [
+        0.32,
+        0.08,
+        0.12
+      ],
+      "material": "aluminum",
+      "role": "Small tick mark for the seventh visible local band in the explanatory stack.",
+      "connections": [
+        "local_band_07"
+      ]
+    },
+    {
+      "id": "local_tick_08",
+      "name": "Local Count Tick 8",
+      "shape": "box",
+      "position": [
+        -1.55,
+        4.16,
+        0.8
+      ],
+      "size": [
+        0.32,
+        0.08,
+        0.12
+      ],
+      "material": "aluminum",
+      "role": "Small tick mark for a later local sliding-window layer.",
+      "connections": [
+        "local_band_08"
+      ]
+    },
+    {
+      "id": "local_tick_09",
+      "name": "Local Count Tick 9",
+      "shape": "box",
+      "position": [
+        -1.55,
+        4.53,
+        0.8
+      ],
+      "size": [
+        0.32,
+        0.08,
+        0.12
+      ],
+      "material": "aluminum",
+      "role": "Small tick mark for the ninth visible local layer.",
+      "connections": [
+        "local_band_09"
+      ]
+    },
+    {
+      "id": "local_tick_10",
+      "name": "Local Count Tick 10",
+      "shape": "box",
+      "position": [
+        -1.55,
+        4.9,
+        0.8
+      ],
+      "size": [
+        0.32,
+        0.08,
+        0.12
+      ],
+      "material": "aluminum",
+      "role": "Small tick mark for the tenth visible local layer before the second global band.",
+      "connections": [
+        "local_band_10"
+      ]
+    },
+    {
+      "id": "global_tick_02",
+      "name": "Global Count Tick 2",
+      "shape": "box",
+      "position": [
+        -1.65,
+        5.3,
+        0.9
+      ],
+      "size": [
+        0.46,
+        0.1,
+        0.14
+      ],
+      "material": "copper",
+      "role": "Wider tick mark identifying the second visible global full-context layer in the repeated stack.",
+      "connections": [
+        "global_band_02"
+      ]
+    },
+    {
+      "id": "schedule_cartridge_01",
+      "name": "Schedule Cartridge 01 Layers 1-6",
+      "shape": "box",
+      "position": [
+        -2.65,
+        1.05,
+        1.45
+      ],
+      "size": [
+        0.38,
+        0.18,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Compact cartridge representing one 5-local-plus-1-global attention repeat for layers 1 through 6.",
+      "connections": [
+        "left_rail",
+        "rear_rail",
+        "schedule_cartridge_02"
+      ]
+    },
+    {
+      "id": "schedule_cartridge_02",
+      "name": "Schedule Cartridge 02 Layers 7-12",
+      "shape": "box",
+      "position": [
+        -2.25,
+        1.05,
+        1.45
+      ],
+      "size": [
+        0.38,
+        0.18,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Compact cartridge representing the second 5-local-plus-1-global repeat in the 62-layer stack.",
+      "connections": [
+        "schedule_cartridge_01",
+        "schedule_cartridge_03"
+      ]
+    },
+    {
+      "id": "schedule_cartridge_03",
+      "name": "Schedule Cartridge 03 Layers 13-18",
+      "shape": "box",
+      "position": [
+        -1.85,
+        1.05,
+        1.45
+      ],
+      "size": [
+        0.38,
+        0.18,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Compact cartridge making the third repeated local/global group countable from the side and top views.",
+      "connections": [
+        "schedule_cartridge_02",
+        "schedule_cartridge_04"
+      ]
+    },
+    {
+      "id": "schedule_cartridge_04",
+      "name": "Schedule Cartridge 04 Layers 19-24",
+      "shape": "box",
+      "position": [
+        -1.45,
+        1.05,
+        1.45
+      ],
+      "size": [
+        0.38,
+        0.18,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Compact cartridge representing another six-layer cadence without adding opaque hidden stack volume.",
+      "connections": [
+        "schedule_cartridge_03",
+        "schedule_cartridge_05"
+      ]
+    },
+    {
+      "id": "schedule_cartridge_05",
+      "name": "Schedule Cartridge 05 Layers 25-30",
+      "shape": "box",
+      "position": [
+        -1.05,
+        1.05,
+        1.45
+      ],
+      "size": [
+        0.38,
+        0.18,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Compact cartridge showing that the 5:1 pattern continues through the middle of the model.",
+      "connections": [
+        "schedule_cartridge_04",
+        "schedule_cartridge_06"
+      ]
+    },
+    {
+      "id": "schedule_cartridge_06",
+      "name": "Schedule Cartridge 06 Layers 31-36",
+      "shape": "box",
+      "position": [
+        -0.65,
+        1.05,
+        1.45
+      ],
+      "size": [
+        0.38,
+        0.18,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Compact cartridge marking the halfway region of the 62-layer transformer depth.",
+      "connections": [
+        "schedule_cartridge_05",
+        "schedule_cartridge_07"
+      ]
+    },
+    {
+      "id": "schedule_cartridge_07",
+      "name": "Schedule Cartridge 07 Layers 37-42",
+      "shape": "box",
+      "position": [
+        -0.25,
+        1.05,
+        1.45
+      ],
+      "size": [
+        0.38,
+        0.18,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Compact cartridge representing a later 5-local-plus-1-global layer group.",
+      "connections": [
+        "schedule_cartridge_06",
+        "schedule_cartridge_08"
+      ]
+    },
+    {
+      "id": "schedule_cartridge_08",
+      "name": "Schedule Cartridge 08 Layers 43-48",
+      "shape": "box",
+      "position": [
+        0.15,
+        1.05,
+        1.45
+      ],
+      "size": [
+        0.38,
+        0.18,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Compact cartridge keeping the high-layer schedule visible without concealing the residual pipe.",
+      "connections": [
+        "schedule_cartridge_07",
+        "schedule_cartridge_09"
+      ]
+    },
+    {
+      "id": "schedule_cartridge_09",
+      "name": "Schedule Cartridge 09 Layers 49-54",
+      "shape": "box",
+      "position": [
+        0.55,
+        1.05,
+        1.45
+      ],
+      "size": [
+        0.38,
+        0.18,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Compact cartridge for the ninth repeated schedule group near the top of the model.",
+      "connections": [
+        "schedule_cartridge_08",
+        "schedule_cartridge_10"
+      ]
+    },
+    {
+      "id": "schedule_cartridge_10",
+      "name": "Schedule Cartridge 10 Layers 55-60",
+      "shape": "box",
+      "position": [
+        0.95,
+        1.05,
+        1.45
+      ],
+      "size": [
+        0.38,
+        0.18,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Compact cartridge representing layers 55 through 60 before the two-layer tail.",
+      "connections": [
+        "schedule_cartridge_09",
+        "schedule_cartridge_11"
+      ]
+    },
+    {
+      "id": "schedule_cartridge_11",
+      "name": "Schedule Tail Cartridge Layer 61",
+      "shape": "box",
+      "position": [
+        1.35,
+        1.05,
+        1.45
+      ],
+      "size": [
+        0.28,
+        0.18,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Tail cartridge marking layer 61 so the total count does not round up to a false 66-layer model.",
+      "connections": [
+        "schedule_cartridge_10",
+        "schedule_cartridge_12"
+      ]
+    },
+    {
+      "id": "schedule_cartridge_12",
+      "name": "Schedule Tail Cartridge Layer 62",
+      "shape": "box",
+      "position": [
+        1.68,
+        1.05,
+        1.45
+      ],
+      "size": [
+        0.28,
+        0.18,
+        0.7
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Final tail cartridge marking layer 62 and closing the countable transformer depth.",
+      "connections": [
+        "schedule_cartridge_11",
+        "layer_ruler_spine"
+      ]
+    },
+    {
+      "id": "layer_ruler_spine",
+      "name": "Sixty-Two Layer Ruler Spine",
+      "shape": "box",
+      "position": [
+        2.95,
+        3.2,
+        1.35
+      ],
+      "size": [
+        0.08,
+        4.6,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Right-side ruler spine carrying 62 small notches so the model depth is countable without hiding the stack.",
+      "connections": [
+        "right_rail",
+        "schedule_cartridge_12",
+        "notch_bank_local_lower",
+        "notch_bank_global",
+        "notch_bank_local_upper"
+      ]
+    },
+    {
+      "id": "notch_bank_local_lower",
+      "name": "Layer Notches 1-30 Local Bank",
+      "shape": "box",
+      "position": [
+        3.12,
+        2.35,
+        1.35
+      ],
+      "size": [
+        0.28,
+        1.9,
+        0.06
+      ],
+      "material": "aluminum",
+      "role": "Dense lower comb of thirty local-layer notches that makes the first half of the 62-layer count visible.",
+      "connections": [
+        "layer_ruler_spine"
+      ]
+    },
+    {
+      "id": "notch_bank_global",
+      "name": "Global Layer Notches 6 12 18 24 30 36 42 48 54 60",
+      "shape": "box",
+      "position": [
+        3.22,
+        3.2,
+        1.52
+      ],
+      "size": [
+        0.42,
+        3.9,
+        0.07
+      ],
+      "material": "copper",
+      "role": "Offset brass comb marks the ten full-context global layers at every sixth position through layer 60.",
+      "connections": [
+        "layer_ruler_spine"
+      ]
+    },
+    {
+      "id": "notch_bank_local_upper",
+      "name": "Layer Notches 31-62 Local Bank",
+      "shape": "box",
+      "position": [
+        3.12,
+        4.05,
+        1.35
+      ],
+      "size": [
+        0.28,
+        2.1,
+        0.06
+      ],
+      "material": "aluminum",
+      "role": "Dense upper comb of thirty-two layer notches completes the count through layer 62.",
+      "connections": [
+        "layer_ruler_spine"
+      ]
+    },
     {
       "id": "attn_pre_norm",
-      "name": "Pre-Attn RMSNorm",
+      "name": "Pre-Attention RMSNorm",
       "shape": "box",
-      "position": [-1.8, 2.45, 0],
-      "size": [0.55, 0.18, 0.6],
-      "material": "matte ivory tile",
-      "role": "Pre-norm RMSNorm before attention. γ ∈ R^d learned.",
+      "position": [
+        -1.7,
+        3.05,
+        -0.55
+      ],
+      "size": [
+        0.58,
+        0.18,
+        0.42
+      ],
+      "material": "white composite",
+      "role": "Pre-attention RMSNorm normalizes hidden states before QKV projection using a learned gamma vector of length d.",
       "compute_profile": "gpu-bandwidth-bound",
       "parallelism": "tensor-parallel",
-      "algorithm": "y = γ * x / sqrt(mean(x*x) + eps)",
-      "connections": ["attn_qkv_proj"]
+      "algorithm": "y = gamma * x / sqrt(mean(x*x) + eps)",
+      "connections": [
+        "layer_window_slot",
+        "attn_qkv_proj"
+      ]
     },
     {
       "id": "attn_qkv_proj",
-      "name": "GQA · QKV Proj (32 Q / 16 KV)",
+      "name": "GQA QKV Projection 32Q 16KV",
       "shape": "box",
-      "position": [-1.8, 2.85, 0],
-      "size": [0.7, 0.22, 0.7],
-      "material": "anodised aluminium tile",
-      "role": "Fused QKV projection. 32 query heads share 16 KV heads (group ratio 2). Each head is 128-dim.",
+      "position": [
+        -2.15,
+        3.45,
+        -0.55
+      ],
+      "size": [
+        0.72,
+        0.26,
+        0.52
+      ],
+      "material": "aluminum",
+      "role": "Fused projection creates 32 query heads and 16 shared key-value heads for grouped-query attention.",
       "compute_profile": "gpu-compute-bound",
-      "flops_per_token": "≈ 2·d·(n_h + 2·n_kv)·d_h ≈ 88 MFLOP",
+      "flops_per_token": "about 88 MFLOP per token",
       "parallelism": "tensor-parallel",
-      "algorithm": "Q = x @ W_Q  # [B,T, 32, 128]\nK = x @ W_K  # [B,T, 16, 128]\nV = x @ W_V  # [B,T, 16, 128]\nQ, K = qk_rmsnorm(Q, K)\nQ, K = apply_rope(Q, K, base=10K_local OR 1M_global)",
-      "connections": ["qk_norm_disk", "rope_disk", "attn_kernel"]
+      "algorithm": "Q,K,V = x @ W_qkv; Q,K = qk_rmsnorm(Q,K)",
+      "connections": [
+        "attn_pre_norm",
+        "qk_norm_ring",
+        "rope_ring"
+      ]
     },
     {
-      "id": "qk_norm_disk",
-      "name": "QK-Norm (replaces soft-cap)",
-      "shape": "cylinder",
-      "position": [-1.8, 3.15, 0],
-      "size": [0.34, 0.05],
-      "material": "polished pewter ring",
-      "role": "RMSNorm on Q and K BEFORE the dot product. Cleaner long-context behaviour than Gemma-2's logit soft-cap.",
+      "id": "qk_norm_ring",
+      "name": "QK-Norm Ring",
+      "shape": "torus",
+      "position": [
+        -2.75,
+        3.45,
+        -0.55
+      ],
+      "size": [
+        0.22,
+        0.04
+      ],
+      "material": "brushed steel",
+      "role": "Ring symbol for RMSNorm applied to query and key vectors before attention logits are formed.",
       "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "embarrassingly-parallel"
+      "parallelism": "embarrassingly-parallel",
+      "connections": [
+        "attn_qkv_proj",
+        "attention_kernel"
+      ]
     },
     {
-      "id": "rope_disk",
-      "name": "RoPE (10K local / 1M global)",
-      "shape": "cylinder",
-      "position": [-1.8, 3.25, 0],
-      "size": [0.36, 0.05],
-      "material": "rose-gold annulus",
-      "role": "Two RoPE bases live in the model: 10K for local layers (standard), 1M for global layers (extends cleanly to 128K).",
+      "id": "rope_ring",
+      "name": "RoPE Dual-Base Ring",
+      "shape": "torus",
+      "position": [
+        -2.75,
+        3.8,
+        -0.55
+      ],
+      "size": [
+        0.24,
+        0.04
+      ],
+      "material": "copper",
+      "role": "Ring symbol for RoPE using base 10000 on local layers and base 1000000 on global layers.",
       "compute_profile": "negligible",
       "parallelism": "embarrassingly-parallel",
-      "algorithm": "freqs = base ** (-2*i/d)\nQ_rot = (Q[..., even] * cos) - (Q[..., odd] * sin)"
+      "algorithm": "apply_rope(Q,K, base = local ? 10000 : 1000000)",
+      "connections": [
+        "attn_qkv_proj",
+        "attention_kernel"
+      ]
     },
     {
-      "id": "attn_kernel",
-      "name": "FlashAttention-2 (local OR global)",
+      "id": "attention_kernel",
+      "name": "FlashAttention Kernel",
       "shape": "box",
-      "position": [-1.8, 3.55, 0],
-      "size": [0.7, 0.22, 0.7],
-      "material": "midnight blue tile",
-      "role": "Same kernel, different mask. LOCAL layers apply a sliding-window mask (last 1024 tokens). GLOBAL layers apply a standard causal mask over the full context.",
-      "compute_profile": "gpu-compute-bound",
-      "flops_per_token": "Local: ≈ 2·n_h·d_h·1024 ≈ 8 MFLOP. Global: ≈ 2·n_h·d_h·T ≈ 1 GFLOP at T=128K.",
-      "parallelism": "embarrassingly-parallel",
-      "algorithm": "if local:\n    mask = causal_sliding(window=1024)\nelse:\n    mask = causal()\nout = flash_attn(Q, K, V, mask=mask)",
-      "improvement_ideas": [
-        "Ring-attention sharding for global layers at >256K context.",
-        "Sparse global attention (e.g. BigBird) if context grows further."
+      "position": [
+        -2.15,
+        3.95,
+        -0.55
       ],
-      "connections": ["attn_o_proj"]
+      "size": [
+        0.82,
+        0.28,
+        0.56
+      ],
+      "material": "black composite",
+      "role": "Attention compute block applies either a 1024-token sliding mask for local layers or a full causal mask for global layers.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "local about 8 MFLOP; global about 1 GFLOP at T=128K",
+      "parallelism": "embarrassingly-parallel",
+      "algorithm": "out = flash_attn(Q,K,V, mask = local ? sliding_1024 : causal_full)",
+      "connections": [
+        "qk_norm_ring",
+        "rope_ring",
+        "kv_cache_window_column",
+        "kv_cache_global_column",
+        "attn_o_proj"
+      ]
     },
     {
       "id": "attn_o_proj",
-      "name": "Attention · O-Projection",
+      "name": "Attention O Projection",
       "shape": "box",
-      "position": [-1.8, 3.95, 0],
-      "size": [0.7, 0.22, 0.7],
-      "material": "burnished bronze tile",
-      "role": "Output projection back to d=5376.",
+      "position": [
+        -1.45,
+        4.15,
+        -0.55
+      ],
+      "size": [
+        0.62,
+        0.22,
+        0.46
+      ],
+      "material": "brass",
+      "role": "Output projection maps the concatenated attention heads back to hidden width d=5376.",
       "compute_profile": "gpu-compute-bound",
-      "flops_per_token": "≈ 2·n_h·d_h·d ≈ 44 MFLOP",
+      "flops_per_token": "about 44 MFLOP per token",
       "parallelism": "tensor-parallel",
-      "connections": ["attn_post_norm"]
+      "connections": [
+        "attention_kernel",
+        "attn_post_norm"
+      ]
     },
     {
       "id": "attn_post_norm",
-      "name": "Post-Attn RMSNorm",
+      "name": "Post-Attention RMSNorm",
       "shape": "box",
-      "position": [-1.8, 4.25, 0],
-      "size": [0.55, 0.18, 0.6],
-      "material": "matte ivory tile",
-      "role": "POST-norm RMSNorm before adding back into the residual. Gemma-3 is one of the few models that does pre+post RMSNorm — small but consistent stability win.",
+      "position": [
+        -0.85,
+        4,
+        -0.55
+      ],
+      "size": [
+        0.58,
+        0.18,
+        0.42
+      ],
+      "material": "white composite",
+      "role": "Post-attention RMSNorm normalizes the attention output before it is added back to the residual stream.",
       "compute_profile": "gpu-bandwidth-bound",
       "parallelism": "tensor-parallel",
-      "algorithm": "y = post_norm(o)\nresidual += y",
-      "connections": ["residual_pipe"]
+      "algorithm": "residual += post_norm(attn_out)",
+      "connections": [
+        "attn_o_proj",
+        "residual_pipe"
+      ]
     },
-
-    {
-      "id": "kv_cache",
-      "name": "GQA KV Cache (5/6 layers windowed)",
-      "shape": "cylinder",
-      "position": [-3.4, 5.0, 0],
-      "size": [0.55, 6.0],
-      "material": "amber translucent silica",
-      "role": "Hetero KV cache. LOCAL layers (5/6 of total) only need to retain the last 1024 tokens — those layers' KV is essentially free at long context. GLOBAL layers (1/6) hold the full context but at a 16-head GQA rate.",
-      "compute_profile": "memory-capacity-bound",
-      "memory_footprint": "Local: 1024 × 16 × 128 × 2 × FP16 × ~52 layers ≈ 200 MB. Global: 128K × 16 × 128 × 2 × FP16 × ~10 layers ≈ 5 GB. Total much smaller than full-MHA.",
-      "parallelism": "tensor-parallel",
-      "algorithm": "for layer l:\n    if local(l): cache[l] = ring_buffer(K, V, size=1024)\n    else:        cache[l] = paged_kv(K, V)",
-      "improvement_ideas": [
-        "INT4 KV quantisation on global layers (where the bulk lives at 128K).",
-        "RadixAttention for shared system prompts."
-      ],
-      "connections": ["attn_kernel"]
-    },
-
     {
       "id": "ffn_pre_norm",
-      "name": "FFN · Pre-Norm RMSNorm",
+      "name": "Pre-FFN RMSNorm",
       "shape": "box",
-      "position": [1.8, 2.45, 0],
-      "size": [0.55, 0.18, 0.6],
-      "material": "matte ivory tile",
-      "role": "Pre-norm before the SwiGLU FFN.",
+      "position": [
+        1.15,
+        3.05,
+        0.55
+      ],
+      "size": [
+        0.58,
+        0.18,
+        0.42
+      ],
+      "material": "white composite",
+      "role": "Pre-FFN RMSNorm normalizes the residual stream before the dense SwiGLU feed-forward network.",
       "compute_profile": "gpu-bandwidth-bound",
       "parallelism": "tensor-parallel",
-      "connections": ["ffn_swiglu"]
+      "connections": [
+        "layer_window_slot",
+        "ffn_swiglu"
+      ]
     },
     {
       "id": "ffn_swiglu",
-      "name": "SwiGLU FFN (d_ff = 21504, dense)",
+      "name": "Dense SwiGLU FFN dff=21504",
       "shape": "box",
-      "position": [1.8, 2.95, 0],
-      "size": [0.85, 0.45, 0.85],
-      "material": "iridescent silver-grey panel",
-      "role": "Dense SwiGLU FFN. NO MoE — every parameter activates for every token. d_ff = 21504 ≈ 4×d.",
-      "compute_profile": "gpu-compute-bound",
-      "flops_per_token": "≈ 3 × 2·d·d_ff ≈ 690 MFLOP / layer (largest single GEMM in the block)",
-      "memory_footprint": "3 × d × d_ff × BF16 ≈ 692 MB / layer; 62 layers ≈ 43 GB total FFN params",
-      "parallelism": "tensor-parallel",
-      "algorithm": "h = silu(x @ W_gate) * (x @ W_up)\ny = h @ W_down\nresidual += post_norm(y)",
-      "bottleneck": "Largest GEMM in the model — soaks tensor cores at training, becomes bandwidth-bound at decode (small batch).",
-      "improvement_ideas": [
-        "FP8 / FP4 weight quantisation for inference.",
-        "Sequence-parallel FFN to overlap with attention of the next layer."
+      "position": [
+        2.05,
+        3.45,
+        0.55
       ],
-      "connections": ["ffn_post_norm"]
+      "size": [
+        1,
+        0.56,
+        0.72
+      ],
+      "material": "aluminum",
+      "role": "Dense SwiGLU feed-forward network with intermediate size 21504; every parameter is active for every token because Gemma 3 is not MoE.",
+      "compute_profile": "gpu-compute-bound",
+      "flops_per_token": "about 690 MFLOP per layer",
+      "memory_footprint": "about 692 MB BF16 per layer for three FFN matrices",
+      "parallelism": "tensor-parallel",
+      "algorithm": "h = silu(x @ W_gate) * (x @ W_up); y = h @ W_down",
+      "connections": [
+        "right_rail",
+        "ffn_pre_norm",
+        "ffn_post_norm"
+      ]
     },
     {
       "id": "ffn_post_norm",
-      "name": "FFN · Post-Norm RMSNorm",
+      "name": "Post-FFN RMSNorm",
       "shape": "box",
-      "position": [1.8, 3.55, 0],
-      "size": [0.55, 0.18, 0.6],
-      "material": "matte ivory tile",
-      "role": "Post-norm RMSNorm before adding the FFN output back to the residual.",
+      "position": [
+        1.15,
+        3.95,
+        0.55
+      ],
+      "size": [
+        0.58,
+        0.18,
+        0.42
+      ],
+      "material": "white composite",
+      "role": "Post-FFN RMSNorm stabilizes the dense feed-forward output before residual addition.",
       "compute_profile": "gpu-bandwidth-bound",
       "parallelism": "tensor-parallel",
-      "connections": ["residual_pipe"]
+      "algorithm": "residual += post_norm(ffn_out)",
+      "connections": [
+        "ffn_swiglu",
+        "residual_pipe"
+      ]
     },
-
+    {
+      "id": "kv_cache_window_column",
+      "name": "Local Window KV Cache",
+      "shape": "cylinder",
+      "position": [
+        -3,
+        2.65,
+        0.75
+      ],
+      "size": [
+        0.24,
+        4.5
+      ],
+      "material": "glass display",
+      "role": "Tall narrow cache column for the five-sixths of layers that only retain a 1024-token sliding window.",
+      "compute_profile": "memory-capacity-bound",
+      "memory_footprint": "about 200 MB for local layers at 1024-token windows",
+      "parallelism": "tensor-parallel",
+      "algorithm": "cache[l] = ring_buffer(K,V,size=1024)",
+      "connections": [
+        "left_rail",
+        "attention_kernel"
+      ]
+    },
+    {
+      "id": "kv_cache_global_column",
+      "name": "Global KV Cache",
+      "shape": "cylinder",
+      "position": [
+        -3.55,
+        2.65,
+        0.75
+      ],
+      "size": [
+        0.18,
+        4.5
+      ],
+      "material": "copper",
+      "role": "Slimmer count column for the one-sixth of layers that retain full 128K-context key-value pages.",
+      "compute_profile": "memory-capacity-bound",
+      "memory_footprint": "about 5 GB for global layers at 128K context with 16 KV heads",
+      "parallelism": "tensor-parallel",
+      "algorithm": "cache[l] = paged_kv(K,V)",
+      "connections": [
+        "left_rail",
+        "attention_kernel"
+      ]
+    },
     {
       "id": "prediction_head",
-      "name": "LM Head (tied, V=256K)",
+      "name": "Tied LM Head V=256K",
       "shape": "box",
-      "position": [0, 9.05, 0],
-      "size": [3.4, 0.4, 1.6],
-      "material": "white marble slab",
-      "role": "Tied projection back to the 256K vocab.",
+      "position": [
+        0,
+        6.15,
+        -0.75
+      ],
+      "size": [
+        2.7,
+        0.34,
+        0.65
+      ],
+      "material": "white composite",
+      "role": "Tied output projection converts final hidden state back into logits over the 256K-token vocabulary.",
       "compute_profile": "gpu-compute-bound",
-      "flops_per_token": "≈ 2·d·V ≈ 2.75 GFLOP",
+      "flops_per_token": "about 2.75 GFLOP per token",
       "parallelism": "tensor-parallel",
-      "algorithm": "logits = h @ E.T\np      = softmax(logits / T)",
-      "connections": ["lm_loss"]
+      "algorithm": "logits = h @ E.T",
+      "connections": [
+        "residual_pipe",
+        "top_bridge",
+        "loss_node",
+        "student_logits_conduit"
+      ]
     },
     {
-      "id": "lm_loss",
-      "name": "LM Loss + Distillation Loss",
+      "id": "loss_node",
+      "name": "CE plus Distillation Loss",
       "shape": "sphere",
-      "position": [-1.4, 10.0, 0],
-      "size": [0.28],
-      "material": "incandescent ivory",
-      "role": "Cross-entropy on next-token PLUS KL-distillation against a larger teacher's softmax.",
+      "position": [
+        -1.45,
+        6.45,
+        -0.75
+      ],
+      "size": [
+        0.22
+      ],
+      "material": "brass",
+      "role": "Loss node combines next-token cross-entropy with KL distillation from the larger Gemini teacher.",
       "compute_profile": "gpu-bandwidth-bound",
       "parallelism": "data-parallel",
-      "algorithm": "loss = α·CE(logits, target) + (1-α)·KL(softmax(logits/T) || teacher_p)"
+      "algorithm": "loss = alpha*CE(logits,target) + (1-alpha)*KL(student, teacher)",
+      "connections": [
+        "prediction_head",
+        "teacher_model",
+        "optimizer_adamw",
+        "student_logits_conduit",
+        "teacher_logits_conduit",
+        "loss_gradient_conduit"
+      ]
+    },
+    {
+      "id": "student_logits_conduit",
+      "name": "Student Logits Conduit",
+      "shape": "cylinder",
+      "position": [
+        -0.72,
+        6.28,
+        -0.75
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.045,
+        1.46
+      ],
+      "material": "aluminum",
+      "role": "Horizontal conduit carrying the Gemma 3 prediction-head logits into the training loss node.",
+      "connections": [
+        "prediction_head",
+        "loss_node"
+      ]
+    },
+    {
+      "id": "teacher_logits_conduit",
+      "name": "Teacher Logits Distillation Conduit",
+      "shape": "cylinder",
+      "position": [
+        0.65,
+        3.65,
+        0.55
+      ],
+      "rotation": [
+        0,
+        0,
+        0.72
+      ],
+      "size": [
+        0.055,
+        5.65
+      ],
+      "material": "copper",
+      "role": "Distinct training-only conduit routes soft targets from the larger Gemini teacher into the loss node.",
+      "connections": [
+        "teacher_model",
+        "loss_node"
+      ]
+    },
+    {
+      "id": "loss_gradient_conduit",
+      "name": "Loss Gradient Return Conduit",
+      "shape": "cylinder",
+      "position": [
+        -3.4,
+        3.55,
+        0.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0.35
+      ],
+      "size": [
+        0.055,
+        6.1
+      ],
+      "material": "brass",
+      "role": "Training-only return line carries the scalar loss and gradients down to the AdamW optimizer block.",
+      "connections": [
+        "loss_node",
+        "optimizer_adamw"
+      ]
+    },
+    {
+      "id": "adamw_update_conduit",
+      "name": "AdamW Update Conduit",
+      "shape": "cylinder",
+      "position": [
+        -2.65,
+        1.55,
+        0.6
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.055,
+        5.3
+      ],
+      "material": "brushed steel",
+      "role": "Ground-level update line returns AdamW parameter updates from optimizer state back toward the dense model stack.",
+      "connections": [
+        "optimizer_adamw",
+        "residual_pipe"
+      ]
+    },
+    {
+      "id": "data_ingest_conduit",
+      "name": "Training Data Ingest Conduit",
+      "shape": "cylinder",
+      "position": [
+        2.35,
+        0.58,
+        -1.18
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.05,
+        4.7
+      ],
+      "material": "glass display",
+      "role": "Low grounded conduit feeds the 14T-token training corpus from the data plate into the embedding table.",
+      "connections": [
+        "training_data_pipe",
+        "embedding_table"
+      ]
+    },
+    {
+      "id": "teacher_pedestal",
+      "name": "Teacher Model Pedestal",
+      "shape": "box",
+      "position": [
+        2.55,
+        0.25,
+        1.25
+      ],
+      "size": [
+        1.3,
+        0.3,
+        0.9
+      ],
+      "material": "concrete",
+      "role": "Grounded pedestal that prevents the training teacher from floating above the main assembly.",
+      "connections": [
+        "base_floor",
+        "teacher_model"
+      ]
     },
     {
       "id": "teacher_model",
-      "name": "Teacher (larger Gemini)",
+      "name": "Larger Gemini Teacher",
       "shape": "box",
-      "position": [3.0, 10.4, 0],
-      "size": [1.4, 0.5, 1.0],
-      "material": "polished obsidian slab",
-      "role": "Frozen larger Gemini model whose softmax outputs the student distils against. Crucial for matching MoE peers at 27B.",
+      "position": [
+        2.55,
+        0.75,
+        1.25
+      ],
+      "size": [
+        1.25,
+        0.7,
+        0.8
+      ],
+      "material": "black composite",
+      "role": "Frozen larger Gemini model that supplies soft targets for knowledge distillation during training.",
       "compute_profile": "gpu-compute-bound",
-      "parallelism": "data-parallel"
+      "parallelism": "data-parallel",
+      "connections": [
+        "teacher_pedestal",
+        "loss_node",
+        "teacher_logits_conduit"
+      ]
     },
-
     {
       "id": "optimizer_adamw",
-      "name": "AdamW + large batch",
+      "name": "AdamW Optimizer Block",
       "shape": "box",
-      "position": [-6.0, 4.0, 0],
-      "size": [1.4, 1.0, 1.0],
-      "material": "anodised navy block",
-      "role": "AdamW with large batch (millions of tokens / step) on TPU pods. β1=0.9, β2=0.95.",
+      "position": [
+        -5.35,
+        0.65,
+        1.15
+      ],
+      "size": [
+        1,
+        1.1,
+        0.8
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Grounded training optimizer block representing AdamW large-batch updates and two optimizer-state tensors.",
       "compute_profile": "gpu-bandwidth-bound",
-      "memory_footprint": "Adam state: 2× param size.",
-      "parallelism": "data-parallel"
-    },
-
-    {
-      "id": "parallelism_marker",
-      "name": "TPU-pod Parallelism (TP × DP × FSDP)",
-      "shape": "box",
-      "position": [8.5, 5.0, 0],
-      "size": [1.4, 2.4, 0.8],
-      "material": "smoked acrylic translucent",
-      "role": "Trained on TPU pods rather than GPUs. Plan: TP within pod-slice, FSDP for parameter/optimiser sharding, DP across pod-slices. No EP because the model is dense.",
-      "compute_profile": "communication-bound",
+      "memory_footprint": "Adam state is about 2 times parameter size",
       "parallelism": "data-parallel",
-      "improvement_ideas": [
-        "FSDP-2 with parameter prefetching.",
-        "Sequence-parallel norms to remove TP-replicated activations."
+      "connections": [
+        "base_floor",
+        "loss_node",
+        "parallelism_plan",
+        "loss_gradient_conduit",
+        "adamw_update_conduit"
       ]
     },
     {
       "id": "training_data_pipe",
-      "name": "14 T-token Multilingual Corpus",
+      "name": "14T Token Data Pipe",
       "shape": "box",
-      "position": [8.5, 0.6, 0],
-      "size": [1.4, 0.4, 0.8],
-      "material": "etched obsidian plate",
-      "role": "Pre-training data plate: ~14T tokens of multilingual text + interleaved image-text pairs for the vision-language phase.",
+      "position": [
+        4.65,
+        0.35,
+        -1.3
+      ],
+      "size": [
+        1.25,
+        0.3,
+        0.55
+      ],
+      "material": "black composite",
+      "role": "Grounded data feed plate for roughly 14 trillion multilingual text and image-text training tokens.",
       "compute_profile": "storage-bound",
-      "parallelism": "data-parallel"
+      "parallelism": "data-parallel",
+      "connections": [
+        "base_floor",
+        "embedding_table",
+        "optimizer_adamw",
+        "data_ingest_conduit"
+      ]
+    },
+    {
+      "id": "parallelism_plan",
+      "name": "TP DP FSDP Parallelism Plan",
+      "shape": "box",
+      "position": [
+        4.7,
+        1.35,
+        0.75
+      ],
+      "size": [
+        1.1,
+        1.6,
+        0.55
+      ],
+      "material": "glass display",
+      "role": "Translucent training plan block showing tensor parallelism, data parallelism, and FSDP sharding without expert parallelism because the model is dense.",
+      "compute_profile": "communication-bound",
+      "parallelism": "data-parallel",
+      "connections": [
+        "base_floor",
+        "optimizer_adamw",
+        "residual_pipe"
+      ]
     }
   ]
 }

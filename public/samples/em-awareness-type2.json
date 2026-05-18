@@ -1,10 +1,27 @@
 {
   "machine_name": "EM Interference Awareness Device — Type 2 (Mobile)",
-  "assembly_instructions": "Mobile variant of Japan's satellite EM-interference awareness system. Mounted on an Isuzu GIGA truck: operator cabin forward, shelter module with equipment racks aft, telescoping antenna mast with wideband survey antennas, and a small steerable dish for satellite-link monitoring.",
+  "assembly_instructions": [
+    "1. Fabricate the welded-steel ladder frame from two 7.4 m longitudinal rails, install six crossmembers, then bolt the bumper and rear equipment step to the frame.",
+    "2. Install the front steering axle and two rear drive axles, then mount each tire and hub so all tire bottoms sit on the ground plane at y = 0.",
+    "3. Fit front and tandem mudguards above the road wheels, then install the cab shell, windshield, side windows, grille slats, headlamps and mirror brackets to the forward chassis mounts.",
+    "4. Bolt four hydraulic stabilizer outriggers to the frame rails and pin the square foot pads below them for stationary mast operation.",
+    "5. Bolt the EMI shelter floor to the frame, then install the front bulkhead, rear wall, starboard wall and partial port-side lower wall; leave the port upper wall removed and place the roof panel exploded above the shelter as a cutaway reference.",
+    "6. Install the two 19-inch receiver racks, power conditioner, cable tray, operator desk, seats, two consoles and displays on the shelter floor while the cutaway side remains open.",
+    "7. Slide the named RF receiver, spectrum-analyzer, server, storage and timing trays into the rack faces so the electronics chain is visible from the cutaway side.",
+    "8. Route visible coaxial and power trunks from the racks through the cable tray to the telescoping mast base, dish pedestal and auxiliary generator.",
+    "9. Bolt the diesel generator to the rear-right frame brackets and connect its power cable to the conditioner rack.",
+    "10. Assemble the mast pedestal, three telescoping fiberglass mast sections, guy arms, discone antenna, log-periodic boom with dipoles, and GNSS reference dome.",
+    "11. Assemble the azimuth/elevation pedestal, tapered reflector, rim, rear backing plate, feed horn and three feed struts, then cable the dish receiver path back to the RF rack.",
+    "12. Perform final continuity checks: every RF antenna connects to the rack, every heavy module connects to the frame or shelter floor, and all stabilizer pads contact the ground before raising the mast."
+  ],
   "metadata": {
     "reference": "https://jm2040.blogspot.com/2021/07/blog-post.html",
     "domain": "satellite-rf-monitoring",
-    "thumbnail_camera": [10, 5.5, 10],
+    "thumbnail_camera": [
+      10,
+      5.5,
+      10
+    ],
     "info": {
       "japanese_name": "電磁妨害状況把握装置2型",
       "english_name": "Electromagnetic Interference Situation Awareness Device, Type 2",
@@ -16,37 +33,2473 @@
       "contract_value": "¥3.98B (system) + ¥2.57B (initial costs) + ¥146M (8 trucks)",
       "status": "Procured; fielded with JASDF",
       "facts": [
-        { "label": "Type", "value": "Mobile / vehicle-mounted" },
-        { "label": "Platform", "value": "Isuzu GIGA heavy truck, 8 units" },
-        { "label": "Role", "value": "Detect and characterise EM interference against Japanese satellites" },
-        { "label": "Procuring body", "value": "Acquisition, Technology & Logistics Agency (防衛装備庁)" }
+        {
+          "label": "Scale model length",
+          "value": "7.6 m overall scene length, representative of a heavy Isuzu GIGA equipment truck."
+        },
+        {
+          "label": "Shelter envelope",
+          "value": "4.2 m long × 2.4 m wide × 2.2 m high EMI equipment shelter with port-side cutaway."
+        },
+        {
+          "label": "Mast height",
+          "value": "Three telescoping mast sections shown to 5.9 m above ground for elevated RF survey antennas."
+        },
+        {
+          "label": "Wheelbase layout",
+          "value": "Three-axle heavy truck layout with front steering axle and tandem rear drive axles."
+        },
+        {
+          "label": "Dish aperture",
+          "value": "1.0 m class steerable Ku-band monitoring dish represented as a tapered shallow reflector with rim and feed struts."
+        },
+        {
+          "label": "Rack standard",
+          "value": "Two 0.6 m wide 19-inch equipment racks are broken into receiver, analyzer, server, storage and timing trays."
+        },
+        {
+          "label": "Stabilizer span",
+          "value": "Four deployed stabilizer pads span about 4.2 m across the vehicle for static mast operation."
+        },
+        {
+          "label": "Cab width",
+          "value": "Cab details fit within a 2.35 m wide forward-control heavy-truck envelope."
+        },
+        {
+          "label": "Procured vehicles",
+          "value": "Eight Isuzu GIGA trucks contracted for the mobile Type 2 platform."
+        },
+        {
+          "label": "Operational role",
+          "value": "Detect, characterise and train response to electromagnetic interference against Japanese communications satellites."
+        }
       ],
       "sources": [
-        { "title": "JM2040 — 防衛装備庁、電磁妨害状況把握装置を契約", "url": "https://jm2040.blogspot.com/2021/07/blog-post.html" }
+        {
+          "title": "JM2040 — 防衛装備庁、電磁妨害状況把握装置を契約",
+          "url": "https://jm2040.blogspot.com/2021/07/blog-post.html"
+        },
+        {
+          "title": "Japan Ministry of Defense ATLA procurement contract notices",
+          "url": "https://www.mod.go.jp/atla/"
+        },
+        {
+          "title": "Isuzu GIGA heavy-duty truck product family",
+          "url": "https://www.isuzu.co.jp/product/giga/"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "chassis", "name": "Isuzu GIGA Chassis", "shape": "box", "position": [0, 0.55, 0], "size": [7.2, 0.3, 2.5], "material": "painted steel", "role": "Heavy-duty 10-ton truck chassis carrying the shelter and all mounted equipment.", "connections": ["cabin", "shelter", "generator", "wheel_fl", "wheel_fr", "wheel_ml", "wheel_mr", "wheel_rl", "wheel_rr"] },
-    { "id": "cabin", "name": "Driver Cabin", "shape": "box", "position": [-2.7, 1.6, 0], "size": [2.2, 1.6, 2.4], "material": "painted steel", "role": "Two-seat driver cabin for road transit.", "connections": ["chassis", "windshield"] },
-    { "id": "windshield", "name": "Windshield", "shape": "box", "position": [-1.6, 1.9, 0], "size": [0.05, 0.9, 2.1], "material": "glass display", "role": "Cabin windshield.", "connections": ["cabin"] },
-    { "id": "shelter", "name": "Equipment Shelter", "shape": "box", "position": [0.9, 1.9, 0], "size": [4.0, 2.2, 2.45], "material": "painted steel", "role": "EMI-shielded cargo-box shelter enclosing the signal-processing racks and operator consoles.", "connections": ["chassis", "rack", "console", "door"] },
-    { "id": "door", "name": "Rear Access Door", "shape": "box", "position": [2.95, 1.8, 0], "size": [0.06, 1.9, 1.4], "material": "painted steel", "role": "Rear personnel access door.", "connections": ["shelter"] },
-    { "id": "rack", "name": "Signal Processing Rack", "shape": "box", "position": [0.3, 1.9, 0.7], "size": [0.8, 1.8, 0.7], "material": "dark anodized aluminum", "role": "19-inch rack housing SDR receivers, spectrum analysers, and correlator hardware.", "connections": ["shelter", "console", "mast", "dish"] },
-    { "id": "console", "name": "Operator Console", "shape": "box", "position": [1.6, 1.3, -0.6], "size": [1.2, 0.2, 0.7], "material": "dark anodized aluminum", "role": "Analyst workstation for tasking, display, and tactical reporting.", "connections": ["shelter", "rack", "display"] },
-    { "id": "display", "name": "Console Display", "shape": "box", "position": [1.6, 1.9, -0.7], "size": [1.0, 0.7, 0.08], "material": "glass display", "role": "Waterfall / spectrum display.", "connections": ["console"] },
-    { "id": "generator", "name": "Auxiliary Generator", "shape": "box", "position": [3.2, 1.05, 0.9], "size": [0.9, 0.6, 1.0], "material": "painted steel", "role": "Diesel-driven inverter generator providing clean mains while stationary.", "connections": ["chassis", "rack"] },
-    { "id": "mast", "name": "Telescopic Antenna Mast", "shape": "cylinder", "position": [2.3, 4.0, 0.5], "size": [0.1, 4.2], "material": "fiberglass", "role": "Pneumatic mast lifting survey antennas above terrain clutter.", "connections": ["shelter", "rack", "ant_wide", "ant_log", "ant_gps"] },
-    { "id": "ant_wide", "name": "Wideband Discone", "shape": "cylinder", "position": [2.3, 6.3, 0.5], "size": [0.45, 0.5], "material": "brushed steel", "role": "Omnidirectional survey antenna, 25 MHz – 3 GHz.", "connections": ["mast"] },
-    { "id": "ant_log", "name": "Log-Periodic Array", "shape": "box", "position": [1.7, 6.8, 0.5], "size": [1.4, 0.05, 0.4], "material": "brushed steel", "role": "Directional L/S-band array for bearing estimation.", "connections": ["mast"] },
-    { "id": "ant_gps", "name": "GNSS Reference Antenna", "shape": "sphere", "position": [2.3, 7.2, 0.5], "size": [0.14], "material": "white composite", "role": "Time/position reference for coherent capture and geotagging.", "connections": ["mast"] },
-    { "id": "dish", "name": "Steerable Ku-Band Dish", "shape": "cylinder", "position": [0.4, 3.3, 0], "rotation": [1.5707963, 0, 0], "size": [0.9, 0.25], "material": "white composite", "role": "Steerable parabolic dish for direct monitoring of downlinks from Japanese communications satellites.", "connections": ["dish_pedestal", "rack"] },
-    { "id": "dish_pedestal", "name": "Az/El Pedestal", "shape": "cylinder", "position": [0.4, 3.05, 0], "size": [0.25, 0.3], "material": "dark anodized aluminum", "role": "Two-axis positioner aiming the dish at target spacecraft.", "connections": ["shelter", "dish"] },
-    { "id": "wheel_fl", "name": "Wheel FL", "shape": "cylinder", "position": [-2.6, 0.5, -1.25], "rotation": [1.5707963, 0, 0], "size": [0.5, 0.35], "material": "rubber", "role": "Front left wheel.", "connections": ["chassis"] },
-    { "id": "wheel_fr", "name": "Wheel FR", "shape": "cylinder", "position": [-2.6, 0.5, 1.25], "rotation": [1.5707963, 0, 0], "size": [0.5, 0.35], "material": "rubber", "role": "Front right wheel.", "connections": ["chassis"] },
-    { "id": "wheel_ml", "name": "Wheel ML", "shape": "cylinder", "position": [1.5, 0.5, -1.25], "rotation": [1.5707963, 0, 0], "size": [0.5, 0.35], "material": "rubber", "role": "Middle left wheel.", "connections": ["chassis"] },
-    { "id": "wheel_mr", "name": "Wheel MR", "shape": "cylinder", "position": [1.5, 0.5, 1.25], "rotation": [1.5707963, 0, 0], "size": [0.5, 0.35], "material": "rubber", "role": "Middle right wheel.", "connections": ["chassis"] },
-    { "id": "wheel_rl", "name": "Wheel RL", "shape": "cylinder", "position": [2.6, 0.5, -1.25], "rotation": [1.5707963, 0, 0], "size": [0.5, 0.35], "material": "rubber", "role": "Rear left wheel.", "connections": ["chassis"] },
-    { "id": "wheel_rr", "name": "Wheel RR", "shape": "cylinder", "position": [2.6, 0.5, 1.25], "rotation": [1.5707963, 0, 0], "size": [0.5, 0.35], "material": "rubber", "role": "Rear right wheel.", "connections": ["chassis"] }
+    {
+      "id": "frame_left_rail",
+      "name": "Left Ladder-Frame Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.62,
+        -0.92
+      ],
+      "size": [
+        7.4,
+        0.22,
+        0.16
+      ],
+      "material": "welded steel",
+      "role": "Left longitudinal truck frame rail that carries cab, shelter, outriggers and rear equipment loads.",
+      "connections": [
+        "frame_right_rail",
+        "crossmember_front",
+        "crossmember_cab",
+        "crossmember_mid",
+        "crossmember_rear",
+        "front_axle",
+        "rear_axle_1",
+        "rear_axle_2",
+        "shelter_floor",
+        "cab_shell",
+        "outrigger_fl",
+        "outrigger_rl"
+      ]
+    },
+    {
+      "id": "frame_right_rail",
+      "name": "Right Ladder-Frame Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.62,
+        0.92
+      ],
+      "size": [
+        7.4,
+        0.22,
+        0.16
+      ],
+      "material": "welded steel",
+      "role": "Right longitudinal truck frame rail completing the heavy ladder chassis.",
+      "connections": [
+        "frame_left_rail",
+        "crossmember_front",
+        "crossmember_cab",
+        "crossmember_mid",
+        "crossmember_rear",
+        "generator_frame",
+        "outrigger_fr",
+        "outrigger_rr"
+      ]
+    },
+    {
+      "id": "crossmember_front",
+      "name": "Front Frame Crossmember",
+      "shape": "box",
+      "position": [
+        -3.35,
+        0.62,
+        0
+      ],
+      "size": [
+        0.18,
+        0.18,
+        2
+      ],
+      "material": "welded steel",
+      "role": "Front transverse frame member tying the rails ahead of the steering axle.",
+      "connections": [
+        "frame_left_rail",
+        "frame_right_rail",
+        "front_bumper"
+      ]
+    },
+    {
+      "id": "crossmember_cab",
+      "name": "Cab Frame Crossmember",
+      "shape": "box",
+      "position": [
+        -2.05,
+        0.62,
+        0
+      ],
+      "size": [
+        0.16,
+        0.18,
+        2
+      ],
+      "material": "welded steel",
+      "role": "Cab support crossmember that takes the forward cabin mounts.",
+      "connections": [
+        "frame_left_rail",
+        "frame_right_rail",
+        "cab_shell"
+      ]
+    },
+    {
+      "id": "crossmember_mid",
+      "name": "Shelter Mid Crossmember",
+      "shape": "box",
+      "position": [
+        0.65,
+        0.62,
+        0
+      ],
+      "size": [
+        0.18,
+        0.2,
+        2
+      ],
+      "material": "welded steel",
+      "role": "Central crossmember supporting the shelter floor and electronics payload.",
+      "connections": [
+        "frame_left_rail",
+        "frame_right_rail",
+        "shelter_floor"
+      ]
+    },
+    {
+      "id": "crossmember_rear",
+      "name": "Rear Frame Crossmember",
+      "shape": "box",
+      "position": [
+        3.35,
+        0.62,
+        0
+      ],
+      "size": [
+        0.2,
+        0.22,
+        2
+      ],
+      "material": "welded steel",
+      "role": "Rear crossmember tying the chassis behind the tandem axle group.",
+      "connections": [
+        "frame_left_rail",
+        "frame_right_rail",
+        "rear_step",
+        "generator_frame"
+      ]
+    },
+    {
+      "id": "front_bumper",
+      "name": "Front Bumper",
+      "shape": "box",
+      "position": [
+        -3.88,
+        0.78,
+        0
+      ],
+      "size": [
+        0.18,
+        0.32,
+        2.25
+      ],
+      "material": "steel",
+      "role": "Forward underride bumper protecting the cab and radiator area.",
+      "connections": [
+        "crossmember_front",
+        "cab_shell"
+      ]
+    },
+    {
+      "id": "cab_shell",
+      "name": "Isuzu GIGA Cab Shell",
+      "shape": "complex",
+      "position": [
+        -2.75,
+        1.55,
+        0
+      ],
+      "size": [
+        1.85,
+        1.75,
+        2.35
+      ],
+      "material": "welded steel",
+      "role": "Forward control cab for road movement of the mobile RF-monitoring platform.",
+      "connections": [
+        "frame_left_rail",
+        "crossmember_cab",
+        "front_bumper",
+        "windshield",
+        "cab_left_window",
+        "cab_right_window",
+        "cab_grille",
+        "cab_grille_slot_upper",
+        "cab_grille_slot_middle",
+        "cab_grille_slot_lower",
+        "headlight_left",
+        "headlight_right",
+        "mirror_left",
+        "mirror_right",
+        "front_mudguard_left",
+        "front_mudguard_right"
+      ]
+    },
+    {
+      "id": "windshield",
+      "name": "Wide Cab Windshield",
+      "shape": "box",
+      "position": [
+        -3.37,
+        1.86,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.18
+      ],
+      "size": [
+        0.06,
+        0.72,
+        1.75
+      ],
+      "material": "glass display",
+      "role": "Sloped front windshield for the driver and vehicle commander.",
+      "connections": [
+        "cab_shell"
+      ]
+    },
+    {
+      "id": "cab_left_window",
+      "name": "Left Cab Side Window",
+      "shape": "box",
+      "position": [
+        -2.55,
+        1.92,
+        -1.19
+      ],
+      "size": [
+        0.82,
+        0.55,
+        0.04
+      ],
+      "material": "glass display",
+      "role": "Port-side cab window marking the driving compartment in side view.",
+      "connections": [
+        "cab_shell"
+      ]
+    },
+    {
+      "id": "cab_right_window",
+      "name": "Right Cab Side Window",
+      "shape": "box",
+      "position": [
+        -2.55,
+        1.92,
+        1.19
+      ],
+      "size": [
+        0.82,
+        0.55,
+        0.04
+      ],
+      "material": "glass display",
+      "role": "Starboard-side cab window for the opposite door of the driving compartment.",
+      "connections": [
+        "cab_shell"
+      ]
+    },
+    {
+      "id": "cab_grille",
+      "name": "Cab Radiator Grille",
+      "shape": "box",
+      "position": [
+        -3.73,
+        1.28,
+        0
+      ],
+      "size": [
+        0.05,
+        0.55,
+        1.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Dark front grille identifying the forward truck nose and cooling intake.",
+      "connections": [
+        "cab_shell",
+        "cab_grille_slot_upper",
+        "cab_grille_slot_middle",
+        "cab_grille_slot_lower"
+      ]
+    },
+    {
+      "id": "cab_grille_slot_upper",
+      "name": "Upper Grille Slot",
+      "shape": "box",
+      "position": [
+        -3.765,
+        1.42,
+        0
+      ],
+      "size": [
+        0.035,
+        0.045,
+        1.08
+      ],
+      "material": "brushed steel",
+      "role": "Bright horizontal grille bar that gives the cab a heavy Isuzu-style face.",
+      "connections": [
+        "cab_grille",
+        "cab_shell"
+      ]
+    },
+    {
+      "id": "cab_grille_slot_middle",
+      "name": "Middle Grille Slot",
+      "shape": "box",
+      "position": [
+        -3.765,
+        1.27,
+        0
+      ],
+      "size": [
+        0.035,
+        0.045,
+        1.08
+      ],
+      "material": "brushed steel",
+      "role": "Middle cooling slot separating the grille into visible serviceable bands.",
+      "connections": [
+        "cab_grille",
+        "cab_shell"
+      ]
+    },
+    {
+      "id": "cab_grille_slot_lower",
+      "name": "Lower Grille Slot",
+      "shape": "box",
+      "position": [
+        -3.765,
+        1.12,
+        0
+      ],
+      "size": [
+        0.035,
+        0.045,
+        1.08
+      ],
+      "material": "brushed steel",
+      "role": "Lower grille band above the bumper, improving front-view truck recognition.",
+      "connections": [
+        "cab_grille",
+        "cab_shell"
+      ]
+    },
+    {
+      "id": "headlight_left",
+      "name": "Left Headlight Cluster",
+      "shape": "box",
+      "position": [
+        -3.79,
+        1.08,
+        -0.72
+      ],
+      "size": [
+        0.04,
+        0.18,
+        0.34
+      ],
+      "material": "glass display",
+      "role": "Left rectangular headlamp cluster marking road-legal truck equipment.",
+      "connections": [
+        "cab_shell",
+        "front_bumper"
+      ]
+    },
+    {
+      "id": "headlight_right",
+      "name": "Right Headlight Cluster",
+      "shape": "box",
+      "position": [
+        -3.79,
+        1.08,
+        0.72
+      ],
+      "size": [
+        0.04,
+        0.18,
+        0.34
+      ],
+      "material": "glass display",
+      "role": "Right rectangular headlamp cluster matching the left side of the cab nose.",
+      "connections": [
+        "cab_shell",
+        "front_bumper"
+      ]
+    },
+    {
+      "id": "mirror_left",
+      "name": "Left Door Mirror",
+      "shape": "box",
+      "position": [
+        -3.32,
+        1.98,
+        -1.44
+      ],
+      "size": [
+        0.08,
+        0.36,
+        0.22
+      ],
+      "material": "black composite",
+      "role": "Port-side door mirror on a bracket, a visible road-vehicle cue in the ISO view.",
+      "connections": [
+        "cab_shell"
+      ]
+    },
+    {
+      "id": "mirror_right",
+      "name": "Right Door Mirror",
+      "shape": "box",
+      "position": [
+        -3.32,
+        1.98,
+        1.44
+      ],
+      "size": [
+        0.08,
+        0.36,
+        0.22
+      ],
+      "material": "black composite",
+      "role": "Starboard-side door mirror balancing the cab outline and showing driving hardware.",
+      "connections": [
+        "cab_shell"
+      ]
+    },
+    {
+      "id": "front_axle",
+      "name": "Front Steering Axle",
+      "shape": "cylinder",
+      "position": [
+        -2.75,
+        0.48,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        2.35
+      ],
+      "material": "forged steel",
+      "role": "Front steering axle spanning the frame and carrying the two front tires.",
+      "connections": [
+        "frame_left_rail",
+        "frame_right_rail",
+        "tire_front_left",
+        "tire_front_right"
+      ]
+    },
+    {
+      "id": "rear_axle_1",
+      "name": "Forward Rear Drive Axle",
+      "shape": "cylinder",
+      "position": [
+        1.55,
+        0.48,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        2.45
+      ],
+      "material": "forged steel",
+      "role": "First tandem drive axle supporting the shelter and electronics mass.",
+      "connections": [
+        "frame_left_rail",
+        "frame_right_rail",
+        "tire_rear1_left_outer",
+        "tire_rear1_left_inner",
+        "tire_rear1_right_inner",
+        "tire_rear1_right_outer"
+      ]
+    },
+    {
+      "id": "rear_axle_2",
+      "name": "Aft Rear Drive Axle",
+      "shape": "cylinder",
+      "position": [
+        2.55,
+        0.48,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        2.45
+      ],
+      "material": "forged steel",
+      "role": "Second tandem drive axle sharing the rear shelter and generator load.",
+      "connections": [
+        "frame_left_rail",
+        "frame_right_rail",
+        "tire_rear2_left_outer",
+        "tire_rear2_left_inner",
+        "tire_rear2_right_inner",
+        "tire_rear2_right_outer"
+      ]
+    },
+    {
+      "id": "tire_front_left",
+      "name": "Front Left Tire",
+      "shape": "torus",
+      "position": [
+        -2.75,
+        0.48,
+        -1.23
+      ],
+      "size": [
+        0.43,
+        0.13
+      ],
+      "material": "rubber",
+      "role": "Single front-left road tire with a 0.86 m outside diameter.",
+      "connections": [
+        "front_axle",
+        "hub_front_left"
+      ]
+    },
+    {
+      "id": "hub_front_left",
+      "name": "Front Left Wheel Hub",
+      "shape": "cylinder",
+      "position": [
+        -2.75,
+        0.48,
+        -1.23
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.18
+      ],
+      "material": "steel",
+      "role": "Steel hub clamping the front-left tire to the steering axle.",
+      "connections": [
+        "tire_front_left",
+        "front_axle"
+      ]
+    },
+    {
+      "id": "tire_front_right",
+      "name": "Front Right Tire",
+      "shape": "torus",
+      "position": [
+        -2.75,
+        0.48,
+        1.23
+      ],
+      "size": [
+        0.43,
+        0.13
+      ],
+      "material": "rubber",
+      "role": "Single front-right road tire matching the steering axle pair.",
+      "connections": [
+        "front_axle",
+        "hub_front_right"
+      ]
+    },
+    {
+      "id": "hub_front_right",
+      "name": "Front Right Wheel Hub",
+      "shape": "cylinder",
+      "position": [
+        -2.75,
+        0.48,
+        1.23
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.18
+      ],
+      "material": "steel",
+      "role": "Steel hub clamping the front-right tire to the steering axle.",
+      "connections": [
+        "tire_front_right",
+        "front_axle"
+      ]
+    },
+    {
+      "id": "front_mudguard_left",
+      "name": "Front Left Mudguard",
+      "shape": "box",
+      "position": [
+        -2.75,
+        0.95,
+        -1.23
+      ],
+      "size": [
+        0.92,
+        0.12,
+        0.42
+      ],
+      "material": "black composite",
+      "role": "Flat-topped mudguard over the left steering tire, approximating the cab wheel arch.",
+      "connections": [
+        "cab_shell",
+        "tire_front_left"
+      ]
+    },
+    {
+      "id": "front_mudguard_right",
+      "name": "Front Right Mudguard",
+      "shape": "box",
+      "position": [
+        -2.75,
+        0.95,
+        1.23
+      ],
+      "size": [
+        0.92,
+        0.12,
+        0.42
+      ],
+      "material": "black composite",
+      "role": "Flat-topped mudguard over the right steering tire, matching the left wheel-arch cue.",
+      "connections": [
+        "cab_shell",
+        "tire_front_right"
+      ]
+    },
+    {
+      "id": "tire_rear1_left_outer",
+      "name": "Forward Rear Left Outer Tire",
+      "shape": "torus",
+      "position": [
+        1.55,
+        0.48,
+        -1.34
+      ],
+      "size": [
+        0.43,
+        0.12
+      ],
+      "material": "rubber",
+      "role": "Outer tire of the left dual set on the forward rear axle.",
+      "connections": [
+        "rear_axle_1",
+        "hub_rear1_left"
+      ]
+    },
+    {
+      "id": "tire_rear1_left_inner",
+      "name": "Forward Rear Left Inner Tire",
+      "shape": "torus",
+      "position": [
+        1.55,
+        0.48,
+        -1.08
+      ],
+      "size": [
+        0.43,
+        0.12
+      ],
+      "material": "rubber",
+      "role": "Inner tire of the left dual set on the forward rear axle.",
+      "connections": [
+        "rear_axle_1",
+        "hub_rear1_left"
+      ]
+    },
+    {
+      "id": "hub_rear1_left",
+      "name": "Forward Rear Left Dual Hub",
+      "shape": "cylinder",
+      "position": [
+        1.55,
+        0.48,
+        -1.21
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.2,
+        0.34
+      ],
+      "material": "steel",
+      "role": "Wide hub carrying both left dual tires on the first rear axle.",
+      "connections": [
+        "rear_axle_1",
+        "tire_rear1_left_outer",
+        "tire_rear1_left_inner"
+      ]
+    },
+    {
+      "id": "tire_rear1_right_inner",
+      "name": "Forward Rear Right Inner Tire",
+      "shape": "torus",
+      "position": [
+        1.55,
+        0.48,
+        1.08
+      ],
+      "size": [
+        0.43,
+        0.12
+      ],
+      "material": "rubber",
+      "role": "Inner tire of the right dual set on the forward rear axle.",
+      "connections": [
+        "rear_axle_1",
+        "hub_rear1_right"
+      ]
+    },
+    {
+      "id": "tire_rear1_right_outer",
+      "name": "Forward Rear Right Outer Tire",
+      "shape": "torus",
+      "position": [
+        1.55,
+        0.48,
+        1.34
+      ],
+      "size": [
+        0.43,
+        0.12
+      ],
+      "material": "rubber",
+      "role": "Outer tire of the right dual set on the forward rear axle.",
+      "connections": [
+        "rear_axle_1",
+        "hub_rear1_right"
+      ]
+    },
+    {
+      "id": "hub_rear1_right",
+      "name": "Forward Rear Right Dual Hub",
+      "shape": "cylinder",
+      "position": [
+        1.55,
+        0.48,
+        1.21
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.2,
+        0.34
+      ],
+      "material": "steel",
+      "role": "Wide hub carrying both right dual tires on the first rear axle.",
+      "connections": [
+        "rear_axle_1",
+        "tire_rear1_right_inner",
+        "tire_rear1_right_outer"
+      ]
+    },
+    {
+      "id": "tire_rear2_left_outer",
+      "name": "Aft Rear Left Outer Tire",
+      "shape": "torus",
+      "position": [
+        2.55,
+        0.48,
+        -1.34
+      ],
+      "size": [
+        0.43,
+        0.12
+      ],
+      "material": "rubber",
+      "role": "Outer tire of the left dual set on the aft rear axle.",
+      "connections": [
+        "rear_axle_2",
+        "hub_rear2_left"
+      ]
+    },
+    {
+      "id": "tire_rear2_left_inner",
+      "name": "Aft Rear Left Inner Tire",
+      "shape": "torus",
+      "position": [
+        2.55,
+        0.48,
+        -1.08
+      ],
+      "size": [
+        0.43,
+        0.12
+      ],
+      "material": "rubber",
+      "role": "Inner tire of the left dual set on the aft rear axle.",
+      "connections": [
+        "rear_axle_2",
+        "hub_rear2_left"
+      ]
+    },
+    {
+      "id": "hub_rear2_left",
+      "name": "Aft Rear Left Dual Hub",
+      "shape": "cylinder",
+      "position": [
+        2.55,
+        0.48,
+        -1.21
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.2,
+        0.34
+      ],
+      "material": "steel",
+      "role": "Wide hub carrying both left dual tires on the second rear axle.",
+      "connections": [
+        "rear_axle_2",
+        "tire_rear2_left_outer",
+        "tire_rear2_left_inner"
+      ]
+    },
+    {
+      "id": "tire_rear2_right_inner",
+      "name": "Aft Rear Right Inner Tire",
+      "shape": "torus",
+      "position": [
+        2.55,
+        0.48,
+        1.08
+      ],
+      "size": [
+        0.43,
+        0.12
+      ],
+      "material": "rubber",
+      "role": "Inner tire of the right dual set on the aft rear axle.",
+      "connections": [
+        "rear_axle_2",
+        "hub_rear2_right"
+      ]
+    },
+    {
+      "id": "tire_rear2_right_outer",
+      "name": "Aft Rear Right Outer Tire",
+      "shape": "torus",
+      "position": [
+        2.55,
+        0.48,
+        1.34
+      ],
+      "size": [
+        0.43,
+        0.12
+      ],
+      "material": "rubber",
+      "role": "Outer tire of the right dual set on the aft rear axle.",
+      "connections": [
+        "rear_axle_2",
+        "hub_rear2_right"
+      ]
+    },
+    {
+      "id": "hub_rear2_right",
+      "name": "Aft Rear Right Dual Hub",
+      "shape": "cylinder",
+      "position": [
+        2.55,
+        0.48,
+        1.21
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.2,
+        0.34
+      ],
+      "material": "steel",
+      "role": "Wide hub carrying both right dual tires on the second rear axle.",
+      "connections": [
+        "rear_axle_2",
+        "tire_rear2_right_inner",
+        "tire_rear2_right_outer"
+      ]
+    },
+    {
+      "id": "rear_mudguard_left",
+      "name": "Left Tandem Mudguard",
+      "shape": "box",
+      "position": [
+        2.05,
+        0.98,
+        -1.23
+      ],
+      "size": [
+        1.85,
+        0.12,
+        0.48
+      ],
+      "material": "black composite",
+      "role": "Long mudguard spanning the left tandem wheel pair without hiding the tire sidewalls.",
+      "connections": [
+        "frame_left_rail",
+        "tire_rear1_left_outer",
+        "tire_rear2_left_outer"
+      ]
+    },
+    {
+      "id": "rear_mudguard_right",
+      "name": "Right Tandem Mudguard",
+      "shape": "box",
+      "position": [
+        2.05,
+        0.98,
+        1.23
+      ],
+      "size": [
+        1.85,
+        0.12,
+        0.48
+      ],
+      "material": "black composite",
+      "role": "Long mudguard spanning the right tandem wheel pair while leaving the dual tires legible.",
+      "connections": [
+        "frame_right_rail",
+        "tire_rear1_right_outer",
+        "tire_rear2_right_outer"
+      ]
+    },
+    {
+      "id": "shelter_floor",
+      "name": "EMI Shelter Floor Pan",
+      "shape": "box",
+      "position": [
+        0.85,
+        1.03,
+        0
+      ],
+      "size": [
+        4.25,
+        0.14,
+        2.42
+      ],
+      "material": "aluminum",
+      "role": "Thin equipment-shelter floor bolted to the chassis and visible because the port wall is cut away.",
+      "connections": [
+        "frame_left_rail",
+        "frame_right_rail",
+        "shelter_front_bulkhead",
+        "shelter_rear_wall",
+        "shelter_starboard_wall",
+        "port_lower_cutaway_wall",
+        "rack_rf",
+        "rack_compute",
+        "operator_desk",
+        "mast_base",
+        "dish_turntable"
+      ]
+    },
+    {
+      "id": "shelter_front_bulkhead",
+      "name": "Shelter Front Bulkhead",
+      "shape": "box",
+      "position": [
+        -1.28,
+        2.08,
+        0
+      ],
+      "size": [
+        0.1,
+        2.1,
+        2.42
+      ],
+      "material": "aluminum",
+      "role": "Forward EMI bulkhead separating the cab from the electronics shelter.",
+      "connections": [
+        "shelter_floor",
+        "shelter_starboard_wall",
+        "port_lower_cutaway_wall",
+        "exploded_roof_panel"
+      ]
+    },
+    {
+      "id": "shelter_rear_wall",
+      "name": "Shelter Rear Wall With Door",
+      "shape": "box",
+      "position": [
+        2.98,
+        2.08,
+        0
+      ],
+      "size": [
+        0.1,
+        2.1,
+        2.42
+      ],
+      "material": "aluminum",
+      "role": "Rear shelter wall carrying the personnel door and cable gland area.",
+      "connections": [
+        "shelter_floor",
+        "rear_access_door",
+        "shelter_starboard_wall",
+        "exploded_roof_panel"
+      ]
+    },
+    {
+      "id": "rear_access_door",
+      "name": "Rear Personnel Door",
+      "shape": "box",
+      "position": [
+        3.04,
+        1.95,
+        -0.45
+      ],
+      "size": [
+        0.06,
+        1.65,
+        0.75
+      ],
+      "material": "aluminum",
+      "role": "Narrow rear access door for crew entry into the electronics shelter.",
+      "connections": [
+        "shelter_rear_wall",
+        "rear_step"
+      ]
+    },
+    {
+      "id": "shelter_starboard_wall",
+      "name": "Starboard Shelter Wall",
+      "shape": "box",
+      "position": [
+        0.85,
+        2.08,
+        1.21
+      ],
+      "size": [
+        4.25,
+        2.1,
+        0.09
+      ],
+      "material": "aluminum",
+      "role": "Full-height starboard EMI wall left in place to show the shelter envelope.",
+      "connections": [
+        "shelter_floor",
+        "shelter_front_bulkhead",
+        "shelter_rear_wall",
+        "exploded_roof_panel"
+      ]
+    },
+    {
+      "id": "port_lower_cutaway_wall",
+      "name": "Port Lower Cutaway Wall",
+      "shape": "box",
+      "position": [
+        0.85,
+        1.38,
+        -1.21
+      ],
+      "size": [
+        4.25,
+        0.65,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Low remaining port wall shows the cutaway boundary while exposing the racks and operator station.",
+      "connections": [
+        "shelter_floor",
+        "shelter_front_bulkhead",
+        "shelter_rear_wall"
+      ]
+    },
+    {
+      "id": "exploded_roof_panel",
+      "name": "Exploded Shelter Roof Panel",
+      "shape": "box",
+      "position": [
+        0.85,
+        3.75,
+        0
+      ],
+      "size": [
+        4.25,
+        0.12,
+        2.42
+      ],
+      "material": "aluminum",
+      "role": "Removed roof panel floating directly above the shelter to reveal interior equipment in the ISO view.",
+      "connections": [
+        "shelter_front_bulkhead",
+        "shelter_rear_wall",
+        "shelter_starboard_wall"
+      ]
+    },
+    {
+      "id": "rack_rf",
+      "name": "RF Receiver Rack",
+      "shape": "box",
+      "position": [
+        0.05,
+        1.93,
+        0.72
+      ],
+      "size": [
+        0.62,
+        1.65,
+        0.55
+      ],
+      "material": "dark anodized aluminum",
+      "role": "19-inch RF rack holding wideband receivers, downconverters and spectrum-analysis front ends.",
+      "connections": [
+        "shelter_floor",
+        "rack_compute",
+        "cable_tray",
+        "coax_to_mast",
+        "coax_to_dish",
+        "power_conditioner",
+        "rf_receiver_drawer",
+        "spectrum_analyzer_drawer"
+      ]
+    },
+    {
+      "id": "rf_receiver_drawer",
+      "name": "Wideband Receiver Drawer",
+      "shape": "box",
+      "position": [
+        0.05,
+        2.18,
+        0.42
+      ],
+      "size": [
+        0.52,
+        0.2,
+        0.05
+      ],
+      "material": "brushed steel",
+      "role": "Visible front panel for the wideband receiver tray fed by the mast and dish coax.",
+      "connections": [
+        "rack_rf",
+        "coax_to_mast",
+        "coax_to_dish"
+      ]
+    },
+    {
+      "id": "spectrum_analyzer_drawer",
+      "name": "Spectrum Analyzer Drawer",
+      "shape": "box",
+      "position": [
+        0.05,
+        1.87,
+        0.42
+      ],
+      "size": [
+        0.52,
+        0.2,
+        0.05
+      ],
+      "material": "glass display",
+      "role": "Instrument face for real-time spectrum analysis before data passes to the compute rack.",
+      "connections": [
+        "rack_rf",
+        "rack_compute"
+      ]
+    },
+    {
+      "id": "rack_compute",
+      "name": "Processing and Timing Rack",
+      "shape": "box",
+      "position": [
+        0.78,
+        1.93,
+        0.72
+      ],
+      "size": [
+        0.62,
+        1.65,
+        0.55
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rack containing compute servers, storage and timing distribution for coherent interference capture.",
+      "connections": [
+        "shelter_floor",
+        "rack_rf",
+        "gnss_timing_cable",
+        "power_conditioner",
+        "console_left",
+        "server_tray",
+        "timing_unit_tray"
+      ]
+    },
+    {
+      "id": "server_tray",
+      "name": "Compute Server Tray",
+      "shape": "box",
+      "position": [
+        0.78,
+        2.18,
+        0.42
+      ],
+      "size": [
+        0.52,
+        0.2,
+        0.05
+      ],
+      "material": "brushed steel",
+      "role": "Visible rack server tray processing captured RF events and storing raw recordings.",
+      "connections": [
+        "rack_compute",
+        "spectrum_analyzer_drawer"
+      ]
+    },
+    {
+      "id": "timing_unit_tray",
+      "name": "GNSS Timing Unit Tray",
+      "shape": "box",
+      "position": [
+        0.78,
+        1.87,
+        0.42
+      ],
+      "size": [
+        0.52,
+        0.18,
+        0.05
+      ],
+      "material": "brushed steel",
+      "role": "Front-panel timing unit that distributes GNSS-disciplined clock signals to the receivers.",
+      "connections": [
+        "rack_compute",
+        "gnss_timing_cable"
+      ]
+    },
+    {
+      "id": "power_conditioner",
+      "name": "Power Conditioner Cabinet",
+      "shape": "box",
+      "position": [
+        1.48,
+        1.75,
+        0.72
+      ],
+      "size": [
+        0.5,
+        1.3,
+        0.5
+      ],
+      "material": "brushed steel",
+      "role": "UPS and power-conditioning cabinet feeding stable mains to the receiver and compute racks.",
+      "connections": [
+        "shelter_floor",
+        "rack_rf",
+        "rack_compute",
+        "generator_power_cable"
+      ]
+    },
+    {
+      "id": "operator_desk",
+      "name": "Operator Desk Frame",
+      "shape": "box",
+      "position": [
+        1.18,
+        1.38,
+        -0.55
+      ],
+      "size": [
+        1.55,
+        0.18,
+        0.58
+      ],
+      "material": "aluminum",
+      "role": "Work surface for two analysts facing the exposed port-side opening.",
+      "connections": [
+        "shelter_floor",
+        "console_left",
+        "console_right",
+        "seat_left",
+        "seat_right"
+      ]
+    },
+    {
+      "id": "console_left",
+      "name": "Left Spectrum Console",
+      "shape": "box",
+      "position": [
+        0.82,
+        1.62,
+        -0.72
+      ],
+      "rotation": [
+        0.18,
+        0,
+        0
+      ],
+      "size": [
+        0.62,
+        0.16,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Left operator keyboard and control panel for receiver tuning and event tagging.",
+      "connections": [
+        "operator_desk",
+        "display_left",
+        "rack_compute"
+      ]
+    },
+    {
+      "id": "display_left",
+      "name": "Left Waterfall Display",
+      "shape": "box",
+      "position": [
+        0.82,
+        2.02,
+        -0.83
+      ],
+      "rotation": [
+        0.25,
+        0,
+        0
+      ],
+      "size": [
+        0.58,
+        0.46,
+        0.05
+      ],
+      "material": "glass display",
+      "role": "Glass display showing spectrum waterfall and interference detections for the left operator.",
+      "connections": [
+        "console_left"
+      ]
+    },
+    {
+      "id": "console_right",
+      "name": "Right Tasking Console",
+      "shape": "box",
+      "position": [
+        1.55,
+        1.62,
+        -0.72
+      ],
+      "rotation": [
+        0.18,
+        0,
+        0
+      ],
+      "size": [
+        0.62,
+        0.16,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Right operator control panel for mast, dish pointing and report preparation.",
+      "connections": [
+        "operator_desk",
+        "display_right",
+        "rack_compute"
+      ]
+    },
+    {
+      "id": "display_right",
+      "name": "Right Map Display",
+      "shape": "box",
+      "position": [
+        1.55,
+        2.02,
+        -0.83
+      ],
+      "rotation": [
+        0.25,
+        0,
+        0
+      ],
+      "size": [
+        0.58,
+        0.46,
+        0.05
+      ],
+      "material": "glass display",
+      "role": "Glass display showing geolocation, satellite pass data and tactical reports.",
+      "connections": [
+        "console_right"
+      ]
+    },
+    {
+      "id": "seat_left",
+      "name": "Left Fold-Down Seat",
+      "shape": "box",
+      "position": [
+        0.82,
+        1.18,
+        -1.02
+      ],
+      "size": [
+        0.46,
+        0.16,
+        0.42
+      ],
+      "material": "black composite",
+      "role": "Fold-down crew seat positioned at the left operator console.",
+      "connections": [
+        "operator_desk",
+        "shelter_floor"
+      ]
+    },
+    {
+      "id": "seat_right",
+      "name": "Right Fold-Down Seat",
+      "shape": "box",
+      "position": [
+        1.55,
+        1.18,
+        -1.02
+      ],
+      "size": [
+        0.46,
+        0.16,
+        0.42
+      ],
+      "material": "black composite",
+      "role": "Fold-down crew seat positioned at the right operator console.",
+      "connections": [
+        "operator_desk",
+        "shelter_floor"
+      ]
+    },
+    {
+      "id": "cable_tray",
+      "name": "Overhead Cable Tray",
+      "shape": "box",
+      "position": [
+        0.92,
+        2.88,
+        0.92
+      ],
+      "size": [
+        2.15,
+        0.1,
+        0.16
+      ],
+      "material": "brushed steel",
+      "role": "Open cable tray routing RF, timing and power harnesses above the interior racks.",
+      "connections": [
+        "rack_rf",
+        "rack_compute",
+        "coax_to_mast",
+        "coax_to_dish",
+        "gnss_timing_cable"
+      ]
+    },
+    {
+      "id": "coax_to_mast",
+      "name": "Visible Mast RF Coax Run",
+      "shape": "capsule",
+      "position": [
+        1.82,
+        2.78,
+        0.82
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        1.65
+      ],
+      "material": "rubber",
+      "role": "Blue-black coax bundle carrying wideband antenna signals from the mast into the RF rack.",
+      "connections": [
+        "cable_tray",
+        "rack_rf",
+        "mast_base",
+        "rf_receiver_drawer"
+      ]
+    },
+    {
+      "id": "coax_to_dish",
+      "name": "Visible Dish IF Coax Run",
+      "shape": "capsule",
+      "position": [
+        0.52,
+        2.72,
+        0.22
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.03,
+        1.3
+      ],
+      "material": "rubber",
+      "role": "Coaxial intermediate-frequency cable from the steerable dish receiver to the rack.",
+      "connections": [
+        "cable_tray",
+        "rack_rf",
+        "dish_turntable",
+        "rf_receiver_drawer"
+      ]
+    },
+    {
+      "id": "gnss_timing_cable",
+      "name": "GNSS Timing Cable",
+      "shape": "capsule",
+      "position": [
+        1.15,
+        2.68,
+        1.02
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.025,
+        1.75
+      ],
+      "material": "rubber",
+      "role": "Reference timing cable distributing GNSS time to the compute rack.",
+      "connections": [
+        "cable_tray",
+        "rack_compute",
+        "gnss_dome",
+        "timing_unit_tray"
+      ]
+    },
+    {
+      "id": "generator_frame",
+      "name": "Generator Mount Frame",
+      "shape": "box",
+      "position": [
+        3.18,
+        0.95,
+        0.84
+      ],
+      "size": [
+        0.95,
+        0.18,
+        0.82
+      ],
+      "material": "welded steel",
+      "role": "Bolted support cradle for the auxiliary diesel generator behind the shelter.",
+      "connections": [
+        "frame_right_rail",
+        "crossmember_rear",
+        "generator_box"
+      ]
+    },
+    {
+      "id": "generator_box",
+      "name": "Auxiliary Diesel Generator",
+      "shape": "box",
+      "position": [
+        3.18,
+        1.32,
+        0.84
+      ],
+      "size": [
+        0.9,
+        0.58,
+        0.78
+      ],
+      "material": "steel",
+      "role": "Diesel inverter generator providing clean electrical power while the truck is stationary.",
+      "connections": [
+        "generator_frame",
+        "generator_power_cable"
+      ]
+    },
+    {
+      "id": "generator_power_cable",
+      "name": "Generator Power Cable",
+      "shape": "capsule",
+      "position": [
+        2.35,
+        1.62,
+        0.82
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.04,
+        1.45
+      ],
+      "material": "rubber",
+      "role": "Heavy power cable linking the rear generator to the shelter power conditioner.",
+      "connections": [
+        "generator_box",
+        "power_conditioner"
+      ]
+    },
+    {
+      "id": "rear_step",
+      "name": "Rear Access Step",
+      "shape": "box",
+      "position": [
+        3.55,
+        0.92,
+        -0.45
+      ],
+      "size": [
+        0.5,
+        0.12,
+        0.9
+      ],
+      "material": "brushed steel",
+      "role": "Folded metal step below the personnel door for crew access.",
+      "connections": [
+        "crossmember_rear",
+        "rear_access_door"
+      ]
+    },
+    {
+      "id": "outrigger_fl",
+      "name": "Front Left Stabilizer Outrigger",
+      "shape": "box",
+      "position": [
+        -0.75,
+        0.48,
+        -1.78
+      ],
+      "size": [
+        0.85,
+        0.12,
+        0.16
+      ],
+      "material": "welded steel",
+      "role": "Left-front lateral stabilizer beam deployed to steady the raised mast.",
+      "connections": [
+        "frame_left_rail",
+        "pad_fl"
+      ]
+    },
+    {
+      "id": "pad_fl",
+      "name": "Front Left Stabilizer Pad",
+      "shape": "box",
+      "position": [
+        -0.75,
+        0.04,
+        -2.08
+      ],
+      "size": [
+        0.55,
+        0.08,
+        0.45
+      ],
+      "material": "steel",
+      "role": "Ground-contact foot pad spreading mast loads into the soil at y = 0.",
+      "connections": [
+        "outrigger_fl"
+      ]
+    },
+    {
+      "id": "outrigger_fr",
+      "name": "Front Right Stabilizer Outrigger",
+      "shape": "box",
+      "position": [
+        -0.75,
+        0.48,
+        1.78
+      ],
+      "size": [
+        0.85,
+        0.12,
+        0.16
+      ],
+      "material": "welded steel",
+      "role": "Right-front lateral stabilizer beam paired with the left front outrigger.",
+      "connections": [
+        "frame_right_rail",
+        "pad_fr"
+      ]
+    },
+    {
+      "id": "pad_fr",
+      "name": "Front Right Stabilizer Pad",
+      "shape": "box",
+      "position": [
+        -0.75,
+        0.04,
+        2.08
+      ],
+      "size": [
+        0.55,
+        0.08,
+        0.45
+      ],
+      "material": "steel",
+      "role": "Ground-contact foot pad for the right-front stabilizer station.",
+      "connections": [
+        "outrigger_fr"
+      ]
+    },
+    {
+      "id": "outrigger_rl",
+      "name": "Rear Left Stabilizer Outrigger",
+      "shape": "box",
+      "position": [
+        2.15,
+        0.48,
+        -1.78
+      ],
+      "size": [
+        0.85,
+        0.12,
+        0.16
+      ],
+      "material": "welded steel",
+      "role": "Left-rear stabilizer beam preventing chassis roll during antenna pointing.",
+      "connections": [
+        "frame_left_rail",
+        "pad_rl"
+      ]
+    },
+    {
+      "id": "pad_rl",
+      "name": "Rear Left Stabilizer Pad",
+      "shape": "box",
+      "position": [
+        2.15,
+        0.04,
+        -2.08
+      ],
+      "size": [
+        0.55,
+        0.08,
+        0.45
+      ],
+      "material": "steel",
+      "role": "Ground-contact foot pad for the left-rear outrigger.",
+      "connections": [
+        "outrigger_rl"
+      ]
+    },
+    {
+      "id": "outrigger_rr",
+      "name": "Rear Right Stabilizer Outrigger",
+      "shape": "box",
+      "position": [
+        2.15,
+        0.48,
+        1.78
+      ],
+      "size": [
+        0.85,
+        0.12,
+        0.16
+      ],
+      "material": "welded steel",
+      "role": "Right-rear stabilizer beam paired with the left rear outrigger.",
+      "connections": [
+        "frame_right_rail",
+        "pad_rr"
+      ]
+    },
+    {
+      "id": "pad_rr",
+      "name": "Rear Right Stabilizer Pad",
+      "shape": "box",
+      "position": [
+        2.15,
+        0.04,
+        2.08
+      ],
+      "size": [
+        0.55,
+        0.08,
+        0.45
+      ],
+      "material": "steel",
+      "role": "Ground-contact foot pad for the right-rear outrigger.",
+      "connections": [
+        "outrigger_rr"
+      ]
+    },
+    {
+      "id": "mast_base",
+      "name": "Mast Base Pedestal",
+      "shape": "cylinder",
+      "position": [
+        2.38,
+        1.28,
+        0.62
+      ],
+      "size": [
+        0.26,
+        0.36
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Bolted mast base that transfers antenna bending loads into the shelter floor.",
+      "connections": [
+        "shelter_floor",
+        "coax_to_mast",
+        "mast_section_lower"
+      ]
+    },
+    {
+      "id": "mast_section_lower",
+      "name": "Lower Telescoping Mast Section",
+      "shape": "cylinder",
+      "position": [
+        2.38,
+        2.65,
+        0.62
+      ],
+      "size": [
+        0.095,
+        2.4
+      ],
+      "material": "fiberglass",
+      "role": "Largest fiberglass mast tube raised from the shelter-mounted pedestal.",
+      "connections": [
+        "mast_base",
+        "mast_section_middle",
+        "guy_arm_front",
+        "guy_arm_rear"
+      ]
+    },
+    {
+      "id": "mast_section_middle",
+      "name": "Middle Telescoping Mast Section",
+      "shape": "cylinder",
+      "position": [
+        2.38,
+        4.25,
+        0.62
+      ],
+      "size": [
+        0.07,
+        1.9
+      ],
+      "material": "fiberglass",
+      "role": "Intermediate mast tube extending the antenna head above the vehicle roofline.",
+      "connections": [
+        "mast_section_lower",
+        "mast_section_upper"
+      ]
+    },
+    {
+      "id": "mast_section_upper",
+      "name": "Upper Telescoping Mast Section",
+      "shape": "cylinder",
+      "position": [
+        2.38,
+        5.55,
+        0.62
+      ],
+      "size": [
+        0.048,
+        1.35
+      ],
+      "material": "fiberglass",
+      "role": "Upper mast tube carrying the survey antenna cluster.",
+      "connections": [
+        "mast_section_middle",
+        "discone_hub",
+        "log_periodic_boom",
+        "gnss_dome"
+      ]
+    },
+    {
+      "id": "guy_arm_front",
+      "name": "Forward Mast Brace Arm",
+      "shape": "capsule",
+      "position": [
+        2.02,
+        3.18,
+        0.62
+      ],
+      "rotation": [
+        0,
+        0,
+        1.02
+      ],
+      "size": [
+        0.035,
+        0.9
+      ],
+      "material": "brushed steel",
+      "role": "Short brace arm stiffening the mast base against forward bending.",
+      "connections": [
+        "mast_section_lower",
+        "shelter_floor"
+      ]
+    },
+    {
+      "id": "guy_arm_rear",
+      "name": "Rear Mast Brace Arm",
+      "shape": "capsule",
+      "position": [
+        2.74,
+        3.18,
+        0.62
+      ],
+      "rotation": [
+        0,
+        0,
+        -1.02
+      ],
+      "size": [
+        0.035,
+        0.9
+      ],
+      "material": "brushed steel",
+      "role": "Opposed brace arm balancing mast loads over the shelter structure.",
+      "connections": [
+        "mast_section_lower",
+        "shelter_floor"
+      ]
+    },
+    {
+      "id": "discone_hub",
+      "name": "Wideband Discone Hub",
+      "shape": "cylinder",
+      "position": [
+        2.38,
+        6.32,
+        0.62
+      ],
+      "size": [
+        0.16,
+        0.18
+      ],
+      "material": "brushed steel",
+      "role": "Central hub feeding the omnidirectional discone survey antenna.",
+      "connections": [
+        "mast_section_upper",
+        "discone_skirt",
+        "discone_top_disc"
+      ]
+    },
+    {
+      "id": "discone_skirt",
+      "name": "Discone Conical Skirt",
+      "shape": "cone",
+      "position": [
+        2.38,
+        6.03,
+        0.62
+      ],
+      "rotation": [
+        3.1416,
+        0,
+        0
+      ],
+      "size": [
+        0.42,
+        0.48
+      ],
+      "material": "brushed steel",
+      "role": "Downward cone of the discone antenna for broad 25 MHz to 3 GHz coverage.",
+      "connections": [
+        "discone_hub"
+      ]
+    },
+    {
+      "id": "discone_top_disc",
+      "name": "Discone Top Disc",
+      "shape": "cylinder",
+      "position": [
+        2.38,
+        6.55,
+        0.62
+      ],
+      "size": [
+        0.32,
+        0.035
+      ],
+      "material": "brushed steel",
+      "role": "Flat top disc completing the discone's wideband impedance geometry.",
+      "connections": [
+        "discone_hub"
+      ]
+    },
+    {
+      "id": "log_periodic_boom",
+      "name": "Log-Periodic Antenna Boom",
+      "shape": "capsule",
+      "position": [
+        1.62,
+        6.48,
+        0.62
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        1.35
+      ],
+      "material": "brushed steel",
+      "role": "Directional L/S-band boom used for bearing-sensitive interference monitoring.",
+      "connections": [
+        "mast_section_upper",
+        "log_dipole_1",
+        "log_dipole_2",
+        "log_dipole_3",
+        "log_dipole_4",
+        "log_dipole_5"
+      ]
+    },
+    {
+      "id": "log_dipole_1",
+      "name": "Longest Log-Periodic Dipole",
+      "shape": "capsule",
+      "position": [
+        1.05,
+        6.48,
+        0.62
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.02,
+        0.9
+      ],
+      "material": "brushed steel",
+      "role": "Longest dipole element at the rear of the log-periodic array for lower L-band response.",
+      "connections": [
+        "log_periodic_boom"
+      ]
+    },
+    {
+      "id": "log_dipole_2",
+      "name": "Second Log-Periodic Dipole",
+      "shape": "capsule",
+      "position": [
+        1.32,
+        6.48,
+        0.62
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.018,
+        0.72
+      ],
+      "material": "brushed steel",
+      "role": "Second scaled dipole element in the directional antenna array.",
+      "connections": [
+        "log_periodic_boom"
+      ]
+    },
+    {
+      "id": "log_dipole_3",
+      "name": "Middle Log-Periodic Dipole",
+      "shape": "capsule",
+      "position": [
+        1.6,
+        6.48,
+        0.62
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.017,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "Middle dipole element providing frequency-scaled directional response.",
+      "connections": [
+        "log_periodic_boom"
+      ]
+    },
+    {
+      "id": "log_dipole_4",
+      "name": "Fourth Log-Periodic Dipole",
+      "shape": "capsule",
+      "position": [
+        1.87,
+        6.48,
+        0.62
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.016,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Shorter dipole element toward the high-frequency end of the array.",
+      "connections": [
+        "log_periodic_boom"
+      ]
+    },
+    {
+      "id": "log_dipole_5",
+      "name": "Shortest Log-Periodic Dipole",
+      "shape": "capsule",
+      "position": [
+        2.12,
+        6.48,
+        0.62
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.014,
+        0.3
+      ],
+      "material": "brushed steel",
+      "role": "Shortest forward dipole element for the upper portion of the monitored band.",
+      "connections": [
+        "log_periodic_boom"
+      ]
+    },
+    {
+      "id": "gnss_dome",
+      "name": "GNSS Reference Dome",
+      "shape": "sphere",
+      "position": [
+        2.38,
+        6.98,
+        0.62
+      ],
+      "size": [
+        0.14
+      ],
+      "material": "white composite",
+      "role": "Weatherproof GNSS timing and position antenna dome for coherent capture timestamps.",
+      "connections": [
+        "mast_section_upper",
+        "gnss_timing_cable"
+      ]
+    },
+    {
+      "id": "dish_turntable",
+      "name": "Dish Azimuth Turntable",
+      "shape": "cylinder",
+      "position": [
+        -0.18,
+        1.28,
+        -0.18
+      ],
+      "size": [
+        0.28,
+        0.28
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Azimuth bearing mounted through the shelter floor for steering the satellite-monitoring dish.",
+      "connections": [
+        "shelter_floor",
+        "coax_to_dish",
+        "dish_elevation_yoke"
+      ]
+    },
+    {
+      "id": "dish_elevation_yoke",
+      "name": "Dish Elevation Yoke",
+      "shape": "box",
+      "position": [
+        -0.18,
+        1.62,
+        -0.18
+      ],
+      "size": [
+        0.18,
+        0.48,
+        0.78
+      ],
+      "material": "dark anodized aluminum",
+      "role": "U-shaped elevation support that tilts the dish reflector toward a satellite arc.",
+      "connections": [
+        "dish_turntable",
+        "dish_reflector",
+        "dish_back_plate",
+        "dish_feed_strut_left",
+        "dish_feed_strut_right",
+        "dish_feed_strut_lower"
+      ]
+    },
+    {
+      "id": "dish_reflector",
+      "name": "Tapered Ku-Band Dish Reflector",
+      "shape": "cylinder",
+      "position": [
+        -0.18,
+        2.08,
+        -0.18
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.5,
+        0.42,
+        0.09
+      ],
+      "material": "white composite",
+      "role": "One-metre class shallow tapered reflector approximating the steerable satellite downlink monitoring dish.",
+      "connections": [
+        "dish_elevation_yoke",
+        "dish_rim",
+        "dish_back_plate",
+        "dish_feed_horn"
+      ]
+    },
+    {
+      "id": "dish_rim",
+      "name": "Dish Aperture Rim",
+      "shape": "torus",
+      "position": [
+        -0.18,
+        2.08,
+        -0.23
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.5,
+        0.025
+      ],
+      "material": "brushed steel",
+      "role": "Thin circular rim defining the one-metre aperture of the monitoring dish.",
+      "connections": [
+        "dish_reflector"
+      ]
+    },
+    {
+      "id": "dish_back_plate",
+      "name": "Dish Rear Backing Plate",
+      "shape": "cylinder",
+      "position": [
+        -0.18,
+        2.08,
+        -0.08
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.25,
+        0.04
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear structural plate tying the reflector shell to the elevation yoke.",
+      "connections": [
+        "dish_reflector",
+        "dish_elevation_yoke"
+      ]
+    },
+    {
+      "id": "dish_feed_horn",
+      "name": "Dish Feed Horn",
+      "shape": "cone",
+      "position": [
+        -0.18,
+        2.08,
+        -0.78
+      ],
+      "rotation": [
+        -1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.12,
+        0.32
+      ],
+      "material": "brushed steel",
+      "role": "Feed horn at the reflector focus coupling Ku-band energy into the receiver chain.",
+      "connections": [
+        "dish_reflector",
+        "dish_feed_strut_left",
+        "dish_feed_strut_right",
+        "dish_feed_strut_lower",
+        "coax_to_dish"
+      ]
+    },
+    {
+      "id": "dish_feed_strut_left",
+      "name": "Left Dish Feed Strut",
+      "shape": "capsule",
+      "position": [
+        -0.48,
+        2.08,
+        -0.5
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0.45
+      ],
+      "size": [
+        0.018,
+        0.72
+      ],
+      "material": "brushed steel",
+      "role": "Left support strut holding the feed horn at the dish focus.",
+      "connections": [
+        "dish_elevation_yoke",
+        "dish_feed_horn",
+        "dish_rim"
+      ]
+    },
+    {
+      "id": "dish_feed_strut_right",
+      "name": "Right Dish Feed Strut",
+      "shape": "capsule",
+      "position": [
+        0.12,
+        2.08,
+        -0.5
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        -0.45
+      ],
+      "size": [
+        0.018,
+        0.72
+      ],
+      "material": "brushed steel",
+      "role": "Right support strut holding the feed horn at the dish focus.",
+      "connections": [
+        "dish_elevation_yoke",
+        "dish_feed_horn",
+        "dish_rim"
+      ]
+    },
+    {
+      "id": "dish_feed_strut_lower",
+      "name": "Lower Dish Feed Strut",
+      "shape": "capsule",
+      "position": [
+        -0.18,
+        1.8,
+        -0.5
+      ],
+      "rotation": [
+        1.5708,
+        0.42,
+        0
+      ],
+      "size": [
+        0.016,
+        0.68
+      ],
+      "material": "brushed steel",
+      "role": "Lower support strut completing the triangular feed-horn support frame.",
+      "connections": [
+        "dish_elevation_yoke",
+        "dish_feed_horn",
+        "dish_rim"
+      ]
+    }
   ]
 }

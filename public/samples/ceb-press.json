@@ -1,10 +1,27 @@
 {
   "machine_name": "CEB Press 'The Liberator'",
-  "assembly_instructions": "Open Source Ecology Compressed-Earth-Block press. Four adjustable threaded legs support a welded base plate. A rectangular cage of four vertical 3×3 inch tube posts and two upper side rails forms the chassis. A horizontal hydraulic cylinder mounted at the rear pushes a polished ram rod forward; a hardened pressing plate at the end of the rod drives into a steel mold chamber in the middle of the frame. Soil drops into the mold through an open-bottom hopper atop the mold, fed in turn from a 3'×6' tractor-loading grate with internal deflector plates; a side-mounted shaker vibrates the hopper so soil flows evenly. On the forward end of the mold, a discharge chute catches the finished 4×6×12 inch block. A glass-fronted control panel sits on the operator side and an external hydraulic-power-unit connector on the rear feeds the cylinder at 2,400 psi.",
+  "assembly_instructions": [
+    "Set the four 0.16 m diameter foot pads on the ground at the chassis corners, thread the four 0.26 m adjustable legs into them, and level the leg tops to the lower frame height.",
+    "Weld the lower port and starboard longitudinal rails, front and rear crossmembers, and thin base deck to the four legs; this creates the rooted rectangular chassis datum.",
+    "Weld the four 3 x 3 inch square-tube vertical posts to the lower frame, then add the upper side rails, upper end rails, and diagonal side braces to make the cage rigid under hydraulic load.",
+    "Bolt the mold floor plate to the base deck, then install the left and right mold side walls, rear throat bottom rail, rear throat uprights, rear throat top lintel, front gate sill, front gate uprights, front gate top lintel, replaceable compression liner, and discharge chute in line with the ram axis.",
+    "Fit the front gate hinge barrels, latch hasp, and latch pin so the ejection opening can be locked square during compression and opened for service.",
+    "Install the rear cylinder clevis bracket and front gland support bracket, pin the double-acting hydraulic cylinder between them with the rear and front clevis pins, and slide the polished ram rod through the two ram guide rails until the pressing platen enters the rear throat of the mold.",
+    "Attach the sample 4 x 6 x 12 inch block to the discharge chute only as a scale reference; in operation it is ejected forward after each compression stroke.",
+    "Assemble the hopper by bolting the four sloped wall plates to the mold-mouth flange, then fit the two inclined deflector plates so soil funnels toward the 102 x 152 mm mold opening.",
+    "Build the 3 ft x 6 ft tractor-loading grate from the four perimeter rails and six removable cross bars, then fasten it to the hopper rim and upper frame posts.",
+    "Clamp the eccentric hopper shaker to the port hopper wall, mount the control panel on the operator-side post, and install the hydraulic manifold, pressure gauge, supply quick-disconnect, return quick-disconnect, cylinder hoses, hose clamps, and control cable.",
+    "Mount the rear-retracted and front-extended limit switches beside the ram guide path, align their rollers with the platen travel, and connect them back to the control enclosure.",
+    "Connect an external OSE PowerCube or LifeTrac hydraulic supply, verify the pressure gauge reaches about 2400 psi under load, cycle the ram without soil, then feed moist soil through the grate and tune the shaker until blocks eject cleanly."
+  ],
   "metadata": {
     "reference": "https://wiki.opensourceecology.org/wiki/CEB_Press",
     "domain": "construction-automation",
-    "thumbnail_camera": [2.4, 1.7, 2.4],
+    "thumbnail_camera": [
+      2.4,
+      1.7,
+      2.4
+    ],
     "info": {
       "japanese_name": "CEBプレス（通称リベレーター）",
       "english_name": "Open Source Ecology CEB Press — 'The Liberator'",
@@ -16,54 +33,2163 @@
       "contract_value": "≈US$7,500 in materials (self-build kit)",
       "status": "Open-source, production-proven; dozens of independent builds on record",
       "facts": [
-        { "label": "Architecture",          "value": "Horizontal-ram hydraulic press with vertical soil feed" },
-        { "label": "Footprint",             "value": "Fits in a 3/4-ton pickup bed; adjustable legs for uneven ground" },
-        { "label": "Mass",                  "value": "≈1,700 lb (≈770 kg)" },
-        { "label": "Block size",            "value": "4 × 6 × 12 in (102 × 152 × 305 mm)" },
-        { "label": "Compression pressure",  "value": "≈2,400 psi (hydraulic)" },
-        { "label": "Throughput",            "value": "≈6 full-sized blocks per minute" },
-        { "label": "Soil input",            "value": "3' × 6' grate with internal deflector plates for tractor loading" },
-        { "label": "Hydraulic supply",      "value": "External — OSE PowerCube or LifeTrac PTO" },
-        { "label": "License",               "value": "CC BY-SA 4.0 (docs, CAD, firmware)" }
+        {
+          "label": "Architecture",
+          "value": "Horizontal-ram hydraulic press with vertical soil feed"
+        },
+        {
+          "label": "Footprint",
+          "value": "Fits in a 3/4-ton pickup bed; adjustable legs for uneven ground"
+        },
+        {
+          "label": "Mass",
+          "value": "≈1,700 lb (≈770 kg)"
+        },
+        {
+          "label": "Block size",
+          "value": "4 × 6 × 12 in (102 × 152 × 305 mm)"
+        },
+        {
+          "label": "Compression pressure",
+          "value": "≈2,400 psi (hydraulic)"
+        },
+        {
+          "label": "Throughput",
+          "value": "≈6 full-sized blocks per minute"
+        },
+        {
+          "label": "Soil input",
+          "value": "3' × 6' grate with internal deflector plates for tractor loading"
+        },
+        {
+          "label": "Hydraulic supply",
+          "value": "External — OSE PowerCube or LifeTrac PTO"
+        },
+        {
+          "label": "License",
+          "value": "CC BY-SA 4.0 (docs, CAD, firmware)"
+        }
       ],
       "sources": [
-        { "title": "Open Source Ecology Wiki — CEB Press", "url": "https://wiki.opensourceecology.org/wiki/CEB_Press" },
-        { "title": "OSE — The Liberator (project page)",    "url": "https://www.opensourceecology.org/portfolio/ceb-press/" },
-        { "title": "OSE — Global Village Construction Set", "url": "https://www.opensourceecology.org/gvcs/" }
+        {
+          "title": "Open Source Ecology Wiki — CEB Press",
+          "url": "https://wiki.opensourceecology.org/wiki/CEB_Press"
+        },
+        {
+          "title": "OSE — The Liberator (project page)",
+          "url": "https://www.opensourceecology.org/portfolio/ceb-press/"
+        },
+        {
+          "title": "OSE — Global Village Construction Set",
+          "url": "https://www.opensourceecology.org/gvcs/"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "leg_fl",              "name": "Adjustable Leg (Fwd-Left)",        "shape": "cylinder", "position": [-0.82, 0.10, 0.38],                            "size": [0.040, 0.22], "material": "welded steel",     "role": "Threaded adjustable foot at the forward-left corner — levels the press on uneven ground.", "connections": ["base_plate"] },
-    { "id": "leg_fr",              "name": "Adjustable Leg (Fwd-Right)",       "shape": "cylinder", "position": [-0.82, 0.10, -0.38],                           "size": [0.040, 0.22], "material": "welded steel",     "role": "Threaded adjustable foot (forward-right).", "connections": ["base_plate"] },
-    { "id": "leg_rl",              "name": "Adjustable Leg (Rear-Left)",       "shape": "cylinder", "position": [ 0.82, 0.10, 0.38],                            "size": [0.040, 0.22], "material": "welded steel",     "role": "Threaded adjustable foot (rear-left).", "connections": ["base_plate"] },
-    { "id": "leg_rr",              "name": "Adjustable Leg (Rear-Right)",      "shape": "cylinder", "position": [ 0.82, 0.10, -0.38],                           "size": [0.040, 0.22], "material": "welded steel",     "role": "Threaded adjustable foot (rear-right).", "connections": ["base_plate"] },
-
-    { "id": "base_plate",          "name": "Welded Base Plate",                "shape": "box",      "position": [0, 0.23, 0],                                   "size": [1.80, 0.06, 0.90], "material": "welded steel", "role": "Steel base plate / lower frame the legs bolt into and every subassembly mounts onto.", "connections": ["leg_fl","leg_fr","leg_rl","leg_rr","post_fl","post_fr","post_rl","post_rr","hydraulic_cylinder","mold_chamber","brick_chute","control_panel","hydraulic_pu_connector"] },
-
-    { "id": "post_fl",             "name": "Vertical Post (Fwd-Left)",         "shape": "box",      "position": [-0.85, 0.78, 0.42],                            "size": [0.06, 1.04, 0.06], "material": "welded steel",  "role": "3×3 inch square-tube post at the forward-left corner of the chassis cage.", "connections": ["base_plate", "frame_rail_port"] },
-    { "id": "post_fr",             "name": "Vertical Post (Fwd-Right)",        "shape": "box",      "position": [-0.85, 0.78, -0.42],                           "size": [0.06, 1.04, 0.06], "material": "welded steel",  "role": "Forward-right post.", "connections": ["base_plate", "frame_rail_stbd"] },
-    { "id": "post_rl",             "name": "Vertical Post (Rear-Left)",        "shape": "box",      "position": [ 0.85, 0.78, 0.42],                            "size": [0.06, 1.04, 0.06], "material": "welded steel",  "role": "Rear-left post.", "connections": ["base_plate", "frame_rail_port"] },
-    { "id": "post_rr",             "name": "Vertical Post (Rear-Right)",       "shape": "box",      "position": [ 0.85, 0.78, -0.42],                           "size": [0.06, 1.04, 0.06], "material": "welded steel",  "role": "Rear-right post.", "connections": ["base_plate", "frame_rail_stbd"] },
-
-    { "id": "frame_rail_port",     "name": "Upper Frame Rail (Port)",          "shape": "box",      "position": [0, 1.30, 0.42],                                "size": [1.80, 0.06, 0.06], "material": "welded steel",  "role": "Top port-side rail tying the forward and rear posts together.", "connections": ["post_fl", "post_rl"] },
-    { "id": "frame_rail_stbd",     "name": "Upper Frame Rail (Starboard)",     "shape": "box",      "position": [0, 1.30, -0.42],                               "size": [1.80, 0.06, 0.06], "material": "welded steel",  "role": "Top starboard-side rail.", "connections": ["post_fr", "post_rr"] },
-
-    { "id": "hydraulic_cylinder",  "name": "Horizontal Hydraulic Cylinder",    "shape": "cylinder", "position": [0.55, 0.40, 0],  "rotation": [0, 0, 1.5708],  "size": [0.090, 0.70], "material": "brushed steel",        "role": "Double-acting hydraulic cylinder mounted longitudinally at the rear of the chassis. Extends the ram rod forward to compress soil at ≈2,400 psi; retracts to reset.", "connections": ["base_plate", "ram_rod", "hydraulic_pu_connector"] },
-    { "id": "ram_rod",             "name": "Ram Piston Rod",                   "shape": "cylinder", "position": [0.00, 0.40, 0],  "rotation": [0, 0, 1.5708],  "size": [0.040, 0.35], "material": "brushed steel",        "role": "Chrome-finished piston rod that emerges from the hydraulic cylinder and pushes the pressing head into the mold.", "connections": ["hydraulic_cylinder", "ram_head"] },
-    { "id": "ram_head",            "name": "Pressing Head",                    "shape": "box",      "position": [-0.22, 0.40, 0],                              "size": [0.06, 0.25, 0.28], "material": "forged steel",           "role": "Hardened platen bolted to the ram rod. Its face forms one end of the finished block as it slides through the mold.", "connections": ["ram_rod", "mold_chamber"] },
-
-    { "id": "mold_chamber",        "name": "Brick Mold Chamber",               "shape": "box",      "position": [-0.52, 0.40, 0],                              "size": [0.40, 0.22, 0.32], "material": "forged steel",          "role": "Hardened steel mold with an opening in the top (for soil from the hopper), an opening on the ram side (for compression), and an opening on the forward side (for ejection).", "connections": ["base_plate", "ram_head", "hopper", "brick_chute"] },
-
-    { "id": "hopper",              "name": "Soil Hopper",                      "shape": "box",      "position": [-0.52, 0.72, 0],                              "size": [0.45, 0.40, 0.55], "material": "welded steel",          "role": "Tapered open-bottom hopper sitting directly on the mold opening. Meters soil into the mold between compression cycles.", "connections": ["mold_chamber", "grate", "hopper_shaker", "hopper_deflector"] },
-    { "id": "hopper_deflector",    "name": "Internal Soil Deflector",          "shape": "box",      "position": [-0.42, 0.85, 0],   "rotation": [0, 0, -0.40], "size": [0.04, 0.25, 0.40], "material": "welded steel",          "role": "Inclined deflector plate inside the hopper funneling tractor-dumped soil toward the mold opening.", "connections": ["hopper"] },
-    { "id": "grate",               "name": "Soil Input Grate (3' × 6')",       "shape": "box",      "position": [-0.50, 0.94, 0],                              "size": [1.80, 0.03, 0.90], "material": "welded steel",          "role": "Coarse 3' × 6' grating on top of the hopper. A tractor bucket dumps soil onto the grate; the grate screens out rocks and breaks up soil clumps.", "connections": ["hopper", "post_fl", "post_fr"] },
-    { "id": "hopper_shaker",       "name": "Hopper Shaker",                    "shape": "box",      "position": [-0.52, 0.72, 0.40],                           "size": [0.20, 0.18, 0.14], "material": "dark anodized aluminum","role": "Eccentric-cam hopper vibrator clamped to the port-side hopper wall. Keeps the soil column flowing.", "connections": ["hopper"] },
-
-    { "id": "brick_chute",         "name": "Block Discharge Chute",            "shape": "box",      "position": [-1.05, 0.34, 0],                              "size": [0.30, 0.12, 0.32], "material": "welded steel",          "role": "Forward discharge chute — the finished block slides out here as the ram cycles.", "connections": ["mold_chamber", "base_plate", "brick_sample"] },
-    { "id": "brick_sample",        "name": "Compressed Earth Block (sample)",  "shape": "box",      "position": [-1.08, 0.44, 0],                              "size": [0.305, 0.102, 0.152], "material": "concrete",           "role": "A finished 4 × 6 × 12 in compressed earth block resting on the discharge chute.", "connections": ["brick_chute"] },
-
-    { "id": "control_panel",       "name": "Control Panel",                    "shape": "box",      "position": [0.40, 0.55, 0.46],                            "size": [0.30, 0.30, 0.04], "material": "glass display",         "role": "Operator control panel — starts/stops the automated press cycle and drives the solenoid valves on the hydraulic manifold.", "connections": ["base_plate"] },
-    { "id": "hydraulic_pu_connector","name": "Hydraulic Power-Unit Connector", "shape": "box",      "position": [0.88, 0.50, 0.30],                            "size": [0.14, 0.20, 0.15], "material": "dark anodized aluminum","role": "Quick-disconnect hydraulic manifold with supply/return ports for an external PowerCube or a LifeTrac tractor's auxiliary hydraulics.", "connections": ["base_plate", "hydraulic_cylinder"] }
+    {
+      "id": "foot_pad_fl",
+      "name": "Round Foot Pad (Fwd-Port)",
+      "shape": "cylinder",
+      "position": [
+        -0.9,
+        0.015,
+        0.45
+      ],
+      "size": [
+        0.08,
+        0.03
+      ],
+      "material": "welded steel",
+      "role": "Ground-bearing pad that spreads the forward-port leg load and keeps the adjustable screw from sinking into soil.",
+      "connections": [
+        "leg_fl"
+      ]
+    },
+    {
+      "id": "foot_pad_fr",
+      "name": "Round Foot Pad (Fwd-Starboard)",
+      "shape": "cylinder",
+      "position": [
+        -0.9,
+        0.015,
+        -0.45
+      ],
+      "size": [
+        0.08,
+        0.03
+      ],
+      "material": "welded steel",
+      "role": "Ground-bearing pad that supports the forward-starboard adjustable leg at world y = 0.",
+      "connections": [
+        "leg_fr"
+      ]
+    },
+    {
+      "id": "foot_pad_rl",
+      "name": "Round Foot Pad (Rear-Port)",
+      "shape": "cylinder",
+      "position": [
+        0.9,
+        0.015,
+        0.45
+      ],
+      "size": [
+        0.08,
+        0.03
+      ],
+      "material": "welded steel",
+      "role": "Ground-bearing pad that supports the rear-port adjustable leg and levels the hydraulic end of the press.",
+      "connections": [
+        "leg_rl"
+      ]
+    },
+    {
+      "id": "foot_pad_rr",
+      "name": "Round Foot Pad (Rear-Starboard)",
+      "shape": "cylinder",
+      "position": [
+        0.9,
+        0.015,
+        -0.45
+      ],
+      "size": [
+        0.08,
+        0.03
+      ],
+      "material": "welded steel",
+      "role": "Ground-bearing pad that supports the rear-starboard adjustable leg.",
+      "connections": [
+        "leg_rr"
+      ]
+    },
+    {
+      "id": "leg_fl",
+      "name": "Adjustable Threaded Leg (Fwd-Port)",
+      "shape": "cylinder",
+      "position": [
+        -0.9,
+        0.16,
+        0.45
+      ],
+      "size": [
+        0.04,
+        0.26
+      ],
+      "material": "welded steel",
+      "role": "Threaded steel leveling leg at the forward-port corner, connecting the foot pad to the lower chassis rail.",
+      "connections": [
+        "foot_pad_fl",
+        "lower_rail_port",
+        "front_crossmember"
+      ]
+    },
+    {
+      "id": "leg_fr",
+      "name": "Adjustable Threaded Leg (Fwd-Starboard)",
+      "shape": "cylinder",
+      "position": [
+        -0.9,
+        0.16,
+        -0.45
+      ],
+      "size": [
+        0.04,
+        0.26
+      ],
+      "material": "welded steel",
+      "role": "Threaded steel leveling leg at the forward-starboard corner, used to square the mold and discharge chute.",
+      "connections": [
+        "foot_pad_fr",
+        "lower_rail_stbd",
+        "front_crossmember"
+      ]
+    },
+    {
+      "id": "leg_rl",
+      "name": "Adjustable Threaded Leg (Rear-Port)",
+      "shape": "cylinder",
+      "position": [
+        0.9,
+        0.16,
+        0.45
+      ],
+      "size": [
+        0.04,
+        0.26
+      ],
+      "material": "welded steel",
+      "role": "Threaded steel leveling leg at the rear-port corner under the hydraulic cylinder mount.",
+      "connections": [
+        "foot_pad_rl",
+        "lower_rail_port",
+        "rear_crossmember"
+      ]
+    },
+    {
+      "id": "leg_rr",
+      "name": "Adjustable Threaded Leg (Rear-Starboard)",
+      "shape": "cylinder",
+      "position": [
+        0.9,
+        0.16,
+        -0.45
+      ],
+      "size": [
+        0.04,
+        0.26
+      ],
+      "material": "welded steel",
+      "role": "Threaded steel leveling leg at the rear-starboard corner under the hydraulic manifold side.",
+      "connections": [
+        "foot_pad_rr",
+        "lower_rail_stbd",
+        "rear_crossmember"
+      ]
+    },
+    {
+      "id": "lower_rail_port",
+      "name": "Lower Longitudinal Rail (Port)",
+      "shape": "box",
+      "position": [
+        0,
+        0.285,
+        0.45
+      ],
+      "size": [
+        1.9,
+        0.06,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "3 x 3 inch square-tube lower rail that carries the mold and ties the port legs together.",
+      "connections": [
+        "leg_fl",
+        "leg_rl",
+        "base_deck",
+        "post_fl",
+        "post_rl"
+      ]
+    },
+    {
+      "id": "lower_rail_stbd",
+      "name": "Lower Longitudinal Rail (Starboard)",
+      "shape": "box",
+      "position": [
+        0,
+        0.285,
+        -0.45
+      ],
+      "size": [
+        1.9,
+        0.06,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "3 x 3 inch square-tube lower rail that carries the operator-side controls and ties the starboard legs together.",
+      "connections": [
+        "leg_fr",
+        "leg_rr",
+        "base_deck",
+        "post_fr",
+        "post_rr"
+      ]
+    },
+    {
+      "id": "front_crossmember",
+      "name": "Lower Front Crossmember",
+      "shape": "box",
+      "position": [
+        -0.9,
+        0.285,
+        0
+      ],
+      "size": [
+        0.06,
+        0.06,
+        0.96
+      ],
+      "material": "welded steel",
+      "role": "Forward lower cross tube that supports the discharge chute end of the press.",
+      "connections": [
+        "leg_fl",
+        "leg_fr",
+        "lower_rail_port",
+        "lower_rail_stbd"
+      ]
+    },
+    {
+      "id": "rear_crossmember",
+      "name": "Lower Rear Crossmember",
+      "shape": "box",
+      "position": [
+        0.9,
+        0.285,
+        0
+      ],
+      "size": [
+        0.06,
+        0.06,
+        0.96
+      ],
+      "material": "welded steel",
+      "role": "Rear lower cross tube that resists the hydraulic cylinder reaction load.",
+      "connections": [
+        "leg_rl",
+        "leg_rr",
+        "lower_rail_port",
+        "lower_rail_stbd"
+      ]
+    },
+    {
+      "id": "base_deck",
+      "name": "Thin Base Deck Plate",
+      "shape": "box",
+      "position": [
+        -0.05,
+        0.325,
+        0
+      ],
+      "size": [
+        1.7,
+        0.025,
+        0.72
+      ],
+      "material": "welded steel",
+      "role": "Thin steel mounting deck above the lower rails; it locates the mold, cylinder brackets, manifold, and chute without hiding them.",
+      "connections": [
+        "lower_rail_port",
+        "lower_rail_stbd",
+        "mold_floor",
+        "rear_clevis_bracket",
+        "front_gland_support"
+      ]
+    },
+    {
+      "id": "post_fl",
+      "name": "Vertical Post (Fwd-Port)",
+      "shape": "box",
+      "position": [
+        -0.9,
+        0.83,
+        0.45
+      ],
+      "size": [
+        0.06,
+        1.1,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "Forward-port 3 x 3 inch square-tube post that supports the upper grate frame and hopper rim.",
+      "connections": [
+        "lower_rail_port",
+        "upper_rail_port",
+        "front_upper_crossmember"
+      ]
+    },
+    {
+      "id": "post_fr",
+      "name": "Vertical Post (Fwd-Starboard)",
+      "shape": "box",
+      "position": [
+        -0.9,
+        0.83,
+        -0.45
+      ],
+      "size": [
+        0.06,
+        1.1,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "Forward-starboard square-tube post that frames the operator side of the feed grate.",
+      "connections": [
+        "lower_rail_stbd",
+        "upper_rail_stbd",
+        "front_upper_crossmember",
+        "control_panel_arm"
+      ]
+    },
+    {
+      "id": "post_rl",
+      "name": "Vertical Post (Rear-Port)",
+      "shape": "box",
+      "position": [
+        0.9,
+        0.83,
+        0.45
+      ],
+      "size": [
+        0.06,
+        1.1,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "Rear-port square-tube post that carries the tractor-loading grate and braces the hydraulic end.",
+      "connections": [
+        "lower_rail_port",
+        "upper_rail_port",
+        "rear_upper_crossmember"
+      ]
+    },
+    {
+      "id": "post_rr",
+      "name": "Vertical Post (Rear-Starboard)",
+      "shape": "box",
+      "position": [
+        0.9,
+        0.83,
+        -0.45
+      ],
+      "size": [
+        0.06,
+        1.1,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "Rear-starboard square-tube post that provides a rigid mounting edge for controls and hydraulics.",
+      "connections": [
+        "lower_rail_stbd",
+        "upper_rail_stbd",
+        "rear_upper_crossmember"
+      ]
+    },
+    {
+      "id": "upper_rail_port",
+      "name": "Upper Frame Rail (Port)",
+      "shape": "box",
+      "position": [
+        0,
+        1.38,
+        0.45
+      ],
+      "size": [
+        1.9,
+        0.06,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "Upper port-side square tube tying the two port posts and supporting the grate perimeter.",
+      "connections": [
+        "post_fl",
+        "post_rl",
+        "grate_port_rail"
+      ]
+    },
+    {
+      "id": "upper_rail_stbd",
+      "name": "Upper Frame Rail (Starboard)",
+      "shape": "box",
+      "position": [
+        0,
+        1.38,
+        -0.45
+      ],
+      "size": [
+        1.9,
+        0.06,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "Upper starboard-side square tube tying the two starboard posts and carrying the operator-side grate edge.",
+      "connections": [
+        "post_fr",
+        "post_rr",
+        "grate_stbd_rail"
+      ]
+    },
+    {
+      "id": "front_upper_crossmember",
+      "name": "Upper Front Crossmember",
+      "shape": "box",
+      "position": [
+        -0.9,
+        1.38,
+        0
+      ],
+      "size": [
+        0.06,
+        0.06,
+        0.96
+      ],
+      "material": "welded steel",
+      "role": "Upper forward cross tube that closes the cage above the discharge chute.",
+      "connections": [
+        "post_fl",
+        "post_fr",
+        "grate_front_rail"
+      ]
+    },
+    {
+      "id": "rear_upper_crossmember",
+      "name": "Upper Rear Crossmember",
+      "shape": "box",
+      "position": [
+        0.9,
+        1.38,
+        0
+      ],
+      "size": [
+        0.06,
+        0.06,
+        0.96
+      ],
+      "material": "welded steel",
+      "role": "Upper rear cross tube that closes the cage above the hydraulic cylinder.",
+      "connections": [
+        "post_rl",
+        "post_rr",
+        "grate_rear_rail"
+      ]
+    },
+    {
+      "id": "brace_port_diag",
+      "name": "Port Side Diagonal Brace",
+      "shape": "box",
+      "position": [
+        0,
+        0.82,
+        0.48
+      ],
+      "rotation": [
+        0,
+        0,
+        0.52
+      ],
+      "size": [
+        1.55,
+        0.035,
+        0.035
+      ],
+      "material": "welded steel",
+      "role": "Diagonal brace on the port side that prevents the frame from racking during the ram stroke.",
+      "connections": [
+        "lower_rail_port",
+        "upper_rail_port"
+      ]
+    },
+    {
+      "id": "brace_stbd_diag",
+      "name": "Starboard Side Diagonal Brace",
+      "shape": "box",
+      "position": [
+        0,
+        0.82,
+        -0.48
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.52
+      ],
+      "size": [
+        1.55,
+        0.035,
+        0.035
+      ],
+      "material": "welded steel",
+      "role": "Diagonal brace on the starboard side that keeps the operator side square under vibration.",
+      "connections": [
+        "lower_rail_stbd",
+        "upper_rail_stbd"
+      ]
+    },
+    {
+      "id": "rear_clevis_bracket",
+      "name": "Rear Cylinder Clevis Bracket",
+      "shape": "box",
+      "position": [
+        0.78,
+        0.43,
+        0
+      ],
+      "size": [
+        0.12,
+        0.2,
+        0.28
+      ],
+      "material": "forged steel",
+      "role": "Pinned clevis bracket that anchors the rear eye of the double-acting hydraulic cylinder to the base deck.",
+      "connections": [
+        "base_deck",
+        "hydraulic_cylinder_body",
+        "rear_clevis_pin"
+      ]
+    },
+    {
+      "id": "front_gland_support",
+      "name": "Front Cylinder Gland Support",
+      "shape": "box",
+      "position": [
+        0.28,
+        0.43,
+        0
+      ],
+      "size": [
+        0.08,
+        0.18,
+        0.24
+      ],
+      "material": "forged steel",
+      "role": "Support saddle at the rod end of the cylinder that keeps the ram axis aligned with the mold throat.",
+      "connections": [
+        "base_deck",
+        "hydraulic_cylinder_body",
+        "ram_guide_port",
+        "ram_guide_stbd",
+        "front_clevis_pin"
+      ]
+    },
+    {
+      "id": "rear_clevis_pin",
+      "name": "Rear Cylinder Clevis Pin",
+      "shape": "cylinder",
+      "position": [
+        0.78,
+        0.43,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.025,
+        0.32
+      ],
+      "material": "forged steel",
+      "role": "Removable cross pin through the rear cylinder eye and clevis bracket for serviceable cylinder mounting.",
+      "connections": [
+        "rear_clevis_bracket",
+        "hydraulic_cylinder_body"
+      ]
+    },
+    {
+      "id": "front_clevis_pin",
+      "name": "Front Gland Support Pin",
+      "shape": "cylinder",
+      "position": [
+        0.28,
+        0.43,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.022,
+        0.28
+      ],
+      "material": "forged steel",
+      "role": "Service pin through the front support saddle that keeps the rod-end gland aligned with the ram guides.",
+      "connections": [
+        "front_gland_support",
+        "hydraulic_cylinder_body"
+      ]
+    },
+    {
+      "id": "hydraulic_cylinder_body",
+      "name": "Horizontal Hydraulic Cylinder Body",
+      "shape": "cylinder",
+      "position": [
+        0.55,
+        0.43,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.09,
+        0.58
+      ],
+      "material": "brushed steel",
+      "role": "Double-acting hydraulic cylinder barrel that converts about 2400 psi hydraulic pressure into the block-compressing ram force.",
+      "connections": [
+        "rear_clevis_bracket",
+        "front_gland_support",
+        "ram_rod",
+        "hose_pressure",
+        "hose_return",
+        "rear_clevis_pin",
+        "front_clevis_pin"
+      ]
+    },
+    {
+      "id": "ram_rod",
+      "name": "Polished Ram Piston Rod",
+      "shape": "cylinder",
+      "position": [
+        0.08,
+        0.43,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.038,
+        0.48
+      ],
+      "material": "brushed steel",
+      "role": "Chrome piston rod sliding forward from the cylinder into the mold throat to carry the pressing platen.",
+      "connections": [
+        "hydraulic_cylinder_body",
+        "pressing_platen",
+        "ram_guide_port",
+        "ram_guide_stbd"
+      ]
+    },
+    {
+      "id": "ram_guide_port",
+      "name": "Ram Guide Rail (Port)",
+      "shape": "box",
+      "position": [
+        -0.1,
+        0.35,
+        0.16
+      ],
+      "size": [
+        0.6,
+        0.035,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Low guide rail beside the ram path that keeps the platen from yawing inside the mold.",
+      "connections": [
+        "front_gland_support",
+        "mold_rear_throat",
+        "ram_rod",
+        "limit_switch_retracted",
+        "limit_switch_extended"
+      ]
+    },
+    {
+      "id": "ram_guide_stbd",
+      "name": "Ram Guide Rail (Starboard)",
+      "shape": "box",
+      "position": [
+        -0.1,
+        0.35,
+        -0.16
+      ],
+      "size": [
+        0.6,
+        0.035,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Opposite low guide rail that keeps the pressing platen centered in the mold cavity.",
+      "connections": [
+        "front_gland_support",
+        "mold_rear_throat",
+        "ram_rod"
+      ]
+    },
+    {
+      "id": "pressing_platen",
+      "name": "Hardened Pressing Platen",
+      "shape": "box",
+      "position": [
+        -0.25,
+        0.43,
+        0
+      ],
+      "size": [
+        0.06,
+        0.16,
+        0.26
+      ],
+      "material": "forged steel",
+      "role": "Bolted platen on the rod end whose face compresses soil to the 4 x 6 inch block cross-section.",
+      "connections": [
+        "ram_rod",
+        "mold_rear_throat",
+        "mold_liner",
+        "limit_switch_retracted",
+        "limit_switch_extended"
+      ]
+    },
+    {
+      "id": "mold_floor",
+      "name": "Mold Floor Plate",
+      "shape": "box",
+      "position": [
+        -0.48,
+        0.35,
+        0
+      ],
+      "size": [
+        0.46,
+        0.04,
+        0.32
+      ],
+      "material": "forged steel",
+      "role": "Flat hardened floor of the brick mold; it supports the 305 mm long block during compression.",
+      "connections": [
+        "base_deck",
+        "mold_wall_port",
+        "mold_wall_stbd",
+        "mold_rear_throat",
+        "mold_front_gate_frame"
+      ]
+    },
+    {
+      "id": "mold_wall_port",
+      "name": "Mold Side Wall (Port)",
+      "shape": "box",
+      "position": [
+        -0.48,
+        0.47,
+        0.18
+      ],
+      "size": [
+        0.46,
+        0.22,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Port-side hardened wall that defines one long edge of the 152 mm block width while leaving the top visible.",
+      "connections": [
+        "mold_floor",
+        "mold_rear_throat",
+        "mold_front_gate_frame",
+        "mold_liner",
+        "rear_throat_upright_port",
+        "front_gate_upright_port"
+      ]
+    },
+    {
+      "id": "mold_wall_stbd",
+      "name": "Mold Side Wall (Starboard)",
+      "shape": "box",
+      "position": [
+        -0.48,
+        0.47,
+        -0.18
+      ],
+      "size": [
+        0.46,
+        0.22,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Starboard hardened wall that forms the opposite edge of the mold cavity and remains separated for X-ray visibility.",
+      "connections": [
+        "mold_floor",
+        "mold_rear_throat",
+        "mold_front_gate_frame",
+        "mold_liner",
+        "rear_throat_upright_stbd",
+        "front_gate_upright_stbd"
+      ]
+    },
+    {
+      "id": "mold_rear_throat",
+      "name": "Rear Mold Throat Bottom Rail",
+      "shape": "box",
+      "position": [
+        -0.24,
+        0.37,
+        0
+      ],
+      "size": [
+        0.04,
+        0.04,
+        0.36
+      ],
+      "material": "forged steel",
+      "role": "Bottom member of the rear throat frame, leaving the center open so the ram platen and mold cavity are visible.",
+      "connections": [
+        "mold_floor",
+        "mold_wall_port",
+        "mold_wall_stbd",
+        "pressing_platen",
+        "ram_guide_port",
+        "ram_guide_stbd",
+        "rear_throat_upright_port",
+        "rear_throat_upright_stbd"
+      ]
+    },
+    {
+      "id": "rear_throat_upright_port",
+      "name": "Rear Throat Upright (Port)",
+      "shape": "box",
+      "position": [
+        -0.24,
+        0.49,
+        0.18
+      ],
+      "size": [
+        0.04,
+        0.2,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Port upright of the rear mold throat that frames the ram opening without covering it.",
+      "connections": [
+        "mold_rear_throat",
+        "mold_wall_port",
+        "rear_throat_top_lintel"
+      ]
+    },
+    {
+      "id": "rear_throat_upright_stbd",
+      "name": "Rear Throat Upright (Starboard)",
+      "shape": "box",
+      "position": [
+        -0.24,
+        0.49,
+        -0.18
+      ],
+      "size": [
+        0.04,
+        0.2,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Starboard upright of the rear mold throat that keeps the opening square around the ram path.",
+      "connections": [
+        "mold_rear_throat",
+        "mold_wall_stbd",
+        "rear_throat_top_lintel"
+      ]
+    },
+    {
+      "id": "rear_throat_top_lintel",
+      "name": "Rear Throat Top Lintel",
+      "shape": "box",
+      "position": [
+        -0.24,
+        0.6,
+        0
+      ],
+      "size": [
+        0.04,
+        0.035,
+        0.36
+      ],
+      "material": "forged steel",
+      "role": "Top member of the rear throat frame that resists compression load while leaving the ram opening exposed.",
+      "connections": [
+        "rear_throat_upright_port",
+        "rear_throat_upright_stbd",
+        "mold_wall_port",
+        "mold_wall_stbd"
+      ]
+    },
+    {
+      "id": "mold_front_gate_frame",
+      "name": "Front Gate Bottom Sill",
+      "shape": "box",
+      "position": [
+        -0.72,
+        0.37,
+        0
+      ],
+      "size": [
+        0.04,
+        0.04,
+        0.36
+      ],
+      "material": "forged steel",
+      "role": "Bottom sill of the front gate frame, leaving the ejection opening visible rather than blocking it with a plate.",
+      "connections": [
+        "mold_floor",
+        "mold_wall_port",
+        "mold_wall_stbd",
+        "discharge_chute_floor",
+        "gate_lintel",
+        "front_gate_upright_port",
+        "front_gate_upright_stbd"
+      ]
+    },
+    {
+      "id": "front_gate_upright_port",
+      "name": "Front Gate Upright (Port)",
+      "shape": "box",
+      "position": [
+        -0.72,
+        0.49,
+        0.18
+      ],
+      "size": [
+        0.04,
+        0.2,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Port upright of the front ejection gate that guides the block without hiding the opening.",
+      "connections": [
+        "mold_front_gate_frame",
+        "mold_wall_port",
+        "gate_lintel",
+        "gate_hinge_upper",
+        "gate_hinge_lower"
+      ]
+    },
+    {
+      "id": "front_gate_upright_stbd",
+      "name": "Front Gate Upright (Starboard)",
+      "shape": "box",
+      "position": [
+        -0.72,
+        0.49,
+        -0.18
+      ],
+      "size": [
+        0.04,
+        0.2,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Starboard upright of the front ejection gate with latch hardware mounted on its outside face.",
+      "connections": [
+        "mold_front_gate_frame",
+        "mold_wall_stbd",
+        "gate_lintel",
+        "gate_latch_hasp",
+        "gate_latch_pin"
+      ]
+    },
+    {
+      "id": "gate_lintel",
+      "name": "Mold Gate Top Lintel",
+      "shape": "box",
+      "position": [
+        -0.72,
+        0.6,
+        0
+      ],
+      "size": [
+        0.06,
+        0.04,
+        0.36
+      ],
+      "material": "forged steel",
+      "role": "Top lintel over the ejection opening that keeps the front of the mold square while the block exits.",
+      "connections": [
+        "mold_front_gate_frame",
+        "mold_wall_port",
+        "mold_wall_stbd",
+        "front_gate_upright_port",
+        "front_gate_upright_stbd"
+      ]
+    },
+    {
+      "id": "gate_hinge_upper",
+      "name": "Upper Gate Hinge Barrel",
+      "shape": "cylinder",
+      "position": [
+        -0.735,
+        0.56,
+        0.23
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.022,
+        0.12
+      ],
+      "material": "forged steel",
+      "role": "Upper hinge barrel that shows how the front gate can swing open for cleaning and service.",
+      "connections": [
+        "front_gate_upright_port",
+        "gate_lintel"
+      ]
+    },
+    {
+      "id": "gate_hinge_lower",
+      "name": "Lower Gate Hinge Barrel",
+      "shape": "cylinder",
+      "position": [
+        -0.735,
+        0.43,
+        0.23
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.022,
+        0.12
+      ],
+      "material": "forged steel",
+      "role": "Lower hinge barrel aligned with the upper hinge so the mold gate has a believable service pivot.",
+      "connections": [
+        "front_gate_upright_port",
+        "mold_front_gate_frame"
+      ]
+    },
+    {
+      "id": "gate_latch_hasp",
+      "name": "Front Gate Latch Hasp",
+      "shape": "box",
+      "position": [
+        -0.76,
+        0.5,
+        -0.235
+      ],
+      "size": [
+        0.12,
+        0.035,
+        0.025
+      ],
+      "material": "forged steel",
+      "role": "Latch strap across the starboard side of the gate that locks the mold closed during the compression stroke.",
+      "connections": [
+        "front_gate_upright_stbd",
+        "gate_latch_pin"
+      ]
+    },
+    {
+      "id": "gate_latch_pin",
+      "name": "Removable Gate Latch Pin",
+      "shape": "cylinder",
+      "position": [
+        -0.81,
+        0.5,
+        -0.235
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.014,
+        0.08
+      ],
+      "material": "brass",
+      "role": "Small removable pin through the latch hasp that makes the mold door locking method explicit.",
+      "connections": [
+        "gate_latch_hasp",
+        "front_gate_upright_stbd"
+      ]
+    },
+    {
+      "id": "mold_liner",
+      "name": "Replaceable Mold Liner",
+      "shape": "box",
+      "position": [
+        -0.5,
+        0.48,
+        0
+      ],
+      "size": [
+        0.34,
+        0.015,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Thin replaceable wear liner visible inside the mold cavity, sized around the 102 x 152 mm compressed-block section.",
+      "connections": [
+        "mold_floor",
+        "mold_wall_port",
+        "mold_wall_stbd",
+        "pressing_platen",
+        "liner_bolt_port",
+        "liner_bolt_stbd"
+      ]
+    },
+    {
+      "id": "liner_bolt_port",
+      "name": "Port Mold Liner Bolt Head",
+      "shape": "cylinder",
+      "position": [
+        -0.5,
+        0.57,
+        0.195
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.015,
+        0.01
+      ],
+      "material": "brass",
+      "role": "Visible bolt head showing that the port wear liner is replaceable rather than welded permanently.",
+      "connections": [
+        "mold_liner",
+        "mold_wall_port"
+      ]
+    },
+    {
+      "id": "liner_bolt_stbd",
+      "name": "Starboard Mold Liner Bolt Head",
+      "shape": "cylinder",
+      "position": [
+        -0.5,
+        0.57,
+        -0.195
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.015,
+        0.01
+      ],
+      "material": "brass",
+      "role": "Visible bolt head showing the starboard liner attachment point for field replacement.",
+      "connections": [
+        "mold_liner",
+        "mold_wall_stbd"
+      ]
+    },
+    {
+      "id": "discharge_chute_floor",
+      "name": "Block Discharge Chute Floor",
+      "shape": "box",
+      "position": [
+        -0.98,
+        0.36,
+        0
+      ],
+      "size": [
+        0.48,
+        0.04,
+        0.32
+      ],
+      "material": "welded steel",
+      "role": "Forward chute floor that receives the compressed earth block as the ram ejects it from the mold.",
+      "connections": [
+        "mold_front_gate_frame",
+        "base_deck",
+        "chute_side_port",
+        "chute_side_stbd",
+        "brick_sample"
+      ]
+    },
+    {
+      "id": "chute_side_port",
+      "name": "Discharge Chute Side (Port)",
+      "shape": "box",
+      "position": [
+        -0.98,
+        0.43,
+        0.18
+      ],
+      "size": [
+        0.48,
+        0.12,
+        0.025
+      ],
+      "material": "welded steel",
+      "role": "Low port-side guide that keeps finished blocks centered on the discharge chute.",
+      "connections": [
+        "discharge_chute_floor",
+        "mold_front_gate_frame"
+      ]
+    },
+    {
+      "id": "chute_side_stbd",
+      "name": "Discharge Chute Side (Starboard)",
+      "shape": "box",
+      "position": [
+        -0.98,
+        0.43,
+        -0.18
+      ],
+      "size": [
+        0.48,
+        0.12,
+        0.025
+      ],
+      "material": "welded steel",
+      "role": "Low starboard-side guide that prevents a fresh block from twisting as it exits.",
+      "connections": [
+        "discharge_chute_floor",
+        "mold_front_gate_frame"
+      ]
+    },
+    {
+      "id": "brick_sample",
+      "name": "Compressed Earth Block Scale Sample",
+      "shape": "box",
+      "position": [
+        -1.08,
+        0.43,
+        0
+      ],
+      "size": [
+        0.305,
+        0.102,
+        0.152
+      ],
+      "material": "concrete",
+      "role": "Finished 4 x 6 x 12 inch earth block shown on the chute to reveal the actual product size and ejection path.",
+      "connections": [
+        "discharge_chute_floor"
+      ]
+    },
+    {
+      "id": "hopper_mouth_flange",
+      "name": "Hopper-to-Mold Mouth Flange",
+      "shape": "box",
+      "position": [
+        -0.48,
+        0.63,
+        0
+      ],
+      "size": [
+        0.38,
+        0.035,
+        0.34
+      ],
+      "material": "welded steel",
+      "role": "Bolted rectangular flange around the mold opening where the sheet-metal hopper attaches.",
+      "connections": [
+        "mold_wall_port",
+        "mold_wall_stbd",
+        "hopper_front_plate",
+        "hopper_rear_plate",
+        "hopper_port_plate",
+        "hopper_stbd_plate",
+        "flange_bolt_front",
+        "flange_bolt_rear"
+      ]
+    },
+    {
+      "id": "flange_bolt_front",
+      "name": "Front Hopper Flange Bolt",
+      "shape": "cylinder",
+      "position": [
+        -0.66,
+        0.655,
+        0
+      ],
+      "size": [
+        0.014,
+        0.018
+      ],
+      "material": "brass",
+      "role": "Visible bolt head showing the front hopper sheet attachment to the mold-mouth flange.",
+      "connections": [
+        "hopper_mouth_flange",
+        "hopper_front_plate"
+      ]
+    },
+    {
+      "id": "flange_bolt_rear",
+      "name": "Rear Hopper Flange Bolt",
+      "shape": "cylinder",
+      "position": [
+        -0.3,
+        0.655,
+        0
+      ],
+      "size": [
+        0.014,
+        0.018
+      ],
+      "material": "brass",
+      "role": "Visible bolt head showing the rear hopper sheet attachment to the mold-mouth flange.",
+      "connections": [
+        "hopper_mouth_flange",
+        "hopper_rear_plate"
+      ]
+    },
+    {
+      "id": "hopper_front_plate",
+      "name": "Sloped Hopper Front Plate",
+      "shape": "box",
+      "position": [
+        -0.68,
+        0.86,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.45
+      ],
+      "size": [
+        0.38,
+        0.035,
+        0.62
+      ],
+      "material": "welded steel",
+      "role": "Forward sloped hopper wall that funnels tractor-dumped soil down toward the mold mouth without covering the interior.",
+      "connections": [
+        "hopper_mouth_flange",
+        "grate_front_rail",
+        "hopper_port_plate",
+        "hopper_stbd_plate"
+      ]
+    },
+    {
+      "id": "hopper_rear_plate",
+      "name": "Sloped Hopper Rear Plate",
+      "shape": "box",
+      "position": [
+        -0.28,
+        0.86,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.45
+      ],
+      "size": [
+        0.38,
+        0.035,
+        0.62
+      ],
+      "material": "welded steel",
+      "role": "Rear sloped hopper wall that prevents soil from spilling toward the hydraulic cylinder.",
+      "connections": [
+        "hopper_mouth_flange",
+        "grate_rear_rail",
+        "hopper_port_plate",
+        "hopper_stbd_plate"
+      ]
+    },
+    {
+      "id": "hopper_port_plate",
+      "name": "Sloped Hopper Port Plate",
+      "shape": "box",
+      "position": [
+        -0.48,
+        0.86,
+        0.32
+      ],
+      "rotation": [
+        0.42,
+        0,
+        0
+      ],
+      "size": [
+        0.62,
+        0.035,
+        0.34
+      ],
+      "material": "welded steel",
+      "role": "Port-side sloped hopper wall that remains separated from the opposite wall so the soil path is visible.",
+      "connections": [
+        "hopper_mouth_flange",
+        "grate_port_rail",
+        "hopper_front_plate",
+        "hopper_rear_plate",
+        "hopper_shaker"
+      ]
+    },
+    {
+      "id": "hopper_stbd_plate",
+      "name": "Sloped Hopper Starboard Plate",
+      "shape": "box",
+      "position": [
+        -0.48,
+        0.86,
+        -0.32
+      ],
+      "rotation": [
+        -0.42,
+        0,
+        0
+      ],
+      "size": [
+        0.62,
+        0.035,
+        0.34
+      ],
+      "material": "welded steel",
+      "role": "Starboard-side sloped hopper wall that funnels soil toward the mold and keeps the operator side contained.",
+      "connections": [
+        "hopper_mouth_flange",
+        "grate_stbd_rail",
+        "hopper_front_plate",
+        "hopper_rear_plate"
+      ]
+    },
+    {
+      "id": "deflector_upper",
+      "name": "Upper Internal Soil Deflector",
+      "shape": "box",
+      "position": [
+        -0.39,
+        0.93,
+        0.08
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.55
+      ],
+      "size": [
+        0.34,
+        0.025,
+        0.38
+      ],
+      "material": "welded steel",
+      "role": "Inclined internal plate that breaks up incoming soil and directs it away from one-sided packing.",
+      "connections": [
+        "hopper_port_plate",
+        "hopper_rear_plate"
+      ]
+    },
+    {
+      "id": "deflector_lower",
+      "name": "Lower Internal Soil Deflector",
+      "shape": "box",
+      "position": [
+        -0.56,
+        0.78,
+        -0.06
+      ],
+      "rotation": [
+        0,
+        0,
+        0.5
+      ],
+      "size": [
+        0.28,
+        0.025,
+        0.34
+      ],
+      "material": "welded steel",
+      "role": "Second inclined deflector that guides soil directly over the mold mouth for consistent block fill.",
+      "connections": [
+        "hopper_stbd_plate",
+        "hopper_front_plate",
+        "hopper_mouth_flange"
+      ]
+    },
+    {
+      "id": "grate_front_rail",
+      "name": "Input Grate Front Rail",
+      "shape": "box",
+      "position": [
+        -1.02,
+        1.18,
+        0
+      ],
+      "size": [
+        0.04,
+        0.04,
+        0.9
+      ],
+      "material": "welded steel",
+      "role": "Front perimeter rail of the 3 ft x 6 ft loading grate that catches tractor bucket loads.",
+      "connections": [
+        "front_upper_crossmember",
+        "hopper_front_plate",
+        "grate_bar_1",
+        "grate_bar_2",
+        "grate_bar_3",
+        "grate_bar_4",
+        "grate_bar_5",
+        "grate_bar_6"
+      ]
+    },
+    {
+      "id": "grate_rear_rail",
+      "name": "Input Grate Rear Rail",
+      "shape": "box",
+      "position": [
+        0.06,
+        1.18,
+        0
+      ],
+      "size": [
+        0.04,
+        0.04,
+        0.9
+      ],
+      "material": "welded steel",
+      "role": "Rear perimeter rail of the loading grate, open enough to show the hopper below.",
+      "connections": [
+        "rear_upper_crossmember",
+        "hopper_rear_plate",
+        "grate_bar_1",
+        "grate_bar_2",
+        "grate_bar_3",
+        "grate_bar_4",
+        "grate_bar_5",
+        "grate_bar_6"
+      ]
+    },
+    {
+      "id": "grate_port_rail",
+      "name": "Input Grate Port Rail",
+      "shape": "box",
+      "position": [
+        -0.48,
+        1.18,
+        0.45
+      ],
+      "size": [
+        1.08,
+        0.04,
+        0.04
+      ],
+      "material": "welded steel",
+      "role": "Port perimeter rail of the removable soil grate.",
+      "connections": [
+        "upper_rail_port",
+        "hopper_port_plate",
+        "grate_front_rail",
+        "grate_rear_rail"
+      ]
+    },
+    {
+      "id": "grate_stbd_rail",
+      "name": "Input Grate Starboard Rail",
+      "shape": "box",
+      "position": [
+        -0.48,
+        1.18,
+        -0.45
+      ],
+      "size": [
+        1.08,
+        0.04,
+        0.04
+      ],
+      "material": "welded steel",
+      "role": "Starboard perimeter rail of the removable soil grate.",
+      "connections": [
+        "upper_rail_stbd",
+        "hopper_stbd_plate",
+        "grate_front_rail",
+        "grate_rear_rail"
+      ]
+    },
+    {
+      "id": "grate_bar_1",
+      "name": "Input Grate Cross Bar 1",
+      "shape": "box",
+      "position": [
+        -0.9,
+        1.2,
+        0
+      ],
+      "size": [
+        0.035,
+        0.035,
+        0.82
+      ],
+      "material": "welded steel",
+      "role": "Removable grate bar that screens rocks while leaving a visible slot into the hopper.",
+      "connections": [
+        "grate_front_rail",
+        "grate_rear_rail",
+        "grate_port_rail",
+        "grate_stbd_rail"
+      ]
+    },
+    {
+      "id": "grate_bar_2",
+      "name": "Input Grate Cross Bar 2",
+      "shape": "box",
+      "position": [
+        -0.72,
+        1.2,
+        0
+      ],
+      "size": [
+        0.035,
+        0.035,
+        0.82
+      ],
+      "material": "welded steel",
+      "role": "Second grate bar with open spacing so soil flow into the hopper remains legible.",
+      "connections": [
+        "grate_front_rail",
+        "grate_rear_rail",
+        "grate_port_rail",
+        "grate_stbd_rail"
+      ]
+    },
+    {
+      "id": "grate_bar_3",
+      "name": "Input Grate Cross Bar 3",
+      "shape": "box",
+      "position": [
+        -0.54,
+        1.2,
+        0
+      ],
+      "size": [
+        0.035,
+        0.035,
+        0.82
+      ],
+      "material": "welded steel",
+      "role": "Center grate bar positioned above the hopper opening for clod breaking.",
+      "connections": [
+        "grate_front_rail",
+        "grate_rear_rail",
+        "grate_port_rail",
+        "grate_stbd_rail"
+      ]
+    },
+    {
+      "id": "grate_bar_4",
+      "name": "Input Grate Cross Bar 4",
+      "shape": "box",
+      "position": [
+        -0.36,
+        1.2,
+        0
+      ],
+      "size": [
+        0.035,
+        0.035,
+        0.82
+      ],
+      "material": "welded steel",
+      "role": "Center-rear grate bar that continues the rock-screening pattern across the 3 ft width.",
+      "connections": [
+        "grate_front_rail",
+        "grate_rear_rail",
+        "grate_port_rail",
+        "grate_stbd_rail"
+      ]
+    },
+    {
+      "id": "grate_bar_5",
+      "name": "Input Grate Cross Bar 5",
+      "shape": "box",
+      "position": [
+        -0.18,
+        1.2,
+        0
+      ],
+      "size": [
+        0.035,
+        0.035,
+        0.82
+      ],
+      "material": "welded steel",
+      "role": "Rear grate bar that supports a tractor bucket load without turning the grate into an opaque slab.",
+      "connections": [
+        "grate_front_rail",
+        "grate_rear_rail",
+        "grate_port_rail",
+        "grate_stbd_rail"
+      ]
+    },
+    {
+      "id": "grate_bar_6",
+      "name": "Input Grate Cross Bar 6",
+      "shape": "box",
+      "position": [
+        0,
+        1.2,
+        0
+      ],
+      "size": [
+        0.035,
+        0.035,
+        0.82
+      ],
+      "material": "welded steel",
+      "role": "Final grate bar at the rear edge of the loading area for even soil support.",
+      "connections": [
+        "grate_front_rail",
+        "grate_rear_rail",
+        "grate_port_rail",
+        "grate_stbd_rail"
+      ]
+    },
+    {
+      "id": "hopper_shaker",
+      "name": "Eccentric Hopper Shaker",
+      "shape": "cylinder",
+      "position": [
+        -0.55,
+        0.82,
+        0.56
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Eccentric vibrator clamped to the port hopper wall to keep moist soil flowing through the open bottom.",
+      "connections": [
+        "hopper_port_plate",
+        "shaker_clamp"
+      ]
+    },
+    {
+      "id": "shaker_clamp",
+      "name": "Hopper Shaker Clamp Plate",
+      "shape": "box",
+      "position": [
+        -0.55,
+        0.82,
+        0.48
+      ],
+      "size": [
+        0.22,
+        0.16,
+        0.025
+      ],
+      "material": "welded steel",
+      "role": "Clamp plate that transfers the shaker vibration into the hopper side sheet.",
+      "connections": [
+        "hopper_port_plate",
+        "hopper_shaker"
+      ]
+    },
+    {
+      "id": "control_panel_arm",
+      "name": "Control Panel Support Arm",
+      "shape": "box",
+      "position": [
+        0.35,
+        0.78,
+        -0.55
+      ],
+      "size": [
+        0.36,
+        0.035,
+        0.035
+      ],
+      "material": "welded steel",
+      "role": "Short welded arm projecting from the operator-side post to carry the control enclosure.",
+      "connections": [
+        "post_fr",
+        "control_panel_box"
+      ]
+    },
+    {
+      "id": "control_panel_box",
+      "name": "Operator Control Panel Enclosure",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.78,
+        -0.62
+      ],
+      "size": [
+        0.32,
+        0.32,
+        0.08
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Electrical enclosure that houses cycle controls and solenoid wiring for automated press operation.",
+      "connections": [
+        "control_panel_arm",
+        "glass_operator_display",
+        "control_cable",
+        "limit_switch_retracted",
+        "limit_switch_extended"
+      ]
+    },
+    {
+      "id": "glass_operator_display",
+      "name": "Glass Operator Display",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.8,
+        -0.665
+      ],
+      "size": [
+        0.24,
+        0.18,
+        0.012
+      ],
+      "material": "glass display",
+      "role": "Glass-fronted display and button face used by the operator to start, stop, and monitor the press cycle.",
+      "connections": [
+        "control_panel_box"
+      ]
+    },
+    {
+      "id": "hydraulic_manifold",
+      "name": "Hydraulic Manifold Block",
+      "shape": "box",
+      "position": [
+        0.72,
+        0.38,
+        -0.28
+      ],
+      "size": [
+        0.18,
+        0.13,
+        0.12
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Valve manifold that routes external hydraulic supply and return flow to the cylinder ports.",
+      "connections": [
+        "base_deck",
+        "hose_pressure",
+        "hose_return",
+        "supply_quick_disconnect",
+        "return_quick_disconnect",
+        "pressure_gauge",
+        "control_cable"
+      ]
+    },
+    {
+      "id": "pressure_gauge",
+      "name": "Hydraulic Pressure Gauge",
+      "shape": "cylinder",
+      "position": [
+        0.66,
+        0.5,
+        -0.28
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.055,
+        0.025
+      ],
+      "material": "glass display",
+      "role": "Round gauge face showing hydraulic pressure so the builder can verify the approximately 2400 psi compression setting.",
+      "connections": [
+        "hydraulic_manifold"
+      ]
+    },
+    {
+      "id": "supply_quick_disconnect",
+      "name": "Hydraulic Supply Quick-Disconnect",
+      "shape": "cylinder",
+      "position": [
+        0.9,
+        0.39,
+        -0.22
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.12
+      ],
+      "material": "brass",
+      "role": "External pressure-port coupler for an OSE PowerCube or LifeTrac auxiliary hydraulic supply.",
+      "connections": [
+        "hydraulic_manifold"
+      ]
+    },
+    {
+      "id": "return_quick_disconnect",
+      "name": "Hydraulic Return Quick-Disconnect",
+      "shape": "cylinder",
+      "position": [
+        0.9,
+        0.32,
+        -0.34
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.12
+      ],
+      "material": "brass",
+      "role": "External return-port coupler that carries low-pressure oil back to the power unit.",
+      "connections": [
+        "hydraulic_manifold"
+      ]
+    },
+    {
+      "id": "hose_pressure",
+      "name": "Pressure Hose to Cylinder",
+      "shape": "capsule",
+      "position": [
+        0.66,
+        0.5,
+        -0.12
+      ],
+      "rotation": [
+        0.45,
+        0,
+        0.95
+      ],
+      "size": [
+        0.025,
+        0.5
+      ],
+      "material": "rubber",
+      "role": "Flexible pressure hose connecting the manifold work port to the rear cylinder port.",
+      "connections": [
+        "hydraulic_manifold",
+        "hydraulic_cylinder_body",
+        "hose_clamp_pressure"
+      ]
+    },
+    {
+      "id": "hose_return",
+      "name": "Return Hose to Cylinder",
+      "shape": "capsule",
+      "position": [
+        0.46,
+        0.36,
+        -0.14
+      ],
+      "rotation": [
+        -0.35,
+        0,
+        1.2
+      ],
+      "size": [
+        0.025,
+        0.42
+      ],
+      "material": "rubber",
+      "role": "Flexible return hose connecting the rod-end cylinder port back to the manifold.",
+      "connections": [
+        "hydraulic_manifold",
+        "hydraulic_cylinder_body",
+        "hose_clamp_return"
+      ]
+    },
+    {
+      "id": "hose_clamp_pressure",
+      "name": "Pressure Hose Clamp",
+      "shape": "torus",
+      "position": [
+        0.55,
+        0.48,
+        -0.08
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.006
+      ],
+      "material": "brass",
+      "role": "Clamp ring that fastens the pressure hose near the cylinder port so the hose routing is rebuildable.",
+      "connections": [
+        "hose_pressure",
+        "hydraulic_cylinder_body"
+      ]
+    },
+    {
+      "id": "hose_clamp_return",
+      "name": "Return Hose Clamp",
+      "shape": "torus",
+      "position": [
+        0.42,
+        0.38,
+        -0.09
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.032,
+        0.006
+      ],
+      "material": "brass",
+      "role": "Clamp ring that secures the return hose at the rod-end cylinder port.",
+      "connections": [
+        "hose_return",
+        "hydraulic_cylinder_body"
+      ]
+    },
+    {
+      "id": "control_cable",
+      "name": "Control Cable to Manifold",
+      "shape": "capsule",
+      "position": [
+        0.6,
+        0.58,
+        -0.48
+      ],
+      "rotation": [
+        -0.5,
+        0,
+        0.35
+      ],
+      "size": [
+        0.012,
+        0.42
+      ],
+      "material": "rubber",
+      "role": "Low-voltage cable linking the operator control panel to the solenoid valves on the hydraulic manifold.",
+      "connections": [
+        "control_panel_box",
+        "hydraulic_manifold"
+      ]
+    },
+    {
+      "id": "limit_switch_retracted",
+      "name": "Ram Retracted Limit Switch",
+      "shape": "box",
+      "position": [
+        0.04,
+        0.52,
+        0.21
+      ],
+      "size": [
+        0.08,
+        0.045,
+        0.035
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Electrical limit switch that tells the controller when the ram is fully retracted and the mold can refill.",
+      "connections": [
+        "ram_guide_port",
+        "pressing_platen",
+        "control_panel_box"
+      ]
+    },
+    {
+      "id": "limit_switch_extended",
+      "name": "Ram Extended Limit Switch",
+      "shape": "box",
+      "position": [
+        -0.38,
+        0.52,
+        0.21
+      ],
+      "size": [
+        0.08,
+        0.045,
+        0.035
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Electrical limit switch that detects the forward compression stroke and signals the controller to reverse the valve.",
+      "connections": [
+        "ram_guide_port",
+        "pressing_platen",
+        "control_panel_box"
+      ]
+    }
   ]
 }

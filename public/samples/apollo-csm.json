@@ -1,68 +1,2069 @@
 {
   "machine_name": "Apollo Command & Service Module (CSM)",
-  "assembly_instructions": "Full launch-configuration Apollo CSM stack. From bottom up: bell-shaped Service Propulsion System nozzle, cylindrical Service Module carrying four 90°-spaced RCS thruster quads, a deployed S-band high-gain antenna mast + dish cluster, a Scientific Instrument Module (SIM) bay on the opposite side, four radiator panels wrapping the SM between the RCS quads, and the crew umbilical fairing at the SM/CM junction. The conical Command Module is approximated as four stacked truncated cylinders (aft heat shield, lower, mid, forward compartment) and carries a side hatch and an apex docking probe. A Launch Escape System tower rises from the CM apex, topped by the solid escape rocket, a jettison motor, and a Q-ball nose cap. Real-scale 0.5× — ≈5 m tall, 1.95 m diameter SM.",
+  "assembly_instructions": "1. Place the Service Module aft structural ring at y=1.15 m and bolt the SPS nozzle throat, bell, and exit ring below it so the exit lip rests on the ground reference at y=0. 2. Add the SM forward ring, intermediate ring, four longitudinal stringers, and three narrow external bay panels, leaving the -X sector open as a deliberate cutaway for the SIM bay and internal equipment. 3. Install the two exposed cryogenic tanks, two fuel-cell modules, and equipment shelf inside the open SM frame, then mount the SIM-bay floor, mapping camera, and panoramic camera in the recessed -X sector. 4. Attach radiator panels between the RCS stations and install four RCS mounting blocks at +X, -X, +Z, and -Z; fit four individual thruster bells to each block. 5. Hinge the S-band high-gain antenna mast to the +X/-Z quadrant, add the square hub, and mount four shallow dish reflectors around it. 6. Stack the CM aft heat shield, tapered lower cone, tapered mid cone, and forward compartment on the SM forward ring, then add the crew hatch, umbilical fairing, and docking probe. 7. Build the exploded CM cabin insert above the capsule by adding its pressure-vessel ring, cabin floor, three couches, instrument panel, forward tunnel, and parachute canisters so the hidden crew systems are legible. 8. Fasten the launch-escape tower base to the CM apex, install four tower legs and eight diagonal cross-braces, mount the LES solid rocket, then add the jettison motor and Q-ball nose cap.",
   "metadata": {
     "reference": "https://www.nasa.gov/history/historical-spacecraft-diagrams/",
     "domain": "human-spaceflight",
-    "thumbnail_camera": [7.0, 8.0, 7.0],
+    "thumbnail_camera": [
+      7,
+      8,
+      7
+    ],
     "info": {
       "japanese_name": "アポロ司令船・機械船 (CSM)",
       "english_name": "NASA Apollo Command and Service Module (CSM)",
       "summary": "Crewed spacecraft used on all Apollo lunar missions. A conical 3-seat Command Module rode home on the heat shield; a cylindrical Service Module carried propulsion, power, and life support.",
-      "description": "The Apollo Command and Service Module (CSM) was the crew-carrying spacecraft of NASA's Apollo program. It consisted of two mated sections: the Command Module (CM) — a pressurized conical capsule 3.48 m tall with a 3.91 m-diameter ablative heat shield at its base, housing three astronauts and returning them to Earth; and the Service Module (SM) — a 4.52 m-long, 3.91 m-diameter cylindrical stage carrying the Service Propulsion System (SPS) main engine with a 2.50 m-diameter bell nozzle, four Reaction Control System (RCS) thruster quads at 90° spacing, the deployable S-band high-gain antenna (four 0.79 m dishes + a central square), radiator panels, fuel cells, cryogenic propellant, and on J-missions a Scientific Instrument Module (SIM) bay recessed into one sector. A Launch Escape System tower mounted above the CM during ascent could pull the capsule clear of a failing booster; once safe staging was achieved it was jettisoned, exposing the docking probe used to mate with the Lunar Module. NASA engineering documentation for the CSM is in the public domain.",
-      "operator": "NASA (Apollo program, 1966–1975)",
+      "description": "The Apollo Command and Service Module (CSM) was the crew-carrying spacecraft of NASA's Apollo program. It consisted of two mated sections: the Command Module (CM) - a pressurized conical capsule 3.48 m tall with a 3.91 m-diameter ablative heat shield at its base, housing three astronauts and returning them to Earth; and the Service Module (SM) - a 4.52 m-long, 3.91 m-diameter cylindrical stage carrying the Service Propulsion System (SPS) main engine with a 2.50 m-diameter bell nozzle, four Reaction Control System (RCS) thruster quads at 90 degree spacing, the deployable S-band high-gain antenna with four 0.79 m dishes and a central square reflector, radiator panels, fuel cells, cryogenic propellant, and on J-missions a Scientific Instrument Module (SIM) bay recessed into one sector. A Launch Escape System tower mounted above the CM during ascent could pull the capsule clear of a failing booster; once safe staging was achieved it was jettisoned, exposing the docking probe used to mate with the Lunar Module. This scene includes an exploded CM cabin insert above the outer shell so the three couches, instrument panel, tunnel, and parachute bay can be inspected despite the opaque render.",
+      "operator": "NASA (Apollo program, 1966-1975)",
       "contractor": "North American Aviation / Rockwell (CM); North American Aviation (SM)",
       "contract_date": "Development contract 1961; flew Apollo 7 (Oct 1968) through Apollo-Soyuz (Jul 1975)",
       "contract_value": "Program total (CSM): several billion 1960s USD",
       "status": "Retired; flown on 15 crewed Apollo/Skylab/ASTP missions",
       "facts": [
-        { "label": "CM — height × base Ø",     "value": "3.48 m × 3.91 m (with apex truncated cone)" },
-        { "label": "SM — length × Ø",           "value": "4.52 m × 3.91 m" },
-        { "label": "SPS nozzle — length × exit Ø","value": "3.88 m × 2.50 m (bell)" },
-        { "label": "HGA",                        "value": "Four 0.79 m dishes + central 0.28 m square reflector, deployable" },
-        { "label": "RCS",                        "value": "4 × quad clusters at 90° around the SM (16 thrusters total)" },
-        { "label": "SIM bay",                    "value": "Recessed sector on J-missions (Apollo 15–17)" },
-        { "label": "Crew",                       "value": "3 astronauts (CM)" },
-        { "label": "License",                    "value": "NASA imagery / engineering docs — public domain" }
+        {
+          "label": "CM - height x base diameter",
+          "value": "3.48 m x 3.91 m with truncated forward cone"
+        },
+        {
+          "label": "SM - length x diameter",
+          "value": "4.52 m x 3.91 m"
+        },
+        {
+          "label": "SPS nozzle - length x exit diameter",
+          "value": "3.88 m x 2.50 m bell"
+        },
+        {
+          "label": "HGA",
+          "value": "Four 0.79 m dishes plus central 0.28 m square reflector, deployable"
+        },
+        {
+          "label": "RCS",
+          "value": "4 quad clusters at 90 degrees around the SM, 16 thrusters total"
+        },
+        {
+          "label": "SIM bay",
+          "value": "Recessed sector on J-missions Apollo 15-17"
+        },
+        {
+          "label": "Crew",
+          "value": "3 astronauts in side-by-side couches inside the CM"
+        },
+        {
+          "label": "LES tower",
+          "value": "Four-leg truss carrying the solid escape motor above the CM apex"
+        },
+        {
+          "label": "License",
+          "value": "NASA imagery and engineering documents are public domain"
+        }
       ],
       "sources": [
-        { "title": "Wikipedia — Apollo command and service module", "url": "https://en.wikipedia.org/wiki/Apollo_command_and_service_module" },
-        { "title": "NASA History — historical spacecraft diagrams", "url": "https://www.nasa.gov/history/historical-spacecraft-diagrams/" }
+        {
+          "title": "Wikipedia - Apollo command and service module",
+          "url": "https://en.wikipedia.org/wiki/Apollo_command_and_service_module"
+        },
+        {
+          "title": "NASA History - historical spacecraft diagrams",
+          "url": "https://www.nasa.gov/history/historical-spacecraft-diagrams/"
+        },
+        {
+          "title": "NASA Apollo Operations Handbook - Command and Service Module",
+          "url": "https://www.ibiblio.org/apollo/Documents/AOH/AOH-v1-2-01-Structural.pdf"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "nozzle_exit",       "name": "SPS Nozzle Exit Ring",       "shape": "cylinder", "position": [0, 0.075, 0],       "size": [0.625, 0.15],        "material": "brushed steel",         "role": "Flared exit lip of the Service Propulsion System bell nozzle (2.50 m exit diameter scaled 0.5×).", "connections": ["nozzle_bell"] },
-    { "id": "nozzle_bell",       "name": "SPS Nozzle Bell",            "shape": "cylinder", "position": [0, 0.65, 0],        "size": [0.48, 0.95],         "material": "brushed steel",         "role": "Bell-profile nozzle of the SPS main engine. Lunar-orbit-insertion and trans-Earth-injection burns fire through here.", "connections": ["nozzle_exit", "service_module"] },
-
-    { "id": "service_module",    "name": "Service Module (SM)",        "shape": "cylinder", "position": [0, 2.28, 0],        "size": [0.98, 2.26],         "material": "white composite",       "role": "Cylindrical service stage. Carries the SPS engine, four RCS quads, fuel cells, propellant, radiators, HGA, and (on J-missions) the SIM bay.", "connections": ["nozzle_bell", "rcs_plus_x", "rcs_minus_x", "rcs_plus_z", "rcs_minus_z", "hga_mast", "radiator_1", "radiator_2", "sim_bay", "umbilical", "cm_aft_hs"] },
-
-    { "id": "rcs_plus_x",        "name": "RCS Quad (+X)",              "shape": "box",      "position": [ 1.10, 2.28, 0],    "size": [0.22, 0.32, 0.22],   "material": "dark anodized aluminum","role": "Four-thruster Reaction Control System cluster on the +X face of the SM.", "connections": ["service_module"] },
-    { "id": "rcs_minus_x",       "name": "RCS Quad (−X)",              "shape": "box",      "position": [-1.10, 2.28, 0],    "size": [0.22, 0.32, 0.22],   "material": "dark anodized aluminum","role": "Four-thruster RCS cluster on the −X face of the SM.", "connections": ["service_module"] },
-    { "id": "rcs_plus_z",        "name": "RCS Quad (+Z)",              "shape": "box",      "position": [0, 2.28,  1.10],    "size": [0.22, 0.32, 0.22],   "material": "dark anodized aluminum","role": "Four-thruster RCS cluster on the +Z face of the SM.", "connections": ["service_module"] },
-    { "id": "rcs_minus_z",       "name": "RCS Quad (−Z)",              "shape": "box",      "position": [0, 2.28, -1.10],    "size": [0.22, 0.32, 0.22],   "material": "dark anodized aluminum","role": "Four-thruster RCS cluster on the −Z face of the SM.", "connections": ["service_module"] },
-
-    { "id": "radiator_1",        "name": "SM Radiator Panel (I)",      "shape": "box",      "position": [ 0.72, 2.10,  0.72],"rotation": [0, -0.7854, 0],  "size": [0.04, 1.60, 0.80],   "material": "dark anodized aluminum","role": "One of the four flat radiator panels wrapping the SM between the RCS quads — rejects waste heat from the environmental control system and fuel cells.", "connections": ["service_module"] },
-    { "id": "radiator_2",        "name": "SM Radiator Panel (II)",     "shape": "box",      "position": [-0.72, 2.10,  0.72],"rotation": [0,  0.7854, 0],  "size": [0.04, 1.60, 0.80],   "material": "dark anodized aluminum","role": "Second radiator panel, 90° around from the first.", "connections": ["service_module"] },
-
-    { "id": "sim_bay",           "name": "SIM Bay (Scientific Instrument Module)", "shape": "box", "position": [-0.90, 2.20, 0], "size": [0.20, 1.30, 0.80], "material": "dark anodized aluminum","role": "Recessed science bay on the −X sector of the SM, added for the J-missions (Apollo 15–17). Carried mapping and panoramic cameras and a sub-satellite.", "connections": ["service_module"] },
-
-    { "id": "hga_mast",          "name": "HGA Deployable Mast",        "shape": "cylinder", "position": [ 1.20, 1.80, -0.20],"size": [0.035, 0.60],        "material": "brushed steel",         "role": "Deployable boom that swings the S-band high-gain antenna out clear of the SM for Earth-pointing.", "connections": ["service_module", "hga_dish"] },
-    { "id": "hga_dish",          "name": "HGA 4-Dish Cluster",         "shape": "cylinder", "position": [ 1.35, 2.10, -0.20],"rotation": [1.3, 0, 0],      "size": [0.30, 0.03],         "material": "dark anodized aluminum","role": "Four 0.79 m parabolic dishes + central 0.28 m square reflector. S-band command and telemetry link with Earth. Approximated as a single flat disk.", "connections": ["hga_mast"] },
-
-    { "id": "umbilical",         "name": "Crew Umbilical Fairing",     "shape": "box",      "position": [0, 3.35, 1.00],     "size": [0.18, 0.55, 0.22],   "material": "white composite",       "role": "Fairing at the SM/CM interface housing the umbilical wiring between the two modules.", "connections": ["service_module", "cm_aft_hs"] },
-
-    { "id": "cm_aft_hs",         "name": "CM Aft Heat Shield",         "shape": "cylinder", "position": [0, 3.485, 0],       "size": [0.98, 0.15],         "material": "forged steel",          "role": "Ablative aft heat shield at the base of the Command Module — protects the crew during re-entry at ≈11 km/s.", "connections": ["service_module", "cm_lower", "umbilical"] },
-    { "id": "cm_lower",          "name": "CM Lower Cone",              "shape": "cylinder", "position": [0, 3.785, 0],       "size": [0.85, 0.45],         "material": "white composite",       "role": "Lower segment of the conical Command Module pressure shell (approximated as a truncated cylinder).", "connections": ["cm_aft_hs", "cm_mid", "hatch"] },
-    { "id": "cm_mid",            "name": "CM Mid Cone",                "shape": "cylinder", "position": [0, 4.34, 0],        "size": [0.65, 0.65],         "material": "white composite",       "role": "Middle segment of the conical CM — carries the crew couches and main control panel.", "connections": ["cm_lower", "cm_forward", "hatch"] },
-    { "id": "cm_forward",        "name": "CM Forward Compartment",     "shape": "cylinder", "position": [0, 4.91, 0],        "size": [0.40, 0.49],         "material": "white composite",       "role": "Forward compartment — houses the drogue parachutes, tunnel, and hatch to the docking probe.", "connections": ["cm_mid", "docking_probe", "les_tower"] },
-    { "id": "hatch",             "name": "CM Side Hatch",              "shape": "box",      "position": [ 0.86, 4.02, 0],    "rotation": [0, 0, -0.58],    "size": [0.08, 0.55, 0.40],   "material": "white composite",       "role": "Unified side hatch on the +X face of the CM — primary crew ingress/egress.", "connections": ["cm_lower", "cm_mid"] },
-
-    { "id": "docking_probe",     "name": "Docking Probe",              "shape": "cylinder", "position": [0, 5.24, 0],        "size": [0.09, 0.18],         "material": "dark anodized aluminum","role": "Central probe at the CM apex — engages the Lunar Module's drogue for docking on the trans-lunar coast.", "connections": ["cm_forward"] },
-
-    { "id": "les_tower",         "name": "Launch Escape Tower",        "shape": "cylinder", "position": [0, 6.00, 0],        "size": [0.10, 1.50],         "material": "welded steel",          "role": "Four-bar truss between the CM apex and the LES solid rocket (approximated as a single thin cylinder). Jettisoned ≈3.5 minutes into flight if the mission is nominal.", "connections": ["cm_forward", "les_rocket"] },
-    { "id": "les_rocket",        "name": "LES Solid Escape Rocket",    "shape": "cylinder", "position": [0, 7.93, 0],        "size": [0.17, 2.35],         "material": "white composite",       "role": "Solid-propellant rocket — fires to pull the CM clear of a failing booster.", "connections": ["les_tower", "les_jettison"] },
-    { "id": "les_jettison",      "name": "LES Jettison Motor",         "shape": "cylinder", "position": [0, 9.23, 0],        "size": [0.13, 0.25],         "material": "white composite",       "role": "Small solid motor at the top of the LES — pulls the spent escape rocket away once safe staging is reached.", "connections": ["les_rocket", "les_nose"] },
-    { "id": "les_nose",          "name": "LES Q-Ball Nose Cap",        "shape": "sphere",   "position": [0, 9.55, 0],        "size": [0.18],               "material": "brushed steel",         "role": "Aerodynamic Q-ball nose cap — senses dynamic pressure and angle-of-attack during early ascent.", "connections": ["les_jettison"] }
+    {
+      "id": "sm_aft_ring",
+      "name": "Service Module Aft Structural Ring",
+      "shape": "torus",
+      "position": [
+        0,
+        1.15,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.98,
+        0.045
+      ],
+      "material": "welded steel",
+      "role": "Root structural ring of the Service Module; it carries the SPS engine mount and starts the open-frame assembly.",
+      "connections": [
+        "sps_throat",
+        "sm_mid_ring",
+        "sm_stringer_px",
+        "sm_stringer_nx",
+        "sm_stringer_pz",
+        "sm_stringer_nz"
+      ]
+    },
+    {
+      "id": "sm_mid_ring",
+      "name": "Service Module Mid Structural Ring",
+      "shape": "torus",
+      "position": [
+        0,
+        2.28,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.98,
+        0.035
+      ],
+      "material": "welded steel",
+      "role": "Mid-height circular frame that ties the SM bay panels and internal equipment shelf together.",
+      "connections": [
+        "sm_aft_ring",
+        "sm_forward_ring",
+        "fuel_cell_1",
+        "fuel_cell_2",
+        "cryotank_o2",
+        "cryotank_h2",
+        "equipment_shelf"
+      ]
+    },
+    {
+      "id": "sm_forward_ring",
+      "name": "Service Module Forward Structural Ring",
+      "shape": "torus",
+      "position": [
+        0,
+        3.41,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.98,
+        0.045
+      ],
+      "material": "welded steel",
+      "role": "Forward SM ring that supports the Command Module heat shield and the crew umbilical fairing.",
+      "connections": [
+        "sm_mid_ring",
+        "cm_aft_hs",
+        "umbilical",
+        "panel_px",
+        "panel_pz",
+        "panel_nz"
+      ]
+    },
+    {
+      "id": "sm_stringer_px",
+      "name": "SM +X Longitudinal Stringer",
+      "shape": "box",
+      "position": [
+        0.98,
+        2.28,
+        0
+      ],
+      "size": [
+        0.055,
+        2.24,
+        0.055
+      ],
+      "material": "welded steel",
+      "role": "Vertical stringer at the +X clock position; it keeps the SM cylindrical frame visible without closing the cutaway.",
+      "connections": [
+        "sm_aft_ring",
+        "sm_forward_ring",
+        "rcs_plus_x",
+        "hga_mast"
+      ]
+    },
+    {
+      "id": "sm_stringer_nx",
+      "name": "SM -X Cutaway Edge Stringer",
+      "shape": "box",
+      "position": [
+        -0.98,
+        2.28,
+        0
+      ],
+      "size": [
+        0.055,
+        2.24,
+        0.055
+      ],
+      "material": "welded steel",
+      "role": "Exposed edge stringer marking the open SIM-bay cutaway side of the SM.",
+      "connections": [
+        "sm_aft_ring",
+        "sm_forward_ring",
+        "rcs_minus_x",
+        "sim_bay_floor"
+      ]
+    },
+    {
+      "id": "sm_stringer_pz",
+      "name": "SM +Z Longitudinal Stringer",
+      "shape": "box",
+      "position": [
+        0,
+        2.28,
+        0.98
+      ],
+      "size": [
+        0.055,
+        2.24,
+        0.055
+      ],
+      "material": "welded steel",
+      "role": "Vertical stringer at the +Z clock position carrying one RCS quad and adjacent radiator panels.",
+      "connections": [
+        "sm_aft_ring",
+        "sm_forward_ring",
+        "rcs_plus_z"
+      ]
+    },
+    {
+      "id": "sm_stringer_nz",
+      "name": "SM -Z Longitudinal Stringer",
+      "shape": "box",
+      "position": [
+        0,
+        2.28,
+        -0.98
+      ],
+      "size": [
+        0.055,
+        2.24,
+        0.055
+      ],
+      "material": "welded steel",
+      "role": "Vertical stringer at the -Z clock position carrying one RCS quad and the deployed HGA boom side.",
+      "connections": [
+        "sm_aft_ring",
+        "sm_forward_ring",
+        "rcs_minus_z",
+        "hga_mast"
+      ]
+    },
+    {
+      "id": "panel_px",
+      "name": "SM Outer Bay Panel +X",
+      "shape": "box",
+      "position": [
+        0.91,
+        2.28,
+        0.38
+      ],
+      "rotation": [
+        0,
+        -0.38,
+        0
+      ],
+      "size": [
+        0.045,
+        2.05,
+        0.66
+      ],
+      "material": "white composite",
+      "role": "Narrow removable exterior bay panel that preserves the cylindrical SM silhouette while leaving internal tanks visible.",
+      "connections": [
+        "sm_aft_ring",
+        "sm_forward_ring",
+        "radiator_px"
+      ]
+    },
+    {
+      "id": "panel_pz",
+      "name": "SM Outer Bay Panel +Z",
+      "shape": "box",
+      "position": [
+        0.38,
+        2.28,
+        0.91
+      ],
+      "rotation": [
+        0,
+        0.38,
+        0
+      ],
+      "size": [
+        0.66,
+        2.05,
+        0.045
+      ],
+      "material": "white composite",
+      "role": "Curved-sector approximation of an SM exterior panel between RCS quads.",
+      "connections": [
+        "sm_aft_ring",
+        "sm_forward_ring",
+        "radiator_pz"
+      ]
+    },
+    {
+      "id": "panel_nz",
+      "name": "SM Outer Bay Panel -Z",
+      "shape": "box",
+      "position": [
+        0.38,
+        2.28,
+        -0.91
+      ],
+      "rotation": [
+        0,
+        -0.38,
+        0
+      ],
+      "size": [
+        0.66,
+        2.05,
+        0.045
+      ],
+      "material": "white composite",
+      "role": "Exterior bay panel on the HGA side, kept narrow so the antenna mount and internal frame remain visible.",
+      "connections": [
+        "sm_aft_ring",
+        "sm_forward_ring",
+        "radiator_nz"
+      ]
+    },
+    {
+      "id": "sim_bay_floor",
+      "name": "Open SIM Bay Floor",
+      "shape": "box",
+      "position": [
+        -0.82,
+        2.18,
+        0
+      ],
+      "size": [
+        0.1,
+        1.35,
+        0.82
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Recessed J-mission science bay floor in the -X sector; the missing outer wall is intentional cutaway exposure.",
+      "connections": [
+        "sm_stringer_nx",
+        "mapping_camera",
+        "panoramic_camera"
+      ]
+    },
+    {
+      "id": "mapping_camera",
+      "name": "SIM Mapping Camera Barrel",
+      "shape": "cylinder",
+      "position": [
+        -1.03,
+        2.52,
+        0.22
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.08,
+        0.34
+      ],
+      "material": "brushed steel",
+      "role": "Long-lens mapping camera barrel visible in the open SIM bay for lunar surface photography.",
+      "connections": [
+        "sim_bay_floor"
+      ]
+    },
+    {
+      "id": "panoramic_camera",
+      "name": "SIM Panoramic Camera Barrel",
+      "shape": "cylinder",
+      "position": [
+        -1.04,
+        1.92,
+        -0.22
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.07,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Panoramic camera barrel in the SIM bay; it points outward through the exposed -X cutaway.",
+      "connections": [
+        "sim_bay_floor"
+      ]
+    },
+    {
+      "id": "cryotank_o2",
+      "name": "Exposed Cryogenic Oxygen Tank",
+      "shape": "sphere",
+      "position": [
+        -0.28,
+        2.64,
+        0.28
+      ],
+      "size": [
+        0.28
+      ],
+      "material": "brushed steel",
+      "role": "Spherical cryogenic oxygen tank exposed by the cutaway so the SM life-support storage is legible.",
+      "connections": [
+        "sm_mid_ring",
+        "equipment_shelf"
+      ]
+    },
+    {
+      "id": "cryotank_h2",
+      "name": "Exposed Cryogenic Hydrogen Tank",
+      "shape": "sphere",
+      "position": [
+        -0.26,
+        1.92,
+        -0.28
+      ],
+      "size": [
+        0.24
+      ],
+      "material": "brushed steel",
+      "role": "Spherical cryogenic hydrogen tank feeding the fuel cells, shown inside the SM instead of hidden by a shell.",
+      "connections": [
+        "sm_mid_ring",
+        "equipment_shelf"
+      ]
+    },
+    {
+      "id": "fuel_cell_1",
+      "name": "Fuel Cell Module A",
+      "shape": "box",
+      "position": [
+        0.22,
+        2.72,
+        -0.34
+      ],
+      "size": [
+        0.24,
+        0.2,
+        0.34
+      ],
+      "material": "dark anodized aluminum",
+      "role": "One rectangular fuel-cell package that generated Apollo electrical power and water from cryogenic reactants.",
+      "connections": [
+        "sm_mid_ring",
+        "equipment_shelf"
+      ]
+    },
+    {
+      "id": "fuel_cell_2",
+      "name": "Fuel Cell Module B",
+      "shape": "box",
+      "position": [
+        0.22,
+        2.38,
+        -0.34
+      ],
+      "size": [
+        0.24,
+        0.2,
+        0.34
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second visible fuel-cell package, mounted beside the first on the internal equipment shelf.",
+      "connections": [
+        "sm_mid_ring",
+        "equipment_shelf"
+      ]
+    },
+    {
+      "id": "equipment_shelf",
+      "name": "SM Internal Equipment Shelf",
+      "shape": "box",
+      "position": [
+        0.02,
+        2.28,
+        -0.08
+      ],
+      "size": [
+        0.72,
+        0.05,
+        0.58
+      ],
+      "material": "aluminum",
+      "role": "Thin internal shelf that locates tanks, fuel cells, and avionics within the Service Module frame.",
+      "connections": [
+        "sm_mid_ring",
+        "cryotank_o2",
+        "cryotank_h2",
+        "fuel_cell_1",
+        "fuel_cell_2"
+      ]
+    },
+    {
+      "id": "radiator_px",
+      "name": "SM Radiator Panel +X",
+      "shape": "box",
+      "position": [
+        1.02,
+        2.3,
+        0.36
+      ],
+      "rotation": [
+        0,
+        -0.34,
+        0
+      ],
+      "size": [
+        0.035,
+        1.36,
+        0.62
+      ],
+      "material": "dark anodized aluminum",
+      "role": "External radiator panel rejecting heat from the environmental-control and power systems.",
+      "connections": [
+        "panel_px"
+      ]
+    },
+    {
+      "id": "radiator_pz",
+      "name": "SM Radiator Panel +Z",
+      "shape": "box",
+      "position": [
+        0.36,
+        2.3,
+        1.02
+      ],
+      "rotation": [
+        0,
+        0.34,
+        0
+      ],
+      "size": [
+        0.62,
+        1.36,
+        0.035
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second radiator panel wrapped around the SM between RCS quads.",
+      "connections": [
+        "panel_pz"
+      ]
+    },
+    {
+      "id": "radiator_nz",
+      "name": "SM Radiator Panel -Z",
+      "shape": "box",
+      "position": [
+        0.36,
+        2.3,
+        -1.02
+      ],
+      "rotation": [
+        0,
+        -0.34,
+        0
+      ],
+      "size": [
+        0.62,
+        1.36,
+        0.035
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Third radiator panel on the HGA side of the SM.",
+      "connections": [
+        "panel_nz"
+      ]
+    },
+    {
+      "id": "radiator_nx_edge",
+      "name": "SIM Bay Edge Radiator Strip",
+      "shape": "box",
+      "position": [
+        -0.92,
+        2.85,
+        -0.48
+      ],
+      "rotation": [
+        0,
+        0.2,
+        0
+      ],
+      "size": [
+        0.035,
+        0.72,
+        0.3
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Narrow remaining radiator strip beside the open SIM bay, showing that the science bay interrupts the normal SM skin.",
+      "connections": [
+        "sim_bay_floor",
+        "sm_forward_ring"
+      ]
+    },
+    {
+      "id": "sps_throat",
+      "name": "SPS Nozzle Throat",
+      "shape": "cylinder",
+      "position": [
+        0,
+        1.02,
+        0
+      ],
+      "size": [
+        0.22,
+        0.25
+      ],
+      "material": "brushed steel",
+      "role": "Narrow combustion-chamber throat that bolts the Service Propulsion System nozzle to the SM aft ring.",
+      "connections": [
+        "sm_aft_ring",
+        "nozzle_bell"
+      ]
+    },
+    {
+      "id": "nozzle_bell",
+      "name": "SPS Tapered Nozzle Bell",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.54,
+        0
+      ],
+      "size": [
+        0.24,
+        0.54,
+        0.82
+      ],
+      "material": "brushed steel",
+      "role": "Tapered SPS engine bell scaled from the Apollo 2.50 m exit diameter; it performs major orbital burns.",
+      "connections": [
+        "sps_throat",
+        "nozzle_exit"
+      ]
+    },
+    {
+      "id": "nozzle_exit",
+      "name": "SPS Nozzle Exit Ring",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.075,
+        0
+      ],
+      "size": [
+        0.625,
+        0.15
+      ],
+      "material": "brushed steel",
+      "role": "Wide flared exit lip of the SPS bell; its bottom face sits on the render ground line at y=0.",
+      "connections": [
+        "nozzle_bell"
+      ]
+    },
+    {
+      "id": "rcs_plus_x",
+      "name": "RCS Quad Mount +X",
+      "shape": "box",
+      "position": [
+        1.12,
+        2.28,
+        0
+      ],
+      "size": [
+        0.16,
+        0.3,
+        0.22
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Mounting block for four +X-sector attitude-control thruster nozzles.",
+      "connections": [
+        "sm_stringer_px",
+        "rcs_px_u",
+        "rcs_px_d",
+        "rcs_px_f",
+        "rcs_px_a"
+      ]
+    },
+    {
+      "id": "rcs_px_u",
+      "name": "RCS +X Upper Thruster Bell",
+      "shape": "cone",
+      "position": [
+        1.26,
+        2.42,
+        0.08
+      ],
+      "rotation": [
+        0,
+        0,
+        -1.5708
+      ],
+      "size": [
+        0.055,
+        0.16
+      ],
+      "material": "brushed steel",
+      "role": "Small conical thruster nozzle in the +X quad, canted outward for rotational control.",
+      "connections": [
+        "rcs_plus_x"
+      ]
+    },
+    {
+      "id": "rcs_px_d",
+      "name": "RCS +X Lower Thruster Bell",
+      "shape": "cone",
+      "position": [
+        1.26,
+        2.14,
+        -0.08
+      ],
+      "rotation": [
+        0,
+        0,
+        -1.5708
+      ],
+      "size": [
+        0.055,
+        0.16
+      ],
+      "material": "brushed steel",
+      "role": "Second +X quad thruster nozzle completing the visible vertical pair.",
+      "connections": [
+        "rcs_plus_x"
+      ]
+    },
+    {
+      "id": "rcs_px_f",
+      "name": "RCS +X Forward Thruster Bell",
+      "shape": "cone",
+      "position": [
+        1.24,
+        2.28,
+        0.16
+      ],
+      "rotation": [
+        0,
+        0,
+        -1.5708
+      ],
+      "size": [
+        0.045,
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Forward-facing small RCS bell in the +X cluster for translation and attitude authority.",
+      "connections": [
+        "rcs_plus_x"
+      ]
+    },
+    {
+      "id": "rcs_px_a",
+      "name": "RCS +X Aft Thruster Bell",
+      "shape": "cone",
+      "position": [
+        1.24,
+        2.28,
+        -0.16
+      ],
+      "rotation": [
+        0,
+        0,
+        -1.5708
+      ],
+      "size": [
+        0.045,
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Aft-facing small RCS bell in the +X cluster, paired with the forward bell.",
+      "connections": [
+        "rcs_plus_x"
+      ]
+    },
+    {
+      "id": "rcs_minus_x",
+      "name": "RCS Quad Mount -X",
+      "shape": "box",
+      "position": [
+        -1.12,
+        2.28,
+        0
+      ],
+      "size": [
+        0.16,
+        0.3,
+        0.22
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Mounting block for four -X-sector attitude-control thruster nozzles at the SIM-bay side.",
+      "connections": [
+        "sm_stringer_nx",
+        "rcs_nx_u",
+        "rcs_nx_d",
+        "rcs_nx_f",
+        "rcs_nx_a"
+      ]
+    },
+    {
+      "id": "rcs_nx_u",
+      "name": "RCS -X Upper Thruster Bell",
+      "shape": "cone",
+      "position": [
+        -1.26,
+        2.42,
+        -0.08
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.055,
+        0.16
+      ],
+      "material": "brushed steel",
+      "role": "Upper thruster nozzle in the -X RCS quad, pointing outward from the Service Module.",
+      "connections": [
+        "rcs_minus_x"
+      ]
+    },
+    {
+      "id": "rcs_nx_d",
+      "name": "RCS -X Lower Thruster Bell",
+      "shape": "cone",
+      "position": [
+        -1.26,
+        2.14,
+        0.08
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.055,
+        0.16
+      ],
+      "material": "brushed steel",
+      "role": "Lower thruster nozzle in the -X RCS quad, completing the opposed pair.",
+      "connections": [
+        "rcs_minus_x"
+      ]
+    },
+    {
+      "id": "rcs_nx_f",
+      "name": "RCS -X Forward Thruster Bell",
+      "shape": "cone",
+      "position": [
+        -1.24,
+        2.28,
+        0.16
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.045,
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Forward small bell in the -X RCS cluster.",
+      "connections": [
+        "rcs_minus_x"
+      ]
+    },
+    {
+      "id": "rcs_nx_a",
+      "name": "RCS -X Aft Thruster Bell",
+      "shape": "cone",
+      "position": [
+        -1.24,
+        2.28,
+        -0.16
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.045,
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Aft small bell in the -X RCS cluster.",
+      "connections": [
+        "rcs_minus_x"
+      ]
+    },
+    {
+      "id": "rcs_plus_z",
+      "name": "RCS Quad Mount +Z",
+      "shape": "box",
+      "position": [
+        0,
+        2.28,
+        1.12
+      ],
+      "size": [
+        0.22,
+        0.3,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Mounting block for four +Z-sector RCS thrusters.",
+      "connections": [
+        "sm_stringer_pz",
+        "rcs_pz_u",
+        "rcs_pz_d",
+        "rcs_pz_l",
+        "rcs_pz_r"
+      ]
+    },
+    {
+      "id": "rcs_pz_u",
+      "name": "RCS +Z Upper Thruster Bell",
+      "shape": "cone",
+      "position": [
+        0.08,
+        2.42,
+        1.26
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.055,
+        0.16
+      ],
+      "material": "brushed steel",
+      "role": "Upper outward-pointing thruster in the +Z RCS quad.",
+      "connections": [
+        "rcs_plus_z"
+      ]
+    },
+    {
+      "id": "rcs_pz_d",
+      "name": "RCS +Z Lower Thruster Bell",
+      "shape": "cone",
+      "position": [
+        -0.08,
+        2.14,
+        1.26
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.055,
+        0.16
+      ],
+      "material": "brushed steel",
+      "role": "Lower outward-pointing thruster in the +Z RCS quad.",
+      "connections": [
+        "rcs_plus_z"
+      ]
+    },
+    {
+      "id": "rcs_pz_l",
+      "name": "RCS +Z Left Thruster Bell",
+      "shape": "cone",
+      "position": [
+        0.16,
+        2.28,
+        1.24
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Lateral small RCS bell in the +Z cluster.",
+      "connections": [
+        "rcs_plus_z"
+      ]
+    },
+    {
+      "id": "rcs_pz_r",
+      "name": "RCS +Z Right Thruster Bell",
+      "shape": "cone",
+      "position": [
+        -0.16,
+        2.28,
+        1.24
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Opposite lateral small RCS bell in the +Z cluster.",
+      "connections": [
+        "rcs_plus_z"
+      ]
+    },
+    {
+      "id": "rcs_minus_z",
+      "name": "RCS Quad Mount -Z",
+      "shape": "box",
+      "position": [
+        0,
+        2.28,
+        -1.12
+      ],
+      "size": [
+        0.22,
+        0.3,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Mounting block for four -Z-sector RCS thrusters beside the deployed antenna boom.",
+      "connections": [
+        "sm_stringer_nz",
+        "rcs_nz_u",
+        "rcs_nz_d",
+        "rcs_nz_l",
+        "rcs_nz_r"
+      ]
+    },
+    {
+      "id": "rcs_nz_u",
+      "name": "RCS -Z Upper Thruster Bell",
+      "shape": "cone",
+      "position": [
+        -0.08,
+        2.42,
+        -1.26
+      ],
+      "rotation": [
+        -1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.055,
+        0.16
+      ],
+      "material": "brushed steel",
+      "role": "Upper outward-pointing thruster in the -Z RCS quad.",
+      "connections": [
+        "rcs_minus_z"
+      ]
+    },
+    {
+      "id": "rcs_nz_d",
+      "name": "RCS -Z Lower Thruster Bell",
+      "shape": "cone",
+      "position": [
+        0.08,
+        2.14,
+        -1.26
+      ],
+      "rotation": [
+        -1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.055,
+        0.16
+      ],
+      "material": "brushed steel",
+      "role": "Lower outward-pointing thruster in the -Z RCS quad.",
+      "connections": [
+        "rcs_minus_z"
+      ]
+    },
+    {
+      "id": "rcs_nz_l",
+      "name": "RCS -Z Left Thruster Bell",
+      "shape": "cone",
+      "position": [
+        0.16,
+        2.28,
+        -1.24
+      ],
+      "rotation": [
+        -1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Lateral small RCS bell in the -Z cluster.",
+      "connections": [
+        "rcs_minus_z"
+      ]
+    },
+    {
+      "id": "rcs_nz_r",
+      "name": "RCS -Z Right Thruster Bell",
+      "shape": "cone",
+      "position": [
+        -0.16,
+        2.28,
+        -1.24
+      ],
+      "rotation": [
+        -1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Opposite lateral small RCS bell in the -Z cluster.",
+      "connections": [
+        "rcs_minus_z"
+      ]
+    },
+    {
+      "id": "hga_mast",
+      "name": "HGA Deployable Mast",
+      "shape": "cylinder",
+      "position": [
+        1.22,
+        1.74,
+        -0.42
+      ],
+      "rotation": [
+        0.72,
+        0,
+        0.78
+      ],
+      "size": [
+        0.025,
+        0.72
+      ],
+      "material": "brushed steel",
+      "role": "Angled deployable boom that moves the S-band antenna cluster clear of the SM body.",
+      "connections": [
+        "sm_stringer_px",
+        "sm_stringer_nz",
+        "hga_hub"
+      ]
+    },
+    {
+      "id": "hga_hub",
+      "name": "HGA Square Reflector Hub",
+      "shape": "box",
+      "position": [
+        1.48,
+        1.52,
+        -0.72
+      ],
+      "rotation": [
+        0,
+        0.35,
+        0
+      ],
+      "size": [
+        0.2,
+        0.2,
+        0.04
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Central square reflector hub of the high-gain antenna, scaled from the 0.28 m Apollo unit.",
+      "connections": [
+        "hga_mast",
+        "hga_dish_upper",
+        "hga_dish_lower",
+        "hga_dish_left",
+        "hga_dish_right"
+      ]
+    },
+    {
+      "id": "hga_dish_upper",
+      "name": "HGA Upper Shallow Dish",
+      "shape": "cylinder",
+      "position": [
+        1.48,
+        1.78,
+        -0.72
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        0.21,
+        0.035
+      ],
+      "material": "dark anodized aluminum",
+      "role": "One of four shallow tapered S-band dish reflectors, individually visible rather than merged into one disk.",
+      "connections": [
+        "hga_hub"
+      ]
+    },
+    {
+      "id": "hga_dish_lower",
+      "name": "HGA Lower Shallow Dish",
+      "shape": "cylinder",
+      "position": [
+        1.48,
+        1.26,
+        -0.72
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        0.21,
+        0.035
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Lower shallow reflector in the four-dish deployed high-gain antenna cluster.",
+      "connections": [
+        "hga_hub"
+      ]
+    },
+    {
+      "id": "hga_dish_left",
+      "name": "HGA Left Shallow Dish",
+      "shape": "cylinder",
+      "position": [
+        1.24,
+        1.52,
+        -0.72
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        0.21,
+        0.035
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Left shallow reflector in the four-dish S-band antenna cluster.",
+      "connections": [
+        "hga_hub"
+      ]
+    },
+    {
+      "id": "hga_dish_right",
+      "name": "HGA Right Shallow Dish",
+      "shape": "cylinder",
+      "position": [
+        1.72,
+        1.52,
+        -0.72
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        0.21,
+        0.035
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Right shallow reflector in the four-dish S-band antenna cluster.",
+      "connections": [
+        "hga_hub"
+      ]
+    },
+    {
+      "id": "umbilical",
+      "name": "Crew Umbilical Fairing",
+      "shape": "box",
+      "position": [
+        0,
+        3.48,
+        1.02
+      ],
+      "size": [
+        0.18,
+        0.5,
+        0.18
+      ],
+      "material": "white composite",
+      "role": "External fairing carrying electrical and fluid umbilicals across the SM-to-CM joint.",
+      "connections": [
+        "sm_forward_ring",
+        "cm_aft_hs"
+      ]
+    },
+    {
+      "id": "cm_aft_hs",
+      "name": "CM Aft Heat Shield",
+      "shape": "cylinder",
+      "position": [
+        0,
+        3.55,
+        0
+      ],
+      "size": [
+        0.98,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Broad ablative heat shield at the Command Module base, scaled from the 3.91 m Apollo diameter.",
+      "connections": [
+        "sm_forward_ring",
+        "cm_lower",
+        "umbilical"
+      ]
+    },
+    {
+      "id": "cm_lower",
+      "name": "CM Lower Tapered Outer Shell",
+      "shape": "cylinder",
+      "position": [
+        0,
+        3.86,
+        0
+      ],
+      "size": [
+        0.78,
+        0.96,
+        0.46
+      ],
+      "material": "white composite",
+      "role": "Lower tapered outer shell segment forming the wide base of the CM; its hidden cabin is exposed separately in the exploded insert.",
+      "connections": [
+        "cm_aft_hs",
+        "cm_mid",
+        "hatch"
+      ]
+    },
+    {
+      "id": "cm_mid",
+      "name": "CM Mid Tapered Outer Shell",
+      "shape": "cylinder",
+      "position": [
+        0,
+        4.39,
+        0
+      ],
+      "size": [
+        0.52,
+        0.78,
+        0.6
+      ],
+      "material": "white composite",
+      "role": "Middle tapered CM shell around the three-astronaut cabin; the cabin layout is shown in an exploded module above.",
+      "connections": [
+        "cm_lower",
+        "cm_forward",
+        "hatch",
+        "cm_exploded_pressure_ring"
+      ]
+    },
+    {
+      "id": "cm_forward",
+      "name": "CM Forward Compartment",
+      "shape": "cylinder",
+      "position": [
+        0,
+        4.93,
+        0
+      ],
+      "size": [
+        0.3,
+        0.52,
+        0.48
+      ],
+      "material": "white composite",
+      "role": "Forward tapered CM compartment containing parachute, tunnel, and docking-probe structure in the real vehicle.",
+      "connections": [
+        "cm_mid",
+        "docking_probe",
+        "les_base_ring"
+      ]
+    },
+    {
+      "id": "hatch",
+      "name": "CM Side Hatch",
+      "shape": "box",
+      "position": [
+        0.78,
+        4.08,
+        0.12
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.48
+      ],
+      "size": [
+        0.06,
+        0.5,
+        0.36
+      ],
+      "material": "white composite",
+      "role": "Crew ingress and egress hatch on the side of the Command Module, raised slightly so it remains visible in ISO.",
+      "connections": [
+        "cm_lower",
+        "cm_mid"
+      ]
+    },
+    {
+      "id": "docking_probe",
+      "name": "Docking Probe",
+      "shape": "cylinder",
+      "position": [
+        0,
+        5.22,
+        0
+      ],
+      "size": [
+        0.08,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Central CM apex probe that engaged the Lunar Module drogue during docking.",
+      "connections": [
+        "cm_forward"
+      ]
+    },
+    {
+      "id": "cm_exploded_pressure_ring",
+      "name": "Exploded CM Pressure Vessel Ring",
+      "shape": "torus",
+      "position": [
+        -1.55,
+        5.35,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.42,
+        0.025
+      ],
+      "material": "aluminum",
+      "role": "Exploded cabin reference ring showing the crew pressure-vessel diameter outside the opaque CM shell.",
+      "connections": [
+        "cm_mid",
+        "cm_exploded_floor",
+        "cm_instrument_panel",
+        "cm_forward_tunnel"
+      ]
+    },
+    {
+      "id": "cm_exploded_floor",
+      "name": "Exploded CM Cabin Floor",
+      "shape": "box",
+      "position": [
+        -1.55,
+        5.18,
+        0
+      ],
+      "size": [
+        0.72,
+        0.055,
+        0.62
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Flat crew-cabin deck in the exploded insert; it locates the three couches relative to the pressure vessel.",
+      "connections": [
+        "cm_exploded_pressure_ring",
+        "cm_couch_left",
+        "cm_couch_center",
+        "cm_couch_right"
+      ]
+    },
+    {
+      "id": "cm_couch_left",
+      "name": "Left Crew Couch",
+      "shape": "box",
+      "position": [
+        -1.74,
+        5.28,
+        0.18
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.25
+      ],
+      "size": [
+        0.16,
+        0.1,
+        0.28
+      ],
+      "material": "black composite",
+      "role": "Left astronaut couch in the exploded cabin insert, showing the CM was a three-seat pressure vessel.",
+      "connections": [
+        "cm_exploded_floor"
+      ]
+    },
+    {
+      "id": "cm_couch_center",
+      "name": "Center Crew Couch",
+      "shape": "box",
+      "position": [
+        -1.55,
+        5.3,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.18
+      ],
+      "size": [
+        0.16,
+        0.1,
+        0.3
+      ],
+      "material": "black composite",
+      "role": "Center astronaut couch positioned between the two side couches in the exploded CM cabin.",
+      "connections": [
+        "cm_exploded_floor"
+      ]
+    },
+    {
+      "id": "cm_couch_right",
+      "name": "Right Crew Couch",
+      "shape": "box",
+      "position": [
+        -1.36,
+        5.28,
+        -0.18
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.25
+      ],
+      "size": [
+        0.16,
+        0.1,
+        0.28
+      ],
+      "material": "black composite",
+      "role": "Right astronaut couch completing the three-abreast Apollo crew arrangement.",
+      "connections": [
+        "cm_exploded_floor"
+      ]
+    },
+    {
+      "id": "cm_instrument_panel",
+      "name": "Exploded CM Instrument Panel",
+      "shape": "box",
+      "position": [
+        -1.2,
+        5.42,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.35
+      ],
+      "size": [
+        0.08,
+        0.28,
+        0.58
+      ],
+      "material": "glass display",
+      "role": "Forward instrument panel in the exploded cabin insert, visible ahead of the crew couches.",
+      "connections": [
+        "cm_exploded_pressure_ring",
+        "cm_exploded_floor"
+      ]
+    },
+    {
+      "id": "cm_forward_tunnel",
+      "name": "Exploded CM Forward Tunnel",
+      "shape": "cylinder",
+      "position": [
+        -1.55,
+        5.72,
+        0
+      ],
+      "size": [
+        0.13,
+        0.32
+      ],
+      "material": "aluminum",
+      "role": "Short tunnel cylinder representing the passage from the crew cabin to the docking probe at the CM apex.",
+      "connections": [
+        "cm_exploded_pressure_ring",
+        "cm_parachute_canister_a",
+        "cm_parachute_canister_b"
+      ]
+    },
+    {
+      "id": "cm_parachute_canister_a",
+      "name": "Exploded CM Parachute Canister A",
+      "shape": "cylinder",
+      "position": [
+        -1.72,
+        5.78,
+        0.18
+      ],
+      "size": [
+        0.08,
+        0.22
+      ],
+      "material": "aluminum",
+      "role": "One forward-compartment parachute canister shown in the exploded insert instead of hidden in the CM nose.",
+      "connections": [
+        "cm_forward_tunnel"
+      ]
+    },
+    {
+      "id": "cm_parachute_canister_b",
+      "name": "Exploded CM Parachute Canister B",
+      "shape": "cylinder",
+      "position": [
+        -1.38,
+        5.78,
+        -0.18
+      ],
+      "size": [
+        0.08,
+        0.22
+      ],
+      "material": "aluminum",
+      "role": "Second forward-compartment parachute canister paired with the first to expose the recovery subsystem.",
+      "connections": [
+        "cm_forward_tunnel"
+      ]
+    },
+    {
+      "id": "les_base_ring",
+      "name": "LES Tower Base Ring",
+      "shape": "torus",
+      "position": [
+        0,
+        5.28,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.28,
+        0.025
+      ],
+      "material": "welded steel",
+      "role": "Circular base fitting that bolts the launch-escape tower to the CM forward compartment.",
+      "connections": [
+        "cm_forward",
+        "les_leg_px",
+        "les_leg_nx",
+        "les_leg_pz",
+        "les_leg_nz"
+      ]
+    },
+    {
+      "id": "les_leg_px",
+      "name": "LES Tower Leg +X",
+      "shape": "cylinder",
+      "position": [
+        0.18,
+        5.98,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.12
+      ],
+      "size": [
+        0.025,
+        1.42
+      ],
+      "material": "welded steel",
+      "role": "One of four slender steel tower legs transferring escape-rocket thrust into the CM structure.",
+      "connections": [
+        "les_base_ring",
+        "les_rocket",
+        "les_brace_px_pz",
+        "les_brace_px_nz"
+      ]
+    },
+    {
+      "id": "les_leg_nx",
+      "name": "LES Tower Leg -X",
+      "shape": "cylinder",
+      "position": [
+        -0.18,
+        5.98,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.12
+      ],
+      "size": [
+        0.025,
+        1.42
+      ],
+      "material": "welded steel",
+      "role": "Opposite tower leg completing the fore-aft pair of the LES truss.",
+      "connections": [
+        "les_base_ring",
+        "les_rocket",
+        "les_brace_nx_pz",
+        "les_brace_nx_nz"
+      ]
+    },
+    {
+      "id": "les_leg_pz",
+      "name": "LES Tower Leg +Z",
+      "shape": "cylinder",
+      "position": [
+        0,
+        5.98,
+        0.18
+      ],
+      "rotation": [
+        0.12,
+        0,
+        0
+      ],
+      "size": [
+        0.025,
+        1.42
+      ],
+      "material": "welded steel",
+      "role": "Port-side tower leg making the LES a real four-member truss rather than a pole.",
+      "connections": [
+        "les_base_ring",
+        "les_rocket",
+        "les_brace_pz_px",
+        "les_brace_pz_nx"
+      ]
+    },
+    {
+      "id": "les_leg_nz",
+      "name": "LES Tower Leg -Z",
+      "shape": "cylinder",
+      "position": [
+        0,
+        5.98,
+        -0.18
+      ],
+      "rotation": [
+        -0.12,
+        0,
+        0
+      ],
+      "size": [
+        0.025,
+        1.42
+      ],
+      "material": "welded steel",
+      "role": "Starboard-side tower leg carrying the fourth corner of the LES truss.",
+      "connections": [
+        "les_base_ring",
+        "les_rocket",
+        "les_brace_nz_px",
+        "les_brace_nz_nx"
+      ]
+    },
+    {
+      "id": "les_brace_px_pz",
+      "name": "LES Diagonal Brace +X to +Z",
+      "shape": "cylinder",
+      "position": [
+        0.11,
+        5.76,
+        0.11
+      ],
+      "rotation": [
+        0.42,
+        0,
+        -0.42
+      ],
+      "size": [
+        0.014,
+        0.62
+      ],
+      "material": "welded steel",
+      "role": "Diagonal cross-brace tying two adjacent tower legs so the LES reads as a triangulated truss.",
+      "connections": [
+        "les_leg_px",
+        "les_leg_pz"
+      ]
+    },
+    {
+      "id": "les_brace_pz_nx",
+      "name": "LES Diagonal Brace +Z to -X",
+      "shape": "cylinder",
+      "position": [
+        -0.11,
+        5.76,
+        0.11
+      ],
+      "rotation": [
+        0.42,
+        0,
+        0.42
+      ],
+      "size": [
+        0.014,
+        0.62
+      ],
+      "material": "welded steel",
+      "role": "Second lower diagonal brace around the LES tower base.",
+      "connections": [
+        "les_leg_pz",
+        "les_leg_nx"
+      ]
+    },
+    {
+      "id": "les_brace_nx_nz",
+      "name": "LES Diagonal Brace -X to -Z",
+      "shape": "cylinder",
+      "position": [
+        -0.11,
+        5.76,
+        -0.11
+      ],
+      "rotation": [
+        -0.42,
+        0,
+        0.42
+      ],
+      "size": [
+        0.014,
+        0.62
+      ],
+      "material": "welded steel",
+      "role": "Third lower diagonal brace preventing the tower legs from reading as isolated rods.",
+      "connections": [
+        "les_leg_nx",
+        "les_leg_nz"
+      ]
+    },
+    {
+      "id": "les_brace_nz_px",
+      "name": "LES Diagonal Brace -Z to +X",
+      "shape": "cylinder",
+      "position": [
+        0.11,
+        5.76,
+        -0.11
+      ],
+      "rotation": [
+        -0.42,
+        0,
+        -0.42
+      ],
+      "size": [
+        0.014,
+        0.62
+      ],
+      "material": "welded steel",
+      "role": "Fourth lower diagonal brace closing the square truss bay at the LES base.",
+      "connections": [
+        "les_leg_nz",
+        "les_leg_px"
+      ]
+    },
+    {
+      "id": "les_brace_px_nz",
+      "name": "LES Upper Diagonal Brace +X to -Z",
+      "shape": "cylinder",
+      "position": [
+        0.09,
+        6.24,
+        -0.09
+      ],
+      "rotation": [
+        -0.34,
+        0,
+        -0.34
+      ],
+      "size": [
+        0.014,
+        0.52
+      ],
+      "material": "welded steel",
+      "role": "Upper diagonal member tying the +X leg toward the -Z side below the escape rocket.",
+      "connections": [
+        "les_leg_px",
+        "les_leg_nz"
+      ]
+    },
+    {
+      "id": "les_brace_nz_nx",
+      "name": "LES Upper Diagonal Brace -Z to -X",
+      "shape": "cylinder",
+      "position": [
+        -0.09,
+        6.24,
+        -0.09
+      ],
+      "rotation": [
+        -0.34,
+        0,
+        0.34
+      ],
+      "size": [
+        0.014,
+        0.52
+      ],
+      "material": "welded steel",
+      "role": "Upper diagonal member that triangulates the starboard side of the LES tower.",
+      "connections": [
+        "les_leg_nz",
+        "les_leg_nx"
+      ]
+    },
+    {
+      "id": "les_brace_nx_pz",
+      "name": "LES Upper Diagonal Brace -X to +Z",
+      "shape": "cylinder",
+      "position": [
+        -0.09,
+        6.24,
+        0.09
+      ],
+      "rotation": [
+        0.34,
+        0,
+        0.34
+      ],
+      "size": [
+        0.014,
+        0.52
+      ],
+      "material": "welded steel",
+      "role": "Upper diagonal member that triangulates the aft side of the LES tower.",
+      "connections": [
+        "les_leg_nx",
+        "les_leg_pz"
+      ]
+    },
+    {
+      "id": "les_brace_pz_px",
+      "name": "LES Upper Diagonal Brace +Z to +X",
+      "shape": "cylinder",
+      "position": [
+        0.09,
+        6.24,
+        0.09
+      ],
+      "rotation": [
+        0.34,
+        0,
+        -0.34
+      ],
+      "size": [
+        0.014,
+        0.52
+      ],
+      "material": "welded steel",
+      "role": "Upper diagonal member completing the visible four-sided LES truss bay.",
+      "connections": [
+        "les_leg_pz",
+        "les_leg_px"
+      ]
+    },
+    {
+      "id": "les_rocket",
+      "name": "LES Solid Escape Rocket",
+      "shape": "cylinder",
+      "position": [
+        0,
+        6.92,
+        0
+      ],
+      "size": [
+        0.16,
+        1.38
+      ],
+      "material": "white composite",
+      "role": "Solid rocket motor that pulled the Command Module away from a launch vehicle failure.",
+      "connections": [
+        "les_leg_px",
+        "les_leg_nx",
+        "les_leg_pz",
+        "les_leg_nz",
+        "les_jettison"
+      ]
+    },
+    {
+      "id": "les_jettison",
+      "name": "LES Jettison Motor",
+      "shape": "cylinder",
+      "position": [
+        0,
+        7.74,
+        0
+      ],
+      "size": [
+        0.12,
+        0.25
+      ],
+      "material": "white composite",
+      "role": "Small motor above the escape rocket used to pull the tower clear after nominal ascent.",
+      "connections": [
+        "les_rocket",
+        "les_nose"
+      ]
+    },
+    {
+      "id": "les_nose",
+      "name": "LES Q-Ball Nose Cap",
+      "shape": "sphere",
+      "position": [
+        0,
+        7.94,
+        0
+      ],
+      "size": [
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Q-ball nose cap sensing dynamic pressure and angle of attack during early ascent.",
+      "connections": [
+        "les_jettison"
+      ]
+    }
   ]
 }
