@@ -89,7 +89,7 @@ Every scene is a [`MachineSceneDescriptor`](./docs/schema.json):
   parts: Array<{
     id: string
     name: string
-    shape: 'box' | 'cylinder' | 'sphere' | 'complex'
+    shape: 'box' | 'cylinder' | 'sphere' | 'cone' | 'torus' | 'capsule' | 'complex'
     position: [number, number, number]
     rotation?: [number, number, number]   // Euler radians, optional
     size: number[]

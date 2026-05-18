@@ -39,7 +39,7 @@ export interface PartEngineering {
 export interface Part extends PartEngineering {
   id: string;
   name: string;
-  shape: 'box' | 'cylinder' | 'sphere' | 'complex';
+  shape: 'box' | 'cylinder' | 'sphere' | 'cone' | 'torus' | 'capsule' | 'complex';
   position: [number, number, number];
   rotation?: [number, number, number];
   size: number[];

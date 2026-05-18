@@ -1,6 +1,6 @@
 import React, { Suspense, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Grid, Environment, ContactShadows, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, Grid, Environment, ContactShadows, PerspectiveCamera, RoundedBox } from '@react-three/drei';
 import * as THREE from 'three';
 import { Connections } from './Connections';
 import type { Part, SceneDescriptor } from '../types';
@@ -70,10 +70,12 @@ const ScenePart: React.FC<{
   };
 
   if (part.shape === 'cylinder') {
-    const [radius = 0.5, height = 1] = part.size;
+    // [radius, height] = uniform; [radiusTop, radiusBottom, height] = tapered / truncated cone.
+    const [a = 0.5, b = 1, c] = part.size;
+    const [radiusTop, radiusBottom, height] = c !== undefined ? [a, b, c] : [a, a, b];
     return (
       <mesh {...common}>
-        <cylinderGeometry args={[radius, radius, height, 28]} />
+        <cylinderGeometry args={[radiusTop, radiusBottom, height, 32]} />
         {material}
       </mesh>
     );
@@ -83,13 +85,57 @@ const ScenePart: React.FC<{
     const [radius = 0.5] = part.size;
     return (
       <mesh {...common}>
-        <sphereGeometry args={[radius, 24, 14]} />
+        <sphereGeometry args={[radius, 28, 18]} />
+        {material}
+      </mesh>
+    );
+  }
+
+  if (part.shape === 'cone') {
+    // [radius, height] — apex points along +Y before rotation.
+    const [radius = 0.5, height = 1] = part.size;
+    return (
+      <mesh {...common}>
+        <coneGeometry args={[radius, height, 32]} />
+        {material}
+      </mesh>
+    );
+  }
+
+  if (part.shape === 'torus') {
+    // [ringRadius, tubeRadius] — ring lies in the XY plane (axis along Z) before rotation.
+    const [radius = 0.5, tube = 0.15] = part.size;
+    return (
+      <mesh {...common}>
+        <torusGeometry args={[radius, tube, 20, 48]} />
+        {material}
+      </mesh>
+    );
+  }
+
+  if (part.shape === 'capsule') {
+    // [radius, length] — length is the cylindrical mid-section; axis along Y before rotation.
+    const [radius = 0.3, length = 1] = part.size;
+    return (
+      <mesh {...common}>
+        <capsuleGeometry args={[radius, length, 8, 24]} />
         {material}
       </mesh>
     );
   }
 
   const args: [number, number, number] = part.size.length >= 3 ? [part.size[0], part.size[1], part.size[2]] : [1, 1, 1];
+
+  if (part.shape === 'complex') {
+    // Irregular / organic part: a bevelled box so it reads as machined, not a plain primitive.
+    const radius = Math.min(...args) * 0.16;
+    return (
+      <RoundedBox {...common} args={args} radius={radius} smoothness={3}>
+        {material}
+      </RoundedBox>
+    );
+  }
+
   return (
     <mesh {...common}>
       <boxGeometry args={args} />
@@ -108,14 +154,41 @@ type ViewerProps = {
   maxDpr?: number;
 };
 
+// Axis-aligned half-extent of a part, ignoring rotation (a conservative-enough estimate).
+const partHalfExtent = (part: Part): THREE.Vector3 => {
+  const s = part.size;
+  switch (part.shape) {
+    case 'cylinder': {
+      const [a = 0.5, b = 1, c] = s;
+      const [rTop, rBot, h] = c !== undefined ? [a, b, c] : [a, a, b];
+      const r = Math.max(rTop, rBot);
+      return new THREE.Vector3(r, h / 2, r);
+    }
+    case 'cone': {
+      const [r = 0.5, h = 1] = s;
+      return new THREE.Vector3(r, h / 2, r);
+    }
+    case 'sphere': {
+      const r = s[0] ?? 0.5;
+      return new THREE.Vector3(r, r, r);
+    }
+    case 'torus': {
+      const outer = (s[0] ?? 0.5) + (s[1] ?? 0.15);
+      return new THREE.Vector3(outer, outer, outer);
+    }
+    case 'capsule': {
+      const [r = 0.3, len = 1] = s;
+      return new THREE.Vector3(r, len / 2 + r, r);
+    }
+    default:
+      return new THREE.Vector3((s[0] ?? 1) / 2, (s[1] ?? 1) / 2, (s[2] ?? 1) / 2);
+  }
+};
+
 const sceneBounds = (scene: SceneDescriptor) => {
   const box = new THREE.Box3();
   scene.parts.forEach((part) => {
-    const half = part.shape === 'cylinder'
-      ? new THREE.Vector3(part.size[0] ?? 0.5, (part.size[1] ?? 1) / 2, part.size[0] ?? 0.5)
-      : part.shape === 'sphere'
-      ? new THREE.Vector3(part.size[0] ?? 0.5, part.size[0] ?? 0.5, part.size[0] ?? 0.5)
-      : new THREE.Vector3((part.size[0] ?? 1) / 2, (part.size[1] ?? 1) / 2, (part.size[2] ?? 1) / 2);
+    const half = partHalfExtent(part);
     const center = new THREE.Vector3(...part.position);
     box.expandByPoint(center.clone().add(half));
     box.expandByPoint(center.clone().sub(half));

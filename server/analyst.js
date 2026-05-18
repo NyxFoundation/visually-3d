@@ -37,7 +37,7 @@ Return ONLY a JSON object with this shape — no markdown, no prose:
     {
       "id": string,                 // snake_case, unique
       "name": string,               // human-readable
-      "shape": "box" | "cylinder" | "sphere" | "complex",
+      "shape": "box" | "cylinder" | "sphere" | "cone" | "torus" | "capsule" | "complex",
       "position": [x, y, z],        // world coordinates in meters
       "rotation": [rx, ry, rz],     // XYZ Euler radians, optional
       "size": number[],             // see Primitives below
@@ -94,27 +94,46 @@ Return ONLY a JSON object with this shape — no markdown, no prose:
 
 # Primitives
 
-- **box**: size is [width-X, height-Y, depth-Z].
-- **cylinder**: size is [radius, height]. Native axis is Y.
-- **sphere**: size is [radius].
-- **complex** is a fallback — avoid.
+You have six geometry primitives. Pick the one whose silhouette matches the
+real part — do NOT stack boxes or cylinders when a curved primitive fits.
 
-Cylinder axis rotation cheat sheet:
+- **box**: size [width-X, height-Y, depth-Z].
+- **cylinder**: size [radius, height] for a uniform cylinder, OR
+  [radiusTop, radiusBottom, height] for a tapered / truncated cone. Native
+  axis is Y. Use the 3-number tapered form for rocket nozzles, tower
+  tapers, the Apollo command module cone, hoppers, lamp shades.
+- **cone**: size [radius, height]. A full cone, apex along +Y. Use for
+  sharp nose cones, drill tips, pointed finials.
+- **sphere**: size [radius]. Domes, tanks, balls, sensor heads.
+- **torus**: size [ringRadius, tubeRadius]. The ring lies in the XY plane
+  (its axis is Z) before rotation. Use for tires, O-rings, wheel hubs,
+  antenna loops, hand-wheels, ring trusses.
+- **capsule**: size [radius, length] — length is the straight mid-section;
+  total height is length + 2·radius. Native axis is Y. Use for hydraulic
+  cylinders, pressure vessels, rounded rods, limbs, gas bottles.
+- **complex**: a bevelled box for genuinely irregular machined parts. Use
+  sparingly — prefer a real primitive whenever one fits.
+
+Axis rotation cheat sheet — cylinder, cone and capsule all share native
+axis Y:
 - Axis along Y (default): rotation omitted or [0, 0, 0].
 - Axis along X (shafts, booms): rotation [0, 0, 1.5708].
-- Axis along Z (wheels, rods across the vehicle): rotation [1.5708, 0, 0].
+- Axis along Z (rods across the vehicle): rotation [1.5708, 0, 0].
 - Tilted in the XY plane (guy wires, loader arms, side rods): rotation
   [0, 0, angle] where \`(-sin angle, cos angle)\` is the unit direction you
   want the Y-axis to rotate to. For a wire from (0, a) to (b, 0):
   \`angle = -π + atan2(b/L, a/L)\` with L = sqrt(a² + b²).
 - Tilted in the YZ plane: rotation [angle, 0, 0] with analogous math.
+
+A torus' native axis is Z, not Y: an upright wheel/tire needs no rotation;
+to lay it flat (axis pointing up) use rotation [1.5708, 0, 0].
+
 - **Aspect ratios under 200:1.** Avoid cylinders longer than ~200× their
   radius — very thin tall cylinders can stress WebGL shadow passes.
 
-Cones / dishes have no primitive. Approximate a cone by stacking 3-4
-cylinders of decreasing radius (works for Apollo CM, rocket nozzles, tower
-tapers). Approximate a dish by a flat tilted cylinder (radius >> height).
-Approximate a curved/bent arm by 2 straight boxes at different angles.
+A dish is a flat tapered cylinder (large radius, tiny height). A
+curved/bent arm is still best modelled as 2 straight members at different
+angles — there is no spline primitive.
 
 # Material vocabulary
 
@@ -203,8 +222,8 @@ The \`info\` block is surfaced in the UI, so fill it properly:
 - Cylinder axes guessed wrong (wheels upright, shafts floating in place).
   Always think about what axis the cylinder's Y points along after rotation.
 - NaN / Infinity / zero-length sizes.
-- Using \`shape: "complex"\` unless truly necessary — the renderer falls
-  back to a box and it looks wrong.
+- Reaching for \`shape: "complex"\` when \`cone\`, \`torus\`, \`capsule\` or a
+  tapered \`cylinder\` would actually match the real part's silhouette.
 - Generic "metal" or "plastic" with no keyword match — picks up a generic
   grey color with middling metalness.
 - Metadata with adjectives ("highly capable", "industry-leading") instead
