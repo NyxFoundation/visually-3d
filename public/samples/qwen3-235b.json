@@ -1,6 +1,6 @@
 {
   "machine_name": "Qwen3-235B-A22B",
-  "assembly_instructions": "1. Bolt the base_frame to the floor at y=0 and mount base_rail_port, base_rail_starboard, post_front_port, post_rear_port, post_front_starboard, and post_rear_starboard to create an open service frame. 2. Install input_plate on the base_frame, then place embedding_table directly above it and connect the residual_pipe through the center of the frame. 3. Attach layer_tray_01 through layer_tray_06 and the two final-layer trays to the posts, leaving gaps between trays so the residual stream is visible. 4. Mount the attention lane on the port side of layer_tray_03 in this order: attn_pre_norm, q_head_fan, kv_head_four_pack, qk_norm_ring, rope_ring, flash_attention_core, and attn_o_proj, then connect the kv_cache_tower to the attention core with kv_cache_bus. 5. Mount the MoE lane on the starboard side of layer_tray_03 in this order: ffn_pre_norm, router_disk, dispatch_bus, active_expert_01 through active_expert_08, grouped_gemm_plate, combine_bus, and moe_output_join. 6. Place dormant_expert_bank_a through dormant_expert_bank_d behind the active experts to show the unused routed capacity of the 128-expert bank. 7. Mount dca_local_chunk, dca_global_chunk, yarn_rescale_ring, mode_selector_think, and mode_selector_no_think above the final layers, then connect them to the attention lane and residual_pipe. 8. Install prediction_head, lm_loss_marker, and output_tokens_plate at the top of the residual path. 9. Attach optimizer_adamw, training_data_pipe, post_train_pipeline, and parallelism_marker to side rails so training and deployment infrastructure is grounded and not floating. 10. Verify every module has a visible connection back to base_frame through either a rail, post, tray, bus, or the residual_pipe.",
+  "assembly_instructions": "1. Bolt base_frame to the floor at y=0, then fasten base_cross_rail_front, base_cross_rail_rear, base_rail_port, and base_rail_starboard to make a rigid open skid. 2. Stand post_front_port, post_rear_port, post_front_starboard, and post_rear_starboard on the service rails, then tie them with the eight narrow transformer tray cross-members so the central bay remains open. 3. Mount input_plate on the base_frame, install embedding_table above it, and pass residual_pipe vertically through the center of each tray cross-member. 4. Build the exploded third layer by adding layer_03_port_ledger, layer_03_starboard_ledger, layer_03_front_crossbar, and layer_03_rear_crossbar around layer_tray_03. 5. Assemble the port attention lane on the layer-3 ledger: attn_pre_norm, q_head_fan, q_head_bundle_01 through q_head_bundle_08, kv_head_four_pack, kv_head_01 through kv_head_04, qk_norm_ring, rope_ring, flash_attention_core, and attn_o_proj. 6. Bolt kv_cache_foot to the port rail, stand kv_cache_tower on it, and connect kv_cache_bus between the tower, KV-head pack, and flash_attention_core. 7. Assemble the starboard MoE lane: ffn_pre_norm, router_disk, dispatch_bus, active_expert_01 through active_expert_08, dormant_expert_bank_a through dormant_expert_bank_d, grouped_gemm_plate, combine_bus, moe_output_join, and moe_alltoall_ring. 8. Install top_attention_support_beam, top_mode_support_beam, and lm_head_support_cradle on the final-layer rail, then mount dca_local_chunk, dca_global_chunk, yarn_rescale_ring, mode_selector_think, mode_selector_no_think, prediction_head, lm_loss_marker, output_arm, and output_tokens_plate. 9. Build the training-side hardware from the floor upward: data_feeder_pedestal, training_data_pipe, optimizer_adamw, and post_train_pipeline, then link them to input_plate and lm_loss_marker. 10. Add parallelism_panel_stand and parallelism_marker to the starboard rail, then verify that every module has a visible mechanical or data-flow connection back to base_frame.",
   "metadata": {
     "domain": "ml-architecture",
     "reference": "https://huggingface.co/Qwen/Qwen3-235B-A22B",
@@ -111,11 +111,62 @@
       "material": "welded steel",
       "role": "The floor plate roots the scene and carries the token input, residual tower, side modules, and service rails.",
       "connections": [
+        "base_cross_rail_front",
+        "base_cross_rail_rear",
         "base_rail_port",
         "base_rail_starboard",
         "input_plate",
+        "data_feeder_pedestal",
         "training_data_pipe",
         "optimizer_adamw"
+      ]
+    },
+    {
+      "id": "base_cross_rail_front",
+      "name": "Front Base Cross Rail",
+      "shape": "box",
+      "position": [
+        -0.2,
+        0.26,
+        -1.55
+      ],
+      "size": [
+        7.6,
+        0.2,
+        0.16
+      ],
+      "material": "brushed steel",
+      "role": "This front rail keeps the four upright posts square and gives the tray ladder a visible floor datum.",
+      "connections": [
+        "base_frame",
+        "base_rail_port",
+        "base_rail_starboard",
+        "post_front_port",
+        "post_front_starboard"
+      ]
+    },
+    {
+      "id": "base_cross_rail_rear",
+      "name": "Rear Base Cross Rail",
+      "shape": "box",
+      "position": [
+        -0.2,
+        0.26,
+        1.55
+      ],
+      "size": [
+        7.6,
+        0.2,
+        0.16
+      ],
+      "material": "brushed steel",
+      "role": "This rear rail closes the skid frame and supports the starboard MoE service side.",
+      "connections": [
+        "base_frame",
+        "base_rail_port",
+        "base_rail_starboard",
+        "post_rear_port",
+        "post_rear_starboard"
       ]
     },
     {
@@ -136,9 +187,11 @@
       "role": "The port rail carries the attention lane, KV-cache tower, and two left posts.",
       "connections": [
         "base_frame",
+        "base_cross_rail_front",
+        "base_cross_rail_rear",
         "post_front_port",
         "post_rear_port",
-        "kv_cache_tower",
+        "kv_cache_foot",
         "attn_pre_norm"
       ]
     },
@@ -160,10 +213,12 @@
       "role": "The starboard rail carries the MoE lane, expert bank, mode selector, and deployment panels.",
       "connections": [
         "base_frame",
+        "base_cross_rail_front",
+        "base_cross_rail_rear",
         "post_front_starboard",
         "post_rear_starboard",
         "router_disk",
-        "parallelism_marker"
+        "parallelism_panel_stand"
       ]
     },
     {
@@ -183,6 +238,7 @@
       "role": "This upright post supports the front-left corners of all visible transformer trays.",
       "connections": [
         "base_rail_port",
+        "base_cross_rail_front",
         "layer_tray_01",
         "layer_tray_94"
       ]
@@ -204,6 +260,7 @@
       "role": "This upright post supports the rear-left corners of the open transformer ladder.",
       "connections": [
         "base_rail_port",
+        "base_cross_rail_rear",
         "layer_tray_01",
         "layer_tray_94"
       ]
@@ -225,6 +282,7 @@
       "role": "This upright post supports the front-right corners of all visible transformer trays.",
       "connections": [
         "base_rail_starboard",
+        "base_cross_rail_front",
         "layer_tray_01",
         "layer_tray_94"
       ]
@@ -246,6 +304,7 @@
       "role": "This upright post supports the rear-right corners and keeps the MoE lane visually grounded.",
       "connections": [
         "base_rail_starboard",
+        "base_cross_rail_rear",
         "layer_tray_01",
         "layer_tray_94"
       ]
@@ -270,7 +329,8 @@
       "parallelism": "embarrassingly-parallel",
       "connections": [
         "base_frame",
-        "embedding_table"
+        "embedding_table",
+        "training_data_pipe"
       ]
     },
     {
@@ -348,12 +408,13 @@
       "connections": [
         "base_rail_port",
         "layer_tray_01",
+        "skip_layers_marker",
         "layer_tray_94"
       ]
     },
     {
       "id": "layer_tray_01",
-      "name": "Transformer Tray 1",
+      "name": "Transformer Tray 1 Open Cross-Member",
       "shape": "box",
       "position": [
         -0.2,
@@ -362,11 +423,11 @@
       ],
       "size": [
         3.9,
-        0.16,
-        2.35
+        0.14,
+        0.28
       ],
       "material": "brushed steel",
-      "role": "This open tray represents decoder layer 1 with space for attention on port and MoE on starboard.",
+      "role": "This narrow tray member represents decoder layer 1 without hiding the residual pipe or side lanes.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "tensor-parallel",
       "connections": [
@@ -378,7 +439,7 @@
     },
     {
       "id": "layer_tray_02",
-      "name": "Transformer Tray 2",
+      "name": "Transformer Tray 2 Open Cross-Member",
       "shape": "box",
       "position": [
         -0.2,
@@ -387,11 +448,11 @@
       ],
       "size": [
         3.9,
-        0.16,
-        2.35
+        0.14,
+        0.28
       ],
       "material": "brushed steel",
-      "role": "This open tray represents decoder layer 2 and leaves vertical gaps so the residual pipe is visible.",
+      "role": "This narrow tray member represents decoder layer 2 and leaves vertical gaps so internals remain visible.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "tensor-parallel",
       "connections": [
@@ -402,7 +463,7 @@
     },
     {
       "id": "layer_tray_03",
-      "name": "Exploded Transformer Tray 3",
+      "name": "Exploded Transformer Tray 3 Residual Saddle",
       "shape": "box",
       "position": [
         -0.2,
@@ -410,25 +471,121 @@
         0
       ],
       "size": [
-        3.9,
-        0.12,
-        2.35
+        0.62,
+        0.1,
+        0.62
       ],
       "material": "white composite",
-      "role": "This cutaway tray exposes one complete layer with the GQA attention lane and routed-MoE FFN lane pulled apart.",
+      "role": "This small cutaway saddle anchors the exposed layer while keeping attention and MoE parts unobscured.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_pipe",
         "layer_tray_02",
+        "layer_03_port_ledger",
+        "layer_03_starboard_ledger",
         "attn_pre_norm",
         "ffn_pre_norm",
         "layer_tray_04"
       ]
     },
     {
+      "id": "layer_03_port_ledger",
+      "name": "Layer 3 Port Attention Ledger",
+      "shape": "box",
+      "position": [
+        0.2,
+        2.72,
+        -1.28
+      ],
+      "size": [
+        4.2,
+        0.1,
+        0.12
+      ],
+      "material": "brushed steel",
+      "role": "This side ledger physically supports the exposed attention sublayer modules on the port side.",
+      "connections": [
+        "layer_tray_03",
+        "layer_03_front_crossbar",
+        "layer_03_rear_crossbar",
+        "attn_pre_norm",
+        "flash_attention_core"
+      ]
+    },
+    {
+      "id": "layer_03_starboard_ledger",
+      "name": "Layer 3 Starboard MoE Ledger",
+      "shape": "box",
+      "position": [
+        0.85,
+        2.72,
+        1.28
+      ],
+      "size": [
+        4.8,
+        0.1,
+        0.12
+      ],
+      "material": "brushed steel",
+      "role": "This side ledger physically supports the router, active experts, dormant banks, and grouped GEMM plate.",
+      "connections": [
+        "layer_tray_03",
+        "layer_03_front_crossbar",
+        "layer_03_rear_crossbar",
+        "ffn_pre_norm",
+        "grouped_gemm_plate"
+      ]
+    },
+    {
+      "id": "layer_03_front_crossbar",
+      "name": "Layer 3 Front Crossbar",
+      "shape": "box",
+      "position": [
+        -2.05,
+        2.72,
+        0
+      ],
+      "size": [
+        0.16,
+        0.1,
+        2.65
+      ],
+      "material": "brushed steel",
+      "role": "This crossbar ties the port and starboard ledgers at the input side of the exploded layer.",
+      "connections": [
+        "layer_03_port_ledger",
+        "layer_03_starboard_ledger",
+        "post_front_port",
+        "post_front_starboard"
+      ]
+    },
+    {
+      "id": "layer_03_rear_crossbar",
+      "name": "Layer 3 Rear Crossbar",
+      "shape": "box",
+      "position": [
+        2.15,
+        2.72,
+        0
+      ],
+      "size": [
+        0.16,
+        0.1,
+        2.65
+      ],
+      "material": "brushed steel",
+      "role": "This crossbar ties the port and starboard ledgers at the output side of the exploded layer.",
+      "connections": [
+        "layer_03_port_ledger",
+        "layer_03_starboard_ledger",
+        "post_rear_port",
+        "post_rear_starboard"
+      ]
+    },
+    {
       "id": "layer_tray_04",
-      "name": "Transformer Tray 4",
+      "name": "Transformer Tray 4 Open Cross-Member",
       "shape": "box",
       "position": [
         -0.2,
@@ -437,11 +594,11 @@
       ],
       "size": [
         3.9,
-        0.16,
-        2.35
+        0.14,
+        0.28
       ],
       "material": "brushed steel",
-      "role": "This open tray represents decoder layer 4 and continues the alternating residual ladder.",
+      "role": "This narrow tray member represents decoder layer 4 and keeps the residual ladder open to inspection.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "tensor-parallel",
       "connections": [
@@ -452,7 +609,7 @@
     },
     {
       "id": "layer_tray_05",
-      "name": "Transformer Tray 5",
+      "name": "Transformer Tray 5 Open Cross-Member",
       "shape": "box",
       "position": [
         -0.2,
@@ -461,11 +618,11 @@
       ],
       "size": [
         3.9,
-        0.16,
-        2.35
+        0.14,
+        0.28
       ],
       "material": "brushed steel",
-      "role": "This open tray represents decoder layer 5 and shows that layers are stacked, not hidden in one block.",
+      "role": "This narrow tray member represents decoder layer 5 and shows stacked layers without an enclosing chassis.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "tensor-parallel",
       "connections": [
@@ -476,7 +633,7 @@
     },
     {
       "id": "layer_tray_06",
-      "name": "Transformer Tray 6",
+      "name": "Transformer Tray 6 Open Cross-Member",
       "shape": "box",
       "position": [
         -0.2,
@@ -485,11 +642,11 @@
       ],
       "size": [
         3.9,
-        0.16,
-        2.35
+        0.14,
+        0.28
       ],
       "material": "brushed steel",
-      "role": "This open tray represents decoder layer 6 before the skipped middle-layer span.",
+      "role": "This narrow tray member represents decoder layer 6 before the skipped middle-layer span.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "tensor-parallel",
       "connections": [
@@ -524,7 +681,7 @@
     },
     {
       "id": "layer_tray_93",
-      "name": "Transformer Tray 93",
+      "name": "Transformer Tray 93 Open Cross-Member",
       "shape": "box",
       "position": [
         -0.2,
@@ -533,11 +690,11 @@
       ],
       "size": [
         3.9,
-        0.16,
-        2.35
+        0.14,
+        0.28
       ],
       "material": "brushed steel",
-      "role": "This open tray represents decoder layer 93 after the compressed middle span.",
+      "role": "This narrow tray member represents decoder layer 93 after the compressed middle span.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "tensor-parallel",
       "connections": [
@@ -548,7 +705,7 @@
     },
     {
       "id": "layer_tray_94",
-      "name": "Transformer Tray 94 Final",
+      "name": "Transformer Tray 94 Final Open Cross-Member",
       "shape": "box",
       "position": [
         -0.2,
@@ -557,11 +714,11 @@
       ],
       "size": [
         3.9,
-        0.16,
-        2.35
+        0.14,
+        0.28
       ],
       "material": "brushed steel",
-      "role": "This final open tray feeds the tied LM head at the top of the residual path.",
+      "role": "This final narrow tray member feeds the tied LM head while leaving the top support hardware visible.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "tensor-parallel",
       "connections": [
@@ -569,7 +726,10 @@
         "layer_tray_93",
         "prediction_head",
         "post_front_port",
-        "post_front_starboard"
+        "post_front_starboard",
+        "top_attention_support_beam",
+        "top_mode_support_beam",
+        "lm_head_support_cradle"
       ]
     },
     {
@@ -592,37 +752,214 @@
       "parallelism": "tensor-parallel",
       "connections": [
         "layer_tray_03",
+        "layer_03_port_ledger",
         "q_head_fan"
       ]
     },
     {
       "id": "q_head_fan",
-      "name": "64 Query-Head Fan",
+      "name": "64 Query-Head Manifold",
       "shape": "box",
       "position": [
-        -0.65,
-        3.18,
+        -0.72,
+        3.25,
         -1.35
       ],
       "size": [
-        1.35,
-        0.18,
-        0.26
+        1.55,
+        0.12,
+        0.2
       ],
       "material": "aluminum",
-      "role": "This wide fan represents 64 query heads of dimension 128 before grouped attention.",
+      "role": "This manifold gathers eight visible query bundles that together stand for 64 query heads of dimension 128.",
       "compute_profile": "gpu-compute-bound",
       "flops_per_token": "Q projection is 2 x 4096 x 64 x 128 multiply-add work per token.",
       "parallelism": "tensor-parallel",
       "connections": [
         "attn_pre_norm",
+        "q_head_bundle_01",
+        "q_head_bundle_02",
+        "q_head_bundle_03",
+        "q_head_bundle_04",
+        "q_head_bundle_05",
+        "q_head_bundle_06",
+        "q_head_bundle_07",
+        "q_head_bundle_08",
         "kv_head_four_pack",
         "qk_norm_ring"
       ]
     },
     {
+      "id": "q_head_bundle_01",
+      "name": "Query Bundle 1: Heads 1-8",
+      "shape": "box",
+      "position": [
+        -1.35,
+        3.4,
+        -1.48
+      ],
+      "size": [
+        0.14,
+        0.14,
+        0.36
+      ],
+      "material": "aluminum",
+      "role": "This blade represents eight query heads feeding the grouped-attention normalization ring.",
+      "connections": [
+        "q_head_fan",
+        "qk_norm_ring"
+      ]
+    },
+    {
+      "id": "q_head_bundle_02",
+      "name": "Query Bundle 2: Heads 9-16",
+      "shape": "box",
+      "position": [
+        -1.17,
+        3.4,
+        -1.48
+      ],
+      "size": [
+        0.14,
+        0.14,
+        0.36
+      ],
+      "material": "aluminum",
+      "role": "This blade represents the second group of eight query heads in the 64-head fan.",
+      "connections": [
+        "q_head_fan",
+        "qk_norm_ring"
+      ]
+    },
+    {
+      "id": "q_head_bundle_03",
+      "name": "Query Bundle 3: Heads 17-24",
+      "shape": "box",
+      "position": [
+        -0.99,
+        3.4,
+        -1.48
+      ],
+      "size": [
+        0.14,
+        0.14,
+        0.36
+      ],
+      "material": "aluminum",
+      "role": "This blade represents the third group of eight query heads before QK normalization.",
+      "connections": [
+        "q_head_fan",
+        "qk_norm_ring"
+      ]
+    },
+    {
+      "id": "q_head_bundle_04",
+      "name": "Query Bundle 4: Heads 25-32",
+      "shape": "box",
+      "position": [
+        -0.81,
+        3.4,
+        -1.48
+      ],
+      "size": [
+        0.14,
+        0.14,
+        0.36
+      ],
+      "material": "aluminum",
+      "role": "This blade represents the fourth group of eight query heads before rotary positioning.",
+      "connections": [
+        "q_head_fan",
+        "qk_norm_ring"
+      ]
+    },
+    {
+      "id": "q_head_bundle_05",
+      "name": "Query Bundle 5: Heads 33-40",
+      "shape": "box",
+      "position": [
+        -0.63,
+        3.4,
+        -1.48
+      ],
+      "size": [
+        0.14,
+        0.14,
+        0.36
+      ],
+      "material": "aluminum",
+      "role": "This blade represents the fifth group of eight query heads sharing compact KV state.",
+      "connections": [
+        "q_head_fan",
+        "qk_norm_ring"
+      ]
+    },
+    {
+      "id": "q_head_bundle_06",
+      "name": "Query Bundle 6: Heads 41-48",
+      "shape": "box",
+      "position": [
+        -0.45,
+        3.4,
+        -1.48
+      ],
+      "size": [
+        0.14,
+        0.14,
+        0.36
+      ],
+      "material": "aluminum",
+      "role": "This blade represents the sixth group of eight query heads in the GQA lane.",
+      "connections": [
+        "q_head_fan",
+        "qk_norm_ring"
+      ]
+    },
+    {
+      "id": "q_head_bundle_07",
+      "name": "Query Bundle 7: Heads 49-56",
+      "shape": "box",
+      "position": [
+        -0.27,
+        3.4,
+        -1.48
+      ],
+      "size": [
+        0.14,
+        0.14,
+        0.36
+      ],
+      "material": "aluminum",
+      "role": "This blade represents the seventh group of eight query heads before FlashAttention.",
+      "connections": [
+        "q_head_fan",
+        "qk_norm_ring"
+      ]
+    },
+    {
+      "id": "q_head_bundle_08",
+      "name": "Query Bundle 8: Heads 57-64",
+      "shape": "box",
+      "position": [
+        -0.09,
+        3.4,
+        -1.48
+      ],
+      "size": [
+        0.14,
+        0.14,
+        0.36
+      ],
+      "material": "aluminum",
+      "role": "This blade completes the 64 visible query heads as eight groups of eight.",
+      "connections": [
+        "q_head_fan",
+        "qk_norm_ring"
+      ]
+    },
+    {
       "id": "kv_head_four_pack",
-      "name": "4 KV-Head Pack",
+      "name": "4 KV-Head Base Pack",
       "shape": "box",
       "position": [
         -0.65,
@@ -630,17 +967,105 @@
         -0.88
       ],
       "size": [
-        0.36,
-        0.32,
-        0.36
+        0.46,
+        0.18,
+        0.42
       ],
       "material": "copper",
-      "role": "This compact pack shows that only four KV heads serve all 64 query heads at a 16:1 sharing ratio.",
+      "role": "This compact base shows that only four KV heads serve all 64 query heads at a 16:1 sharing ratio.",
       "compute_profile": "gpu-compute-bound",
       "memory_footprint": "The per-layer KV projection has only 8 KV-related heads of 128 channels across K and V.",
       "parallelism": "tensor-parallel",
       "connections": [
         "q_head_fan",
+        "kv_head_01",
+        "kv_head_02",
+        "kv_head_03",
+        "kv_head_04",
+        "kv_cache_bus",
+        "qk_norm_ring"
+      ]
+    },
+    {
+      "id": "kv_head_01",
+      "name": "KV Head 1 Capsule",
+      "shape": "capsule",
+      "position": [
+        -0.86,
+        3.46,
+        -0.98
+      ],
+      "size": [
+        0.055,
+        0.32
+      ],
+      "material": "copper",
+      "role": "This upright capsule is the first physical KV head shared by sixteen query heads.",
+      "connections": [
+        "kv_head_four_pack",
+        "kv_cache_bus",
+        "qk_norm_ring"
+      ]
+    },
+    {
+      "id": "kv_head_02",
+      "name": "KV Head 2 Capsule",
+      "shape": "capsule",
+      "position": [
+        -0.72,
+        3.46,
+        -0.98
+      ],
+      "size": [
+        0.055,
+        0.32
+      ],
+      "material": "copper",
+      "role": "This upright capsule is the second physical KV head in the compact GQA pack.",
+      "connections": [
+        "kv_head_four_pack",
+        "kv_cache_bus",
+        "qk_norm_ring"
+      ]
+    },
+    {
+      "id": "kv_head_03",
+      "name": "KV Head 3 Capsule",
+      "shape": "capsule",
+      "position": [
+        -0.58,
+        3.46,
+        -0.98
+      ],
+      "size": [
+        0.055,
+        0.32
+      ],
+      "material": "copper",
+      "role": "This upright capsule is the third physical KV head feeding the cache bus.",
+      "connections": [
+        "kv_head_four_pack",
+        "kv_cache_bus",
+        "qk_norm_ring"
+      ]
+    },
+    {
+      "id": "kv_head_04",
+      "name": "KV Head 4 Capsule",
+      "shape": "capsule",
+      "position": [
+        -0.44,
+        3.46,
+        -0.98
+      ],
+      "size": [
+        0.055,
+        0.32
+      ],
+      "material": "copper",
+      "role": "This upright capsule completes the four-head KV set used by all 64 query heads.",
+      "connections": [
+        "kv_head_four_pack",
         "kv_cache_bus",
         "qk_norm_ring"
       ]
@@ -665,6 +1090,8 @@
       "connections": [
         "q_head_fan",
         "kv_head_four_pack",
+        "q_head_bundle_01",
+        "q_head_bundle_08",
         "rope_ring"
       ]
     },
@@ -687,7 +1114,8 @@
       "parallelism": "embarrassingly-parallel",
       "connections": [
         "qk_norm_ring",
-        "flash_attention_core"
+        "flash_attention_core",
+        "yarn_rescale_ring"
       ]
     },
     {
@@ -714,7 +1142,8 @@
         "rope_ring",
         "attn_o_proj",
         "kv_cache_bus",
-        "dca_local_chunk"
+        "dca_local_chunk",
+        "layer_03_port_ledger"
       ]
     },
     {
@@ -741,12 +1170,33 @@
       ]
     },
     {
+      "id": "kv_cache_foot",
+      "name": "KV Cache Ground Foot",
+      "shape": "box",
+      "position": [
+        -3.25,
+        0.49,
+        -1.2
+      ],
+      "size": [
+        0.82,
+        0.24,
+        0.64
+      ],
+      "material": "welded steel",
+      "role": "This bolted foot carries the paged KV tower so it is visibly grounded on the port rail.",
+      "connections": [
+        "base_rail_port",
+        "kv_cache_tower"
+      ]
+    },
+    {
       "id": "kv_cache_tower",
       "name": "Paged KV Cache Tower",
       "shape": "cylinder",
       "position": [
         -3.25,
-        3.65,
+        3.56,
         -1.2
       ],
       "size": [
@@ -759,6 +1209,7 @@
       "memory_footprint": "About 2 x 4 x 128 x FP8 per token per layer, or roughly 12 GiB for 94 layers at 128K.",
       "parallelism": "tensor-parallel",
       "connections": [
+        "kv_cache_foot",
         "base_rail_port",
         "kv_cache_bus"
       ]
@@ -788,6 +1239,10 @@
       "connections": [
         "kv_cache_tower",
         "kv_head_four_pack",
+        "kv_head_01",
+        "kv_head_02",
+        "kv_head_03",
+        "kv_head_04",
         "flash_attention_core"
       ]
     },
@@ -811,6 +1266,7 @@
       "parallelism": "tensor-parallel",
       "connections": [
         "layer_tray_03",
+        "layer_03_starboard_ledger",
         "router_disk"
       ]
     },
@@ -836,7 +1292,8 @@
       "algorithm": "scores = softmax(x @ W_router) + balance_bias; topk_idx, topk_w = topk(scores, 8).",
       "connections": [
         "ffn_pre_norm",
-        "dispatch_bus"
+        "dispatch_bus",
+        "base_rail_starboard"
       ]
     },
     {
@@ -1077,7 +1534,8 @@
       "parallelism": "expert-parallel",
       "connections": [
         "dispatch_bus",
-        "dormant_expert_bank_b"
+        "dormant_expert_bank_b",
+        "layer_03_starboard_ledger"
       ]
     },
     {
@@ -1100,7 +1558,8 @@
       "parallelism": "expert-parallel",
       "connections": [
         "dormant_expert_bank_a",
-        "dormant_expert_bank_c"
+        "dormant_expert_bank_c",
+        "layer_03_starboard_ledger"
       ]
     },
     {
@@ -1123,7 +1582,8 @@
       "parallelism": "expert-parallel",
       "connections": [
         "dormant_expert_bank_b",
-        "dormant_expert_bank_d"
+        "dormant_expert_bank_d",
+        "grouped_gemm_plate"
       ]
     },
     {
@@ -1170,6 +1630,7 @@
       "parallelism": "expert-parallel",
       "algorithm": "For each routed group, compute SwiGLU gate, up, and down projections, then weight by router probability.",
       "connections": [
+        "layer_03_starboard_ledger",
         "active_expert_01",
         "active_expert_02",
         "active_expert_03",
@@ -1255,6 +1716,30 @@
       ]
     },
     {
+      "id": "top_attention_support_beam",
+      "name": "Top Attention Extension Beam",
+      "shape": "box",
+      "position": [
+        1.55,
+        8.5,
+        -1.15
+      ],
+      "size": [
+        3.1,
+        0.16,
+        0.18
+      ],
+      "material": "brushed steel",
+      "role": "This upper beam supports the DCA and YaRN modules above the final transformer layer.",
+      "connections": [
+        "layer_tray_94",
+        "post_rear_port",
+        "dca_local_chunk",
+        "dca_global_chunk",
+        "yarn_rescale_ring"
+      ]
+    },
+    {
       "id": "dca_local_chunk",
       "name": "DCA Local 32K Chunk",
       "shape": "box",
@@ -1273,6 +1758,7 @@
       "compute_profile": "gpu-compute-bound",
       "parallelism": "embarrassingly-parallel",
       "connections": [
+        "top_attention_support_beam",
         "flash_attention_core",
         "dca_global_chunk",
         "layer_tray_94"
@@ -1297,6 +1783,7 @@
       "compute_profile": "gpu-compute-bound",
       "parallelism": "embarrassingly-parallel",
       "connections": [
+        "top_attention_support_beam",
         "dca_local_chunk",
         "yarn_rescale_ring"
       ]
@@ -1319,8 +1806,32 @@
       "compute_profile": "negligible",
       "parallelism": "embarrassingly-parallel",
       "connections": [
+        "top_attention_support_beam",
         "dca_global_chunk",
         "rope_ring"
+      ]
+    },
+    {
+      "id": "top_mode_support_beam",
+      "name": "Hybrid Mode Support Beam",
+      "shape": "box",
+      "position": [
+        1.58,
+        8.66,
+        1
+      ],
+      "size": [
+        2.8,
+        0.2,
+        0.18
+      ],
+      "material": "brushed steel",
+      "role": "This upper beam carries the /think and /no_think selectors so they are visibly mounted, not floating.",
+      "connections": [
+        "layer_tray_94",
+        "post_rear_starboard",
+        "mode_selector_think",
+        "mode_selector_no_think"
       ]
     },
     {
@@ -1329,7 +1840,7 @@
       "shape": "box",
       "position": [
         0.95,
-        8.95,
+        8.9,
         1
       ],
       "size": [
@@ -1343,6 +1854,7 @@
       "parallelism": "data-parallel",
       "algorithm": "If the system prompt contains /think, use the reasoning template and a larger decode budget.",
       "connections": [
+        "top_mode_support_beam",
         "layer_tray_94",
         "mode_selector_no_think",
         "prediction_head"
@@ -1354,7 +1866,7 @@
       "shape": "box",
       "position": [
         2.2,
-        8.95,
+        8.9,
         1
       ],
       "size": [
@@ -1367,8 +1879,31 @@
       "compute_profile": "negligible",
       "parallelism": "data-parallel",
       "connections": [
+        "top_mode_support_beam",
         "mode_selector_think",
         "prediction_head"
+      ]
+    },
+    {
+      "id": "lm_head_support_cradle",
+      "name": "LM Head Support Cradle",
+      "shape": "box",
+      "position": [
+        -0.2,
+        8.56,
+        0
+      ],
+      "size": [
+        3.3,
+        0.16,
+        0.24
+      ],
+      "material": "brushed steel",
+      "role": "This cradle carries the tied LM head directly above the residual pipe and final tray.",
+      "connections": [
+        "layer_tray_94",
+        "prediction_head",
+        "residual_pipe"
       ]
     },
     {
@@ -1377,7 +1912,7 @@
       "shape": "box",
       "position": [
         -0.2,
-        8.85,
+        8.78,
         0
       ],
       "size": [
@@ -1391,11 +1926,13 @@
       "flops_per_token": "Final logits cost about 2 x 4096 x 151,936 operations per token.",
       "parallelism": "tensor-parallel",
       "connections": [
+        "lm_head_support_cradle",
         "layer_tray_94",
         "residual_pipe",
         "mode_selector_think",
         "mode_selector_no_think",
         "lm_loss_marker",
+        "output_arm",
         "output_tokens_plate"
       ]
     },
@@ -1405,7 +1942,7 @@
       "shape": "sphere",
       "position": [
         -1.8,
-        9.32,
+        9.22,
         0
       ],
       "size": [
@@ -1418,6 +1955,31 @@
       "connections": [
         "prediction_head",
         "post_train_pipeline"
+      ]
+    },
+    {
+      "id": "output_arm",
+      "name": "Decoded Token Output Arm",
+      "shape": "cylinder",
+      "position": [
+        1.02,
+        9.08,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.045,
+        1.75
+      ],
+      "material": "copper",
+      "role": "This small arm carries sampled logits from the LM head to the visible output token plate.",
+      "connections": [
+        "prediction_head",
+        "output_tokens_plate"
       ]
     },
     {
@@ -1439,7 +2001,29 @@
       "compute_profile": "host-cpu",
       "parallelism": "data-parallel",
       "connections": [
-        "prediction_head"
+        "prediction_head",
+        "output_arm"
+      ]
+    },
+    {
+      "id": "data_feeder_pedestal",
+      "name": "Training Data Feeder Pedestal",
+      "shape": "box",
+      "position": [
+        -3.6,
+        0.31,
+        1
+      ],
+      "size": [
+        1.8,
+        0.3,
+        0.8
+      ],
+      "material": "welded steel",
+      "role": "This pedestal grounds the corpus feeder on the base frame instead of leaving it suspended.",
+      "connections": [
+        "base_frame",
+        "training_data_pipe"
       ]
     },
     {
@@ -1461,6 +2045,7 @@
       "compute_profile": "storage-bound",
       "parallelism": "data-parallel",
       "connections": [
+        "data_feeder_pedestal",
         "base_frame",
         "input_plate",
         "optimizer_adamw"
@@ -1472,7 +2057,7 @@
       "shape": "box",
       "position": [
         -3.75,
-        1.35,
+        1.14,
         1
       ],
       "size": [
@@ -1497,7 +2082,7 @@
       "shape": "box",
       "position": [
         -3.75,
-        2.25,
+        1.75,
         1
       ],
       "size": [
@@ -1512,6 +2097,27 @@
       "connections": [
         "optimizer_adamw",
         "lm_loss_marker"
+      ]
+    },
+    {
+      "id": "parallelism_panel_stand",
+      "name": "Parallelism Panel Stand",
+      "shape": "box",
+      "position": [
+        4.25,
+        1.36,
+        1.48
+      ],
+      "size": [
+        0.18,
+        2,
+        0.18
+      ],
+      "material": "welded steel",
+      "role": "This vertical stand grounds the training-parallelism panel to the starboard rail.",
+      "connections": [
+        "base_rail_starboard",
+        "parallelism_marker"
       ]
     },
     {
@@ -1533,6 +2139,7 @@
       "compute_profile": "communication-bound",
       "parallelism": "pipeline-parallel",
       "connections": [
+        "parallelism_panel_stand",
         "base_rail_starboard",
         "moe_alltoall_ring",
         "layer_tray_03"

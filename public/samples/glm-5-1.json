@@ -1,6 +1,6 @@
 {
   "machine_name": "GLM-5.1 (projected flagship)",
-  "assembly_instructions": "1. Bolt the base_frame to the floor plane with the left_upright, right_upright, rear_spine, lower_cross_rail, and upper_cross_rail to form an open inspection rack. 2. Mount input_plate on the front of the base frame, then set embedding_table directly above it and connect both to the residual_bus. 3. Install the residual_bus vertically through the centre and fasten layer_tray_001 through layer_tray_128_marker to it in order, leaving the exploded_block_064 tray pulled forward for inspection. 4. On the port/left lane of exploded_block_064, install attn_pre_norm, q_projection_bank, mla_down_projection, kv_latent_cache_a, kv_latent_cache_b, kv_up_projection, qk_rope_norm, flash_attention_core, and o_projection, then connect o_projection back to residual_bus. 5. On the starboard/right lane, install ffn_pre_norm, router_gate, group_limit_selector, expert_alltoall_bus, routed_expert_tile_a through routed_expert_tile_d, shared_expert, overflow_shared_expert, fp4_qat_plate, and moe_combine_gate, then connect moe_combine_gate back to residual_bus. 6. Install final_norm and prediction_head above the last tray, then attach mtp_block_1, mtp_block_2, primary_lm_loss, and mtp_loss_node to the output side. 7. Mount kv_memory_scale beside the cache pages, muon_optimizer and adamw_carveout on the service shelf, and parallelism_panel plus training_data_pipe on the rear right side. 8. Verify that every functional module has a visible parent connection, no part penetrates the ground plane, and the exposed exploded tray can be read from the ISO, front, side, and top views.",
+  "assembly_instructions": "1. Level base_frame on the floor datum and bolt base_front_rail, base_rear_rail, base_left_rail, base_right_rail, and four foot pads to it so the rack footprint is open rather than a closed box. 2. Stand left_upright, right_upright, rear_spine, front_left_post, and front_right_post on the perimeter rails, then fasten lower_cross_rail, mid_cross_rail, upper_cross_rail, rear_lower_tie, rear_upper_tie, and diagonal braces to make a rigid inspection frame. 3. Mount input_plate and embedding_table on the lower shelf, connect the blue token_flow_pipe into the embedding table, and clamp embedding_output_collar around the lower residual_bus. 4. Install residual_bus vertically through the centre; add residual_input_collar, residual_output_collar, layer pitch ticks, split attention-side trays, split MoE-side trays, and the layer_tray_001 through layer_tray_128_marker datum blocks in order so the 128-layer tower remains readable as a stack. 5. Pull exploded_block_064 forward on drawer_left_slide and drawer_right_slide, bolt drawer_front_crossbar, drawer_rear_crossbar, drawer_port_rail, and drawer_starboard_rail around it, and leave the center open so the layer internals are visible. 6. Mount the attention lane on the port side in this order: attn_pre_norm, q_projection_bank, mla_down_projection, kv_latent_cache_a, kv_latent_cache_b, kv_page_separator, kv_up_projection, qk_rope_norm, flash_attention_core, attention_score_window, and o_projection back to the residual bus through attention_return_pipe. 7. Mount the MoE lane on the starboard side in this order: ffn_pre_norm, router_gate, eight top-k beads, group_limit_selector, eight device-group rails, router dispatch rods, expert_alltoall_bus, four routed expert banks with 16 face micro-tiles, shared_expert, overflow_shared_expert, fp4_qat_plate, and moe_combine_gate back to the residual bus through moe_return_pipe. 8. Attach the final_norm and prediction_head above the layer stack, then fit mtp_block_1, mtp_block_2, primary_lm_loss, mtp_loss_node, their loss posts, and the MTP connector rods on the output shelf. 9. Install kv_memory_scale beside the cache pages, mount muon_optimizer and adamw_carveout on the port service shelf, and attach parallelism_panel plus training_data_pipe on the starboard service side. 10. Confirm every non-root part is connected to the rooted frame or residual path, all feet touch y=0, the service drawer clears the tower in ISO view, and the expert bank is connected by visible dispatch and return rods.",
   "metadata": {
     "domain": "ml-architecture",
     "reference": "https://github.com/zai-org/GLM-4.5",
@@ -19,72 +19,48 @@
           "value": "PROJECTED / SPECULATIVE — no public paper"
         },
         {
+          "label": "rack scale used in scene",
+          "value": "8.8 m wide × 8.9 m high × 3.4 m deep visual assembly, abstracted from model dimensions"
+        },
+        {
           "label": "total parameters",
           "value": "≈ 600 B (≈ 48 B activated / token)"
         },
         {
           "label": "context length",
-          "value": "256 K (native), extendable"
+          "value": "256 K native context shown as two visible MLA cache pages"
         },
         {
-          "label": "transformer layers (L)",
-          "value": "128"
+          "label": "transformer layers",
+          "value": "128 layers shown as 8 indexed trays plus pitch ticks and split attention/MoE half-trays"
         },
         {
-          "label": "hidden dimension (d)",
-          "value": "5760"
+          "label": "hidden dimension",
+          "value": "d=5760 residual bus"
         },
         {
           "label": "vocabulary size",
-          "value": "≈ 152K (Qwen/GLM-tier multilingual)"
+          "value": "≈ 152K multilingual tokens"
         },
         {
-          "label": "query heads (n_h)",
-          "value": "96"
+          "label": "attention heads",
+          "value": "96 query heads with 8 KV heads plus c_kv≈768 MLA latent"
         },
         {
-          "label": "KV heads (GQA)",
-          "value": "8 + MLA compressed latent (c_kv ≈ 768)"
+          "label": "MoE routing",
+          "value": "256 routed experts, top-8 active, limited to ≤4 of 8 device groups"
         },
         {
-          "label": "MoE per layer",
-          "value": "1 shared + 256 routed (top-8)"
-        },
-        {
-          "label": "expert intermediate dim",
-          "value": "≈ 1408 (fine-grained)"
-        },
-        {
-          "label": "router gate",
-          "value": "Sigmoid + loss-free balance bias"
-        },
-        {
-          "label": "group-limited routing",
-          "value": "≤ 4 of 8 device groups per token"
+          "label": "expert precision",
+          "value": "FP4 QAT plate marks ≈4× routed expert weight shrink versus BF16"
         },
         {
           "label": "MTP depth",
-          "value": "2 (was 1 in GLM-4.5)"
-        },
-        {
-          "label": "modes",
-          "value": "think / no-think (shared weights)"
-        },
-        {
-          "label": "optimiser (matrix bulk)",
-          "value": "Muon (adopted from DeepSeek-V4)"
-        },
-        {
-          "label": "optimiser (carve-out)",
-          "value": "AdamW (embed / head / RMSNorm / scalars)"
-        },
-        {
-          "label": "expert weight precision",
-          "value": "FP4 QAT"
+          "value": "2 auxiliary prediction blocks"
         },
         {
           "label": "training tokens",
-          "value": "~30 T (projection)"
+          "value": "~30 T projected tokens entering through the floor intake pipe"
         }
       ],
       "comparisons": [
@@ -128,78 +104,296 @@
   "parts": [
     {
       "id": "base_frame",
-      "name": "Open Base Frame",
+      "name": "Root Floor Datum Plate",
       "shape": "box",
       "position": [
         0,
-        0.08,
+        0.025,
         0
       ],
       "size": [
-        8.8,
-        0.16,
-        3.2
+        7.6,
+        0.05,
+        2.6
       ],
       "material": "welded steel",
-      "role": "Grounded rack base that roots the full projected GLM-5.1 assembly and keeps every subsystem visible.",
-      "compute_profile": "negligible",
-      "parallelism": "pipeline-parallel",
+      "role": "Thin datum plate roots the GLM-5.1 architecture rack without hiding the internal assemblies above it.",
       "connections": [
+        "base_front_rail",
+        "base_rear_rail",
+        "base_left_rail",
+        "base_right_rail",
+        "foot_front_left",
+        "foot_front_right",
+        "foot_rear_left",
+        "foot_rear_right"
+      ]
+    },
+    {
+      "id": "base_front_rail",
+      "name": "Front Floor Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.18,
+        1.45
+      ],
+      "size": [
+        8.8,
+        0.18,
+        0.14
+      ],
+      "material": "welded steel",
+      "role": "Front rail defines the service side of the open rack and carries the pulled-out layer drawer.",
+      "connections": [
+        "base_frame",
+        "front_left_post",
+        "front_right_post",
+        "drawer_left_slide",
+        "drawer_right_slide"
+      ]
+    },
+    {
+      "id": "base_rear_rail",
+      "name": "Rear Floor Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.18,
+        -1.45
+      ],
+      "size": [
+        8.8,
+        0.18,
+        0.14
+      ],
+      "material": "welded steel",
+      "role": "Rear rail ties the residual tower to the back of the inspection frame.",
+      "connections": [
+        "base_frame",
         "left_upright",
         "right_upright",
-        "rear_spine",
-        "input_plate",
-        "training_data_pipe"
+        "rear_spine"
+      ]
+    },
+    {
+      "id": "base_left_rail",
+      "name": "Port Floor Rail",
+      "shape": "box",
+      "position": [
+        -4.2,
+        0.18,
+        0
+      ],
+      "size": [
+        0.14,
+        0.18,
+        3.1
+      ],
+      "material": "welded steel",
+      "role": "Port rail supports the attention, cache, and optimizer service lane.",
+      "connections": [
+        "base_frame",
+        "left_upright",
+        "muon_shelf"
+      ]
+    },
+    {
+      "id": "base_right_rail",
+      "name": "Starboard Floor Rail",
+      "shape": "box",
+      "position": [
+        4.2,
+        0.18,
+        0
+      ],
+      "size": [
+        0.14,
+        0.18,
+        3.1
+      ],
+      "material": "welded steel",
+      "role": "Starboard rail supports the MoE, parallelism, and training-data side equipment.",
+      "connections": [
+        "base_frame",
+        "right_upright",
+        "parallelism_panel"
+      ]
+    },
+    {
+      "id": "foot_front_left",
+      "name": "Front Port Leveling Foot",
+      "shape": "cylinder",
+      "position": [
+        -4.2,
+        0.08,
+        1.45
+      ],
+      "size": [
+        0.18,
+        0.16
+      ],
+      "material": "rubber",
+      "role": "Leveling foot touches the floor and fixes the port-front corner at y=0.",
+      "connections": [
+        "base_frame",
+        "base_front_rail",
+        "base_left_rail"
+      ]
+    },
+    {
+      "id": "foot_front_right",
+      "name": "Front Starboard Leveling Foot",
+      "shape": "cylinder",
+      "position": [
+        4.2,
+        0.08,
+        1.45
+      ],
+      "size": [
+        0.18,
+        0.16
+      ],
+      "material": "rubber",
+      "role": "Leveling foot touches the floor and fixes the starboard-front corner at y=0.",
+      "connections": [
+        "base_frame",
+        "base_front_rail",
+        "base_right_rail"
+      ]
+    },
+    {
+      "id": "foot_rear_left",
+      "name": "Rear Port Leveling Foot",
+      "shape": "cylinder",
+      "position": [
+        -4.2,
+        0.08,
+        -1.45
+      ],
+      "size": [
+        0.18,
+        0.16
+      ],
+      "material": "rubber",
+      "role": "Leveling foot touches the floor and fixes the port-rear corner at y=0.",
+      "connections": [
+        "base_frame",
+        "base_rear_rail",
+        "base_left_rail"
+      ]
+    },
+    {
+      "id": "foot_rear_right",
+      "name": "Rear Starboard Leveling Foot",
+      "shape": "cylinder",
+      "position": [
+        4.2,
+        0.08,
+        -1.45
+      ],
+      "size": [
+        0.18,
+        0.16
+      ],
+      "material": "rubber",
+      "role": "Leveling foot touches the floor and fixes the starboard-rear corner at y=0.",
+      "connections": [
+        "base_frame",
+        "base_rear_rail",
+        "base_right_rail"
       ]
     },
     {
       "id": "left_upright",
-      "name": "Port Upright Rail",
+      "name": "Port Rear Upright Rail",
       "shape": "box",
       "position": [
         -4.2,
-        4.5,
+        4.55,
         -1.45
       ],
       "size": [
         0.14,
-        8.8,
+        8.7,
         0.14
       ],
       "material": "welded steel",
-      "role": "Left structural post that carries the attention and cache inspection lane.",
-      "compute_profile": "negligible",
-      "parallelism": "pipeline-parallel",
+      "role": "Rear port post carries the attention-cache lane and braces the tower.",
       "connections": [
-        "base_frame",
+        "base_rear_rail",
         "upper_cross_rail",
         "lower_cross_rail",
+        "rear_lower_tie",
         "kv_memory_scale"
       ]
     },
     {
       "id": "right_upright",
-      "name": "Starboard Upright Rail",
+      "name": "Starboard Rear Upright Rail",
       "shape": "box",
       "position": [
         4.2,
-        4.5,
+        4.55,
         -1.45
       ],
       "size": [
         0.14,
-        8.8,
+        8.7,
         0.14
       ],
       "material": "welded steel",
-      "role": "Right structural post that carries the MoE, parallelism, and optimiser service lane.",
-      "compute_profile": "negligible",
-      "parallelism": "pipeline-parallel",
+      "role": "Rear starboard post carries the MoE and parallelism service lane.",
       "connections": [
-        "base_frame",
+        "base_rear_rail",
         "upper_cross_rail",
         "lower_cross_rail",
+        "rear_lower_tie",
         "parallelism_panel"
+      ]
+    },
+    {
+      "id": "front_left_post",
+      "name": "Port Front Service Post",
+      "shape": "box",
+      "position": [
+        -4.2,
+        4.05,
+        1.45
+      ],
+      "size": [
+        0.12,
+        7.6,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Front port post makes the rack a real four-post frame while leaving the centre open.",
+      "connections": [
+        "base_front_rail",
+        "upper_front_cross_rail",
+        "drawer_left_slide"
+      ]
+    },
+    {
+      "id": "front_right_post",
+      "name": "Starboard Front Service Post",
+      "shape": "box",
+      "position": [
+        4.2,
+        4.05,
+        1.45
+      ],
+      "size": [
+        0.12,
+        7.6,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Front starboard post supports the service drawer and the visible MoE lane.",
+      "connections": [
+        "base_front_rail",
+        "upper_front_cross_rail",
+        "drawer_right_slide"
       ]
     },
     {
@@ -208,26 +402,26 @@
       "shape": "box",
       "position": [
         0,
-        4.7,
+        4.75,
         -1.6
       ],
       "size": [
         0.18,
-        9,
+        8.9,
         0.18
       ],
       "material": "brushed steel",
-      "role": "Rear post aligning all visible layer trays to the central residual bus.",
-      "compute_profile": "negligible",
-      "parallelism": "pipeline-parallel",
+      "role": "Rear post aligns all visible layer trays to the central residual bus.",
       "connections": [
-        "base_frame",
-        "residual_bus"
+        "base_rear_rail",
+        "residual_bus",
+        "rear_lower_tie",
+        "rear_upper_tie"
       ]
     },
     {
       "id": "lower_cross_rail",
-      "name": "Lower Cross Rail",
+      "name": "Lower Rear Cross Rail",
       "shape": "box",
       "position": [
         0,
@@ -240,9 +434,7 @@
         0.12
       ],
       "material": "welded steel",
-      "role": "Lower transverse rail that locates the input, embedding, and first layer trays.",
-      "compute_profile": "negligible",
-      "parallelism": "pipeline-parallel",
+      "role": "Lower transverse rail locates the embedding shelf and first layer trays.",
       "connections": [
         "left_upright",
         "right_upright",
@@ -250,8 +442,30 @@
       ]
     },
     {
+      "id": "mid_cross_rail",
+      "name": "Middle Rear Cross Rail",
+      "shape": "box",
+      "position": [
+        0,
+        4.1,
+        -1.45
+      ],
+      "size": [
+        8.5,
+        0.1,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Middle rail braces the tower exactly behind the pulled-out layer-64 drawer.",
+      "connections": [
+        "left_upright",
+        "right_upright",
+        "exploded_block_064"
+      ]
+    },
+    {
       "id": "upper_cross_rail",
-      "name": "Upper Cross Rail",
+      "name": "Upper Rear Cross Rail",
       "shape": "box",
       "position": [
         0,
@@ -264,13 +478,130 @@
         0.12
       ],
       "material": "welded steel",
-      "role": "Upper transverse rail that fixes the prediction and MTP head modules above the 128-layer stack.",
-      "compute_profile": "negligible",
-      "parallelism": "pipeline-parallel",
+      "role": "Upper transverse rail fixes the prediction and MTP head modules above the 128-layer stack.",
       "connections": [
         "left_upright",
         "right_upright",
         "prediction_head"
+      ]
+    },
+    {
+      "id": "upper_front_cross_rail",
+      "name": "Upper Front Cross Rail",
+      "shape": "box",
+      "position": [
+        0,
+        7.7,
+        1.45
+      ],
+      "size": [
+        8.5,
+        0.12,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Front upper rail keeps the four-post service frame square without closing the view.",
+      "connections": [
+        "front_left_post",
+        "front_right_post",
+        "upper_cross_rail"
+      ]
+    },
+    {
+      "id": "rear_lower_tie",
+      "name": "Rear Lower Spine Tie",
+      "shape": "box",
+      "position": [
+        0,
+        0.95,
+        -1.52
+      ],
+      "size": [
+        3.1,
+        0.1,
+        0.1
+      ],
+      "material": "brushed steel",
+      "role": "Short rear tie locks the residual spine to the lower rack rail.",
+      "connections": [
+        "left_upright",
+        "right_upright",
+        "rear_spine"
+      ]
+    },
+    {
+      "id": "rear_upper_tie",
+      "name": "Rear Upper Spine Tie",
+      "shape": "box",
+      "position": [
+        0,
+        7.75,
+        -1.52
+      ],
+      "size": [
+        3.1,
+        0.1,
+        0.1
+      ],
+      "material": "brushed steel",
+      "role": "Short rear tie locks the top of the residual spine to the upper rack rail.",
+      "connections": [
+        "rear_spine",
+        "upper_cross_rail"
+      ]
+    },
+    {
+      "id": "diagonal_brace_port",
+      "name": "Port Diagonal Brace",
+      "shape": "box",
+      "position": [
+        -4.2,
+        4.15,
+        0
+      ],
+      "rotation": [
+        0.72,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        7.1,
+        0.08
+      ],
+      "material": "welded steel",
+      "role": "Diagonal brace shows the rack is built from members rather than a single opaque wall.",
+      "connections": [
+        "base_left_rail",
+        "front_left_post",
+        "left_upright"
+      ]
+    },
+    {
+      "id": "diagonal_brace_starboard",
+      "name": "Starboard Diagonal Brace",
+      "shape": "box",
+      "position": [
+        4.2,
+        4.15,
+        0
+      ],
+      "rotation": [
+        -0.72,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        7.1,
+        0.08
+      ],
+      "material": "welded steel",
+      "role": "Diagonal brace leaves the MoE side visible while stiffening the service frame.",
+      "connections": [
+        "base_right_rail",
+        "front_right_post",
+        "right_upright"
       ]
     },
     {
@@ -279,21 +610,45 @@
       "shape": "box",
       "position": [
         -1.2,
-        0.32,
-        0.6
+        0.36,
+        0.75
       ],
       "size": [
         3.2,
         0.22,
-        1.1
+        1
       ],
       "material": "dark anodized aluminum",
       "role": "Token-ID stream from the projected multilingual tokenizer enters the rack at floor level.",
-      "compute_profile": "host-cpu",
-      "parallelism": "embarrassingly-parallel",
       "connections": [
         "base_frame",
+        "token_flow_pipe",
         "embedding_table"
+      ]
+    },
+    {
+      "id": "token_flow_pipe",
+      "name": "Token Flow Intake Pipe",
+      "shape": "cylinder",
+      "position": [
+        -2.9,
+        0.42,
+        0.75
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.08,
+        1
+      ],
+      "material": "copper",
+      "role": "Horizontal pipe makes the raw token stream visibly feed the input plate.",
+      "connections": [
+        "training_data_pipe",
+        "input_plate"
       ]
     },
     {
@@ -302,23 +657,45 @@
       "shape": "box",
       "position": [
         -1.2,
-        0.78,
-        0.6
+        0.86,
+        0.75
       ],
       "size": [
         2.9,
         0.26,
-        0.95
+        0.9
       ],
       "material": "glass display",
       "role": "Tied embedding matrix converts token IDs to the 5760-wide residual stream and is trained by AdamW.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "memory_footprint": "≈152K × 5760 × BF16 ≈ 1.75 GiB",
-      "parallelism": "tensor-parallel",
       "connections": [
         "input_plate",
-        "residual_bus",
+        "embedding_output_collar",
         "lower_cross_rail"
+      ]
+    },
+    {
+      "id": "embedding_output_collar",
+      "name": "Embedding Output Collar",
+      "shape": "torus",
+      "position": [
+        -0.25,
+        1.1,
+        0.25
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.22,
+        0.035
+      ],
+      "material": "brass",
+      "role": "Ring collar marks where embedded vectors enter the residual bus.",
+      "connections": [
+        "embedding_table",
+        "residual_input_collar"
       ]
     },
     {
@@ -331,16 +708,14 @@
         0
       ],
       "size": [
-        0.16,
-        8.1
+        0.14,
+        8.05
       ],
       "material": "aluminum",
-      "role": "Central residual stream carrying hidden states through the projected 128 pre-norm transformer layers.",
-      "compute_profile": "gpu-memory-bound",
-      "parallelism": "tensor-parallel",
+      "role": "Central residual stream carries hidden states through the projected 128 pre-norm transformer layers.",
       "connections": [
         "rear_spine",
-        "embedding_table",
+        "residual_input_collar",
         "layer_tray_001",
         "layer_tray_016",
         "layer_tray_032",
@@ -349,200 +724,854 @@
         "layer_tray_096",
         "layer_tray_112",
         "layer_tray_128_marker",
+        "residual_output_collar",
+        "final_norm"
+      ]
+    },
+    {
+      "id": "residual_input_collar",
+      "name": "Residual Input Collar",
+      "shape": "torus",
+      "position": [
+        0,
+        1.15,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.24,
+        0.035
+      ],
+      "material": "brass",
+      "role": "Lower ring identifies the first residual add point after token embedding.",
+      "connections": [
+        "embedding_output_collar",
+        "residual_bus",
+        "layer_tray_001"
+      ]
+    },
+    {
+      "id": "residual_output_collar",
+      "name": "Residual Output Collar",
+      "shape": "torus",
+      "position": [
+        0,
+        7.15,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.24,
+        0.035
+      ],
+      "material": "brass",
+      "role": "Upper ring identifies the residual output entering final normalization.",
+      "connections": [
+        "residual_bus",
+        "layer_tray_128_marker",
         "final_norm"
       ]
     },
     {
       "id": "layer_tray_001",
-      "name": "Layer Tray 1",
+      "name": "Layer Tray 1 Center Datum",
       "shape": "box",
       "position": [
         0,
         1.35,
-        0
+        -0.05
       ],
       "size": [
-        2.65,
-        0.18,
-        1.05
+        0.58,
+        0.14,
+        0.72
       ],
       "material": "dark anodized aluminum",
-      "role": "First visible transformer tray; it establishes the repeated attention-plus-MoE layer pitch.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "pipeline-parallel",
+      "role": "Small center datum for layer 1 keeps the residual stack visible without hiding the split attention and MoE half-trays.",
       "connections": [
         "residual_bus",
+        "layer_tick_001",
+        "layer_001_attention_half",
+        "layer_001_moe_half",
         "layer_tray_016"
       ]
     },
     {
+      "id": "layer_001_attention_half",
+      "name": "Layer 1 Attention Half-Tray",
+      "shape": "box",
+      "position": [
+        -0.95,
+        1.35,
+        0.18
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "aluminum",
+      "role": "Left half-tray marks the attention sublayer inside the first transformer layer.",
+      "connections": [
+        "layer_tray_001",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "layer_001_moe_half",
+      "name": "Layer 1 MoE Half-Tray",
+      "shape": "box",
+      "position": [
+        0.95,
+        1.35,
+        -0.28
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "brushed steel",
+      "role": "Right half-tray marks the routed MoE sublayer inside the first transformer layer.",
+      "connections": [
+        "layer_tray_001",
+        "residual_bus"
+      ]
+    },
+    {
       "id": "layer_tray_016",
-      "name": "Layer Tray 16",
+      "name": "Layer Tray 16 Center Datum",
       "shape": "box",
       "position": [
         0,
         2.05,
-        0
+        -0.05
       ],
       "size": [
-        2.65,
-        0.18,
-        1.05
+        0.58,
+        0.14,
+        0.72
       ],
       "material": "dark anodized aluminum",
-      "role": "Representative early-depth transformer tray compressed from layers 2 through 16.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "pipeline-parallel",
+      "role": "Center datum marks the visible early-depth checkpoint compressed from layers 2 through 16.",
       "connections": [
         "layer_tray_001",
         "residual_bus",
+        "layer_tick_016",
+        "layer_016_attention_half",
+        "layer_016_moe_half",
         "layer_tray_032"
       ]
     },
     {
+      "id": "layer_016_attention_half",
+      "name": "Layer 16 Attention Half-Tray",
+      "shape": "box",
+      "position": [
+        -0.95,
+        2.05,
+        0.18
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "aluminum",
+      "role": "Visible attention half of the layer-16 checkpoint keeps the stack from reading as one solid shelf bank.",
+      "connections": [
+        "layer_tray_016",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "layer_016_moe_half",
+      "name": "Layer 16 MoE Half-Tray",
+      "shape": "box",
+      "position": [
+        0.95,
+        2.05,
+        -0.28
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "brushed steel",
+      "role": "Visible MoE half of the layer-16 checkpoint shows the repeated routed feed-forward sublayer.",
+      "connections": [
+        "layer_tray_016",
+        "residual_bus"
+      ]
+    },
+    {
       "id": "layer_tray_032",
-      "name": "Layer Tray 32",
+      "name": "Layer Tray 32 Center Datum",
       "shape": "box",
       "position": [
         0,
         2.75,
-        0
+        -0.05
       ],
       "size": [
-        2.65,
-        0.18,
-        1.05
+        0.58,
+        0.14,
+        0.72
       ],
       "material": "dark anodized aluminum",
-      "role": "Visible tray marking the first quarter of the projected 128-layer depth.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "pipeline-parallel",
+      "role": "Center datum marks the first quarter of the projected 128-layer depth.",
       "connections": [
         "layer_tray_016",
         "residual_bus",
+        "layer_tick_032",
+        "layer_032_attention_half",
+        "layer_032_moe_half",
         "exploded_block_064"
       ]
     },
     {
+      "id": "layer_032_attention_half",
+      "name": "Layer 32 Attention Half-Tray",
+      "shape": "box",
+      "position": [
+        -0.95,
+        2.75,
+        0.18
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "aluminum",
+      "role": "Attention half-tray marks the first-quarter attention path before the exploded layer.",
+      "connections": [
+        "layer_tray_032",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "layer_032_moe_half",
+      "name": "Layer 32 MoE Half-Tray",
+      "shape": "box",
+      "position": [
+        0.95,
+        2.75,
+        -0.28
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "brushed steel",
+      "role": "MoE half-tray marks the first-quarter routed expert path before the exploded layer.",
+      "connections": [
+        "layer_tray_032",
+        "residual_bus"
+      ]
+    },
+    {
       "id": "exploded_block_064",
-      "name": "Layer 64 Exploded Tray",
+      "name": "Layer 64 Exploded Center Datum",
       "shape": "box",
       "position": [
         0,
-        3.55,
-        0.45
+        3.58,
+        1.85
       ],
       "size": [
-        2.85,
-        0.16,
-        1.25
+        0.56,
+        0.12,
+        0.56
       ],
       "material": "brushed steel",
-      "role": "Mid-stack transformer block pulled forward as an exploded cutaway so attention and MoE internals remain visible.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "pipeline-parallel",
+      "role": "Small center datum marks the pulled-out layer 64 while open perimeter rails expose the attention and MoE internals.",
       "connections": [
         "layer_tray_032",
+        "drawer_left_slide",
+        "drawer_right_slide",
+        "drawer_front_crossbar",
+        "drawer_rear_crossbar",
+        "drawer_port_rail",
+        "drawer_starboard_rail",
         "residual_bus",
         "attn_pre_norm",
         "ffn_pre_norm",
+        "layer_tick_064",
         "layer_tray_080"
       ]
     },
     {
+      "id": "drawer_left_slide",
+      "name": "Port Drawer Slide",
+      "shape": "box",
+      "position": [
+        -1.8,
+        3.45,
+        1.05
+      ],
+      "size": [
+        0.08,
+        0.08,
+        2
+      ],
+      "material": "steel",
+      "role": "Slide rail physically explains why layer 64 is pulled forward from the main stack.",
+      "connections": [
+        "base_front_rail",
+        "front_left_post",
+        "exploded_block_064"
+      ]
+    },
+    {
+      "id": "drawer_right_slide",
+      "name": "Starboard Drawer Slide",
+      "shape": "box",
+      "position": [
+        1.8,
+        3.45,
+        1.05
+      ],
+      "size": [
+        0.08,
+        0.08,
+        2
+      ],
+      "material": "steel",
+      "role": "Second slide rail keeps the exploded transformer drawer aligned with the residual tower.",
+      "connections": [
+        "base_front_rail",
+        "front_right_post",
+        "exploded_block_064"
+      ]
+    },
+    {
+      "id": "drawer_front_crossbar",
+      "name": "Layer 64 Drawer Front Crossbar",
+      "shape": "box",
+      "position": [
+        0,
+        3.5,
+        2.34
+      ],
+      "size": [
+        4.25,
+        0.08,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Front crossbar outlines the service drawer without forming an opaque tray.",
+      "connections": [
+        "drawer_port_rail",
+        "drawer_starboard_rail",
+        "exploded_block_064"
+      ]
+    },
+    {
+      "id": "drawer_rear_crossbar",
+      "name": "Layer 64 Drawer Rear Crossbar",
+      "shape": "box",
+      "position": [
+        0,
+        3.5,
+        1.36
+      ],
+      "size": [
+        4.25,
+        0.08,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Rear crossbar keeps the exploded layer frame square while leaving the middle transparent.",
+      "connections": [
+        "drawer_port_rail",
+        "drawer_starboard_rail",
+        "exploded_block_064"
+      ]
+    },
+    {
+      "id": "drawer_port_rail",
+      "name": "Layer 64 Drawer Port Rail",
+      "shape": "box",
+      "position": [
+        -2.12,
+        3.5,
+        1.85
+      ],
+      "size": [
+        0.08,
+        0.08,
+        1.06
+      ],
+      "material": "steel",
+      "role": "Port side rail carries the exposed attention lane modules.",
+      "connections": [
+        "drawer_left_slide",
+        "drawer_front_crossbar",
+        "drawer_rear_crossbar",
+        "attention_lane_rail"
+      ]
+    },
+    {
+      "id": "drawer_starboard_rail",
+      "name": "Layer 64 Drawer Starboard Rail",
+      "shape": "box",
+      "position": [
+        2.12,
+        3.5,
+        1.85
+      ],
+      "size": [
+        0.08,
+        0.08,
+        1.06
+      ],
+      "material": "steel",
+      "role": "Starboard side rail carries the exposed MoE lane modules.",
+      "connections": [
+        "drawer_right_slide",
+        "drawer_front_crossbar",
+        "drawer_rear_crossbar",
+        "moe_lane_rail"
+      ]
+    },
+    {
       "id": "layer_tray_080",
-      "name": "Layer Tray 80",
+      "name": "Layer Tray 80 Center Datum",
       "shape": "box",
       "position": [
         0,
         4.55,
-        0
+        -0.05
       ],
       "size": [
-        2.65,
-        0.18,
-        1.05
+        0.58,
+        0.14,
+        0.72
       ],
       "material": "dark anodized aluminum",
-      "role": "Visible tray marking the post-exploded depth section of the deep-narrow stack.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "pipeline-parallel",
+      "role": "Center datum marks the post-exploded depth section of the deep-narrow stack.",
       "connections": [
         "exploded_block_064",
         "residual_bus",
+        "layer_tick_080",
+        "layer_080_attention_half",
+        "layer_080_moe_half",
         "layer_tray_096"
       ]
     },
     {
+      "id": "layer_080_attention_half",
+      "name": "Layer 80 Attention Half-Tray",
+      "shape": "box",
+      "position": [
+        -0.95,
+        4.55,
+        0.18
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "aluminum",
+      "role": "Attention half-tray makes the repeated post-exploded layer structure visible.",
+      "connections": [
+        "layer_tray_080",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "layer_080_moe_half",
+      "name": "Layer 80 MoE Half-Tray",
+      "shape": "box",
+      "position": [
+        0.95,
+        4.55,
+        -0.28
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "brushed steel",
+      "role": "MoE half-tray makes the repeated post-exploded routed layer structure visible.",
+      "connections": [
+        "layer_tray_080",
+        "residual_bus"
+      ]
+    },
+    {
       "id": "layer_tray_096",
-      "name": "Layer Tray 96",
+      "name": "Layer Tray 96 Center Datum",
       "shape": "box",
       "position": [
         0,
         5.25,
-        0
+        -0.05
       ],
       "size": [
-        2.65,
-        0.18,
-        1.05
+        0.58,
+        0.14,
+        0.72
       ],
       "material": "dark anodized aluminum",
-      "role": "Visible tray corresponding to the full depth of GLM-4.5 before the projected GLM-5.1 extension.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "pipeline-parallel",
+      "role": "Center datum corresponds to the full depth of GLM-4.5 before the projected extension.",
       "connections": [
         "layer_tray_080",
         "residual_bus",
+        "layer_tick_096",
+        "layer_096_attention_half",
+        "layer_096_moe_half",
         "layer_tray_112"
       ]
     },
     {
+      "id": "layer_096_attention_half",
+      "name": "Layer 96 Attention Half-Tray",
+      "shape": "box",
+      "position": [
+        -0.95,
+        5.25,
+        0.18
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "aluminum",
+      "role": "Attention half-tray marks the predecessor GLM-4.5 depth point.",
+      "connections": [
+        "layer_tray_096",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "layer_096_moe_half",
+      "name": "Layer 96 MoE Half-Tray",
+      "shape": "box",
+      "position": [
+        0.95,
+        5.25,
+        -0.28
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "brushed steel",
+      "role": "MoE half-tray marks the predecessor GLM-4.5 depth point.",
+      "connections": [
+        "layer_tray_096",
+        "residual_bus"
+      ]
+    },
+    {
       "id": "layer_tray_112",
-      "name": "Layer Tray 112",
+      "name": "Layer Tray 112 Center Datum",
       "shape": "box",
       "position": [
         0,
         5.95,
-        0
+        -0.05
       ],
       "size": [
-        2.65,
-        0.18,
-        1.05
+        0.58,
+        0.14,
+        0.72
       ],
       "material": "dark anodized aluminum",
-      "role": "Visible tray in the projected extra-depth segment beyond GLM-4.5.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "pipeline-parallel",
+      "role": "Center datum marks the projected extra-depth segment beyond GLM-4.5.",
       "connections": [
         "layer_tray_096",
         "residual_bus",
+        "layer_tick_112",
+        "layer_112_attention_half",
+        "layer_112_moe_half",
         "layer_tray_128_marker"
       ]
     },
     {
+      "id": "layer_112_attention_half",
+      "name": "Layer 112 Attention Half-Tray",
+      "shape": "box",
+      "position": [
+        -0.95,
+        5.95,
+        0.18
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "aluminum",
+      "role": "Attention half-tray marks the projected added-depth segment.",
+      "connections": [
+        "layer_tray_112",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "layer_112_moe_half",
+      "name": "Layer 112 MoE Half-Tray",
+      "shape": "box",
+      "position": [
+        0.95,
+        5.95,
+        -0.28
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "brushed steel",
+      "role": "MoE half-tray marks the projected added-depth segment.",
+      "connections": [
+        "layer_tray_112",
+        "residual_bus"
+      ]
+    },
+    {
       "id": "layer_tray_128_marker",
-      "name": "Layer Tray 128 Final",
+      "name": "Layer Tray 128 Final Center Datum",
       "shape": "box",
       "position": [
         0,
         6.65,
-        0
+        -0.05
       ],
       "size": [
-        2.65,
-        0.18,
-        1.05
+        0.58,
+        0.14,
+        0.72
       ],
       "material": "dark anodized aluminum",
-      "role": "Final transformer tray completing the projected 128-layer residual tower.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "pipeline-parallel",
+      "role": "Center datum completes the projected 128-layer residual tower.",
       "connections": [
         "layer_tray_112",
         "residual_bus",
+        "layer_tick_128",
+        "layer_128_attention_half",
+        "layer_128_moe_half",
         "final_norm"
+      ]
+    },
+    {
+      "id": "layer_128_attention_half",
+      "name": "Layer 128 Attention Half-Tray",
+      "shape": "box",
+      "position": [
+        -0.95,
+        6.65,
+        0.18
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "aluminum",
+      "role": "Final attention half-tray shows that the last transformer layer still has the same attention path.",
+      "connections": [
+        "layer_tray_128_marker",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "layer_128_moe_half",
+      "name": "Layer 128 MoE Half-Tray",
+      "shape": "box",
+      "position": [
+        0.95,
+        6.65,
+        -0.28
+      ],
+      "size": [
+        0.86,
+        0.1,
+        0.48
+      ],
+      "material": "brushed steel",
+      "role": "Final MoE half-tray shows that the last transformer layer still has the routed expert path.",
+      "connections": [
+        "layer_tray_128_marker",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "layer_tick_001",
+      "name": "Layer Count Tick 1",
+      "shape": "box",
+      "position": [
+        -1.55,
+        1.35,
+        -0.05
+      ],
+      "size": [
+        0.22,
+        0.06,
+        0.92
+      ],
+      "material": "brass",
+      "role": "Brass tick marks the first layer index on the residual tower.",
+      "connections": [
+        "layer_tray_001"
+      ]
+    },
+    {
+      "id": "layer_tick_016",
+      "name": "Layer Count Tick 16",
+      "shape": "box",
+      "position": [
+        -1.55,
+        2.05,
+        -0.05
+      ],
+      "size": [
+        0.22,
+        0.06,
+        0.92
+      ],
+      "material": "brass",
+      "role": "Brass tick marks the layer-16 checkpoint in the 128-layer stack.",
+      "connections": [
+        "layer_tray_016"
+      ]
+    },
+    {
+      "id": "layer_tick_032",
+      "name": "Layer Count Tick 32",
+      "shape": "box",
+      "position": [
+        -1.55,
+        2.75,
+        -0.05
+      ],
+      "size": [
+        0.22,
+        0.06,
+        0.92
+      ],
+      "material": "brass",
+      "role": "Brass tick marks the first-quarter layer checkpoint.",
+      "connections": [
+        "layer_tray_032"
+      ]
+    },
+    {
+      "id": "layer_tick_064",
+      "name": "Layer Count Tick 64",
+      "shape": "box",
+      "position": [
+        -2.25,
+        3.58,
+        1.85
+      ],
+      "size": [
+        0.24,
+        0.06,
+        1.05
+      ],
+      "material": "brass",
+      "role": "Brass tick identifies the pulled-out layer 64 exploded drawer.",
+      "connections": [
+        "exploded_block_064",
+        "drawer_port_rail"
+      ]
+    },
+    {
+      "id": "layer_tick_080",
+      "name": "Layer Count Tick 80",
+      "shape": "box",
+      "position": [
+        -1.55,
+        4.55,
+        -0.05
+      ],
+      "size": [
+        0.22,
+        0.06,
+        0.92
+      ],
+      "material": "brass",
+      "role": "Brass tick marks the layer-80 checkpoint after the exploded layer.",
+      "connections": [
+        "layer_tray_080"
+      ]
+    },
+    {
+      "id": "layer_tick_096",
+      "name": "Layer Count Tick 96",
+      "shape": "box",
+      "position": [
+        -1.55,
+        5.25,
+        -0.05
+      ],
+      "size": [
+        0.22,
+        0.06,
+        0.92
+      ],
+      "material": "brass",
+      "role": "Brass tick marks the predecessor GLM-4.5 depth point.",
+      "connections": [
+        "layer_tray_096"
+      ]
+    },
+    {
+      "id": "layer_tick_112",
+      "name": "Layer Count Tick 112",
+      "shape": "box",
+      "position": [
+        -1.55,
+        5.95,
+        -0.05
+      ],
+      "size": [
+        0.22,
+        0.06,
+        0.92
+      ],
+      "material": "brass",
+      "role": "Brass tick marks the projected added-depth segment.",
+      "connections": [
+        "layer_tray_112"
+      ]
+    },
+    {
+      "id": "layer_tick_128",
+      "name": "Layer Count Tick 128",
+      "shape": "box",
+      "position": [
+        -1.55,
+        6.65,
+        -0.05
+      ],
+      "size": [
+        0.22,
+        0.06,
+        0.92
+      ],
+      "material": "brass",
+      "role": "Brass tick marks the final 128th transformer layer.",
+      "connections": [
+        "layer_tray_128_marker"
       ]
     },
     {
@@ -550,22 +1579,44 @@
       "name": "Attention Pre-RMSNorm",
       "shape": "box",
       "position": [
-        -2.2,
-        3.28,
-        0.45
+        -2.75,
+        3.25,
+        1.9
       ],
       "size": [
-        0.72,
+        0.62,
         0.16,
-        0.5
+        0.42
       ],
       "material": "white composite",
       "role": "Pre-normalises the residual stream before the attention projections in the exploded layer.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "exploded_block_064",
+        "attention_lane_rail",
         "q_projection_bank"
+      ]
+    },
+    {
+      "id": "attention_lane_rail",
+      "name": "Attention Lane Rail",
+      "shape": "box",
+      "position": [
+        -2.75,
+        4.25,
+        1.9
+      ],
+      "size": [
+        0.08,
+        2.35,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Slim rail groups the visible attention and MLA-cache modules into one assembly lane.",
+      "connections": [
+        "drawer_port_rail",
+        "exploded_block_064",
+        "attn_pre_norm",
+        "o_projection"
       ]
     },
     {
@@ -573,20 +1624,17 @@
       "name": "96-Head Q Projection Bank",
       "shape": "box",
       "position": [
-        -2.2,
-        3.68,
-        0.45
+        -2.75,
+        3.65,
+        1.9
       ],
       "size": [
-        0.92,
+        0.9,
         0.2,
-        0.58
+        0.5
       ],
       "material": "aluminum",
       "role": "Projects d=5760 hidden states into 96 query heads for dense causal attention.",
-      "compute_profile": "gpu-compute-bound",
-      "flops_per_token": "≈2·d·d for the query-side projection at model width",
-      "parallelism": "tensor-parallel",
       "connections": [
         "attn_pre_norm",
         "mla_down_projection",
@@ -598,20 +1646,17 @@
       "name": "MLA KV Down-Projection c_kv≈768",
       "shape": "box",
       "position": [
-        -3.35,
-        3.68,
-        0.45
+        -3.65,
+        3.65,
+        1.9
       ],
       "size": [
-        0.9,
+        0.78,
         0.2,
-        0.58
+        0.5
       ],
       "material": "brushed steel",
       "role": "Compresses K and V into a learned 768-dimensional latent so long-context cache storage is reduced.",
-      "compute_profile": "gpu-compute-bound",
-      "memory_footprint": "Stores c_kv≈768 latent bytes per token per layer before reconstruction",
-      "parallelism": "tensor-parallel",
       "connections": [
         "q_projection_bank",
         "kv_latent_cache_a",
@@ -624,24 +1669,22 @@
       "name": "KV Latent Cache Page A",
       "shape": "box",
       "position": [
-        -4.25,
-        4.25,
-        0.15
+        -4.05,
+        4.35,
+        1.25
       ],
       "size": [
-        0.38,
-        2.8,
-        0.55
+        0.34,
+        2.5,
+        0.5
       ],
       "material": "glass display",
       "role": "First visible cache page stores MLA latent keys and values for the 256K native context window.",
-      "compute_profile": "memory-capacity-bound",
-      "memory_footprint": "≈25 GiB per 256K-token sequence across 128 layers at FP8 latent scale",
-      "parallelism": "tensor-parallel",
       "connections": [
         "mla_down_projection",
         "kv_latent_cache_b",
-        "kv_memory_scale"
+        "kv_memory_scale",
+        "kv_tick_64k"
       ]
     },
     {
@@ -649,24 +1692,106 @@
       "name": "KV Latent Cache Page B",
       "shape": "box",
       "position": [
-        -3.75,
-        4.25,
-        0.15
+        -3.55,
+        4.35,
+        1.25
       ],
       "size": [
-        0.38,
-        2.8,
-        0.55
+        0.34,
+        2.5,
+        0.5
       ],
       "material": "glass display",
-      "role": "Second visible cache page shows the paged long-context memory path rather than hiding it in one cylinder.",
-      "compute_profile": "memory-capacity-bound",
-      "memory_footprint": "FP8 latent cache is projected at roughly half plain GQA(8) storage",
-      "parallelism": "tensor-parallel",
+      "role": "Second visible cache page shows paged long-context memory rather than hiding it inside one block.",
       "connections": [
         "kv_latent_cache_a",
         "mla_down_projection",
-        "kv_up_projection"
+        "kv_up_projection",
+        "kv_tick_128k"
+      ]
+    },
+    {
+      "id": "kv_page_separator",
+      "name": "KV Page Separator",
+      "shape": "box",
+      "position": [
+        -3.8,
+        4.35,
+        1.55
+      ],
+      "size": [
+        0.06,
+        2.55,
+        0.06
+      ],
+      "material": "steel",
+      "role": "Thin separator makes the two cache pages visually distinct in the exploded attention lane.",
+      "connections": [
+        "kv_latent_cache_a",
+        "kv_latent_cache_b"
+      ]
+    },
+    {
+      "id": "kv_tick_64k",
+      "name": "KV Cache Tick 64K",
+      "shape": "box",
+      "position": [
+        -4.28,
+        3.75,
+        1.55
+      ],
+      "size": [
+        0.28,
+        0.04,
+        0.05
+      ],
+      "material": "brass",
+      "role": "Small tick marks the first 64K-token quarter of the projected cache scale.",
+      "connections": [
+        "kv_latent_cache_a",
+        "kv_memory_scale"
+      ]
+    },
+    {
+      "id": "kv_tick_128k",
+      "name": "KV Cache Tick 128K",
+      "shape": "box",
+      "position": [
+        -4.28,
+        4.35,
+        1.55
+      ],
+      "size": [
+        0.28,
+        0.04,
+        0.05
+      ],
+      "material": "brass",
+      "role": "Small tick marks the midpoint of the projected 256K-token cache scale.",
+      "connections": [
+        "kv_latent_cache_b",
+        "kv_memory_scale"
+      ]
+    },
+    {
+      "id": "kv_tick_256k",
+      "name": "KV Cache Tick 256K",
+      "shape": "box",
+      "position": [
+        -4.28,
+        4.95,
+        1.55
+      ],
+      "size": [
+        0.28,
+        0.04,
+        0.05
+      ],
+      "material": "brass",
+      "role": "Small tick marks the full projected 256K native context length.",
+      "connections": [
+        "kv_memory_scale",
+        "kv_latent_cache_a"
       ]
     },
     {
@@ -674,19 +1799,17 @@
       "name": "KV Up-Projection Reconstructor",
       "shape": "box",
       "position": [
-        -3.35,
-        4.48,
-        0.45
+        -3.65,
+        4.55,
+        1.9
       ],
       "size": [
-        0.9,
+        0.78,
         0.2,
-        0.58
+        0.5
       ],
       "material": "aluminum",
       "role": "Reconstructs full K and V tensors from the cached MLA latent before attention scoring.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "kv_latent_cache_b",
         "qk_rope_norm"
@@ -697,18 +1820,21 @@
       "name": "QK-Norm and Partial RoPE",
       "shape": "cylinder",
       "position": [
-        -2.2,
+        -2.75,
         4.15,
-        0.45
+        1.9
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
       ],
       "size": [
-        0.33,
-        0.08
+        0.16,
+        0.12
       ],
       "material": "brass",
       "role": "Applies QK RMSNorm and partial rotary position encoding before the attention kernel.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "embarrassingly-parallel",
       "connections": [
         "q_projection_bank",
         "kv_up_projection",
@@ -720,22 +1846,41 @@
       "name": "FlashAttention-3 Causal Core",
       "shape": "box",
       "position": [
-        -2.2,
+        -2.75,
         4.62,
-        0.45
+        1.9
       ],
       "size": [
-        0.98,
+        0.9,
         0.22,
-        0.62
+        0.55
       ],
       "material": "black composite",
       "role": "Computes dense causal attention over the projected 256K context using tiled GPU kernels.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "embarrassingly-parallel",
       "connections": [
         "qk_rope_norm",
+        "attention_score_window",
         "o_projection"
+      ]
+    },
+    {
+      "id": "attention_score_window",
+      "name": "Causal Score Window",
+      "shape": "box",
+      "position": [
+        -2.05,
+        4.62,
+        1.9
+      ],
+      "size": [
+        0.32,
+        0.04,
+        0.55
+      ],
+      "material": "glass display",
+      "role": "Thin display plate marks the causal attention score matrix produced inside the kernel.",
+      "connections": [
+        "flash_attention_core"
       ]
     },
     {
@@ -743,21 +1888,45 @@
       "name": "Attention O Projection",
       "shape": "box",
       "position": [
-        -2.2,
+        -2.75,
         5.05,
-        0.45
+        1.9
       ],
       "size": [
-        0.92,
+        0.86,
         0.2,
-        0.58
+        0.5
       ],
       "material": "copper",
       "role": "Projects attention output back to d=5760 and adds it to the residual bus.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "flash_attention_core",
+        "attention_return_pipe",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "attention_return_pipe",
+      "name": "Attention Residual Return Pipe",
+      "shape": "cylinder",
+      "position": [
+        -1.35,
+        5.05,
+        1.05
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.045,
+        2.5
+      ],
+      "material": "copper",
+      "role": "Visible return pipe shows attention output flowing back to the central residual bus.",
+      "connections": [
+        "o_projection",
         "residual_bus"
       ]
     },
@@ -766,22 +1935,23 @@
       "name": "256K Context Scale Gauge",
       "shape": "box",
       "position": [
-        -4.55,
-        4.25,
-        0.9
+        -4.45,
+        4.35,
+        1.25
       ],
       "size": [
         0.08,
-        2.8,
-        0.55
+        2.55,
+        0.48
       ],
       "material": "steel",
       "role": "Vertical gauge annotates that the cache lane is sized for the projected 256K native context.",
-      "compute_profile": "negligible",
-      "parallelism": "tensor-parallel",
       "connections": [
         "left_upright",
-        "kv_latent_cache_a"
+        "kv_latent_cache_a",
+        "kv_tick_64k",
+        "kv_tick_128k",
+        "kv_tick_256k"
       ]
     },
     {
@@ -789,22 +1959,44 @@
       "name": "MoE FFN Pre-RMSNorm",
       "shape": "box",
       "position": [
-        2,
-        3.28,
-        0.45
+        2.1,
+        3.25,
+        1.9
       ],
       "size": [
-        0.72,
+        0.62,
         0.16,
-        0.5
+        0.42
       ],
       "material": "white composite",
       "role": "Pre-normalises the residual stream before the routed SwiGLU expert layer.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "exploded_block_064",
+        "moe_lane_rail",
         "router_gate"
+      ]
+    },
+    {
+      "id": "moe_lane_rail",
+      "name": "MoE Lane Rail",
+      "shape": "box",
+      "position": [
+        2.9,
+        4.15,
+        1.9
+      ],
+      "size": [
+        0.08,
+        2.25,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Slim rail groups the router, expert dispatch, and combine gate into one visible MoE lane.",
+      "connections": [
+        "drawer_starboard_rail",
+        "exploded_block_064",
+        "ffn_pre_norm",
+        "moe_combine_gate"
       ]
     },
     {
@@ -813,21 +2005,183 @@
       "shape": "cylinder",
       "position": [
         2.75,
-        3.7,
-        0.45
+        3.65,
+        1.9
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
       ],
       "size": [
-        0.36,
-        0.12
+        0.2,
+        0.16
       ],
       "material": "glass display",
       "role": "Scores 256 routed experts and selects the top 8 with loss-free balance bias.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "flops_per_token": "≈2·5760·256 ≈3 MFLOP per token",
-      "parallelism": "tensor-parallel",
       "algorithm": "scores=sigmoid(x@W_router)+b_balance; top8=topk(scores,8); weights=normalize(top8)",
       "connections": [
         "ffn_pre_norm",
+        "topk_bead_1",
+        "topk_bead_2",
+        "topk_bead_3",
+        "topk_bead_4",
+        "topk_bead_5",
+        "topk_bead_6",
+        "topk_bead_7",
+        "topk_bead_8",
+        "group_limit_selector"
+      ]
+    },
+    {
+      "id": "topk_bead_1",
+      "name": "Top-K Active Expert Bead 1",
+      "shape": "sphere",
+      "position": [
+        3.15,
+        3.95,
+        2.1
+      ],
+      "size": [
+        0.08
+      ],
+      "material": "brass",
+      "role": "One of eight active expert selections made by the router for each token.",
+      "connections": [
+        "router_gate",
+        "group_limit_selector"
+      ]
+    },
+    {
+      "id": "topk_bead_2",
+      "name": "Top-K Active Expert Bead 2",
+      "shape": "sphere",
+      "position": [
+        3.32,
+        3.95,
+        2.1
+      ],
+      "size": [
+        0.08
+      ],
+      "material": "brass",
+      "role": "One of eight active expert selections made by the router for each token.",
+      "connections": [
+        "router_gate",
+        "group_limit_selector"
+      ]
+    },
+    {
+      "id": "topk_bead_3",
+      "name": "Top-K Active Expert Bead 3",
+      "shape": "sphere",
+      "position": [
+        3.49,
+        3.95,
+        2.1
+      ],
+      "size": [
+        0.08
+      ],
+      "material": "brass",
+      "role": "One of eight active expert selections made by the router for each token.",
+      "connections": [
+        "router_gate",
+        "group_limit_selector"
+      ]
+    },
+    {
+      "id": "topk_bead_4",
+      "name": "Top-K Active Expert Bead 4",
+      "shape": "sphere",
+      "position": [
+        3.66,
+        3.95,
+        2.1
+      ],
+      "size": [
+        0.08
+      ],
+      "material": "brass",
+      "role": "One of eight active expert selections made by the router for each token.",
+      "connections": [
+        "router_gate",
+        "group_limit_selector"
+      ]
+    },
+    {
+      "id": "topk_bead_5",
+      "name": "Top-K Active Expert Bead 5",
+      "shape": "sphere",
+      "position": [
+        3.15,
+        3.78,
+        2.1
+      ],
+      "size": [
+        0.08
+      ],
+      "material": "brass",
+      "role": "One of eight active expert selections made by the router for each token.",
+      "connections": [
+        "router_gate",
+        "group_limit_selector"
+      ]
+    },
+    {
+      "id": "topk_bead_6",
+      "name": "Top-K Active Expert Bead 6",
+      "shape": "sphere",
+      "position": [
+        3.32,
+        3.78,
+        2.1
+      ],
+      "size": [
+        0.08
+      ],
+      "material": "brass",
+      "role": "One of eight active expert selections made by the router for each token.",
+      "connections": [
+        "router_gate",
+        "group_limit_selector"
+      ]
+    },
+    {
+      "id": "topk_bead_7",
+      "name": "Top-K Active Expert Bead 7",
+      "shape": "sphere",
+      "position": [
+        3.49,
+        3.78,
+        2.1
+      ],
+      "size": [
+        0.08
+      ],
+      "material": "brass",
+      "role": "One of eight active expert selections made by the router for each token.",
+      "connections": [
+        "router_gate",
+        "group_limit_selector"
+      ]
+    },
+    {
+      "id": "topk_bead_8",
+      "name": "Top-K Active Expert Bead 8",
+      "shape": "sphere",
+      "position": [
+        3.66,
+        3.78,
+        2.1
+      ],
+      "size": [
+        0.08
+      ],
+      "material": "brass",
+      "role": "One of eight active expert selections made by the router for each token.",
+      "connections": [
+        "router_gate",
         "group_limit_selector"
       ]
     },
@@ -836,31 +2190,209 @@
       "name": "≤4 of 8 Group Limiter",
       "shape": "torus",
       "position": [
-        3.35,
-        3.7,
-        0.45
+        3.55,
+        3.65,
+        1.9
       ],
       "size": [
-        0.42,
-        0.06
+        0.32,
+        0.05
       ],
       "material": "rubber",
       "role": "Constrains selected experts to at most four of eight device groups to bound all-to-all traffic.",
-      "compute_profile": "communication-bound",
-      "parallelism": "expert-parallel",
       "connections": [
         "router_gate",
+        "device_group_1",
+        "device_group_2",
+        "device_group_3",
+        "device_group_4",
+        "device_group_5",
+        "device_group_6",
+        "device_group_7",
+        "device_group_8",
         "expert_alltoall_bus"
       ]
     },
     {
-      "id": "expert_alltoall_bus",
-      "name": "Expert All-to-All Bus",
+      "id": "device_group_1",
+      "name": "Device Group Rail 1",
+      "shape": "box",
+      "position": [
+        4.15,
+        2.95,
+        2.1
+      ],
+      "size": [
+        0.48,
+        0.06,
+        0.08
+      ],
+      "material": "steel",
+      "role": "First visible device-group rail used by group-limited expert routing.",
+      "connections": [
+        "group_limit_selector",
+        "dispatch_rod_g1",
+        "expert_alltoall_bus"
+      ]
+    },
+    {
+      "id": "device_group_2",
+      "name": "Device Group Rail 2",
+      "shape": "box",
+      "position": [
+        4.15,
+        3.15,
+        2.1
+      ],
+      "size": [
+        0.48,
+        0.06,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Second visible device-group rail used by group-limited expert routing.",
+      "connections": [
+        "group_limit_selector",
+        "dispatch_rod_g2",
+        "expert_alltoall_bus"
+      ]
+    },
+    {
+      "id": "device_group_3",
+      "name": "Device Group Rail 3",
+      "shape": "box",
+      "position": [
+        4.15,
+        3.35,
+        2.1
+      ],
+      "size": [
+        0.48,
+        0.06,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Third visible device-group rail used by group-limited expert routing.",
+      "connections": [
+        "group_limit_selector",
+        "dispatch_rod_g3",
+        "expert_alltoall_bus"
+      ]
+    },
+    {
+      "id": "device_group_4",
+      "name": "Device Group Rail 4",
+      "shape": "box",
+      "position": [
+        4.15,
+        3.55,
+        2.1
+      ],
+      "size": [
+        0.48,
+        0.06,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Fourth visible device-group rail used by group-limited expert routing.",
+      "connections": [
+        "group_limit_selector",
+        "dispatch_rod_g4",
+        "expert_alltoall_bus"
+      ]
+    },
+    {
+      "id": "device_group_5",
+      "name": "Device Group Rail 5",
+      "shape": "box",
+      "position": [
+        4.15,
+        3.75,
+        2.1
+      ],
+      "size": [
+        0.48,
+        0.06,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Fifth visible device-group rail completes the count beyond the four selected limit.",
+      "connections": [
+        "group_limit_selector",
+        "expert_alltoall_bus"
+      ]
+    },
+    {
+      "id": "device_group_6",
+      "name": "Device Group Rail 6",
+      "shape": "box",
+      "position": [
+        4.15,
+        3.95,
+        2.1
+      ],
+      "size": [
+        0.48,
+        0.06,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Sixth visible device-group rail completes the eight-group routing count.",
+      "connections": [
+        "group_limit_selector",
+        "expert_alltoall_bus"
+      ]
+    },
+    {
+      "id": "device_group_7",
+      "name": "Device Group Rail 7",
+      "shape": "box",
+      "position": [
+        4.15,
+        4.15,
+        2.1
+      ],
+      "size": [
+        0.48,
+        0.06,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Seventh visible device-group rail completes the eight-group routing count.",
+      "connections": [
+        "group_limit_selector",
+        "expert_alltoall_bus"
+      ]
+    },
+    {
+      "id": "device_group_8",
+      "name": "Device Group Rail 8",
+      "shape": "box",
+      "position": [
+        4.15,
+        4.35,
+        2.1
+      ],
+      "size": [
+        0.48,
+        0.06,
+        0.08
+      ],
+      "material": "steel",
+      "role": "Eighth visible device-group rail makes the ≤4 of 8 routing rule countable.",
+      "connections": [
+        "group_limit_selector",
+        "expert_alltoall_bus"
+      ]
+    },
+    {
+      "id": "dispatch_rod_g1",
+      "name": "Selected Group Dispatch Rod 1",
       "shape": "cylinder",
       "position": [
-        4,
-        3.7,
-        0.45
+        3.85,
+        2.95,
+        2
       ],
       "rotation": [
         0,
@@ -868,15 +2400,117 @@
         1.5708
       ],
       "size": [
-        0.08,
+        0.025,
+        0.65
+      ],
+      "material": "copper",
+      "role": "Copper rod shows one selected device group receiving routed token slices.",
+      "connections": [
+        "group_limit_selector",
+        "device_group_1"
+      ]
+    },
+    {
+      "id": "dispatch_rod_g2",
+      "name": "Selected Group Dispatch Rod 2",
+      "shape": "cylinder",
+      "position": [
+        3.85,
+        3.15,
+        2
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.025,
+        0.65
+      ],
+      "material": "copper",
+      "role": "Copper rod shows the second selected group in the top-k route.",
+      "connections": [
+        "group_limit_selector",
+        "device_group_2"
+      ]
+    },
+    {
+      "id": "dispatch_rod_g3",
+      "name": "Selected Group Dispatch Rod 3",
+      "shape": "cylinder",
+      "position": [
+        3.85,
+        3.35,
+        2
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.025,
+        0.65
+      ],
+      "material": "copper",
+      "role": "Copper rod shows the third selected group in the group-limited route.",
+      "connections": [
+        "group_limit_selector",
+        "device_group_3"
+      ]
+    },
+    {
+      "id": "dispatch_rod_g4",
+      "name": "Selected Group Dispatch Rod 4",
+      "shape": "cylinder",
+      "position": [
+        3.85,
+        3.55,
+        2
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.025,
+        0.65
+      ],
+      "material": "copper",
+      "role": "Copper rod shows the fourth and final allowed selected group.",
+      "connections": [
+        "group_limit_selector",
+        "device_group_4"
+      ]
+    },
+    {
+      "id": "expert_alltoall_bus",
+      "name": "Expert All-to-All Bus",
+      "shape": "cylinder",
+      "position": [
+        4.55,
+        3.65,
+        1.9
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.065,
         1
       ],
       "material": "copper",
       "role": "Dispatches token slices to expert-parallel shards and combines the returned activations.",
-      "compute_profile": "communication-bound",
-      "parallelism": "expert-parallel",
       "connections": [
         "group_limit_selector",
+        "expert_feed_a",
+        "expert_feed_b",
+        "expert_feed_c",
+        "expert_feed_d",
         "routed_expert_tile_a",
         "routed_expert_tile_b",
         "routed_expert_tile_c",
@@ -885,27 +2519,128 @@
       ]
     },
     {
+      "id": "expert_feed_a",
+      "name": "Expert Feed Rod A",
+      "shape": "cylinder",
+      "position": [
+        4.95,
+        3.1,
+        1.55
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.03,
+        0.72
+      ],
+      "material": "copper",
+      "role": "Visible rod connects the all-to-all bus to routed expert tile A.",
+      "connections": [
+        "expert_alltoall_bus",
+        "routed_expert_tile_a"
+      ]
+    },
+    {
+      "id": "expert_feed_b",
+      "name": "Expert Feed Rod B",
+      "shape": "cylinder",
+      "position": [
+        5.65,
+        3.1,
+        1.55
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.03,
+        0.72
+      ],
+      "material": "copper",
+      "role": "Visible rod connects the all-to-all bus to routed expert tile B.",
+      "connections": [
+        "expert_alltoall_bus",
+        "routed_expert_tile_b"
+      ]
+    },
+    {
+      "id": "expert_feed_c",
+      "name": "Expert Feed Rod C",
+      "shape": "cylinder",
+      "position": [
+        4.95,
+        3.85,
+        1.55
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.03,
+        0.72
+      ],
+      "material": "copper",
+      "role": "Visible rod connects the all-to-all bus to routed expert tile C.",
+      "connections": [
+        "expert_alltoall_bus",
+        "routed_expert_tile_c"
+      ]
+    },
+    {
+      "id": "expert_feed_d",
+      "name": "Expert Feed Rod D",
+      "shape": "cylinder",
+      "position": [
+        5.65,
+        3.85,
+        1.55
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.03,
+        0.72
+      ],
+      "material": "copper",
+      "role": "Visible rod connects the all-to-all bus to routed expert tile D.",
+      "connections": [
+        "expert_alltoall_bus",
+        "routed_expert_tile_d"
+      ]
+    },
+    {
       "id": "routed_expert_tile_a",
       "name": "Routed Expert Tile A 1-64",
       "shape": "box",
       "position": [
-        4.8,
-        3.15,
-        0.05
+        5.25,
+        3.1,
+        1.55
       ],
       "size": [
-        0.68,
-        0.34,
-        0.52
+        0.62,
+        0.32,
+        0.48
       ],
       "material": "aluminum",
       "role": "Visible quarter of the 256 fine-grained SwiGLU expert bank, representing experts 1 through 64.",
-      "compute_profile": "gpu-compute-bound",
-      "memory_footprint": "64 experts × 3·5760·1408 FP4 weights in this visible quarter",
-      "parallelism": "expert-parallel",
       "connections": [
         "expert_alltoall_bus",
         "fp4_qat_plate",
+        "expert_microtile_a1",
+        "expert_microtile_a2",
+        "expert_microtile_a3",
+        "expert_microtile_a4",
         "moe_combine_gate"
       ]
     },
@@ -914,22 +2649,24 @@
       "name": "Routed Expert Tile B 65-128",
       "shape": "box",
       "position": [
-        5.55,
-        3.15,
-        0.05
+        5.95,
+        3.1,
+        1.55
       ],
       "size": [
-        0.68,
-        0.34,
-        0.52
+        0.62,
+        0.32,
+        0.48
       ],
       "material": "aluminum",
       "role": "Visible quarter of the routed expert bank, representing experts 65 through 128.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "expert-parallel",
       "connections": [
         "expert_alltoall_bus",
         "fp4_qat_plate",
+        "expert_microtile_b1",
+        "expert_microtile_b2",
+        "expert_microtile_b3",
+        "expert_microtile_b4",
         "moe_combine_gate"
       ]
     },
@@ -938,22 +2675,24 @@
       "name": "Routed Expert Tile C 129-192",
       "shape": "box",
       "position": [
-        4.8,
+        5.25,
         3.85,
-        0.05
+        1.55
       ],
       "size": [
-        0.68,
-        0.34,
-        0.52
+        0.62,
+        0.32,
+        0.48
       ],
       "material": "aluminum",
       "role": "Visible quarter of the routed expert bank, representing experts 129 through 192.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "expert-parallel",
       "connections": [
         "expert_alltoall_bus",
         "fp4_qat_plate",
+        "expert_microtile_c1",
+        "expert_microtile_c2",
+        "expert_microtile_c3",
+        "expert_microtile_c4",
         "moe_combine_gate"
       ]
     },
@@ -962,24 +2701,368 @@
       "name": "Routed Expert Tile D 193-256",
       "shape": "box",
       "position": [
-        5.55,
+        5.95,
         3.85,
-        0.05
+        1.55
       ],
       "size": [
-        0.68,
-        0.34,
-        0.52
+        0.62,
+        0.32,
+        0.48
       ],
       "material": "aluminum",
       "role": "Visible quarter of the routed expert bank, representing experts 193 through 256.",
-      "compute_profile": "gpu-compute-bound",
-      "flops_per_token": "Top-8 active experts cost ≈400 MFLOP per layer at d_ff≈1408",
-      "parallelism": "expert-parallel",
       "connections": [
         "expert_alltoall_bus",
         "fp4_qat_plate",
+        "expert_microtile_d1",
+        "expert_microtile_d2",
+        "expert_microtile_d3",
+        "expert_microtile_d4",
         "moe_combine_gate"
+      ]
+    },
+    {
+      "id": "expert_bank_backplane",
+      "name": "Expert Bank Backplane",
+      "shape": "box",
+      "position": [
+        5.6,
+        3.48,
+        1.25
+      ],
+      "size": [
+        1.55,
+        1.1,
+        0.08
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Thin backplane groups the four visible expert tiles while leaving their faces exposed.",
+      "connections": [
+        "routed_expert_tile_a",
+        "routed_expert_tile_b",
+        "routed_expert_tile_c",
+        "routed_expert_tile_d"
+      ]
+    },
+    {
+      "id": "expert_microtile_a1",
+      "name": "Expert Micro-Tile A1",
+      "shape": "box",
+      "position": [
+        5.05,
+        3.02,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile A so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_a"
+      ]
+    },
+    {
+      "id": "expert_microtile_a2",
+      "name": "Expert Micro-Tile A2",
+      "shape": "box",
+      "position": [
+        5.25,
+        3.02,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile A so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_a"
+      ]
+    },
+    {
+      "id": "expert_microtile_a3",
+      "name": "Expert Micro-Tile A3",
+      "shape": "box",
+      "position": [
+        5.05,
+        3.18,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile A so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_a"
+      ]
+    },
+    {
+      "id": "expert_microtile_a4",
+      "name": "Expert Micro-Tile A4",
+      "shape": "box",
+      "position": [
+        5.25,
+        3.18,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile A so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_a"
+      ]
+    },
+    {
+      "id": "expert_microtile_b1",
+      "name": "Expert Micro-Tile B1",
+      "shape": "box",
+      "position": [
+        5.75,
+        3.02,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile B so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_b"
+      ]
+    },
+    {
+      "id": "expert_microtile_b2",
+      "name": "Expert Micro-Tile B2",
+      "shape": "box",
+      "position": [
+        5.95,
+        3.02,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile B so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_b"
+      ]
+    },
+    {
+      "id": "expert_microtile_b3",
+      "name": "Expert Micro-Tile B3",
+      "shape": "box",
+      "position": [
+        5.75,
+        3.18,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile B so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_b"
+      ]
+    },
+    {
+      "id": "expert_microtile_b4",
+      "name": "Expert Micro-Tile B4",
+      "shape": "box",
+      "position": [
+        5.95,
+        3.18,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile B so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_b"
+      ]
+    },
+    {
+      "id": "expert_microtile_c1",
+      "name": "Expert Micro-Tile C1",
+      "shape": "box",
+      "position": [
+        5.05,
+        3.77,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile C so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_c"
+      ]
+    },
+    {
+      "id": "expert_microtile_c2",
+      "name": "Expert Micro-Tile C2",
+      "shape": "box",
+      "position": [
+        5.25,
+        3.77,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile C so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_c"
+      ]
+    },
+    {
+      "id": "expert_microtile_c3",
+      "name": "Expert Micro-Tile C3",
+      "shape": "box",
+      "position": [
+        5.05,
+        3.93,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile C so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_c"
+      ]
+    },
+    {
+      "id": "expert_microtile_c4",
+      "name": "Expert Micro-Tile C4",
+      "shape": "box",
+      "position": [
+        5.25,
+        3.93,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile C so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_c"
+      ]
+    },
+    {
+      "id": "expert_microtile_d1",
+      "name": "Expert Micro-Tile D1",
+      "shape": "box",
+      "position": [
+        5.75,
+        3.77,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile D so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_d"
+      ]
+    },
+    {
+      "id": "expert_microtile_d2",
+      "name": "Expert Micro-Tile D2",
+      "shape": "box",
+      "position": [
+        5.95,
+        3.77,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile D so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_d"
+      ]
+    },
+    {
+      "id": "expert_microtile_d3",
+      "name": "Expert Micro-Tile D3",
+      "shape": "box",
+      "position": [
+        5.75,
+        3.93,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile D so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_d"
+      ]
+    },
+    {
+      "id": "expert_microtile_d4",
+      "name": "Expert Micro-Tile D4",
+      "shape": "box",
+      "position": [
+        5.95,
+        3.93,
+        1.82
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.04
+      ],
+      "material": "brass",
+      "role": "Face marker subdivides expert tile D so its 64 represented experts are countable as a bank.",
+      "connections": [
+        "routed_expert_tile_d"
       ]
     },
     {
@@ -987,19 +3070,17 @@
       "name": "Always-On Shared Expert",
       "shape": "box",
       "position": [
-        5.2,
+        5.55,
         4.45,
-        0.05
+        1.55
       ],
       "size": [
         0.72,
         0.3,
-        0.52
+        0.48
       ],
       "material": "brushed steel",
       "role": "Single shared expert handles common computation for every token alongside the top-8 routed experts.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "expert_alltoall_bus",
         "overflow_shared_expert",
@@ -1011,19 +3092,17 @@
       "name": "Capacity Overflow Shared Expert",
       "shape": "box",
       "position": [
-        6.05,
+        6.35,
         4.45,
-        0.05
+        1.55
       ],
       "size": [
-        0.58,
+        0.54,
         0.3,
-        0.52
+        0.48
       ],
       "material": "forged steel",
       "role": "Projected overflow path absorbs tokens when routed expert capacity is saturated.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "shared_expert",
         "moe_combine_gate"
@@ -1034,20 +3113,17 @@
       "name": "FP4 QAT Expert Weight Plate",
       "shape": "box",
       "position": [
-        5.18,
-        2.72,
-        0.05
+        5.6,
+        2.65,
+        1.55
       ],
       "size": [
-        1.6,
+        1.5,
         0.12,
-        0.62
+        0.55
       ],
       "material": "brass",
       "role": "Quantisation-aware FP4 plate marks the projected fourfold routed-expert weight memory reduction versus BF16.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "memory_footprint": "Routed FFN weights projected at roughly 0.25× BF16 storage",
-      "parallelism": "expert-parallel",
       "connections": [
         "routed_expert_tile_a",
         "routed_expert_tile_b",
@@ -1060,18 +3136,21 @@
       "name": "Weighted MoE Combine Gate",
       "shape": "cylinder",
       "position": [
-        3.35,
+        3.25,
         4.65,
-        0.45
+        1.9
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
       ],
       "size": [
-        0.34,
-        0.12
+        0.18,
+        0.14
       ],
       "material": "copper",
       "role": "Reweights and sums the eight routed expert outputs plus shared-expert output before the residual add.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "expert-parallel",
       "connections": [
         "routed_expert_tile_a",
         "routed_expert_tile_b",
@@ -1079,6 +3158,32 @@
         "routed_expert_tile_d",
         "shared_expert",
         "overflow_shared_expert",
+        "moe_return_pipe",
+        "residual_bus"
+      ]
+    },
+    {
+      "id": "moe_return_pipe",
+      "name": "MoE Residual Return Pipe",
+      "shape": "cylinder",
+      "position": [
+        1.45,
+        4.65,
+        1.05
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.045,
+        2.55
+      ],
+      "material": "copper",
+      "role": "Visible return pipe carries combined MoE output back to the central residual bus.",
+      "connections": [
+        "moe_combine_gate",
         "residual_bus"
       ]
     },
@@ -1089,19 +3194,18 @@
       "position": [
         0,
         7.35,
-        0
+        0.05
       ],
       "size": [
-        2.2,
+        2.15,
         0.16,
-        0.85
+        0.78
       ],
       "material": "white composite",
       "role": "Normalises the final residual state before tied vocabulary projection and MTP heads.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "layer_tray_128_marker",
+        "residual_output_collar",
         "residual_bus",
         "prediction_head"
       ]
@@ -1113,22 +3217,42 @@
       "position": [
         0,
         8.05,
-        0
+        0.05
       ],
       "size": [
-        2.8,
+        2.75,
         0.34,
-        1
+        0.92
       ],
       "material": "white composite",
       "role": "Projects final hidden states back to the approximately 152K-token vocabulary using tied embedding weights.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "final_norm",
         "embedding_table",
         "primary_lm_loss",
-        "mtp_block_1"
+        "mtp_block_1",
+        "vocab_projection_fan"
+      ]
+    },
+    {
+      "id": "vocab_projection_fan",
+      "name": "Vocabulary Projection Fan",
+      "shape": "box",
+      "position": [
+        -1.75,
+        8.05,
+        0.05
+      ],
+      "size": [
+        0.42,
+        0.08,
+        0.92
+      ],
+      "material": "glass display",
+      "role": "Fan plate indicates the wide ≈152K vocabulary logits emitted by the tied head.",
+      "connections": [
+        "prediction_head",
+        "primary_lm_loss"
       ]
     },
     {
@@ -1136,21 +3260,20 @@
       "name": "MTP Block t+1",
       "shape": "box",
       "position": [
-        2.4,
+        2.35,
         8.1,
-        0.35
+        0.55
       ],
       "size": [
-        0.92,
+        0.88,
         0.28,
-        0.68
+        0.62
       ],
       "material": "carbon fiber",
       "role": "First multi-token prediction block predicts the t+1 token for speculative decoding.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "pipeline-parallel",
       "connections": [
         "prediction_head",
+        "mtp_connector_1",
         "mtp_block_2",
         "mtp_loss_node"
       ]
@@ -1160,23 +3283,72 @@
       "name": "MTP Block t+2",
       "shape": "box",
       "position": [
-        3.5,
+        3.4,
         8.1,
-        0.35
+        0.55
       ],
       "size": [
-        0.92,
+        0.88,
         0.28,
-        0.68
+        0.62
       ],
       "material": "carbon fiber",
       "role": "Second multi-token prediction block extends the projected MTP depth to 2 for faster speculative decoding.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "pipeline-parallel",
       "algorithm": "for k in 1..2: h_k=mtp_block_k(h_final); logits_k=h_k@E.T; loss+=w_k*CE(logits_k,target_t+k)",
       "connections": [
         "mtp_block_1",
+        "mtp_connector_2",
         "mtp_loss_node"
+      ]
+    },
+    {
+      "id": "mtp_connector_1",
+      "name": "MTP t+1 Connector Rod",
+      "shape": "cylinder",
+      "position": [
+        1.35,
+        8.1,
+        0.35
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        1.25
+      ],
+      "material": "copper",
+      "role": "Rod shows the tied head feeding the first auxiliary prediction block.",
+      "connections": [
+        "prediction_head",
+        "mtp_block_1"
+      ]
+    },
+    {
+      "id": "mtp_connector_2",
+      "name": "MTP t+2 Connector Rod",
+      "shape": "cylinder",
+      "position": [
+        2.9,
+        8.1,
+        0.35
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        1.05
+      ],
+      "material": "copper",
+      "role": "Rod shows the first auxiliary block feeding the second auxiliary prediction block.",
+      "connections": [
+        "mtp_block_1",
+        "mtp_block_2"
       ]
     },
     {
@@ -1185,17 +3357,36 @@
       "shape": "sphere",
       "position": [
         -1.55,
-        8.75,
-        0.15
+        8.7,
+        0.2
       ],
       "size": [
         0.22
       ],
       "material": "brass",
       "role": "Primary next-token cross-entropy objective for the tied language-model head.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "data-parallel",
       "connections": [
+        "prediction_head",
+        "primary_loss_post"
+      ]
+    },
+    {
+      "id": "primary_loss_post",
+      "name": "Primary Loss Post",
+      "shape": "cylinder",
+      "position": [
+        -1.55,
+        8.37,
+        0.2
+      ],
+      "size": [
+        0.035,
+        0.56
+      ],
+      "material": "steel",
+      "role": "Short post makes the primary loss node visibly mounted to the output shelf.",
+      "connections": [
+        "primary_lm_loss",
         "prediction_head"
       ]
     },
@@ -1204,20 +3395,62 @@
       "name": "Depth-2 MTP Loss",
       "shape": "sphere",
       "position": [
-        3,
-        8.75,
-        0.35
+        2.9,
+        8.72,
+        0.55
       ],
       "size": [
         0.2
       ],
       "material": "brass",
       "role": "Auxiliary weighted loss trains t+1 and t+2 prediction heads jointly with the main objective.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "data-parallel",
       "connections": [
         "mtp_block_1",
+        "mtp_block_2",
+        "mtp_loss_post"
+      ]
+    },
+    {
+      "id": "mtp_loss_post",
+      "name": "MTP Loss Post",
+      "shape": "cylinder",
+      "position": [
+        2.9,
+        8.38,
+        0.55
+      ],
+      "size": [
+        0.035,
+        0.56
+      ],
+      "material": "steel",
+      "role": "Short post makes the MTP auxiliary loss node visibly mounted to the output shelf.",
+      "connections": [
+        "mtp_loss_node",
+        "mtp_block_1",
         "mtp_block_2"
+      ]
+    },
+    {
+      "id": "muon_shelf",
+      "name": "Port Optimizer Service Shelf",
+      "shape": "box",
+      "position": [
+        -5.15,
+        5.95,
+        0.4
+      ],
+      "size": [
+        1.35,
+        0.12,
+        0.9
+      ],
+      "material": "steel",
+      "role": "Service shelf carries the Muon and AdamW optimizer modules outside the main tower for inspection.",
+      "connections": [
+        "base_left_rail",
+        "muon_optimizer",
+        "adamw_carveout"
       ]
     },
     {
@@ -1225,24 +3458,22 @@
       "name": "Muon Matrix Optimizer",
       "shape": "box",
       "position": [
-        -5.25,
-        6.85,
-        0.1
+        -5.15,
+        6.45,
+        0.4
       ],
       "size": [
-        1.25,
-        0.7,
-        0.75
+        1.18,
+        0.55,
+        0.72
       ],
       "material": "brushed steel",
       "role": "Projected Muon optimizer service module applies Newton-Schulz orthonormalised updates to matrix parameters.",
-      "compute_profile": "gpu-compute-bound",
-      "memory_footprint": "Uses one momentum buffer rather than AdamW's two moment buffers for matrix bulk",
-      "parallelism": "data-parallel",
       "algorithm": "M=beta*M+G; U=newton_schulz(M,iters=10); W-=lr*(rms_scale*U+wd*W)",
       "connections": [
-        "left_upright",
+        "muon_shelf",
         "adamw_carveout",
+        "optimizer_return_pipe",
         "residual_bus"
       ]
     },
@@ -1251,23 +3482,47 @@
       "name": "AdamW Carve-Out Optimizer",
       "shape": "box",
       "position": [
-        -5.25,
-        5.9,
-        0.1
+        -5.15,
+        5.45,
+        0.4
       ],
       "size": [
-        1.05,
-        0.48,
-        0.7
+        1,
+        0.42,
+        0.66
       ],
       "material": "dark anodized aluminum",
       "role": "Keeps AdamW for embeddings, LM head, RMSNorm weights, router bias, attention sinks, and scalar carve-outs.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "data-parallel",
       "connections": [
+        "muon_shelf",
         "muon_optimizer",
         "embedding_table",
         "prediction_head"
+      ]
+    },
+    {
+      "id": "optimizer_return_pipe",
+      "name": "Optimizer Update Pipe",
+      "shape": "cylinder",
+      "position": [
+        -3,
+        6.45,
+        0.25
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.045,
+        3.9
+      ],
+      "material": "copper",
+      "role": "Pipe shows optimizer updates feeding back into the trainable matrix stack.",
+      "connections": [
+        "muon_optimizer",
+        "residual_bus"
       ]
     },
     {
@@ -1277,20 +3532,103 @@
       "position": [
         6.35,
         6,
-        0.1
+        0.35
       ],
       "size": [
-        1.2,
-        1.45,
+        1.15,
+        1.35,
         0.12
       ],
       "material": "glass display",
       "role": "Shows the tensor, expert, pipeline, and data parallel axes that make the projected MoE trainable.",
-      "compute_profile": "communication-bound",
-      "parallelism": "pipeline-parallel",
       "connections": [
         "right_upright",
+        "parallel_axis_tp",
+        "parallel_axis_ep",
+        "parallel_axis_pp",
+        "parallel_axis_dp",
         "expert_alltoall_bus"
+      ]
+    },
+    {
+      "id": "parallel_axis_tp",
+      "name": "Tensor Parallel Axis",
+      "shape": "box",
+      "position": [
+        6.15,
+        6.4,
+        0.45
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Panel tick marks tensor-parallel splitting of matrix multiplications.",
+      "connections": [
+        "parallelism_panel"
+      ]
+    },
+    {
+      "id": "parallel_axis_ep",
+      "name": "Expert Parallel Axis",
+      "shape": "box",
+      "position": [
+        6.15,
+        6.15,
+        0.45
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "copper",
+      "role": "Panel tick marks expert-parallel all-to-all dispatch.",
+      "connections": [
+        "parallelism_panel",
+        "expert_alltoall_bus"
+      ]
+    },
+    {
+      "id": "parallel_axis_pp",
+      "name": "Pipeline Parallel Axis",
+      "shape": "box",
+      "position": [
+        6.15,
+        5.9,
+        0.45
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "brass",
+      "role": "Panel tick marks pipeline-parallel layer partitioning along the vertical tower.",
+      "connections": [
+        "parallelism_panel"
+      ]
+    },
+    {
+      "id": "parallel_axis_dp",
+      "name": "Data Parallel Axis",
+      "shape": "box",
+      "position": [
+        6.15,
+        5.65,
+        0.45
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "white composite",
+      "role": "Panel tick marks data-parallel replication over training batches.",
+      "connections": [
+        "parallelism_panel"
       ]
     },
     {
@@ -1298,9 +3636,9 @@
       "name": "Training Data Pipe ~30T Tokens",
       "shape": "cylinder",
       "position": [
-        5.25,
+        5.2,
         0.42,
-        0.65
+        1.05
       ],
       "rotation": [
         0,
@@ -1308,15 +3646,14 @@
         1.5708
       ],
       "size": [
-        0.14,
+        0.13,
         1.5
       ],
       "material": "steel",
       "role": "Floor-level intake pipe represents the projected roughly 30-trillion-token pretraining and reasoning-RL data stream.",
-      "compute_profile": "storage-bound",
-      "parallelism": "data-parallel",
       "connections": [
-        "base_frame",
+        "base_right_rail",
+        "token_flow_pipe",
         "input_plate"
       ]
     }

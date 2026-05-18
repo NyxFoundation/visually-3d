@@ -1,6 +1,6 @@
 {
   "machine_name": "Gemma 4 (projected flagship)",
-  "assembly_instructions": "1. Bolt the concrete base slab to the floor and install the two brushed-steel X rails and two carbon-fiber Z rails as the root frame. 2. Mount four vertical steel posts and the upper crossbeam so the architecture reads as a single exposed rack rather than a solid chassis. 3. Install the front input deck at y=0.16 m: text lane in the centre, image lane at X=-4.8 m, and audio lane at X=-6.8 m. 4. Add the image Pan-and-Scan wheel above the image plate, then the SigLIP-2 encoder and its projector; add the audio mel filterbank, USM encoder, and matching projector on the audio lane. 5. Route both modality projectors and the text embedding table into the central embedding slab, then bolt the residual spine through the slab and up the rack. 6. Stack the exposed 7:1 attention group around the spine: seven thin local trays followed by one thicker global tray, then add the compressed continuation marker for layers 9-79 and the final global tray. 7. Attach the exploded representative block bay to the right side of the rack in assembly order: attention pre-norm, QKV projection, QK norm, RoPE gear, attention mask, attention kernel, O projection, FFN pre-norm, SwiGLU, FFN post-norm, and residual merge links. 8. Mount the amber KV-cache column on the left memory rail and connect it only to attention/global trays; mount the cyan latent-summary capsules on the right memory rail and connect them to the global attention path. 9. Install the LM head and loss sphere at the top of the residual spine, then mount the Gemini teacher slab on its own bracket and connect it to the loss node for KL distillation. 10. Add the training corpus tray, AdamW state blocks, and TPU parallelism frame along the rear rail; connect them to the trainable stack but keep them offset so inference dataflow remains visible.",
+  "assembly_instructions": "1. Anchor the concrete base slab at world y=0 and bolt the four brushed-steel perimeter rails to it; verify every later part ultimately connects back to base_slab through these rails. 2. Install four vertical rack posts and the front/back upper crossbeams, then add the rear continuation ladder rails and small rib plates so the middle 71 layers are represented without a solid opaque tower. 3. Build the front multimodal input deck from left to right: audio waveform plate and waveform bars, 80-mel comb, USM-style encoder, audio projector, image plate with four crop tiles, Pan-and-Scan wheel, SigLIP-2 encoder, vision projector, and centre text plate with token beads. 4. Bolt the embedding table to the front of the residual spine and connect the text, vision, and audio projectors into it with short visible adapter pipes. 5. Install the exposed residual spine through the rack, then stack seven local trays, one global tray, the open continuation ladder, and the final global tray around the spine with clear air gaps. 6. Attach the right-side representative layer bay in assembly order, offset from the rack for visibility: attention pre-norm, QKV projection, QK norm, RoPE gear, mask gate, attention kernel, O projection, attention post-norm, attention residual return, FFN pre-norm, SwiGLU gate/up/down lobes, FFN post-norm, and FFN residual return. 7. Mount the local 512-token KV ring on its side bracket and the global KV cache column on its footed rear-left bracket; connect local trays only to the ring and global trays to the tall column. 8. Mount the latent summary cache bank on its right-side mast with top and bottom clamps, then connect its two stored latent capsules to the global attention path. 9. Fit the tied LM head at the top of the residual spine, place the CE+KL loss sphere above the head, and suspend the frozen Gemini teacher slab from its rear crossbeam bracket with a visible distillation link to the loss node. 10. Assemble the training support line on the rear rail: corpus tray, AdamW m and v blocks, TPU frame posts, mesh crossbar, four chip modules, host links, shard boundary plates, and data-parallel bus; connect these to the loss node and compressed stack while keeping them offset behind the inference dataflow.",
   "metadata": {
     "domain": "ml-architecture",
     "reference": "https://ai.google.dev/gemma/docs/core",
@@ -28,7 +28,7 @@
         },
         {
           "label": "transformer layers",
-          "value": "80 layers shown as 7 local + 1 global exposed group, continuation stack, and final global tray"
+          "value": "80 layers shown as 7 local + 1 global exposed group, open continuation ladder, and final global tray"
         },
         {
           "label": "hidden dimension",
@@ -110,13 +110,34 @@
       ],
       "material": "concrete",
       "role": "Thin floor datum that roots every subsystem and makes any floating component visually obvious.",
-      "compute_profile": "negligible",
-      "parallelism": "none",
       "connections": [
         "rail_front_x",
         "rail_back_x",
         "rail_left_z",
-        "rail_right_z"
+        "rail_right_z",
+        "rack_floor_grid"
+      ]
+    },
+    {
+      "id": "rack_floor_grid",
+      "name": "Open Floor Grid Insert",
+      "shape": "box",
+      "position": [
+        0,
+        0.135,
+        0
+      ],
+      "size": [
+        10.8,
+        0.03,
+        4.7
+      ],
+      "material": "brushed steel",
+      "role": "Thin inset grid marks the active assembly footprint without becoming an opaque chassis box.",
+      "connections": [
+        "base_slab",
+        "rail_front_x",
+        "rail_back_x"
       ]
     },
     {
@@ -135,8 +156,6 @@
       ],
       "material": "brushed steel",
       "role": "Front structural rail tying the text, image, and audio input stations into one assembly.",
-      "compute_profile": "negligible",
-      "parallelism": "none",
       "connections": [
         "base_slab",
         "post_front_left",
@@ -162,15 +181,14 @@
       ],
       "material": "brushed steel",
       "role": "Rear structural rail carrying training, teacher, and parallelism support modules.",
-      "compute_profile": "negligible",
-      "parallelism": "none",
       "connections": [
         "base_slab",
         "post_back_left",
         "post_back_right",
         "training_corpus_tray",
         "optimizer_state_1",
-        "parallelism_frame"
+        "parallelism_frame_left_post",
+        "kv_cache_column_foot"
       ]
     },
     {
@@ -189,8 +207,6 @@
       ],
       "material": "brushed steel",
       "role": "Left side rail that fixes the audio input lane and memory-cache column to the frame.",
-      "compute_profile": "negligible",
-      "parallelism": "none",
       "connections": [
         "base_slab",
         "rail_front_x",
@@ -214,13 +230,11 @@
       ],
       "material": "brushed steel",
       "role": "Right side rail that fixes the latent-cache and training support brackets to the frame.",
-      "compute_profile": "negligible",
-      "parallelism": "none",
       "connections": [
         "base_slab",
         "rail_front_x",
         "rail_back_x",
-        "summary_cache_bank"
+        "summary_cache_mast"
       ]
     },
     {
@@ -238,8 +252,6 @@
       ],
       "material": "steel",
       "role": "Vertical post supporting the exposed transformer rack without hiding the layer interiors.",
-      "compute_profile": "negligible",
-      "parallelism": "none",
       "connections": [
         "rail_front_x",
         "upper_crossbeam_front"
@@ -260,8 +272,6 @@
       ],
       "material": "steel",
       "role": "Vertical post supporting the exposed transformer rack and keeping the local/global trays aligned.",
-      "compute_profile": "negligible",
-      "parallelism": "none",
       "connections": [
         "rail_front_x",
         "upper_crossbeam_front"
@@ -282,8 +292,6 @@
       ],
       "material": "steel",
       "role": "Rear vertical post bracing the central stack while leaving the rear exploded bay visible.",
-      "compute_profile": "negligible",
-      "parallelism": "none",
       "connections": [
         "rail_back_x",
         "upper_crossbeam_back"
@@ -304,8 +312,6 @@
       ],
       "material": "steel",
       "role": "Rear vertical post bracing the central stack and the right-side latent-cache bracket.",
-      "compute_profile": "negligible",
-      "parallelism": "none",
       "connections": [
         "rail_back_x",
         "upper_crossbeam_back"
@@ -327,8 +333,6 @@
       ],
       "material": "brushed steel",
       "role": "Top rail that shows the layer tower is an open rack rather than an opaque box.",
-      "compute_profile": "negligible",
-      "parallelism": "none",
       "connections": [
         "post_front_left",
         "post_front_right",
@@ -351,12 +355,10 @@
       ],
       "material": "brushed steel",
       "role": "Rear top rail carrying the teacher and training brackets without covering the transformer trays.",
-      "compute_profile": "negligible",
-      "parallelism": "none",
       "connections": [
         "post_back_left",
         "post_back_right",
-        "teacher_model"
+        "teacher_support_arm"
       ]
     },
     {
@@ -375,10 +377,93 @@
       ],
       "material": "glass display",
       "role": "Text token intake for the 256K multilingual SentencePiece vocabulary before embedding lookup.",
-      "compute_profile": "host-cpu",
-      "parallelism": "embarrassingly-parallel",
       "connections": [
         "rail_front_x",
+        "text_token_bead_1",
+        "text_token_bead_2",
+        "text_token_bead_3",
+        "embedding_table"
+      ]
+    },
+    {
+      "id": "text_token_bead_1",
+      "name": "Visible Text Token 1",
+      "shape": "sphere",
+      "position": [
+        -0.72,
+        0.46,
+        -2.7
+      ],
+      "size": [
+        0.11
+      ],
+      "material": "white composite",
+      "role": "First bead in the token stream showing that text enters as discrete vocabulary ids.",
+      "connections": [
+        "input_text_plate",
+        "embedding_table"
+      ]
+    },
+    {
+      "id": "text_token_bead_2",
+      "name": "Visible Text Token 2",
+      "shape": "sphere",
+      "position": [
+        0,
+        0.46,
+        -2.7
+      ],
+      "size": [
+        0.11
+      ],
+      "material": "white composite",
+      "role": "Second bead in the token stream marking ordered token positions before lookup.",
+      "connections": [
+        "input_text_plate",
+        "embedding_table"
+      ]
+    },
+    {
+      "id": "text_token_bead_3",
+      "name": "Visible Text Token 3",
+      "shape": "sphere",
+      "position": [
+        0.72,
+        0.46,
+        -2.7
+      ],
+      "size": [
+        0.11
+      ],
+      "material": "white composite",
+      "role": "Third bead in the token stream showing sequence order before embedding.",
+      "connections": [
+        "input_text_plate",
+        "embedding_table"
+      ]
+    },
+    {
+      "id": "text_flow_pipe",
+      "name": "Text Tokens to Embedding Pipe",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.62,
+        -1.92
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        1.56
+      ],
+      "material": "brushed steel",
+      "role": "Short visible pipe showing the text token stream entering the embedding table.",
+      "connections": [
+        "input_text_plate",
         "embedding_table"
       ]
     },
@@ -398,10 +483,96 @@
       ],
       "material": "white composite",
       "role": "Image intake plate representing variable-resolution pictures before crop slicing.",
-      "compute_profile": "host-cpu",
-      "parallelism": "embarrassingly-parallel",
       "connections": [
         "rail_front_x",
+        "image_crop_tile_a",
+        "image_crop_tile_b",
+        "image_crop_tile_c",
+        "image_crop_tile_d",
+        "pan_scan_wheel"
+      ]
+    },
+    {
+      "id": "image_crop_tile_a",
+      "name": "896 Crop Tile A",
+      "shape": "box",
+      "position": [
+        -5.08,
+        0.43,
+        -2.92
+      ],
+      "size": [
+        0.42,
+        0.04,
+        0.32
+      ],
+      "material": "glass display",
+      "role": "First visible 896 by 896 crop tile produced by the Pan-and-Scan image path.",
+      "connections": [
+        "input_image_plate",
+        "pan_scan_wheel"
+      ]
+    },
+    {
+      "id": "image_crop_tile_b",
+      "name": "896 Crop Tile B",
+      "shape": "box",
+      "position": [
+        -4.52,
+        0.43,
+        -2.92
+      ],
+      "size": [
+        0.42,
+        0.04,
+        0.32
+      ],
+      "material": "glass display",
+      "role": "Second visible image crop tile showing overlap across the source image.",
+      "connections": [
+        "input_image_plate",
+        "pan_scan_wheel"
+      ]
+    },
+    {
+      "id": "image_crop_tile_c",
+      "name": "896 Crop Tile C",
+      "shape": "box",
+      "position": [
+        -5.08,
+        0.43,
+        -2.48
+      ],
+      "size": [
+        0.42,
+        0.04,
+        0.32
+      ],
+      "material": "glass display",
+      "role": "Third crop tile making the tiled vision input path legible in top view.",
+      "connections": [
+        "input_image_plate",
+        "pan_scan_wheel"
+      ]
+    },
+    {
+      "id": "image_crop_tile_d",
+      "name": "896 Crop Tile D",
+      "shape": "box",
+      "position": [
+        -4.52,
+        0.43,
+        -2.48
+      ],
+      "size": [
+        0.42,
+        0.04,
+        0.32
+      ],
+      "material": "glass display",
+      "role": "Fourth crop tile completing the visible Pan-and-Scan crop set.",
+      "connections": [
+        "input_image_plate",
         "pan_scan_wheel"
       ]
     },
@@ -411,7 +582,7 @@
       "shape": "torus",
       "position": [
         -4.8,
-        0.78,
+        0.86,
         -2.7
       ],
       "rotation": [
@@ -425,8 +596,6 @@
       ],
       "material": "aluminum",
       "role": "Crop wheel that splits non-square images into overlapping 896×896 SigLIP tiles.",
-      "compute_profile": "host-cpu",
-      "parallelism": "embarrassingly-parallel",
       "connections": [
         "input_image_plate",
         "siglip2_encoder"
@@ -438,7 +607,7 @@
       "shape": "box",
       "position": [
         -4.8,
-        1.38,
+        1.45,
         -2.7
       ],
       "size": [
@@ -448,8 +617,6 @@
       ],
       "material": "dark anodized aluminum",
       "role": "Frozen vision encoder producing projected soft tokens from each image crop.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "embarrassingly-parallel",
       "connections": [
         "pan_scan_wheel",
         "vision_projector"
@@ -461,7 +628,7 @@
       "shape": "box",
       "position": [
         -3.45,
-        1.38,
+        1.45,
         -2.7
       ],
       "size": [
@@ -471,10 +638,34 @@
       ],
       "material": "brushed steel",
       "role": "Linear adapter that maps SigLIP-2 soft tokens into the LLM residual width.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "siglip2_encoder",
+        "embedding_table",
+        "vision_flow_pipe"
+      ]
+    },
+    {
+      "id": "vision_flow_pipe",
+      "name": "Vision Tokens to Embedding Pipe",
+      "shape": "cylinder",
+      "position": [
+        -1.72,
+        1.24,
+        -1.93
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.04,
+        3.46
+      ],
+      "material": "brushed steel",
+      "role": "Visible adapter pipe carrying projected image tokens from SigLIP-2 into the shared embedding stream.",
+      "connections": [
+        "vision_projector",
         "embedding_table"
       ]
     },
@@ -494,10 +685,74 @@
       ],
       "material": "white composite",
       "role": "Projected native audio intake for raw 16 kHz waveform segments.",
-      "compute_profile": "host-cpu",
-      "parallelism": "embarrassingly-parallel",
       "connections": [
         "rail_front_x",
+        "audio_wave_bar_1",
+        "audio_wave_bar_2",
+        "audio_wave_bar_3",
+        "mel_filterbank"
+      ]
+    },
+    {
+      "id": "audio_wave_bar_1",
+      "name": "Audio Waveform Bar Low",
+      "shape": "box",
+      "position": [
+        -7.02,
+        0.47,
+        -2.7
+      ],
+      "size": [
+        0.08,
+        0.28,
+        0.56
+      ],
+      "material": "copper",
+      "role": "Short waveform bar showing raw audio amplitude before mel conversion.",
+      "connections": [
+        "input_audio_plate",
+        "mel_filterbank"
+      ]
+    },
+    {
+      "id": "audio_wave_bar_2",
+      "name": "Audio Waveform Bar High",
+      "shape": "box",
+      "position": [
+        -6.65,
+        0.58,
+        -2.7
+      ],
+      "size": [
+        0.08,
+        0.5,
+        0.56
+      ],
+      "material": "copper",
+      "role": "Tall waveform bar making the native audio lane visible from front and ISO views.",
+      "connections": [
+        "input_audio_plate",
+        "mel_filterbank"
+      ]
+    },
+    {
+      "id": "audio_wave_bar_3",
+      "name": "Audio Waveform Bar Mid",
+      "shape": "box",
+      "position": [
+        -6.28,
+        0.51,
+        -2.7
+      ],
+      "size": [
+        0.08,
+        0.36,
+        0.56
+      ],
+      "material": "copper",
+      "role": "Middle waveform bar completing the visible audio waveform motif.",
+      "connections": [
+        "input_audio_plate",
         "mel_filterbank"
       ]
     },
@@ -507,7 +762,7 @@
       "shape": "box",
       "position": [
         -6.65,
-        0.82,
+        0.94,
         -2.7
       ],
       "size": [
@@ -517,10 +772,30 @@
       ],
       "material": "copper",
       "role": "Signal-processing shelf that converts waveform frames into 80-mel log-spectrogram features.",
-      "compute_profile": "host-cpu",
-      "parallelism": "embarrassingly-parallel",
       "connections": [
         "input_audio_plate",
+        "mel_bin_comb",
+        "audio_encoder"
+      ]
+    },
+    {
+      "id": "mel_bin_comb",
+      "name": "Mel Bin Comb",
+      "shape": "box",
+      "position": [
+        -6.65,
+        1.13,
+        -2.7
+      ],
+      "size": [
+        0.92,
+        0.07,
+        0.18
+      ],
+      "material": "brushed steel",
+      "role": "Small comb marker representing 80 mel bins packed into each audio frame.",
+      "connections": [
+        "mel_filterbank",
         "audio_encoder"
       ]
     },
@@ -530,7 +805,7 @@
       "shape": "box",
       "position": [
         -6.65,
-        1.38,
+        1.55,
         -2.7
       ],
       "size": [
@@ -540,10 +815,6 @@
       ],
       "material": "dark anodized aluminum",
       "role": "Projected frozen conformer encoder producing about 30 audio tokens per second.",
-      "compute_profile": "gpu-compute-bound",
-      "memory_footprint": "Frozen encoder weights projected around 1 GiB BF16.",
-      "parallelism": "embarrassingly-parallel",
-      "algorithm": "mel = log_mel(audio, n_mels=80)\ntokens_audio = conformer(mel)\nh_audio = audio_proj(tokens_audio)",
       "connections": [
         "mel_filterbank",
         "audio_projector"
@@ -555,7 +826,7 @@
       "shape": "box",
       "position": [
         -5.35,
-        1.38,
+        1.55,
         -2.7
       ],
       "size": [
@@ -565,10 +836,34 @@
       ],
       "material": "brushed steel",
       "role": "Linear adapter that maps USM-style audio tokens into the LLM residual width.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "audio_encoder",
+        "embedding_table",
+        "audio_flow_pipe"
+      ]
+    },
+    {
+      "id": "audio_flow_pipe",
+      "name": "Audio Tokens to Embedding Pipe",
+      "shape": "cylinder",
+      "position": [
+        -2.68,
+        1.24,
+        -2.15
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.04,
+        5.34
+      ],
+      "material": "copper",
+      "role": "Visible adapter pipe carrying projected audio tokens into the shared embedding stream.",
+      "connections": [
+        "audio_projector",
         "embedding_table"
       ]
     },
@@ -578,7 +873,7 @@
       "shape": "box",
       "position": [
         0,
-        0.75,
+        0.78,
         -1.15
       ],
       "size": [
@@ -588,14 +883,14 @@
       ],
       "material": "glass display",
       "role": "Shared embedding and output table with about 256000 by 7168 BF16 parameters.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "memory_footprint": "256K × 7168 × BF16 ≈ 3.66 GiB.",
-      "parallelism": "tensor-parallel",
       "connections": [
         "input_text_plate",
         "vision_projector",
         "audio_projector",
-        "residual_spine"
+        "residual_spine",
+        "text_flow_pipe",
+        "vision_flow_pipe",
+        "audio_flow_pipe"
       ]
     },
     {
@@ -613,8 +908,6 @@
       ],
       "material": "brushed steel",
       "role": "Continuous d=7168 residual stream passing through the 80-layer dense stack.",
-      "compute_profile": "gpu-memory-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "embedding_table",
         "local_layer_01",
@@ -646,12 +939,11 @@
       ],
       "material": "aluminum",
       "role": "First sliding-window transformer tray with 512-token local attention.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
         "rep_attention_pre_norm",
-        "kv_cache_local_ring"
+        "kv_cache_local_ring",
+        "local_badge_512_window"
       ]
     },
     {
@@ -670,8 +962,6 @@
       ],
       "material": "aluminum",
       "role": "Second local tray showing the repeated 512-token sliding-window pattern.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
         "kv_cache_local_ring"
@@ -693,8 +983,6 @@
       ],
       "material": "aluminum",
       "role": "Third local tray, still using compact ring-buffer KV storage rather than full-context KV.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
         "kv_cache_local_ring"
@@ -716,8 +1004,6 @@
       ],
       "material": "aluminum",
       "role": "Fourth local tray in the 7:1 group, making the local-dominated cadence visible.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
         "kv_cache_local_ring"
@@ -739,8 +1025,6 @@
       ],
       "material": "aluminum",
       "role": "Fifth local tray, representing cheap near-neighbour attention at one-million-token context.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
         "kv_cache_local_ring"
@@ -762,8 +1046,6 @@
       ],
       "material": "aluminum",
       "role": "Sixth local tray, placed separately so it does not merge into a featureless block.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
         "kv_cache_local_ring"
@@ -785,11 +1067,30 @@
       ],
       "material": "aluminum",
       "role": "Seventh local tray immediately before the full-context global layer in the projected cadence.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
         "kv_cache_local_ring"
+      ]
+    },
+    {
+      "id": "local_badge_512_window",
+      "name": "512-Token Window Badge",
+      "shape": "box",
+      "position": [
+        -1.85,
+        1.38,
+        -1.15
+      ],
+      "size": [
+        0.16,
+        0.7,
+        0.5
+      ],
+      "material": "black composite",
+      "role": "Side badge marks that the seven aluminium trays use a 512-token sliding window.",
+      "connections": [
+        "local_layer_01",
+        "local_layer_07"
       ]
     },
     {
@@ -808,36 +1109,190 @@
       ],
       "material": "dark anodized aluminum",
       "role": "Full-context attention tray using RoPE base 4M and carrying most long-range dependency work.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
         "kv_cache_global_column",
         "summary_cache_bank",
-        "rep_attention_kernel"
+        "rep_attention_kernel",
+        "global_badge_rope4m"
+      ]
+    },
+    {
+      "id": "global_badge_rope4m",
+      "name": "RoPE 4M Global Badge",
+      "shape": "box",
+      "position": [
+        1.88,
+        4.12,
+        -1.15
+      ],
+      "size": [
+        0.16,
+        0.88,
+        0.58
+      ],
+      "material": "brass",
+      "role": "Side badge marks the projected global RoPE base 4000000 on full-context trays.",
+      "connections": [
+        "global_layer_08",
+        "global_layer_80"
       ]
     },
     {
       "id": "compressed_layers_09_79",
-      "name": "Compressed Layers 9-79 Stack Marker",
+      "name": "Open Continuation Marker for Layers 9-79",
       "shape": "box",
       "position": [
         0,
         5.45,
-        -1.15
+        1.42
       ],
       "size": [
-        2.55,
-        1.82,
-        0.82
+        2.25,
+        0.12,
+        0.18
       ],
       "material": "carbon fiber",
-      "role": "Open marker for the repeated middle of the 80-layer dense stack; it is intentionally smaller so the exposed representative group remains readable.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "pipeline-parallel",
+      "role": "Rear offset cap of the open ladder representing layers 9-79 without hiding the central residual spine.",
       "connections": [
         "residual_spine",
+        "continuation_left_rail",
+        "continuation_right_rail",
+        "continuation_rib_1",
+        "continuation_rib_2",
+        "continuation_rib_3",
+        "continuation_rib_4",
         "layer_count_ticks"
+      ]
+    },
+    {
+      "id": "continuation_left_rail",
+      "name": "Continuation Ladder Left Rail",
+      "shape": "cylinder",
+      "position": [
+        -1.18,
+        5.45,
+        1.42
+      ],
+      "size": [
+        0.045,
+        1.95
+      ],
+      "material": "steel",
+      "role": "Left vertical member of the open continuation ladder for the hidden middle layer sequence.",
+      "connections": [
+        "compressed_layers_09_79",
+        "global_layer_08",
+        "global_layer_80"
+      ]
+    },
+    {
+      "id": "continuation_right_rail",
+      "name": "Continuation Ladder Right Rail",
+      "shape": "cylinder",
+      "position": [
+        1.18,
+        5.45,
+        1.42
+      ],
+      "size": [
+        0.045,
+        1.95
+      ],
+      "material": "steel",
+      "role": "Right vertical member of the open continuation ladder for layers 9 through 79.",
+      "connections": [
+        "compressed_layers_09_79",
+        "global_layer_08",
+        "global_layer_80"
+      ]
+    },
+    {
+      "id": "continuation_rib_1",
+      "name": "Continuation Rib 16-Block",
+      "shape": "box",
+      "position": [
+        0,
+        4.82,
+        1.42
+      ],
+      "size": [
+        2.36,
+        0.08,
+        0.22
+      ],
+      "material": "aluminum",
+      "role": "Thin exposed rib grouping the first portion of compressed middle layers.",
+      "connections": [
+        "continuation_left_rail",
+        "continuation_right_rail",
+        "residual_spine"
+      ]
+    },
+    {
+      "id": "continuation_rib_2",
+      "name": "Continuation Rib 32-Block",
+      "shape": "box",
+      "position": [
+        0,
+        5.24,
+        1.42
+      ],
+      "size": [
+        2.36,
+        0.08,
+        0.22
+      ],
+      "material": "aluminum",
+      "role": "Second thin rib showing repeated dense transformer layers without forming a wall.",
+      "connections": [
+        "continuation_left_rail",
+        "continuation_right_rail",
+        "residual_spine"
+      ]
+    },
+    {
+      "id": "continuation_rib_3",
+      "name": "Continuation Rib 48-Block",
+      "shape": "box",
+      "position": [
+        0,
+        5.66,
+        1.42
+      ],
+      "size": [
+        2.36,
+        0.08,
+        0.22
+      ],
+      "material": "aluminum",
+      "role": "Third exposed rib preserving the visual count of the compressed 80-layer stack.",
+      "connections": [
+        "continuation_left_rail",
+        "continuation_right_rail",
+        "residual_spine"
+      ]
+    },
+    {
+      "id": "continuation_rib_4",
+      "name": "Continuation Rib 64-Block",
+      "shape": "box",
+      "position": [
+        0,
+        6.08,
+        1.42
+      ],
+      "size": [
+        2.36,
+        0.08,
+        0.22
+      ],
+      "material": "aluminum",
+      "role": "Fourth exposed rib completing the rear ladder representation of layers 9-79.",
+      "connections": [
+        "continuation_left_rail",
+        "continuation_right_rail",
+        "residual_spine"
       ]
     },
     {
@@ -845,19 +1300,17 @@
       "name": "80-Layer Tick Comb",
       "shape": "box",
       "position": [
-        -1.85,
+        -1.55,
         5.45,
-        -1.15
+        1.42
       ],
       "size": [
-        0.12,
+        0.1,
         1.95,
-        0.7
+        0.32
       ],
       "material": "black composite",
       "role": "Scale marker indicating that the visible trays are representative of an 80-layer sequence.",
-      "compute_profile": "negligible",
-      "parallelism": "none",
       "connections": [
         "compressed_layers_09_79"
       ]
@@ -878,12 +1331,12 @@
       ],
       "material": "dark anodized aluminum",
       "role": "Final full-context global layer feeding the tied vocabulary head.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
         "kv_cache_global_column",
-        "prediction_head"
+        "summary_cache_bank",
+        "prediction_head",
+        "global_badge_rope4m"
       ]
     },
     {
@@ -891,7 +1344,7 @@
       "name": "Exploded Attention Pre-RMSNorm",
       "shape": "box",
       "position": [
-        3,
+        3.55,
         1.45,
         0.7
       ],
@@ -902,8 +1355,6 @@
       ],
       "material": "white composite",
       "role": "Representative pre-attention RMSNorm tile shown outside the tray so it is not hidden by the layer block.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "local_layer_01",
         "rep_qkv_projection"
@@ -914,7 +1365,7 @@
       "name": "Exploded GQA QKV Projection",
       "shape": "box",
       "position": [
-        3,
+        3.55,
         1.85,
         0.7
       ],
@@ -925,11 +1376,29 @@
       ],
       "material": "brushed steel",
       "role": "Fused projection producing 48 query heads and 8 shared key/value heads.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
-      "algorithm": "Q = x @ W_Q\nK = x @ W_K\nV = x @ W_V\nQ, K = qk_rmsnorm(Q, K)",
       "connections": [
         "rep_attention_pre_norm",
+        "rep_qk_norm",
+        "qkv_to_qk_pipe"
+      ]
+    },
+    {
+      "id": "qkv_to_qk_pipe",
+      "name": "QKV to QK-Norm Pipe",
+      "shape": "cylinder",
+      "position": [
+        3.55,
+        2.045,
+        0.7
+      ],
+      "size": [
+        0.035,
+        0.34
+      ],
+      "material": "steel",
+      "role": "Short vertical pipe makes the QKV-to-QK-normalization sequence physically continuous.",
+      "connections": [
+        "rep_qkv_projection",
         "rep_qk_norm"
       ]
     },
@@ -938,7 +1407,7 @@
       "name": "Exploded QK-Norm Pair",
       "shape": "capsule",
       "position": [
-        3,
+        3.55,
         2.24,
         0.7
       ],
@@ -948,8 +1417,6 @@
       ],
       "material": "white composite",
       "role": "Paired RMSNorm on Q and K, preserved from Gemma 3 as a stability feature.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "rep_qkv_projection",
         "rep_rope_gear"
@@ -960,7 +1427,7 @@
       "name": "RoPE Base Selector Gear",
       "shape": "torus",
       "position": [
-        3,
+        3.55,
         2.68,
         0.7
       ],
@@ -970,8 +1437,6 @@
       ],
       "material": "brass",
       "role": "Rotary-position selector: base 10000 for local trays and projected base 4000000 for global trays.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "rep_qk_norm",
         "rep_attention_mask"
@@ -982,7 +1447,7 @@
       "name": "Local-or-Global Mask Gate",
       "shape": "box",
       "position": [
-        3,
+        3.55,
         3.08,
         0.7
       ],
@@ -993,8 +1458,6 @@
       ],
       "material": "black composite",
       "role": "Mask gate selecting either 512-token sliding-window attention or full causal attention.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "embarrassingly-parallel",
       "connections": [
         "rep_rope_gear",
         "rep_attention_kernel"
@@ -1005,7 +1468,7 @@
       "name": "FlashAttention Kernel Bay",
       "shape": "box",
       "position": [
-        3,
+        3.55,
         3.5,
         0.7
       ],
@@ -1016,13 +1479,12 @@
       ],
       "material": "dark anodized aluminum",
       "role": "Attention compute bay using the selected mask and reading KV from local rings or global cache.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "embarrassingly-parallel",
       "connections": [
         "rep_attention_mask",
         "rep_o_projection",
         "kv_cache_global_column",
-        "kv_cache_local_ring"
+        "kv_cache_local_ring",
+        "cache_read_pipe"
       ]
     },
     {
@@ -1030,7 +1492,7 @@
       "name": "Attention O Projection",
       "shape": "box",
       "position": [
-        3,
+        3.55,
         3.92,
         0.7
       ],
@@ -1041,8 +1503,6 @@
       ],
       "material": "brushed steel",
       "role": "Output projection returning attention results to the d=7168 residual stream.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "rep_attention_kernel",
         "rep_attention_post_norm"
@@ -1053,7 +1513,7 @@
       "name": "Exploded Attention Post-RMSNorm",
       "shape": "box",
       "position": [
-        3,
+        3.55,
         4.28,
         0.7
       ],
@@ -1064,11 +1524,30 @@
       ],
       "material": "white composite",
       "role": "Post-attention RMSNorm tile showing the dual-norm placement explicitly.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "rep_o_projection",
         "residual_merge_left"
+      ]
+    },
+    {
+      "id": "attention_branch_standoff",
+      "name": "Attention Bay Standoff Post",
+      "shape": "cylinder",
+      "position": [
+        3.05,
+        2.86,
+        0.18
+      ],
+      "size": [
+        0.045,
+        3
+      ],
+      "material": "steel",
+      "role": "Slender post supports the exploded attention branch from the floor grid without hiding the tiles.",
+      "connections": [
+        "rack_floor_grid",
+        "rep_attention_pre_norm",
+        "rep_attention_kernel"
       ]
     },
     {
@@ -1076,7 +1555,7 @@
       "name": "Exploded FFN Pre-RMSNorm",
       "shape": "box",
       "position": [
-        4.35,
+        5.15,
         2,
         0.7
       ],
@@ -1087,8 +1566,6 @@
       ],
       "material": "white composite",
       "role": "Pre-FFN RMSNorm shown as a separate service tile before the dense SwiGLU block.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "local_layer_01",
         "rep_swiglu_ffn"
@@ -1099,7 +1576,7 @@
       "name": "Dense SwiGLU FFN Bay",
       "shape": "box",
       "position": [
-        4.35,
+        5.15,
         2.58,
         0.7
       ],
@@ -1110,12 +1587,72 @@
       ],
       "material": "aluminum",
       "role": "Dense non-MoE feed-forward bay with d_ff projected near 28672.",
-      "compute_profile": "gpu-compute-bound",
-      "flops_per_token": "≈3 × 2·7168·28672 ≈ 1.23 GFLOP per layer.",
-      "memory_footprint": "3 × d × d_ff × BF16 ≈ 1.23 GiB per layer.",
-      "parallelism": "tensor-parallel",
       "connections": [
         "rep_ffn_pre_norm",
+        "rep_ffn_gate_lobe",
+        "rep_ffn_up_lobe",
+        "rep_ffn_down_lobe",
+        "rep_ffn_post_norm"
+      ]
+    },
+    {
+      "id": "rep_ffn_gate_lobe",
+      "name": "SwiGLU Gate Lobe",
+      "shape": "box",
+      "position": [
+        5.75,
+        2.58,
+        0.25
+      ],
+      "size": [
+        0.38,
+        0.22,
+        0.26
+      ],
+      "material": "brushed steel",
+      "role": "Visible gate projection lobe distinguishes SwiGLU from a plain dense FFN block.",
+      "connections": [
+        "rep_swiglu_ffn"
+      ]
+    },
+    {
+      "id": "rep_ffn_up_lobe",
+      "name": "SwiGLU Up Lobe",
+      "shape": "box",
+      "position": [
+        5.75,
+        2.58,
+        1.15
+      ],
+      "size": [
+        0.38,
+        0.22,
+        0.26
+      ],
+      "material": "brushed steel",
+      "role": "Visible up-projection lobe pairs with the gate projection before down projection.",
+      "connections": [
+        "rep_swiglu_ffn"
+      ]
+    },
+    {
+      "id": "rep_ffn_down_lobe",
+      "name": "SwiGLU Down Projection Lobe",
+      "shape": "box",
+      "position": [
+        5.15,
+        2.2,
+        0.7
+      ],
+      "size": [
+        0.72,
+        0.16,
+        0.28
+      ],
+      "material": "brushed steel",
+      "role": "Visible down-projection lobe shows the gated FFN returning from d_ff to d_model.",
+      "connections": [
+        "rep_swiglu_ffn",
         "rep_ffn_post_norm"
       ]
     },
@@ -1124,7 +1661,7 @@
       "name": "Exploded FFN Post-RMSNorm",
       "shape": "box",
       "position": [
-        4.35,
+        5.15,
         3.18,
         0.7
       ],
@@ -1135,11 +1672,30 @@
       ],
       "material": "white composite",
       "role": "Post-FFN RMSNorm tile before the FFN branch rejoins the residual stream.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "rep_swiglu_ffn",
         "residual_merge_right"
+      ]
+    },
+    {
+      "id": "ffn_branch_standoff",
+      "name": "FFN Bay Standoff Post",
+      "shape": "cylinder",
+      "position": [
+        4.62,
+        2.56,
+        0.18
+      ],
+      "size": [
+        0.045,
+        2.25
+      ],
+      "material": "steel",
+      "role": "Slender post supports the exploded FFN branch and separates it from the attention branch in ISO view.",
+      "connections": [
+        "rack_floor_grid",
+        "rep_ffn_pre_norm",
+        "rep_swiglu_ffn"
       ]
     },
     {
@@ -1147,7 +1703,7 @@
       "name": "Attention Residual Merge Link",
       "shape": "cylinder",
       "position": [
-        1.65,
+        1.92,
         4.28,
         -0.25
       ],
@@ -1158,12 +1714,10 @@
       ],
       "size": [
         0.05,
-        2.7
+        3.25
       ],
       "material": "steel",
       "role": "Visible link returning the exploded attention branch to the central residual spine.",
-      "compute_profile": "gpu-memory-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "rep_attention_post_norm",
         "residual_spine"
@@ -1174,7 +1728,7 @@
       "name": "FFN Residual Merge Link",
       "shape": "cylinder",
       "position": [
-        2.17,
+        2.58,
         3.18,
         -0.25
       ],
@@ -1185,15 +1739,34 @@
       ],
       "size": [
         0.05,
-        4.36
+        5.15
       ],
       "material": "steel",
       "role": "Visible link returning the exploded FFN branch to the central residual spine.",
-      "compute_profile": "gpu-memory-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "rep_ffn_post_norm",
         "residual_spine"
+      ]
+    },
+    {
+      "id": "kv_cache_column_foot",
+      "name": "Global KV Cache Foot Plate",
+      "shape": "box",
+      "position": [
+        -3.25,
+        0.36,
+        0.85
+      ],
+      "size": [
+        0.9,
+        0.22,
+        0.72
+      ],
+      "material": "brushed steel",
+      "role": "Foot plate ties the tall global KV cache column to the rear rail instead of leaving it suspended.",
+      "connections": [
+        "rail_back_x",
+        "kv_cache_global_column"
       ]
     },
     {
@@ -1202,7 +1775,7 @@
       "shape": "cylinder",
       "position": [
         -3.25,
-        4.4,
+        3.45,
         0.85
       ],
       "size": [
@@ -1211,14 +1784,33 @@
       ],
       "material": "brass",
       "role": "Tall memory column for full-context KV from global layers, dominating long-context storage.",
-      "compute_profile": "memory-capacity-bound",
-      "memory_footprint": "1M × 8 KV heads × 128 head dim × K/V × 10 global layers ≈ 40 GiB FP16 before projected INT4 compression.",
-      "parallelism": "tensor-parallel",
       "connections": [
-        "rail_back_x",
+        "kv_cache_column_foot",
         "global_layer_08",
         "global_layer_80",
-        "rep_attention_kernel"
+        "rep_attention_kernel",
+        "kv_cache_upper_clamp"
+      ]
+    },
+    {
+      "id": "kv_cache_upper_clamp",
+      "name": "Global KV Cache Upper Clamp",
+      "shape": "box",
+      "position": [
+        -3.25,
+        6.45,
+        0.85
+      ],
+      "size": [
+        0.88,
+        0.14,
+        0.78
+      ],
+      "material": "steel",
+      "role": "Upper clamp braces the global cache column against the rack near global attention layers.",
+      "connections": [
+        "kv_cache_global_column",
+        "post_back_left"
       ]
     },
     {
@@ -1241,9 +1833,6 @@
       ],
       "material": "copper",
       "role": "Compact ring buffer showing that local layers keep only a 512-token window.",
-      "compute_profile": "memory-capacity-bound",
-      "memory_footprint": "Projected local cache is small because it stores 512 tokens rather than the full 1M context.",
-      "parallelism": "tensor-parallel",
       "connections": [
         "local_layer_01",
         "local_layer_02",
@@ -1252,7 +1841,81 @@
         "local_layer_05",
         "local_layer_06",
         "local_layer_07",
-        "rep_attention_kernel"
+        "rep_attention_kernel",
+        "local_ring_support"
+      ]
+    },
+    {
+      "id": "local_ring_support",
+      "name": "Local KV Ring Support Arm",
+      "shape": "cylinder",
+      "position": [
+        -2.42,
+        2.55,
+        0.15
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        1.4
+      ],
+      "material": "steel",
+      "role": "Side arm holds the local KV ring next to the local trays instead of letting it float.",
+      "connections": [
+        "post_back_left",
+        "kv_cache_local_ring"
+      ]
+    },
+    {
+      "id": "cache_read_pipe",
+      "name": "Cache Read Pipe",
+      "shape": "cylinder",
+      "position": [
+        0.15,
+        3.5,
+        0.78
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.04,
+        6.8
+      ],
+      "material": "copper",
+      "role": "Long read pipe visually joins the cache hardware to the representative attention kernel.",
+      "connections": [
+        "kv_cache_global_column",
+        "rep_attention_kernel",
+        "kv_cache_local_ring"
+      ]
+    },
+    {
+      "id": "summary_cache_mast",
+      "name": "Latent Cache Support Mast",
+      "shape": "cylinder",
+      "position": [
+        5.95,
+        3.2,
+        0.85
+      ],
+      "size": [
+        0.07,
+        5.95
+      ],
+      "material": "steel",
+      "role": "Support mast rises from the right rail so the latent cache reads as mounted hardware.",
+      "connections": [
+        "rail_right_z",
+        "summary_cache_bank",
+        "summary_cache_top_clamp",
+        "summary_cache_bottom_clamp"
       ]
     },
     {
@@ -1270,16 +1933,54 @@
       ],
       "material": "glass display",
       "role": "Projected persistent latent cache for shared long prompts, mounted beside global attention rather than floating above it.",
-      "compute_profile": "memory-capacity-bound",
-      "memory_footprint": "Projected around 1 KB per cached prompt prefix per layer.",
-      "parallelism": "data-parallel",
-      "algorithm": "latent = compress(prompt_kv)\nout = attn(Q, concat(latent, K), concat(latent, V))",
       "connections": [
-        "rail_right_z",
+        "summary_cache_mast",
         "global_layer_08",
         "global_layer_80",
         "summary_cache_latent_a",
         "summary_cache_latent_b"
+      ]
+    },
+    {
+      "id": "summary_cache_top_clamp",
+      "name": "Latent Cache Top Clamp",
+      "shape": "box",
+      "position": [
+        5.77,
+        6.1,
+        0.85
+      ],
+      "size": [
+        0.55,
+        0.1,
+        0.62
+      ],
+      "material": "steel",
+      "role": "Top clamp fixes the summary cache capsule to its support mast.",
+      "connections": [
+        "summary_cache_mast",
+        "summary_cache_bank"
+      ]
+    },
+    {
+      "id": "summary_cache_bottom_clamp",
+      "name": "Latent Cache Bottom Clamp",
+      "shape": "box",
+      "position": [
+        5.77,
+        3.9,
+        0.85
+      ],
+      "size": [
+        0.55,
+        0.1,
+        0.62
+      ],
+      "material": "steel",
+      "role": "Bottom clamp fixes the summary cache capsule and shows the bank is mechanically supported.",
+      "connections": [
+        "summary_cache_mast",
+        "summary_cache_bank"
       ]
     },
     {
@@ -1296,8 +1997,6 @@
       ],
       "material": "glass display",
       "role": "Visible stored prompt latent connected to the summary cache bank.",
-      "compute_profile": "memory-capacity-bound",
-      "parallelism": "data-parallel",
       "connections": [
         "summary_cache_bank"
       ]
@@ -1316,8 +2015,6 @@
       ],
       "material": "glass display",
       "role": "Second stored prompt latent showing that the cache can hold multiple reusable prefixes.",
-      "compute_profile": "memory-capacity-bound",
-      "parallelism": "data-parallel",
       "connections": [
         "summary_cache_bank"
       ]
@@ -1338,8 +2035,6 @@
       ],
       "material": "glass display",
       "role": "Tied projection from residual width back to the 256K vocabulary logits.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
         "lm_loss"
@@ -1359,12 +2054,56 @@
       ],
       "material": "white composite",
       "role": "Training loss node combining next-token cross entropy with KL to the Gemini teacher.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "parallelism": "data-parallel",
       "connections": [
         "prediction_head",
         "teacher_model",
-        "optimizer_state_1"
+        "optimizer_state_1",
+        "distillation_link"
+      ]
+    },
+    {
+      "id": "teacher_support_arm",
+      "name": "Teacher Model Support Arm",
+      "shape": "cylinder",
+      "position": [
+        1.45,
+        8.72,
+        1.67
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.05,
+        2.9
+      ],
+      "material": "steel",
+      "role": "Rear support arm physically suspends the teacher slab from the upper crossbeam.",
+      "connections": [
+        "upper_crossbeam_back",
+        "teacher_model"
+      ]
+    },
+    {
+      "id": "teacher_drop_hanger",
+      "name": "Teacher Vertical Drop Hanger",
+      "shape": "cylinder",
+      "position": [
+        2.9,
+        8.68,
+        1.55
+      ],
+      "size": [
+        0.04,
+        0.44
+      ],
+      "material": "steel",
+      "role": "Short vertical hanger makes the elevated teacher slab visibly supported from above.",
+      "connections": [
+        "teacher_support_arm",
+        "teacher_model"
       ]
     },
     {
@@ -1383,10 +2122,35 @@
       ],
       "material": "black composite",
       "role": "Frozen larger Gemini model whose logits supervise the projected Gemma student.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "data-parallel",
       "connections": [
-        "upper_crossbeam_back",
+        "teacher_support_arm",
+        "teacher_drop_hanger",
+        "lm_loss",
+        "distillation_link"
+      ]
+    },
+    {
+      "id": "distillation_link",
+      "name": "Teacher-to-Loss Distillation Link",
+      "shape": "cylinder",
+      "position": [
+        0.75,
+        8.82,
+        0.2
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        4.35
+      ],
+      "material": "brushed steel",
+      "role": "Visible KL-distillation link from the frozen teacher logits into the loss node.",
+      "connections": [
+        "teacher_model",
         "lm_loss"
       ]
     },
@@ -1406,12 +2170,31 @@
       ],
       "material": "black composite",
       "role": "Projected pretraining data tray for text, image-text, and audio-text examples.",
-      "compute_profile": "storage-bound",
-      "parallelism": "data-parallel",
       "connections": [
         "rail_back_x",
         "embedding_table",
-        "optimizer_state_1"
+        "optimizer_state_1",
+        "corpus_sample_stack"
+      ]
+    },
+    {
+      "id": "corpus_sample_stack",
+      "name": "Visible Corpus Sample Stack",
+      "shape": "box",
+      "position": [
+        5.4,
+        0.72,
+        2.7
+      ],
+      "size": [
+        1.65,
+        0.18,
+        0.62
+      ],
+      "material": "glass display",
+      "role": "Thin stack of sample cards makes the corpus tray read as data rather than a plain base block.",
+      "connections": [
+        "training_corpus_tray"
       ]
     },
     {
@@ -1430,9 +2213,6 @@
       ],
       "material": "dark anodized aluminum",
       "role": "First AdamW moment-state block, one of the two optimizer tensors that double training memory.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "memory_footprint": "One optimizer state tensor approximately equals parameter size.",
-      "parallelism": "data-parallel",
       "connections": [
         "rail_back_x",
         "lm_loss",
@@ -1455,36 +2235,74 @@
       ],
       "material": "dark anodized aluminum",
       "role": "Second AdamW moment-state block completing the projected 2× optimizer-memory overhead.",
-      "compute_profile": "gpu-bandwidth-bound",
-      "memory_footprint": "Second optimizer state tensor approximately equals parameter size.",
-      "parallelism": "data-parallel",
       "connections": [
         "optimizer_state_1",
-        "parallelism_frame"
+        "parallelism_frame_left_post"
       ]
     },
     {
       "id": "parallelism_frame",
-      "name": "TPU Parallelism Frame",
+      "name": "TPU Parallelism Top Frame",
       "shape": "box",
       "position": [
         6.35,
-        2.1,
+        3.4,
         2.7
       ],
       "size": [
         0.9,
-        2.65,
+        0.16,
         0.75
       ],
       "material": "carbon fiber",
-      "role": "Open training frame for tensor parallelism, FSDP, and data parallelism; no expert-parallel lane is present because the model is dense.",
-      "compute_profile": "communication-bound",
-      "parallelism": "data-parallel",
+      "role": "Top rail of the open TPU parallelism frame for tensor, FSDP, and data parallel collectives.",
+      "connections": [
+        "parallelism_frame_left_post",
+        "parallelism_frame_right_post",
+        "tpu_mesh_crossbar"
+      ]
+    },
+    {
+      "id": "parallelism_frame_left_post",
+      "name": "TPU Frame Left Post",
+      "shape": "cylinder",
+      "position": [
+        5.95,
+        1.78,
+        2.7
+      ],
+      "size": [
+        0.055,
+        2.6
+      ],
+      "material": "carbon fiber",
+      "role": "Left upright turns the TPU parallelism area into an open frame instead of a solid block.",
       "connections": [
         "rail_back_x",
         "optimizer_state_2",
-        "tpu_mesh_crossbar"
+        "parallelism_frame"
+      ]
+    },
+    {
+      "id": "parallelism_frame_right_post",
+      "name": "TPU Frame Right Post",
+      "shape": "cylinder",
+      "position": [
+        6.75,
+        1.78,
+        2.7
+      ],
+      "size": [
+        0.055,
+        2.6
+      ],
+      "material": "carbon fiber",
+      "role": "Right upright supports the TPU parallelism top rail and shard plates.",
+      "connections": [
+        "rail_back_x",
+        "parallelism_frame",
+        "tpu_shard_plate_a",
+        "tpu_shard_plate_b"
       ]
     },
     {
@@ -1503,11 +2321,321 @@
       ],
       "material": "copper",
       "role": "Communication crossbar showing collectives between tensor, FSDP, and data-parallel shards.",
-      "compute_profile": "communication-bound",
-      "parallelism": "tensor-parallel",
       "connections": [
         "parallelism_frame",
-        "compressed_layers_09_79"
+        "compressed_layers_09_79",
+        "tpu_shard_plate_a",
+        "tpu_shard_plate_b",
+        "tpu_chip_a",
+        "tpu_chip_b",
+        "tpu_chip_c",
+        "tpu_chip_d"
+      ]
+    },
+    {
+      "id": "tpu_shard_plate_a",
+      "name": "Tensor Parallel Shard Plate",
+      "shape": "box",
+      "position": [
+        6.35,
+        1.42,
+        2.28
+      ],
+      "size": [
+        0.62,
+        0.12,
+        0.28
+      ],
+      "material": "brushed steel",
+      "role": "Small shard plate indicates tensor-parallel partitioning inside the TPU mesh.",
+      "connections": [
+        "parallelism_frame_right_post",
+        "tpu_mesh_crossbar",
+        "tpu_shard_boundary_x"
+      ]
+    },
+    {
+      "id": "tpu_shard_plate_b",
+      "name": "FSDP Shard Plate",
+      "shape": "box",
+      "position": [
+        6.35,
+        1.42,
+        3.12
+      ],
+      "size": [
+        0.62,
+        0.12,
+        0.28
+      ],
+      "material": "brushed steel",
+      "role": "Small shard plate indicates FSDP parameter sharding alongside data parallelism.",
+      "connections": [
+        "parallelism_frame_right_post",
+        "tpu_mesh_crossbar",
+        "tpu_shard_boundary_z"
+      ]
+    },
+    {
+      "id": "tpu_chip_a",
+      "name": "TPU Chip A",
+      "shape": "box",
+      "position": [
+        5.9,
+        1.02,
+        2.34
+      ],
+      "size": [
+        0.36,
+        0.1,
+        0.28
+      ],
+      "material": "dark anodized aluminum",
+      "role": "First visible accelerator chip in the training mesh handling a shard of the dense model.",
+      "connections": [
+        "tpu_mesh_crossbar",
+        "tpu_data_bus",
+        "tpu_host_link_a"
+      ]
+    },
+    {
+      "id": "tpu_chip_b",
+      "name": "TPU Chip B",
+      "shape": "box",
+      "position": [
+        6.45,
+        1.02,
+        2.34
+      ],
+      "size": [
+        0.36,
+        0.1,
+        0.28
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second visible accelerator chip showing tensor-parallel neighbours inside the mesh.",
+      "connections": [
+        "tpu_mesh_crossbar",
+        "tpu_data_bus",
+        "tpu_host_link_b"
+      ]
+    },
+    {
+      "id": "tpu_chip_c",
+      "name": "TPU Chip C",
+      "shape": "box",
+      "position": [
+        5.9,
+        1.02,
+        3.06
+      ],
+      "size": [
+        0.36,
+        0.1,
+        0.28
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Third visible accelerator chip showing the second data-parallel row.",
+      "connections": [
+        "tpu_mesh_crossbar",
+        "tpu_data_bus",
+        "tpu_host_link_c"
+      ]
+    },
+    {
+      "id": "tpu_chip_d",
+      "name": "TPU Chip D",
+      "shape": "box",
+      "position": [
+        6.45,
+        1.02,
+        3.06
+      ],
+      "size": [
+        0.36,
+        0.1,
+        0.28
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Fourth visible accelerator chip completing the 2 by 2 symbolic TPU mesh.",
+      "connections": [
+        "tpu_mesh_crossbar",
+        "tpu_data_bus",
+        "tpu_host_link_d"
+      ]
+    },
+    {
+      "id": "tpu_data_bus",
+      "name": "Data Parallel Bus",
+      "shape": "cylinder",
+      "position": [
+        6.18,
+        1.18,
+        2.7
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        1.15
+      ],
+      "material": "copper",
+      "role": "Central bus ties the four TPU chips into a data-parallel training mesh.",
+      "connections": [
+        "tpu_chip_a",
+        "tpu_chip_b",
+        "tpu_chip_c",
+        "tpu_chip_d",
+        "tpu_mesh_crossbar"
+      ]
+    },
+    {
+      "id": "tpu_shard_boundary_x",
+      "name": "Tensor Shard Boundary Fence",
+      "shape": "box",
+      "position": [
+        6.18,
+        1.28,
+        2.7
+      ],
+      "size": [
+        0.06,
+        0.46,
+        0.92
+      ],
+      "material": "white composite",
+      "role": "Thin vertical fence separates left and right tensor-parallel chip partitions.",
+      "connections": [
+        "tpu_chip_a",
+        "tpu_chip_b",
+        "tpu_chip_c",
+        "tpu_chip_d"
+      ]
+    },
+    {
+      "id": "tpu_shard_boundary_z",
+      "name": "FSDP Shard Boundary Fence",
+      "shape": "box",
+      "position": [
+        6.18,
+        1.32,
+        2.7
+      ],
+      "size": [
+        0.92,
+        0.42,
+        0.06
+      ],
+      "material": "white composite",
+      "role": "Thin vertical fence separates front and rear FSDP shard partitions.",
+      "connections": [
+        "tpu_chip_a",
+        "tpu_chip_b",
+        "tpu_chip_c",
+        "tpu_chip_d"
+      ]
+    },
+    {
+      "id": "tpu_host_link_a",
+      "name": "Host Link A",
+      "shape": "capsule",
+      "position": [
+        5.58,
+        0.95,
+        2.34
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.44
+      ],
+      "material": "brushed steel",
+      "role": "Short host link connects chip A to the training control rail.",
+      "connections": [
+        "tpu_chip_a",
+        "rail_back_x"
+      ]
+    },
+    {
+      "id": "tpu_host_link_b",
+      "name": "Host Link B",
+      "shape": "capsule",
+      "position": [
+        6.78,
+        0.95,
+        2.34
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.44
+      ],
+      "material": "brushed steel",
+      "role": "Short host link connects chip B to the training control rail.",
+      "connections": [
+        "tpu_chip_b",
+        "rail_back_x"
+      ]
+    },
+    {
+      "id": "tpu_host_link_c",
+      "name": "Host Link C",
+      "shape": "capsule",
+      "position": [
+        5.58,
+        0.95,
+        3.06
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.44
+      ],
+      "material": "brushed steel",
+      "role": "Short host link connects chip C to the training control rail.",
+      "connections": [
+        "tpu_chip_c",
+        "rail_back_x"
+      ]
+    },
+    {
+      "id": "tpu_host_link_d",
+      "name": "Host Link D",
+      "shape": "capsule",
+      "position": [
+        6.78,
+        0.95,
+        3.06
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.44
+      ],
+      "material": "brushed steel",
+      "role": "Short host link connects chip D to the training control rail.",
+      "connections": [
+        "tpu_chip_d",
+        "rail_back_x"
       ]
     }
   ]

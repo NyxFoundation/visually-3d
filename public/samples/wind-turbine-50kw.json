@@ -1,67 +1,1883 @@
 {
   "machine_name": "50 kW Open-Source Wind Turbine",
-  "assembly_instructions": "Three-blade horizontal-axis wind turbine on a guyed tower. A concrete foundation pad supports a tapered tubular tower built in three stepped sections (widest at the bottom, narrowest at the top) with a small access door at the base. Three steel guy wires anchored in concrete blocks at 120° around the tower stabilize it against lateral wind loads. Atop the tower: a yaw bearing ring, the nacelle body with a rotor hub spinner at the front, three blades at 120° around the hub, and a tail boom ending in a broad tail vane. A small anemometer and wind vane sit on the nacelle roof. A DC cable runs down the outside of the tower to a ground-level battery shed + inverter box. Scale approx 0.3× real — scene is ≈7.5 m tall.",
+  "assembly_instructions": [
+    "Cast the 1.8 m by 1.8 m reinforced concrete pad and set the steel base plate and three guy-anchor blocks at 120 degrees on a 2.8 m modeled radius.",
+    "Bolt the lower tapered tower section to the base plate, install the access door, then stack the middle and upper tower sections using the two bolted flange collars.",
+    "Attach the low and high guy-wire collars, run each steel guy wire to its matching concrete anchor, and tighten the three turnbuckles until the tower is plumb.",
+    "Install the yaw bearing ring on the upper tower flange, fasten the open nacelle tray to the bearing, then add the side rails while leaving the roof panel exploded above the tray.",
+    "Mount the generator stator in the nacelle tray, fit the rotor drum and brake disc on the front shaft, install the brake caliper, then attach the hub spinner and three blade-root flanges.",
+    "Bolt the three tapered fiberglass blades and their flattened chord caps to the root flanges at true 120 degree spacing in the YZ rotor disc, then install the visible root fasteners.",
+    "Assemble the passive furling tail: bolt the port and starboard hinge plates to the rear nacelle tray, insert the hinge pin, attach the offset tail bracket, tail boom, tension spring and tail vane frame.",
+    "Install the anemometer mast, cup rotor and wind-direction vane on the open nacelle frame, and wire both sensors to the nacelle cut-out controller.",
+    "Route the rubber DC downlead down the outside of the tower through lower, middle and upper cable clips, then run the ground conduit into the opened battery shed.",
+    "Build the cutaway shed floor, rear wall, side posts and lifted roof, then wire the battery modules, copper bus bars, blocking diode, charge controller, display, inverter and AC outlet in inspection order."
+  ],
   "metadata": {
     "reference": "https://wiki.opensourceecology.org/wiki/Wind_Turbine",
     "domain": "renewable-energy",
-    "thumbnail_camera": [5.5, 6.0, 5.5],
+    "thumbnail_camera": [
+      5.5,
+      6,
+      5.5
+    ],
     "info": {
       "japanese_name": "50 kW オープンソース風力タービン",
       "english_name": "Open Source Ecology 50 kW Wind Turbine",
       "summary": "Horizontal-axis, three-blade wind turbine on a guyed tower. Part of OSE's Global Village Construction Set as the renewable-electricity prime mover.",
-      "description": "The OSE 50 kW wind turbine is a community-scale, three-blade horizontal-axis wind turbine (HAWT) published as part of the Global Village Construction Set. The rotor captures wind via three composite blades bolted to a central hub; the hub turns a direct-drive DC generator housed in the nacelle at the top of a tall tower. A tail vane behind the nacelle aligns the rotor into the wind by weathervaning around a yaw bearing. A cup anemometer + wind vane on the nacelle roof feed the cut-in/cut-out controller. Direct-current output flows down a cable routed along the tower to a ground-level battery bank with a blocking diode and a small inverter that conditions the output. The tower is stabilized by three steel guy wires anchored in concrete blocks at 120° around the base. OSE's documentation is released under CC BY-SA 4.0.",
+      "description": "The OSE 50 kW wind turbine is a community-scale, three-blade horizontal-axis wind turbine (HAWT) published as part of the Global Village Construction Set. The rotor captures wind via three composite blades bolted to a central hub; the hub turns a direct-drive DC generator housed in an opened nacelle at the top of a guyed tower. A tail vane behind the nacelle aligns the rotor into the wind by weathervaning around a yaw bearing, with a visible offset hinge and spring link representing passive furling hardware. A cup anemometer and wind vane on the nacelle feed the cut-in/cut-out controller. Direct-current output flows down an externally clipped cable to a cutaway ground battery shed containing batteries, bus bars, a blocking diode, a charge controller, an inverter and an AC output. The tower is stabilized by three steel guy wires anchored in concrete blocks at 120 degrees around the base. OSE's documentation is released under CC BY-SA 4.0.",
       "operator": "OSE community builders and off-grid installations",
       "contractor": "Open Source Ecology",
       "contract_date": "GVCS roadmap (design released 2011, iterated since)",
       "contract_value": "Target ≈US$20k in materials (self-build)",
       "status": "Design / small-scale builds; 50 kW class is the roadmap target",
       "facts": [
-        { "label": "Configuration",      "value": "Three-blade horizontal-axis (upwind, free-yaw tail vane)" },
-        { "label": "Rated power",        "value": "≈50 kW" },
-        { "label": "Drivetrain",         "value": "Direct-drive DC generator (no gearbox)" },
-        { "label": "Tower",              "value": "Three-section tapered tubular steel, guyed at 120° with three steel guy wires" },
-        { "label": "Output",             "value": "DC → ground-level battery bank + inverter" },
-        { "label": "Control",            "value": "Passive yaw via tail vane; furling + anemometer cut-out" },
-        { "label": "License",            "value": "CC BY-SA 4.0 (design docs)" }
+        {
+          "label": "Configuration",
+          "value": "Three-blade horizontal-axis upwind turbine with passive free-yaw tail vane and visible offset furling hinge hardware"
+        },
+        {
+          "label": "Rated power",
+          "value": "≈50 kW community-scale electrical output"
+        },
+        {
+          "label": "Scene scale",
+          "value": "Approximately 0.3× real size; modeled tower height is 4.75 m to yaw bearing and total blade-tip height is ≈7.6 m"
+        },
+        {
+          "label": "Rotor",
+          "value": "Three blades, ≈2.55 m modeled radius from hub center to tip, set 120 degrees apart in the YZ rotor plane"
+        },
+        {
+          "label": "Blade model",
+          "value": "Each blade uses a 2.35 m tapered fiberglass spar plus a flattened chord cap to approximate an airfoil without hiding the hub fasteners"
+        },
+        {
+          "label": "Tower",
+          "value": "Three tapered tubular steel sections, 1.6 m + 1.5 m + 1.3 m high, with cable clips on each section"
+        },
+        {
+          "label": "Guying",
+          "value": "Three steel guy wires at 120 degree spacing on a 2.8 m modeled anchor radius"
+        },
+        {
+          "label": "Drivetrain",
+          "value": "Direct-drive DC generator with visible stator, rotor drum and brake disc; no gearbox"
+        },
+        {
+          "label": "Output path",
+          "value": "DC downlead to battery bank, blocking diode, charge controller and inverter in ground shed"
+        },
+        {
+          "label": "License",
+          "value": "OSE design documentation is CC BY-SA 4.0"
+        }
       ],
       "sources": [
-        { "title": "OSE Wiki — Wind Turbine", "url": "https://wiki.opensourceecology.org/wiki/Wind_Turbine" },
-        { "title": "OSE — Global Village Construction Set overview", "url": "https://www.opensourceecology.org/gvcs/" }
+        {
+          "title": "OSE Wiki — Wind Turbine",
+          "url": "https://wiki.opensourceecology.org/wiki/Wind_Turbine"
+        },
+        {
+          "title": "OSE — Global Village Construction Set overview",
+          "url": "https://www.opensourceecology.org/gvcs/"
+        },
+        {
+          "title": "NREL — Small Wind Electric Systems",
+          "url": "https://www.nrel.gov/docs/fy07osti/42005.pdf"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "foundation_pad",  "name": "Concrete Foundation Pad",    "shape": "box",      "position": [0, 0.125, 0],                                     "size": [1.80, 0.25, 1.80], "material": "concrete",             "role": "Reinforced concrete pad anchoring the tower.", "connections": ["tower_base", "dc_cable"] },
-
-    { "id": "tower_base",      "name": "Tower Section (Lower)",       "shape": "cylinder", "position": [0, 1.05, 0],                                      "size": [0.18, 1.60],       "material": "welded steel",         "role": "Widest lower section of the tubular tower.", "connections": ["foundation_pad", "tower_mid", "access_door", "guy_1", "guy_2", "guy_3"] },
-    { "id": "tower_mid",       "name": "Tower Section (Middle)",      "shape": "cylinder", "position": [0, 2.60, 0],                                      "size": [0.15, 1.50],       "material": "welded steel",         "role": "Middle tapered tower section.", "connections": ["tower_base", "tower_top", "guy_1", "guy_2", "guy_3"] },
-    { "id": "tower_top",       "name": "Tower Section (Upper)",       "shape": "cylinder", "position": [0, 4.00, 0],                                      "size": [0.12, 1.30],       "material": "welded steel",         "role": "Narrowest upper tower section — carries the yaw bearing.", "connections": ["tower_mid", "yaw_bearing"] },
-    { "id": "access_door",     "name": "Tower Access Door",           "shape": "box",      "position": [0, 0.60, 0.19],                                   "size": [0.35, 0.60, 0.03], "material": "dark anodized aluminum","role": "Hinged access door at the base for internal cabling and anemometer maintenance.", "connections": ["tower_base"] },
-
-    { "id": "yaw_bearing",     "name": "Yaw Bearing",                 "shape": "cylinder", "position": [0, 4.70, 0],                                      "size": [0.16, 0.10],       "material": "brushed steel",        "role": "Large-diameter thrust bearing — lets the nacelle weathervane freely.", "connections": ["tower_top", "nacelle"] },
-
-    { "id": "nacelle",         "name": "Nacelle",                     "shape": "box",      "position": [0, 4.98, 0],                                      "size": [1.20, 0.40, 0.48], "material": "white composite",      "role": "Sealed nacelle housing — direct-drive DC generator, yaw and brake hardware, controller.", "connections": ["yaw_bearing", "hub_spinner", "tail_boom", "anemometer", "wind_vane", "dc_cable"] },
-    { "id": "hub_spinner",     "name": "Rotor Hub Spinner",           "shape": "sphere",   "position": [0.70, 4.98, 0],                                   "size": [0.18],             "material": "white composite",      "role": "Aerodynamic nose cone + structural hub at the front of the nacelle. Three blades bolt on at 120°.", "connections": ["nacelle", "blade_1", "blade_2", "blade_3"] },
-
-    { "id": "blade_1",         "name": "Blade #1 (top)",              "shape": "cylinder", "position": [0.70, 6.23, 0],                                   "size": [0.06, 2.50],       "material": "fiberglass",           "role": "Composite aerodynamic blade pointing straight up in the reference pose.", "connections": ["hub_spinner"] },
-    { "id": "blade_2",         "name": "Blade #2 (lower-left)",       "shape": "cylinder", "position": [-0.383, 4.355, 0],"rotation": [0, 0, 2.0944],      "size": [0.06, 2.50],       "material": "fiberglass",           "role": "Composite aerodynamic blade 120° around the rotor disc.", "connections": ["hub_spinner"] },
-    { "id": "blade_3",         "name": "Blade #3 (lower-right)",      "shape": "cylinder", "position": [1.783, 4.355, 0], "rotation": [0, 0, -2.0944],     "size": [0.06, 2.50],       "material": "fiberglass",           "role": "Composite aerodynamic blade 240° around the rotor disc.", "connections": ["hub_spinner"] },
-
-    { "id": "tail_boom",       "name": "Tail Boom",                   "shape": "box",      "position": [-0.90, 4.98, 0],                                  "size": [0.80, 0.06, 0.08], "material": "welded steel",         "role": "Rear-projecting boom carrying the tail vane well behind the rotor plane.", "connections": ["nacelle", "tail_vane"] },
-    { "id": "tail_vane",       "name": "Tail Vane",                   "shape": "box",      "position": [-1.35, 5.05, 0],                                  "size": [0.55, 0.55, 0.03], "material": "fiberglass",           "role": "Broad vertical fin that yaws the rotor into the wind.", "connections": ["tail_boom"] },
-
-    { "id": "anemometer",      "name": "Cup Anemometer",              "shape": "cylinder", "position": [0, 5.30, 0.12],                                   "size": [0.020, 0.25],      "material": "brushed steel",        "role": "Vertical cup-anemometer mast on the nacelle roof — reports wind speed for cut-in/cut-out.", "connections": ["nacelle"] },
-    { "id": "wind_vane",       "name": "Wind-Direction Vane",         "shape": "box",      "position": [-0.18, 5.22, 0.12],                               "size": [0.12, 0.08, 0.02], "material": "dark anodized aluminum","role": "Small wind-direction vane alongside the anemometer.", "connections": ["nacelle"] },
-
-    { "id": "guy_1",           "name": "Guy Wire #1 (0°)",            "shape": "cylinder", "position": [1.25, 1.50, 0],   "rotation": [0, 0, -2.4473],     "size": [0.008, 3.905],     "material": "brushed steel",        "role": "Steel guy wire from a mid-tower collar to a concrete anchor on the +X side.", "connections": ["tower_base", "tower_mid", "anchor_1"] },
-    { "id": "guy_2",           "name": "Guy Wire #2 (120°)",          "shape": "cylinder", "position": [-1.25, 1.50, 0],  "rotation": [0, 0, 2.4473],      "size": [0.008, 3.905],     "material": "brushed steel",        "role": "Guy wire to the −X anchor.", "connections": ["tower_base", "tower_mid", "anchor_2"] },
-    { "id": "guy_3",           "name": "Guy Wire #3 (240°)",          "shape": "cylinder", "position": [0, 1.50, 1.25],   "rotation": [2.4473, 0, 0],      "size": [0.008, 3.905],     "material": "brushed steel",        "role": "Guy wire to the +Z anchor (completes the three-way tie).", "connections": ["tower_base", "tower_mid", "anchor_3"] },
-    { "id": "anchor_1",        "name": "Guy Anchor (+X)",             "shape": "box",      "position": [ 2.50, 0.10, 0],                                  "size": [0.30, 0.20, 0.30], "material": "concrete",             "role": "Concrete ground anchor at the +X guy termination.", "connections": ["guy_1"] },
-    { "id": "anchor_2",        "name": "Guy Anchor (−X)",             "shape": "box",      "position": [-2.50, 0.10, 0],                                  "size": [0.30, 0.20, 0.30], "material": "concrete",             "role": "Concrete ground anchor at the −X guy termination.", "connections": ["guy_2"] },
-    { "id": "anchor_3",        "name": "Guy Anchor (+Z)",             "shape": "box",      "position": [0, 0.10, 2.50],                                   "size": [0.30, 0.20, 0.30], "material": "concrete",             "role": "Concrete ground anchor at the +Z guy termination.", "connections": ["guy_3"] },
-
-    { "id": "dc_cable",        "name": "DC Downlead Cable",           "shape": "cylinder", "position": [0.22, 2.45, 0],                                   "size": [0.018, 4.40],      "material": "rubber",               "role": "Insulated DC cable running along the outside of the tower from the generator to the ground gear.", "connections": ["nacelle", "foundation_pad", "battery_shed"] },
-    { "id": "battery_shed",    "name": "Battery Shed",                "shape": "box",      "position": [2.10, 0.40, -1.00],                               "size": [0.90, 0.80, 0.70], "material": "white composite",      "role": "Ground-level shed housing the battery bank and blocking diode.", "connections": ["dc_cable", "inverter_box"] },
-    { "id": "inverter_box",    "name": "Inverter / Controller Box",   "shape": "box",      "position": [1.95, 0.60, -0.55],                               "size": [0.25, 0.30, 0.20], "material": "dark anodized aluminum","role": "DC-DC / inverter + charge-controller mounted on the outside of the battery shed.", "connections": ["battery_shed"] }
+    {
+      "id": "foundation_pad",
+      "name": "Reinforced Concrete Foundation Pad",
+      "shape": "box",
+      "position": [
+        0,
+        0.125,
+        0
+      ],
+      "size": [
+        1.8,
+        0.25,
+        1.8
+      ],
+      "material": "concrete",
+      "role": "Main poured concrete pad that spreads tower compression load into the ground.",
+      "connections": [
+        "base_plate",
+        "shed_floor"
+      ]
+    },
+    {
+      "id": "base_plate",
+      "name": "Bolted Steel Tower Base Plate",
+      "shape": "box",
+      "position": [
+        0,
+        0.28,
+        0
+      ],
+      "size": [
+        0.72,
+        0.06,
+        0.72
+      ],
+      "material": "welded steel",
+      "role": "Square steel plate with anchor bolts that clamps the tower to the concrete pad.",
+      "connections": [
+        "foundation_pad",
+        "tower_lower"
+      ]
+    },
+    {
+      "id": "tower_lower",
+      "name": "Lower Tapered Tower Tube",
+      "shape": "cylinder",
+      "position": [
+        0,
+        1.1,
+        0
+      ],
+      "size": [
+        0.16,
+        0.21,
+        1.6
+      ],
+      "material": "welded steel",
+      "role": "Widest tubular tower section carrying base bending load and the service opening.",
+      "connections": [
+        "base_plate",
+        "lower_flange",
+        "access_door",
+        "guy_collar_low",
+        "cable_clip_lower"
+      ]
+    },
+    {
+      "id": "access_door",
+      "name": "Tower Access Door",
+      "shape": "box",
+      "position": [
+        0.005,
+        0.72,
+        0.215
+      ],
+      "size": [
+        0.34,
+        0.58,
+        0.03
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Removable hatch for reaching cable clamps and tower-base electrical service points.",
+      "connections": [
+        "tower_lower"
+      ]
+    },
+    {
+      "id": "lower_flange",
+      "name": "Lower Bolted Flange Collar",
+      "shape": "cylinder",
+      "position": [
+        0,
+        1.92,
+        0
+      ],
+      "size": [
+        0.24,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Bolted ring joining the lower and middle tower tubes with visible assembly break.",
+      "connections": [
+        "tower_lower",
+        "tower_middle"
+      ]
+    },
+    {
+      "id": "tower_middle",
+      "name": "Middle Tapered Tower Tube",
+      "shape": "cylinder",
+      "position": [
+        0,
+        2.71,
+        0
+      ],
+      "size": [
+        0.125,
+        0.16,
+        1.5
+      ],
+      "material": "welded steel",
+      "role": "Intermediate tubular section that provides height while reducing tower mass.",
+      "connections": [
+        "lower_flange",
+        "upper_flange",
+        "guy_collar_high",
+        "cable_clip_middle"
+      ]
+    },
+    {
+      "id": "upper_flange",
+      "name": "Upper Bolted Flange Collar",
+      "shape": "cylinder",
+      "position": [
+        0,
+        3.48,
+        0
+      ],
+      "size": [
+        0.19,
+        0.07
+      ],
+      "material": "brushed steel",
+      "role": "Bolted ring joining the middle and upper tower tubes for sectional construction.",
+      "connections": [
+        "tower_middle",
+        "tower_upper"
+      ]
+    },
+    {
+      "id": "tower_upper",
+      "name": "Upper Tapered Tower Tube",
+      "shape": "cylinder",
+      "position": [
+        0,
+        4.15,
+        0
+      ],
+      "size": [
+        0.1,
+        0.125,
+        1.3
+      ],
+      "material": "welded steel",
+      "role": "Narrow top tower section that supports the yaw bearing and nacelle loads.",
+      "connections": [
+        "upper_flange",
+        "yaw_bearing",
+        "cable_clip_upper"
+      ]
+    },
+    {
+      "id": "guy_collar_low",
+      "name": "Lower Guy-Wire Collar",
+      "shape": "cylinder",
+      "position": [
+        0,
+        1.45,
+        0
+      ],
+      "size": [
+        0.24,
+        0.06
+      ],
+      "material": "brushed steel",
+      "role": "Clamp ring where the lower stabilizing guy wires attach to the tower.",
+      "connections": [
+        "tower_lower",
+        "guy_wire_a",
+        "guy_wire_b",
+        "guy_wire_c"
+      ]
+    },
+    {
+      "id": "guy_collar_high",
+      "name": "Upper Guy-Wire Collar",
+      "shape": "cylinder",
+      "position": [
+        0,
+        3.08,
+        0
+      ],
+      "size": [
+        0.2,
+        0.06
+      ],
+      "material": "brushed steel",
+      "role": "Higher clamp ring that shares lateral tower load into the three guy wires.",
+      "connections": [
+        "tower_middle",
+        "guy_wire_a",
+        "guy_wire_b",
+        "guy_wire_c"
+      ]
+    },
+    {
+      "id": "anchor_a",
+      "name": "Guy Anchor A (+X)",
+      "shape": "box",
+      "position": [
+        2.8,
+        0.11,
+        0
+      ],
+      "size": [
+        0.36,
+        0.22,
+        0.36
+      ],
+      "material": "concrete",
+      "role": "Concrete deadman anchor for the east guy wire at ground level.",
+      "connections": [
+        "turnbuckle_a"
+      ]
+    },
+    {
+      "id": "anchor_b",
+      "name": "Guy Anchor B (120 degrees)",
+      "shape": "box",
+      "position": [
+        -1.4,
+        0.11,
+        2.425
+      ],
+      "size": [
+        0.36,
+        0.22,
+        0.36
+      ],
+      "material": "concrete",
+      "role": "Concrete deadman anchor for the second guy wire on the 120 degree radial.",
+      "connections": [
+        "turnbuckle_b"
+      ]
+    },
+    {
+      "id": "anchor_c",
+      "name": "Guy Anchor C (240 degrees)",
+      "shape": "box",
+      "position": [
+        -1.4,
+        0.11,
+        -2.425
+      ],
+      "size": [
+        0.36,
+        0.22,
+        0.36
+      ],
+      "material": "concrete",
+      "role": "Concrete deadman anchor for the third guy wire on the 240 degree radial.",
+      "connections": [
+        "turnbuckle_c"
+      ]
+    },
+    {
+      "id": "turnbuckle_a",
+      "name": "Guy Turnbuckle A",
+      "shape": "capsule",
+      "position": [
+        2.48,
+        0.25,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -1.5708
+      ],
+      "size": [
+        0.035,
+        0.32
+      ],
+      "material": "brushed steel",
+      "role": "Adjustable tensioner that tightens the +X guy wire after tower erection.",
+      "connections": [
+        "anchor_a",
+        "guy_wire_a"
+      ]
+    },
+    {
+      "id": "turnbuckle_b",
+      "name": "Guy Turnbuckle B",
+      "shape": "capsule",
+      "position": [
+        -1.24,
+        0.25,
+        2.15
+      ],
+      "rotation": [
+        1.0472,
+        0,
+        0.5236
+      ],
+      "size": [
+        0.035,
+        0.32
+      ],
+      "material": "brushed steel",
+      "role": "Adjustable tensioner that tightens the 120 degree guy wire at its concrete anchor.",
+      "connections": [
+        "anchor_b",
+        "guy_wire_b"
+      ]
+    },
+    {
+      "id": "turnbuckle_c",
+      "name": "Guy Turnbuckle C",
+      "shape": "capsule",
+      "position": [
+        -1.24,
+        0.25,
+        -2.15
+      ],
+      "rotation": [
+        -1.0472,
+        0,
+        0.5236
+      ],
+      "size": [
+        0.035,
+        0.32
+      ],
+      "material": "brushed steel",
+      "role": "Adjustable tensioner that tightens the 240 degree guy wire at its concrete anchor.",
+      "connections": [
+        "anchor_c",
+        "guy_wire_c"
+      ]
+    },
+    {
+      "id": "guy_wire_a",
+      "name": "Steel Guy Wire A",
+      "shape": "cylinder",
+      "position": [
+        1.4,
+        1.54,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.826
+      ],
+      "size": [
+        0.008,
+        3.94
+      ],
+      "material": "brushed steel",
+      "role": "Tension cable from the tower guy collars to the +X anchor block.",
+      "connections": [
+        "guy_collar_low",
+        "guy_collar_high",
+        "turnbuckle_a"
+      ]
+    },
+    {
+      "id": "guy_wire_b",
+      "name": "Steel Guy Wire B",
+      "shape": "cylinder",
+      "position": [
+        -0.7,
+        1.54,
+        1.212
+      ],
+      "rotation": [
+        0.714,
+        0,
+        0.413
+      ],
+      "size": [
+        0.008,
+        3.94
+      ],
+      "material": "brushed steel",
+      "role": "Tension cable from the tower guy collars to the 120 degree anchor block.",
+      "connections": [
+        "guy_collar_low",
+        "guy_collar_high",
+        "turnbuckle_b"
+      ]
+    },
+    {
+      "id": "guy_wire_c",
+      "name": "Steel Guy Wire C",
+      "shape": "cylinder",
+      "position": [
+        -0.7,
+        1.54,
+        -1.212
+      ],
+      "rotation": [
+        -0.714,
+        0,
+        0.413
+      ],
+      "size": [
+        0.008,
+        3.94
+      ],
+      "material": "brushed steel",
+      "role": "Tension cable from the tower guy collars to the 240 degree anchor block.",
+      "connections": [
+        "guy_collar_low",
+        "guy_collar_high",
+        "turnbuckle_c"
+      ]
+    },
+    {
+      "id": "yaw_bearing",
+      "name": "Yaw Bearing Ring",
+      "shape": "torus",
+      "position": [
+        0,
+        4.82,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.035
+      ],
+      "material": "brushed steel",
+      "role": "Horizontal thrust bearing that lets the nacelle rotate freely into the wind.",
+      "connections": [
+        "tower_upper",
+        "nacelle_tray"
+      ]
+    },
+    {
+      "id": "nacelle_tray",
+      "name": "Open Nacelle Tray",
+      "shape": "box",
+      "position": [
+        0.18,
+        5.02,
+        0
+      ],
+      "size": [
+        1.35,
+        0.12,
+        0.5
+      ],
+      "material": "white composite",
+      "role": "Cutaway lower nacelle shell that supports the drivetrain while leaving internals visible.",
+      "connections": [
+        "yaw_bearing",
+        "generator_stator",
+        "left_side_rail",
+        "right_side_rail",
+        "tail_hinge_plate_port",
+        "tail_hinge_plate_starboard",
+        "dc_cable_vertical"
+      ]
+    },
+    {
+      "id": "left_side_rail",
+      "name": "Port Nacelle Side Rail",
+      "shape": "box",
+      "position": [
+        0.18,
+        5.16,
+        0.285
+      ],
+      "size": [
+        1.28,
+        0.22,
+        0.04
+      ],
+      "material": "white composite",
+      "role": "Low side wall of the opened nacelle that shows the generator instead of hiding it.",
+      "connections": [
+        "nacelle_tray"
+      ]
+    },
+    {
+      "id": "right_side_rail",
+      "name": "Starboard Nacelle Side Rail",
+      "shape": "box",
+      "position": [
+        0.18,
+        5.16,
+        -0.285
+      ],
+      "size": [
+        1.28,
+        0.22,
+        0.04
+      ],
+      "material": "white composite",
+      "role": "Opposite low side wall of the opened nacelle for the cutaway assembly view.",
+      "connections": [
+        "nacelle_tray"
+      ]
+    },
+    {
+      "id": "nacelle_roof_exploded",
+      "name": "Exploded Removable Nacelle Roof",
+      "shape": "box",
+      "position": [
+        0.18,
+        5.64,
+        0.62
+      ],
+      "size": [
+        1.3,
+        0.08,
+        0.5
+      ],
+      "material": "white composite",
+      "role": "Removed roof panel displayed above and to the port side so the nacelle internals stay visible.",
+      "connections": [
+        "nacelle_tray"
+      ]
+    },
+    {
+      "id": "generator_stator",
+      "name": "Direct-Drive Generator Stator",
+      "shape": "cylinder",
+      "position": [
+        0.42,
+        5.2,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.26,
+        0.22
+      ],
+      "material": "copper",
+      "role": "Stationary copper winding pack that produces DC output without a gearbox.",
+      "connections": [
+        "nacelle_tray",
+        "generator_rotor",
+        "dc_cable_vertical"
+      ]
+    },
+    {
+      "id": "generator_rotor",
+      "name": "Permanent-Magnet Rotor Drum",
+      "shape": "cylinder",
+      "position": [
+        0.7,
+        5.2,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.22,
+        0.28
+      ],
+      "material": "forged steel",
+      "role": "Rotating magnet drum fixed to the blade shaft and visible ahead of the stator.",
+      "connections": [
+        "generator_stator",
+        "brake_disc",
+        "hub_spinner"
+      ]
+    },
+    {
+      "id": "brake_disc",
+      "name": "Rotor Brake Disc",
+      "shape": "cylinder",
+      "position": [
+        0.9,
+        5.2,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.2,
+        0.035
+      ],
+      "material": "brushed steel",
+      "role": "Flat mechanical brake disc on the rotor shaft for shutdown and overspeed restraint.",
+      "connections": [
+        "generator_rotor",
+        "brake_caliper"
+      ]
+    },
+    {
+      "id": "brake_caliper",
+      "name": "Brake Caliper",
+      "shape": "box",
+      "position": [
+        0.9,
+        5.33,
+        0.18
+      ],
+      "size": [
+        0.12,
+        0.08,
+        0.1
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Clamp body that grips the brake disc during service shutdown.",
+      "connections": [
+        "brake_disc",
+        "nacelle_tray"
+      ]
+    },
+    {
+      "id": "nacelle_controller",
+      "name": "Nacelle Cut-Out Controller",
+      "shape": "box",
+      "position": [
+        -0.14,
+        5.22,
+        -0.14
+      ],
+      "size": [
+        0.24,
+        0.16,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Small controller box that reads wind sensors and commands electrical cut-out.",
+      "connections": [
+        "nacelle_tray",
+        "anemometer_mast",
+        "wind_vane_pivot"
+      ]
+    },
+    {
+      "id": "hub_spinner",
+      "name": "Rotor Hub Spinner",
+      "shape": "sphere",
+      "position": [
+        1.08,
+        5.2,
+        0
+      ],
+      "size": [
+        0.2
+      ],
+      "material": "white composite",
+      "role": "Aerodynamic nose cone and central hub where the three blade roots bolt on.",
+      "connections": [
+        "generator_rotor",
+        "root_flange_top",
+        "root_flange_lower_port",
+        "root_flange_lower_starboard",
+        "blade_top",
+        "blade_lower_port",
+        "blade_lower_starboard"
+      ]
+    },
+    {
+      "id": "root_flange_top",
+      "name": "Blade Root Flange Top",
+      "shape": "cylinder",
+      "position": [
+        1.08,
+        5.43,
+        0
+      ],
+      "size": [
+        0.08,
+        0.18
+      ],
+      "material": "brushed steel",
+      "role": "Round bolted flange transferring the top blade load into the hub.",
+      "connections": [
+        "hub_spinner",
+        "blade_top",
+        "blade_top_chord",
+        "hub_bolt_top_1",
+        "hub_bolt_top_2"
+      ]
+    },
+    {
+      "id": "root_flange_lower_port",
+      "name": "Blade Root Flange Lower Port",
+      "shape": "cylinder",
+      "position": [
+        1.08,
+        5.08,
+        0.2
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        0.18
+      ],
+      "material": "brushed steel",
+      "role": "Bolted flange for the blade angled down toward the port side of the rotor disc.",
+      "connections": [
+        "hub_spinner",
+        "blade_lower_port",
+        "blade_lower_port_chord",
+        "hub_bolt_lp_1",
+        "hub_bolt_lp_2"
+      ]
+    },
+    {
+      "id": "root_flange_lower_starboard",
+      "name": "Blade Root Flange Lower Starboard",
+      "shape": "cylinder",
+      "position": [
+        1.08,
+        5.08,
+        -0.2
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        0.18
+      ],
+      "material": "brushed steel",
+      "role": "Bolted flange for the blade angled down toward the starboard side of the rotor disc.",
+      "connections": [
+        "hub_spinner",
+        "blade_lower_starboard",
+        "blade_lower_starboard_chord",
+        "hub_bolt_ls_1",
+        "hub_bolt_ls_2"
+      ]
+    },
+    {
+      "id": "hub_bolt_top_1",
+      "name": "Top Root Bolt A",
+      "shape": "sphere",
+      "position": [
+        1.18,
+        5.43,
+        0.05
+      ],
+      "size": [
+        0.025
+      ],
+      "material": "steel",
+      "role": "Visible fastener head showing how the top blade root is bolted to the hub flange.",
+      "connections": [
+        "root_flange_top"
+      ]
+    },
+    {
+      "id": "hub_bolt_top_2",
+      "name": "Top Root Bolt B",
+      "shape": "sphere",
+      "position": [
+        0.98,
+        5.43,
+        -0.05
+      ],
+      "size": [
+        0.025
+      ],
+      "material": "steel",
+      "role": "Second visible fastener head on the top blade root flange.",
+      "connections": [
+        "root_flange_top"
+      ]
+    },
+    {
+      "id": "hub_bolt_lp_1",
+      "name": "Port Root Bolt A",
+      "shape": "sphere",
+      "position": [
+        1.18,
+        5.04,
+        0.18
+      ],
+      "size": [
+        0.025
+      ],
+      "material": "steel",
+      "role": "Visible fastener head on the lower-port blade root flange.",
+      "connections": [
+        "root_flange_lower_port"
+      ]
+    },
+    {
+      "id": "hub_bolt_lp_2",
+      "name": "Port Root Bolt B",
+      "shape": "sphere",
+      "position": [
+        0.98,
+        5.13,
+        0.22
+      ],
+      "size": [
+        0.025
+      ],
+      "material": "steel",
+      "role": "Second visible fastener head on the lower-port blade root flange.",
+      "connections": [
+        "root_flange_lower_port"
+      ]
+    },
+    {
+      "id": "hub_bolt_ls_1",
+      "name": "Starboard Root Bolt A",
+      "shape": "sphere",
+      "position": [
+        1.18,
+        5.04,
+        -0.18
+      ],
+      "size": [
+        0.025
+      ],
+      "material": "steel",
+      "role": "Visible fastener head on the lower-starboard blade root flange.",
+      "connections": [
+        "root_flange_lower_starboard"
+      ]
+    },
+    {
+      "id": "hub_bolt_ls_2",
+      "name": "Starboard Root Bolt B",
+      "shape": "sphere",
+      "position": [
+        0.98,
+        5.13,
+        -0.22
+      ],
+      "size": [
+        0.025
+      ],
+      "material": "steel",
+      "role": "Second visible fastener head on the lower-starboard blade root flange.",
+      "connections": [
+        "root_flange_lower_starboard"
+      ]
+    },
+    {
+      "id": "blade_top",
+      "name": "Tapered Fiberglass Blade Top Spar",
+      "shape": "cylinder",
+      "position": [
+        1.08,
+        6.455,
+        0
+      ],
+      "size": [
+        0.035,
+        0.09,
+        2.35
+      ],
+      "material": "fiberglass",
+      "role": "Upper tapered composite blade spar running radially upward from root to tip.",
+      "connections": [
+        "hub_spinner",
+        "root_flange_top",
+        "blade_top_chord"
+      ]
+    },
+    {
+      "id": "blade_top_chord",
+      "name": "Flattened Airfoil Chord Top",
+      "shape": "box",
+      "position": [
+        1.08,
+        6.455,
+        0.035
+      ],
+      "size": [
+        0.12,
+        2.18,
+        0.035
+      ],
+      "material": "fiberglass",
+      "role": "Thin flattened chord surface beside the top spar so the blade reads as an airfoil rather than a rod.",
+      "connections": [
+        "blade_top",
+        "root_flange_top"
+      ]
+    },
+    {
+      "id": "blade_lower_port",
+      "name": "Tapered Fiberglass Blade Lower Port Spar",
+      "shape": "cylinder",
+      "position": [
+        1.08,
+        4.6125,
+        1.018
+      ],
+      "rotation": [
+        2.0944,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.09,
+        2.35
+      ],
+      "material": "fiberglass",
+      "role": "Lower blade spar angled down and toward +Z at 120 degrees in the rotor disc.",
+      "connections": [
+        "hub_spinner",
+        "root_flange_lower_port",
+        "blade_lower_port_chord"
+      ]
+    },
+    {
+      "id": "blade_lower_port_chord",
+      "name": "Flattened Airfoil Chord Lower Port",
+      "shape": "box",
+      "position": [
+        1.08,
+        4.61,
+        1.05
+      ],
+      "rotation": [
+        2.0944,
+        0,
+        0
+      ],
+      "size": [
+        0.12,
+        2.18,
+        0.035
+      ],
+      "material": "fiberglass",
+      "role": "Thin chord panel aligned with the lower-port blade to show blade width and pitch.",
+      "connections": [
+        "blade_lower_port",
+        "root_flange_lower_port"
+      ]
+    },
+    {
+      "id": "blade_lower_starboard",
+      "name": "Tapered Fiberglass Blade Lower Starboard Spar",
+      "shape": "cylinder",
+      "position": [
+        1.08,
+        4.6125,
+        -1.018
+      ],
+      "rotation": [
+        -2.0944,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.09,
+        2.35
+      ],
+      "material": "fiberglass",
+      "role": "Lower blade spar angled down and toward -Z at 240 degrees in the rotor disc.",
+      "connections": [
+        "hub_spinner",
+        "root_flange_lower_starboard",
+        "blade_lower_starboard_chord"
+      ]
+    },
+    {
+      "id": "blade_lower_starboard_chord",
+      "name": "Flattened Airfoil Chord Lower Starboard",
+      "shape": "box",
+      "position": [
+        1.08,
+        4.61,
+        -1.05
+      ],
+      "rotation": [
+        -2.0944,
+        0,
+        0
+      ],
+      "size": [
+        0.12,
+        2.18,
+        0.035
+      ],
+      "material": "fiberglass",
+      "role": "Thin chord panel aligned with the lower-starboard blade to show blade width and pitch.",
+      "connections": [
+        "blade_lower_starboard",
+        "root_flange_lower_starboard"
+      ]
+    },
+    {
+      "id": "tail_hinge_plate_port",
+      "name": "Passive Furling Port Hinge Plate",
+      "shape": "box",
+      "position": [
+        -0.45,
+        5.2,
+        0.16
+      ],
+      "size": [
+        0.18,
+        0.16,
+        0.035
+      ],
+      "material": "brushed steel",
+      "role": "Port-side hinge lug bolted to the rear nacelle tray for the offset furling tail.",
+      "connections": [
+        "nacelle_tray",
+        "tail_hinge_pin"
+      ]
+    },
+    {
+      "id": "tail_hinge_plate_starboard",
+      "name": "Passive Furling Starboard Hinge Plate",
+      "shape": "box",
+      "position": [
+        -0.45,
+        5.2,
+        -0.16
+      ],
+      "size": [
+        0.18,
+        0.16,
+        0.035
+      ],
+      "material": "brushed steel",
+      "role": "Starboard-side hinge lug completing the clevis for the passive furling tail boom.",
+      "connections": [
+        "nacelle_tray",
+        "tail_hinge_pin"
+      ]
+    },
+    {
+      "id": "tail_hinge_pin",
+      "name": "Furling Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        -0.45,
+        5.2,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.025,
+        0.38
+      ],
+      "material": "forged steel",
+      "role": "Horizontal pin through the clevis plates that lets the tail boom fold during high wind.",
+      "connections": [
+        "tail_hinge_plate_port",
+        "tail_hinge_plate_starboard",
+        "tail_offset_bracket"
+      ]
+    },
+    {
+      "id": "tail_offset_bracket",
+      "name": "Offset Tail Bracket",
+      "shape": "box",
+      "position": [
+        -0.58,
+        5.18,
+        0.07
+      ],
+      "size": [
+        0.22,
+        0.08,
+        0.14
+      ],
+      "material": "welded steel",
+      "role": "Offset bracket that places the tail boom behind the furling hinge instead of rigidly on the nacelle centerline.",
+      "connections": [
+        "tail_hinge_pin",
+        "tail_boom",
+        "furling_spring"
+      ]
+    },
+    {
+      "id": "tail_boom",
+      "name": "Rear Tail Boom",
+      "shape": "capsule",
+      "position": [
+        -1.02,
+        5.18,
+        0.07
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        1.05
+      ],
+      "material": "welded steel",
+      "role": "Rear spar that places the tail vane far enough aft to weathervane the rotor.",
+      "connections": [
+        "tail_offset_bracket",
+        "tail_vane_frame",
+        "furling_spring"
+      ]
+    },
+    {
+      "id": "furling_spring",
+      "name": "Tail Furling Return Spring",
+      "shape": "capsule",
+      "position": [
+        -0.72,
+        5.31,
+        -0.08
+      ],
+      "rotation": [
+        0,
+        0,
+        1.15
+      ],
+      "size": [
+        0.018,
+        0.48
+      ],
+      "material": "steel",
+      "role": "Tension spring linking nacelle tray to tail bracket so the tail recenters after furling.",
+      "connections": [
+        "nacelle_tray",
+        "tail_offset_bracket",
+        "tail_boom"
+      ]
+    },
+    {
+      "id": "tail_vane_frame",
+      "name": "Tail Vane Frame",
+      "shape": "box",
+      "position": [
+        -1.6,
+        5.18,
+        0.07
+      ],
+      "size": [
+        0.08,
+        0.62,
+        0.04
+      ],
+      "material": "welded steel",
+      "role": "Vertical frame member that carries the fiberglass tail fin.",
+      "connections": [
+        "tail_boom",
+        "tail_vane_panel"
+      ]
+    },
+    {
+      "id": "tail_vane_panel",
+      "name": "Fiberglass Tail Vane Panel",
+      "shape": "box",
+      "position": [
+        -1.72,
+        5.28,
+        0.07
+      ],
+      "size": [
+        0.5,
+        0.55,
+        0.035
+      ],
+      "material": "fiberglass",
+      "role": "Broad vertical fin that passively yaws the nacelle into the wind.",
+      "connections": [
+        "tail_vane_frame"
+      ]
+    },
+    {
+      "id": "anemometer_mast",
+      "name": "Anemometer Mast",
+      "shape": "cylinder",
+      "position": [
+        -0.18,
+        5.58,
+        0.16
+      ],
+      "size": [
+        0.018,
+        0.46
+      ],
+      "material": "brushed steel",
+      "role": "Vertical instrument mast mounted on the nacelle frame above the cutaway tray.",
+      "connections": [
+        "nacelle_controller",
+        "anemometer_cross"
+      ]
+    },
+    {
+      "id": "anemometer_cross",
+      "name": "Anemometer Cup Cross Arm",
+      "shape": "cylinder",
+      "position": [
+        -0.18,
+        5.82,
+        0.16
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.01,
+        0.36
+      ],
+      "material": "brushed steel",
+      "role": "Small rotor arm holding the three wind-speed cups around the mast.",
+      "connections": [
+        "anemometer_mast",
+        "anemometer_cup_1",
+        "anemometer_cup_2",
+        "anemometer_cup_3"
+      ]
+    },
+    {
+      "id": "anemometer_cup_1",
+      "name": "Anemometer Cup 1",
+      "shape": "sphere",
+      "position": [
+        -0.18,
+        5.82,
+        0.36
+      ],
+      "size": [
+        0.055
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Hemispherical cup approximated as a sphere that catches wind for speed sensing.",
+      "connections": [
+        "anemometer_cross"
+      ]
+    },
+    {
+      "id": "anemometer_cup_2",
+      "name": "Anemometer Cup 2",
+      "shape": "sphere",
+      "position": [
+        -0.33,
+        5.82,
+        0.06
+      ],
+      "size": [
+        0.055
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second visible wind cup completing the rotating anemometer silhouette.",
+      "connections": [
+        "anemometer_cross"
+      ]
+    },
+    {
+      "id": "anemometer_cup_3",
+      "name": "Anemometer Cup 3",
+      "shape": "sphere",
+      "position": [
+        -0.03,
+        5.82,
+        0.06
+      ],
+      "size": [
+        0.055
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Third visible wind cup completing the wind-speed sensor assembly.",
+      "connections": [
+        "anemometer_cross"
+      ]
+    },
+    {
+      "id": "wind_vane_pivot",
+      "name": "Wind Vane Pivot",
+      "shape": "cylinder",
+      "position": [
+        0.1,
+        5.52,
+        -0.16
+      ],
+      "size": [
+        0.014,
+        0.34
+      ],
+      "material": "brushed steel",
+      "role": "Vertical pivot post for the small wind-direction arrow beside the anemometer.",
+      "connections": [
+        "nacelle_controller",
+        "wind_vane_arrow"
+      ]
+    },
+    {
+      "id": "wind_vane_arrow",
+      "name": "Wind-Direction Vane Arrow",
+      "shape": "box",
+      "position": [
+        0.02,
+        5.72,
+        -0.16
+      ],
+      "size": [
+        0.34,
+        0.045,
+        0.025
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Small horizontal arrow that reports wind direction to the controller.",
+      "connections": [
+        "wind_vane_pivot"
+      ]
+    },
+    {
+      "id": "dc_cable_vertical",
+      "name": "Exterior DC Downlead Cable",
+      "shape": "cylinder",
+      "position": [
+        0.25,
+        2.78,
+        -0.03
+      ],
+      "size": [
+        0.018,
+        4.55
+      ],
+      "material": "rubber",
+      "role": "Insulated DC cable running down the outside of the tower from generator to ground electronics.",
+      "connections": [
+        "generator_stator",
+        "cable_clip_lower",
+        "cable_clip_middle",
+        "cable_clip_upper",
+        "dc_cable_ground"
+      ]
+    },
+    {
+      "id": "cable_clip_lower",
+      "name": "Lower Cable Clip",
+      "shape": "box",
+      "position": [
+        0.24,
+        1.25,
+        -0.02
+      ],
+      "size": [
+        0.08,
+        0.05,
+        0.04
+      ],
+      "material": "brushed steel",
+      "role": "Clamp holding the DC downlead against the lower tower section.",
+      "connections": [
+        "tower_lower",
+        "dc_cable_vertical"
+      ]
+    },
+    {
+      "id": "cable_clip_middle",
+      "name": "Middle Cable Clip",
+      "shape": "box",
+      "position": [
+        0.22,
+        2.55,
+        -0.02
+      ],
+      "size": [
+        0.08,
+        0.05,
+        0.04
+      ],
+      "material": "brushed steel",
+      "role": "Clamp holding the DC downlead against the middle tower section.",
+      "connections": [
+        "tower_middle",
+        "dc_cable_vertical"
+      ]
+    },
+    {
+      "id": "cable_clip_upper",
+      "name": "Upper Cable Clip",
+      "shape": "box",
+      "position": [
+        0.19,
+        3.65,
+        -0.02
+      ],
+      "size": [
+        0.08,
+        0.05,
+        0.04
+      ],
+      "material": "brushed steel",
+      "role": "Clamp holding the DC downlead near the upper tower section.",
+      "connections": [
+        "tower_upper",
+        "dc_cable_vertical"
+      ]
+    },
+    {
+      "id": "dc_cable_ground",
+      "name": "Ground DC Cable Conduit",
+      "shape": "cylinder",
+      "position": [
+        1.28,
+        0.22,
+        -0.72
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        1.18
+      ],
+      "size": [
+        0.022,
+        2.15
+      ],
+      "material": "rubber",
+      "role": "Low conduit carrying the tower downlead across the ground into the open battery shed.",
+      "connections": [
+        "dc_cable_vertical",
+        "shed_floor",
+        "charge_controller"
+      ]
+    },
+    {
+      "id": "shed_floor",
+      "name": "Battery Shed Floor Plate",
+      "shape": "box",
+      "position": [
+        2.25,
+        0.08,
+        -1.18
+      ],
+      "size": [
+        1.05,
+        0.12,
+        0.82
+      ],
+      "material": "concrete",
+      "role": "Small equipment-pad floor for the ground-level battery and inverter assembly.",
+      "connections": [
+        "foundation_pad",
+        "shed_back_wall",
+        "shed_front_sill",
+        "shed_post_left",
+        "shed_post_right",
+        "battery_module_1",
+        "battery_module_2",
+        "dc_cable_ground"
+      ]
+    },
+    {
+      "id": "shed_back_wall",
+      "name": "Cutaway Battery Shed Back Wall",
+      "shape": "box",
+      "position": [
+        2.25,
+        0.55,
+        -1.58
+      ],
+      "size": [
+        1.05,
+        0.86,
+        0.06
+      ],
+      "material": "white composite",
+      "role": "Rear wall left standing while the front and one side are removed to reveal the electrical gear.",
+      "connections": [
+        "shed_floor",
+        "shed_roof_lifted",
+        "inverter_box",
+        "charge_controller"
+      ]
+    },
+    {
+      "id": "shed_front_sill",
+      "name": "Battery Shed Front Sill",
+      "shape": "box",
+      "position": [
+        2.25,
+        0.22,
+        -0.78
+      ],
+      "size": [
+        1.05,
+        0.12,
+        0.08
+      ],
+      "material": "white composite",
+      "role": "Low front sill marks the removed front wall without blocking the view of batteries and bus bars.",
+      "connections": [
+        "shed_floor",
+        "shed_post_left",
+        "shed_post_right"
+      ]
+    },
+    {
+      "id": "shed_post_left",
+      "name": "Battery Shed Left Corner Post",
+      "shape": "box",
+      "position": [
+        1.76,
+        0.55,
+        -0.82
+      ],
+      "size": [
+        0.07,
+        0.78,
+        0.07
+      ],
+      "material": "white composite",
+      "role": "Exposed corner post showing the shed frame while keeping the side open for inspection.",
+      "connections": [
+        "shed_floor",
+        "shed_front_sill",
+        "shed_roof_lifted"
+      ]
+    },
+    {
+      "id": "shed_post_right",
+      "name": "Battery Shed Right Corner Post",
+      "shape": "box",
+      "position": [
+        2.74,
+        0.55,
+        -0.82
+      ],
+      "size": [
+        0.07,
+        0.78,
+        0.07
+      ],
+      "material": "white composite",
+      "role": "Opposite exposed corner post supporting the lifted roof reference plane.",
+      "connections": [
+        "shed_floor",
+        "shed_front_sill",
+        "shed_roof_lifted"
+      ]
+    },
+    {
+      "id": "shed_roof_lifted",
+      "name": "Exploded Battery Shed Roof",
+      "shape": "box",
+      "position": [
+        2.25,
+        1.18,
+        -1.18
+      ],
+      "size": [
+        1.08,
+        0.08,
+        0.86
+      ],
+      "material": "white composite",
+      "role": "Removable roof panel lifted above the shed so the battery bank remains visible.",
+      "connections": [
+        "shed_back_wall",
+        "shed_post_left",
+        "shed_post_right"
+      ]
+    },
+    {
+      "id": "battery_module_1",
+      "name": "Battery Module 1",
+      "shape": "box",
+      "position": [
+        2,
+        0.34,
+        -1.18
+      ],
+      "size": [
+        0.28,
+        0.36,
+        0.5
+      ],
+      "material": "dark anodized aluminum",
+      "role": "First visible battery block storing DC energy from the wind turbine.",
+      "connections": [
+        "shed_floor",
+        "positive_bus_bar",
+        "negative_bus_bar"
+      ]
+    },
+    {
+      "id": "battery_module_2",
+      "name": "Battery Module 2",
+      "shape": "box",
+      "position": [
+        2.35,
+        0.34,
+        -1.18
+      ],
+      "size": [
+        0.28,
+        0.36,
+        0.5
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second visible battery block wired in the ground-level DC storage bank.",
+      "connections": [
+        "shed_floor",
+        "positive_bus_bar",
+        "negative_bus_bar"
+      ]
+    },
+    {
+      "id": "positive_bus_bar",
+      "name": "Positive Copper Bus Bar",
+      "shape": "box",
+      "position": [
+        2.18,
+        0.56,
+        -0.92
+      ],
+      "size": [
+        0.72,
+        0.035,
+        0.04
+      ],
+      "material": "copper",
+      "role": "Copper positive bus tying both battery modules to the charge controller.",
+      "connections": [
+        "battery_module_1",
+        "battery_module_2",
+        "blocking_diode",
+        "charge_controller"
+      ]
+    },
+    {
+      "id": "negative_bus_bar",
+      "name": "Negative Copper Bus Bar",
+      "shape": "box",
+      "position": [
+        2.18,
+        0.22,
+        -0.92
+      ],
+      "size": [
+        0.72,
+        0.035,
+        0.04
+      ],
+      "material": "copper",
+      "role": "Copper negative return bus tying both battery modules to the inverter circuit.",
+      "connections": [
+        "battery_module_1",
+        "battery_module_2",
+        "charge_controller"
+      ]
+    },
+    {
+      "id": "blocking_diode",
+      "name": "Blocking Diode Heat Sink",
+      "shape": "box",
+      "position": [
+        2.72,
+        0.5,
+        -1.05
+      ],
+      "size": [
+        0.12,
+        0.2,
+        0.18
+      ],
+      "material": "brushed steel",
+      "role": "Heat-sunk blocking diode preventing the battery bank from back-driving the generator.",
+      "connections": [
+        "positive_bus_bar",
+        "charge_controller"
+      ]
+    },
+    {
+      "id": "charge_controller",
+      "name": "Charge Controller",
+      "shape": "box",
+      "position": [
+        2.72,
+        0.75,
+        -1.36
+      ],
+      "size": [
+        0.28,
+        0.24,
+        0.12
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Wall-mounted controller that regulates turbine DC input before the battery bank and inverter.",
+      "connections": [
+        "dc_cable_ground",
+        "positive_bus_bar",
+        "negative_bus_bar",
+        "blocking_diode",
+        "controller_display",
+        "inverter_box"
+      ]
+    },
+    {
+      "id": "controller_display",
+      "name": "Controller Glass Display",
+      "shape": "box",
+      "position": [
+        2.72,
+        0.79,
+        -1.29
+      ],
+      "size": [
+        0.18,
+        0.09,
+        0.015
+      ],
+      "material": "glass display",
+      "role": "Small readout on the charge controller for voltage, current and fault state.",
+      "connections": [
+        "charge_controller"
+      ]
+    },
+    {
+      "id": "inverter_box",
+      "name": "Inverter Box",
+      "shape": "box",
+      "position": [
+        1.72,
+        0.68,
+        -1.36
+      ],
+      "size": [
+        0.34,
+        0.36,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "DC-to-AC inverter mounted on the opened shed wall for conditioned electrical output.",
+      "connections": [
+        "shed_back_wall",
+        "charge_controller",
+        "ac_outlet"
+      ]
+    },
+    {
+      "id": "ac_outlet",
+      "name": "AC Output Receptacle",
+      "shape": "box",
+      "position": [
+        1.72,
+        0.56,
+        -1.25
+      ],
+      "size": [
+        0.14,
+        0.1,
+        0.025
+      ],
+      "material": "glass display",
+      "role": "Visible output interface showing where conditioned AC power leaves the inverter.",
+      "connections": [
+        "inverter_box"
+      ]
+    }
   ]
 }

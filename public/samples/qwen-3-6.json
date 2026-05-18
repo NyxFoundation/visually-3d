@@ -1,6 +1,6 @@
 {
   "machine_name": "Qwen3.6 (projected flagship)",
-  "assembly_instructions": "1. Set the open_frame_base on the floor at world y=0, then bolt in the left/right base rails, rear base rail, and four vertical frame posts. 2. Install the cyan residual_spine vertically through the center of the frame and connect it to the input_plate and embedding_table at the floor. 3. Slide the twelve visible layer cartridges onto the residual spine in order: three pale linear DeltaNet cartridges, one dark softmax cartridge, repeated three times to show the 3:1 pattern that scales to 192 layers. 4. Mount the DeltaNet subassembly on the left service rail: qkv_gate_projection feeds the deltanet_kernel, which updates the fixed-size state_torus and state_memory_capsule before returning through deltanet_output_projection. 5. Mount the softmax subassembly on the right service rail: softmax_qkv_projection feeds qk_norm_rope, softmax_attention_plate, kv_cache_tower with four cache_slices, and softmax_output_gate. 6. Attach the MoE bridge to the right side of every cartridge, then install the router disk, dispatch manifold, eight active expert cartridges, inactive expert bank, combine manifold, and copper all_to_all_ring. 7. Install the top output deck with prediction_head, mtp_head, lm_loss_marker, mode_think_plate, and mode_no_think_plate. 8. Add the long_context_module above the softmax side because DCA and YaRN act only on the softmax layers. 9. Connect the training_data_pipe into the input floor and the optimizer_adamw and post_train_pipeline modules to the frame service rail. 10. Verify that every non-root subsystem has a visible connection to either the frame, the residual spine, or the dataflow manifolds; no opaque enclosure hides two or more internal parts.",
+  "assembly_instructions": "1. Place open_frame_base on the floor at world y=0 and bolt the left/right/rear/front base rails, two base outriggers, and four vertical posts through the base plate. 2. Add rear and front top cross rails, left and right top side rails, and the four diagonal braces so the rack is square but still open for inspection. 3. Mount input_plate, embedding_table, and residual_spine on the centerline; the spine is the assembly datum for every sampled transformer cartridge. 4. Stack the twelve visible layer cartridges on the residual spine in the 3:1 cadence: three brass DeltaNet cartridges followed by one copper softmax cartridge, repeated at the bottom and top samples to stand for 192 layers. 5. Attach one narrow layer tap to each visible cartridge, then connect DeltaNet taps to the left service arm and softmax taps to the right service arm. 6. Build the left DeltaNet subassembly from its support posts, qkv gate projection, kernel block, fixed state torus, state memory capsule, and output projection; connect its output back to the residual spine. 7. Build the right softmax subassembly from its support posts, QKV projection, QK-Norm cylinder, RoPE ring, attention plate, output gate, KV cache tower, four 64K cache slices, DCA plate, and YaRN plate. 8. Bolt the MoE bridge to the right side of the layer stack, install router, dispatch manifold, eight active expert cartridges, four open inactive-expert bank shelves, combine manifold, and all-to-all communication ring. 9. Install the top output deck, MTP head, LM loss marker, /think and /no_think mode plates, and connect them to the final softmax layer and residual spine. 10. Add training_data_pipe, optimizer_adamw, post_train_pipeline, and the TP/EP/PP/DP rear backplane; verify every non-root subsystem connects visibly to the frame, residual spine, cache tower, or MoE manifolds without any opaque enclosure hiding two or more internal parts.",
   "metadata": {
     "domain": "ml-architecture",
     "reference": "https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct",
@@ -12,7 +12,7 @@
     "info": {
       "english_name": "Qwen3.6 (projected flagship, ~480B-A30B hybrid-attention MoE)",
       "summary": "PROJECTED next-generation flagship from Alibaba's Qwen team, extrapolated from the Qwen3 + Qwen3-Next research direction. No public paper at scene time. Best guess: scales Qwen3-Next's hybrid Gated DeltaNet (linear) + Gated Attention (softmax) pattern to flagship size. ~480B total / ~30B activated, 192 layers, 3:1 LINEAR:SOFTMAX attention ratio, 256 routed experts (top-8, no shared), QK-Norm + RoPE on softmax layers, MTP head, /think + /no_think modes preserved, 256K native context (1M with DCA + YaRN), 200+ languages. Treat numbers as plausible extrapolation, not fact.",
-      "description": "Qwen3.6 is presented here as a research-trajectory PROJECTION, not a paper. Where Qwen3-235B-A22B was full softmax + GQA(64/4) + 128 experts top-8, and where Qwen3-Next-80B-A3B introduced the Gated DeltaNet linear-attention + Gated Attention hybrid at small scale, Qwen3.6 likely (i) brings that hybrid to flagship scale (480B-A30B), (ii) doubles depth (94 → 192 layers — Qwen3-Next is already 48 layers narrow), (iii) doubles expert count (128 → 256), (iv) keeps GQA at extreme 16:1 in the few softmax layers, (v) adds an MTP head (Qwen3 lacked one; Qwen3-Coder added one — full family adoption), (vi) extends native context 32K → 256K with DCA + YaRN reaching 1M, (vii) keeps /think + /no_think system-tag modes.\n\nDesign rationale, in one line each:\n• Gated DeltaNet (linear): O(N) attention for 75% of layers — KV-cache memory scales with layer count, not context length, on those layers.\n• Keep some softmax: pure linear attention loses associative recall (the 'needle in a haystack' problem); 1-in-4 softmax layer restores it.\n• Doubled experts (256): adds capacity at the same active-FLOPs budget.\n• MTP added: ~1.8× speculative decoding for free.\n• 192 layers: Qwen3-Next showed deep-narrow scaling holds; flagship inherits.",
+      "description": "Qwen3.6 is presented here as a research-trajectory PROJECTION, not a paper. Where Qwen3-235B-A22B was full softmax + GQA(64/4) + 128 experts top-8, and where Qwen3-Next-80B-A3B introduced the Gated DeltaNet linear-attention + Gated Attention hybrid at small scale, Qwen3.6 likely (i) brings that hybrid to flagship scale (480B-A30B), (ii) doubles depth (94 → 192 layers — Qwen3-Next is already 48 layers narrow), (iii) doubles expert count (128 → 256), (iv) keeps GQA at extreme 16:1 in the few softmax layers, (v) adds an MTP head (Qwen3 lacked one; Qwen3-Coder added one — full family adoption), (vi) extends native context 32K → 256K with DCA + YaRN reaching 1M, (vii) keeps /think + /no_think system-tag modes preserved.\n\nDesign rationale, in one line each:\n• Gated DeltaNet (linear): O(N) attention for 75% of layers — KV-cache memory scales with layer count, not context length, on those layers.\n• Keep some softmax: pure linear attention loses associative recall (the 'needle in a haystack' problem); 1-in-4 softmax layer restores it.\n• Doubled experts (256): adds capacity at the same active-FLOPs budget.\n• MTP added: ~1.8× speculative decoding for free.\n• 192 layers: Qwen3-Next showed deep-narrow scaling holds; flagship inherits.",
       "facts": [
         {
           "label": "status",
@@ -145,18 +145,17 @@
         2.6
       ],
       "material": "welded steel",
-      "role": "Thin floor plate that roots the full assembly without hiding the token path or layer internals.",
+      "role": "Thin floor plate roots the assembly at y=0 while leaving transformer, attention, and MoE internals visible above it.",
       "compute_profile": "negligible",
       "parallelism": "pipeline-parallel",
       "connections": [
-        "input_plate",
         "left_base_rail",
         "right_base_rail",
         "rear_base_rail",
-        "front_left_post",
-        "front_right_post",
-        "rear_left_post",
-        "rear_right_post"
+        "front_base_rail",
+        "left_outrigger",
+        "right_outrigger",
+        "input_plate"
       ]
     },
     {
@@ -174,12 +173,15 @@
         2.4
       ],
       "material": "brushed steel",
-      "role": "Left rail carries the DeltaNet state hardware and keeps it visibly outside the layer stack.",
+      "role": "Left rail carries DeltaNet support posts and keeps the linear-attention state hardware outside the layer stack.",
       "compute_profile": "negligible",
       "parallelism": "pipeline-parallel",
       "connections": [
         "open_frame_base",
-        "deltanet_service_arm"
+        "front_left_post",
+        "rear_left_post",
+        "deltanet_lower_support",
+        "deltanet_upper_support"
       ]
     },
     {
@@ -197,12 +199,15 @@
         2.4
       ],
       "material": "brushed steel",
-      "role": "Right rail carries softmax cache and MoE dispatch modules outside the main residual tower.",
+      "role": "Right rail supports the softmax cache and MoE dispatch modules outside the residual tower.",
       "compute_profile": "negligible",
       "parallelism": "pipeline-parallel",
       "connections": [
         "open_frame_base",
-        "softmax_service_arm",
+        "front_right_post",
+        "rear_right_post",
+        "softmax_lower_support",
+        "softmax_upper_support",
         "moe_bridge"
       ]
     },
@@ -221,11 +226,88 @@
         0.14
       ],
       "material": "brushed steel",
-      "role": "Rear cross rail squares the open frame while leaving the front cut away for inspection.",
+      "role": "Rear cross rail squares the base and anchors the distributed-parallelism backplane.",
       "compute_profile": "negligible",
       "parallelism": "pipeline-parallel",
       "connections": [
-        "open_frame_base"
+        "open_frame_base",
+        "rear_left_post",
+        "rear_right_post",
+        "parallelism_backplane"
+      ]
+    },
+    {
+      "id": "front_base_rail",
+      "name": "Front Open Cross Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.24,
+        1.18
+      ],
+      "size": [
+        4.4,
+        0.14,
+        0.1
+      ],
+      "material": "brushed steel",
+      "role": "Low front rail ties the two front posts without blocking the view into token input and embedding stages.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "open_frame_base",
+        "front_left_post",
+        "front_right_post",
+        "input_plate"
+      ]
+    },
+    {
+      "id": "left_outrigger",
+      "name": "Left Module Outrigger",
+      "shape": "box",
+      "position": [
+        -3.05,
+        0.12,
+        0.75
+      ],
+      "size": [
+        1.2,
+        0.1,
+        0.18
+      ],
+      "material": "welded steel",
+      "role": "Floor outrigger braces the external DeltaNet modules so they do not appear to float off the frame.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "open_frame_base",
+        "deltanet_lower_support",
+        "training_data_pipe"
+      ]
+    },
+    {
+      "id": "right_outrigger",
+      "name": "Right Module Outrigger",
+      "shape": "box",
+      "position": [
+        3.15,
+        0.12,
+        0.35
+      ],
+      "size": [
+        1.55,
+        0.1,
+        0.18
+      ],
+      "material": "welded steel",
+      "role": "Floor outrigger carries the external softmax cache tower and MoE expert rack.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "open_frame_base",
+        "softmax_lower_support",
+        "expert_rack_post_front",
+        "expert_rack_post_rear"
       ]
     },
     {
@@ -242,12 +324,14 @@
         6.6
       ],
       "material": "welded steel",
-      "role": "Vertical post showing the frame height and keeping the front-left corner open around the layer cartridges.",
+      "role": "Front-left post defines the open rack height while keeping the cartridge faces exposed.",
       "compute_profile": "negligible",
       "parallelism": "pipeline-parallel",
       "connections": [
-        "open_frame_base",
-        "top_cross_rail"
+        "left_base_rail",
+        "front_top_cross_rail",
+        "left_top_side_rail",
+        "front_left_diagonal_brace"
       ]
     },
     {
@@ -264,12 +348,14 @@
         6.6
       ],
       "material": "welded steel",
-      "role": "Vertical post supporting the MoE side bridge without enclosing the transformer layers.",
+      "role": "Front-right post supports the MoE bridge side while leaving the front inspection face open.",
       "compute_profile": "negligible",
       "parallelism": "pipeline-parallel",
       "connections": [
-        "open_frame_base",
-        "top_cross_rail"
+        "right_base_rail",
+        "front_top_cross_rail",
+        "right_top_side_rail",
+        "front_right_diagonal_brace"
       ]
     },
     {
@@ -286,12 +372,14 @@
         6.6
       ],
       "material": "welded steel",
-      "role": "Rear post gives the tower depth while preserving a cutaway front view.",
+      "role": "Rear-left post gives the tower depth and supports the rear execution backplane.",
       "compute_profile": "negligible",
       "parallelism": "pipeline-parallel",
       "connections": [
-        "open_frame_base",
-        "top_cross_rail"
+        "left_base_rail",
+        "rear_top_cross_rail",
+        "left_top_side_rail",
+        "rear_left_diagonal_brace"
       ]
     },
     {
@@ -308,17 +396,19 @@
         6.6
       ],
       "material": "welded steel",
-      "role": "Rear post ties the softmax and MoE side modules back to the main frame.",
+      "role": "Rear-right post ties the softmax and MoE side modules back to the main frame.",
       "compute_profile": "negligible",
       "parallelism": "pipeline-parallel",
       "connections": [
-        "open_frame_base",
-        "top_cross_rail"
+        "right_base_rail",
+        "rear_top_cross_rail",
+        "right_top_side_rail",
+        "rear_right_diagonal_brace"
       ]
     },
     {
-      "id": "top_cross_rail",
-      "name": "Top Output Cross Rail",
+      "id": "rear_top_cross_rail",
+      "name": "Rear Top Output Cross Rail",
       "shape": "box",
       "position": [
         0,
@@ -331,15 +421,197 @@
         0.16
       ],
       "material": "brushed steel",
-      "role": "Top rail mechanically ties the four posts and carries the final LM head deck.",
+      "role": "Rear top rail ties the rear posts and carries the back edge of the output deck.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "rear_left_post",
+        "rear_right_post",
+        "prediction_head"
+      ]
+    },
+    {
+      "id": "front_top_cross_rail",
+      "name": "Front Top Output Cross Rail",
+      "shape": "box",
+      "position": [
+        0,
+        6.78,
+        1.15
+      ],
+      "size": [
+        4.4,
+        0.12,
+        0.12
+      ],
+      "material": "brushed steel",
+      "role": "Front top rail completes the open rectangular frame without forming an opaque cover.",
       "compute_profile": "negligible",
       "parallelism": "pipeline-parallel",
       "connections": [
         "front_left_post",
         "front_right_post",
-        "rear_left_post",
-        "rear_right_post",
         "prediction_head"
+      ]
+    },
+    {
+      "id": "left_top_side_rail",
+      "name": "Left Top Side Rail",
+      "shape": "box",
+      "position": [
+        -1.95,
+        6.78,
+        0
+      ],
+      "size": [
+        0.12,
+        0.12,
+        2.3
+      ],
+      "material": "brushed steel",
+      "role": "Left side rail locks the two left posts while leaving the DeltaNet modules visible below it.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "front_left_post",
+        "rear_left_post",
+        "deltanet_service_arm"
+      ]
+    },
+    {
+      "id": "right_top_side_rail",
+      "name": "Right Top Side Rail",
+      "shape": "box",
+      "position": [
+        1.95,
+        6.78,
+        0
+      ],
+      "size": [
+        0.12,
+        0.12,
+        2.3
+      ],
+      "material": "brushed steel",
+      "role": "Right side rail braces the softmax cache and MoE side of the frame.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "front_right_post",
+        "rear_right_post",
+        "softmax_service_arm"
+      ]
+    },
+    {
+      "id": "front_left_diagonal_brace",
+      "name": "Front Left Diagonal Brace",
+      "shape": "capsule",
+      "position": [
+        -1.95,
+        3.45,
+        1
+      ],
+      "rotation": [
+        0.58,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        5.8
+      ],
+      "material": "steel",
+      "role": "Slim diagonal brace triangulates the front-left bay without hiding the layer cartridges.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "front_left_post",
+        "left_base_rail",
+        "front_top_cross_rail"
+      ]
+    },
+    {
+      "id": "front_right_diagonal_brace",
+      "name": "Front Right Diagonal Brace",
+      "shape": "capsule",
+      "position": [
+        1.95,
+        3.45,
+        1
+      ],
+      "rotation": [
+        -0.58,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        5.8
+      ],
+      "material": "steel",
+      "role": "Slim diagonal brace supports the MoE side while preserving the front cutaway.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "front_right_post",
+        "right_base_rail",
+        "front_top_cross_rail"
+      ]
+    },
+    {
+      "id": "rear_left_diagonal_brace",
+      "name": "Rear Left Diagonal Brace",
+      "shape": "capsule",
+      "position": [
+        -1.95,
+        3.45,
+        -1
+      ],
+      "rotation": [
+        -0.58,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        5.8
+      ],
+      "material": "steel",
+      "role": "Rear-left brace stabilizes the frame behind the residual tower.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "rear_left_post",
+        "rear_base_rail",
+        "rear_top_cross_rail"
+      ]
+    },
+    {
+      "id": "rear_right_diagonal_brace",
+      "name": "Rear Right Diagonal Brace",
+      "shape": "capsule",
+      "position": [
+        1.95,
+        3.45,
+        -1
+      ],
+      "rotation": [
+        0.58,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        5.8
+      ],
+      "material": "steel",
+      "role": "Rear-right brace stabilizes the softmax and expert side of the frame.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "rear_right_post",
+        "rear_base_rail",
+        "rear_top_cross_rail"
       ]
     },
     {
@@ -363,7 +635,8 @@
       "connections": [
         "open_frame_base",
         "embedding_table",
-        "training_data_pipe"
+        "training_data_pipe",
+        "front_base_rail"
       ]
     },
     {
@@ -381,7 +654,7 @@
         0.5
       ],
       "material": "glass display",
-      "role": "Tied embedding lookup that converts token ids into the d=4096 residual stream.",
+      "role": "Tied embedding lookup converts token ids into the d=4096 residual stream before the first layer.",
       "compute_profile": "gpu-bandwidth-bound",
       "memory_footprint": "≈152K × 4096 × BF16 ≈1.24 GiB",
       "parallelism": "tensor-parallel",
@@ -421,7 +694,8 @@
         "linear_layer_190",
         "linear_layer_191",
         "softmax_layer_192",
-        "prediction_head"
+        "prediction_head",
+        "combine_manifold"
       ]
     },
     {
@@ -439,11 +713,13 @@
         0.12
       ],
       "material": "dark anodized aluminum",
-      "role": "Scale bar marking that the twelve visible cartridges are samples of 192 total layers.",
+      "role": "Scale bar marks that the twelve visible cartridges are samples of 192 total layers.",
       "compute_profile": "negligible",
       "parallelism": "pipeline-parallel",
       "connections": [
-        "residual_spine"
+        "residual_spine",
+        "linear_layer_001",
+        "softmax_layer_192"
       ]
     },
     {
@@ -461,12 +737,12 @@
         0.72
       ],
       "material": "brass",
-      "role": "First visible Gated DeltaNet block using linear recurrent attention instead of a context-length KV cache.",
+      "role": "First visible Gated DeltaNet block uses linear recurrent attention instead of a context-length KV cache.",
       "compute_profile": "gpu-bandwidth-bound",
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
-        "deltanet_qkv_gate_projection",
+        "layer_tap_001",
         "moe_bridge"
       ]
     },
@@ -490,7 +766,7 @@
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
-        "deltanet_kernel",
+        "layer_tap_002",
         "moe_bridge"
       ]
     },
@@ -514,7 +790,7 @@
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
-        "deltanet_state_torus",
+        "layer_tap_003",
         "moe_bridge"
       ]
     },
@@ -538,7 +814,7 @@
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
-        "softmax_qkv_projection",
+        "layer_tap_004",
         "softmax_kv_cache_tower",
         "moe_bridge"
       ]
@@ -558,12 +834,12 @@
         0.72
       ],
       "material": "brass",
-      "role": "Linear layer sample showing the repeated DeltaNet path after a softmax recovery layer.",
+      "role": "Linear layer sample shows the repeated DeltaNet path after a softmax recovery layer.",
       "compute_profile": "gpu-bandwidth-bound",
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
-        "deltanet_kernel",
+        "layer_tap_005",
         "moe_bridge"
       ]
     },
@@ -587,6 +863,7 @@
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
+        "layer_tap_006",
         "deltanet_state_memory",
         "moe_bridge"
       ]
@@ -611,6 +888,7 @@
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
+        "layer_tap_007",
         "deltanet_output_projection",
         "moe_bridge"
       ]
@@ -635,6 +913,7 @@
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
+        "layer_tap_008",
         "softmax_attention_plate",
         "softmax_kv_cache_tower",
         "moe_bridge"
@@ -655,12 +934,12 @@
         0.72
       ],
       "material": "brass",
-      "role": "Compressed top-of-stack sample showing that the late layers still follow the linear attention majority.",
+      "role": "Compressed top-of-stack sample shows that late layers still follow the linear-attention majority.",
       "compute_profile": "gpu-bandwidth-bound",
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
-        "deltanet_kernel",
+        "layer_tap_189",
         "moe_bridge"
       ]
     },
@@ -684,6 +963,7 @@
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
+        "layer_tap_190",
         "deltanet_state_memory",
         "moe_bridge"
       ]
@@ -708,6 +988,7 @@
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
+        "layer_tap_191",
         "deltanet_output_projection",
         "moe_bridge"
       ]
@@ -727,15 +1008,342 @@
         0.78
       ],
       "material": "copper",
-      "role": "Final attention layer before the tied LM head, preserving associative recall at the top of the stack.",
+      "role": "Final attention layer before the tied LM head preserves associative recall at the top of the stack.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "tensor-parallel",
       "connections": [
         "residual_spine",
+        "layer_tap_192",
         "softmax_output_gate",
         "softmax_kv_cache_tower",
         "prediction_head",
         "moe_bridge"
+      ]
+    },
+    {
+      "id": "layer_tap_001",
+      "name": "Layer 001 DeltaNet Tap",
+      "shape": "box",
+      "position": [
+        -1.05,
+        1.12,
+        0.36
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Narrow tap makes the first linear layer's service connection visible outside the cartridge stack.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "linear_layer_001",
+        "deltanet_service_arm"
+      ]
+    },
+    {
+      "id": "layer_tap_002",
+      "name": "Layer 002 DeltaNet Tap",
+      "shape": "box",
+      "position": [
+        -1.05,
+        1.48,
+        0.36
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Narrow tap links the second linear layer to the shared DeltaNet kernel path.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "linear_layer_002",
+        "deltanet_service_arm"
+      ]
+    },
+    {
+      "id": "layer_tap_003",
+      "name": "Layer 003 DeltaNet Tap",
+      "shape": "box",
+      "position": [
+        -1.05,
+        1.84,
+        0.36
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Narrow tap shows the third linear layer feeding recurrent state before softmax recovery.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "linear_layer_003",
+        "deltanet_service_arm"
+      ]
+    },
+    {
+      "id": "layer_tap_004",
+      "name": "Layer 004 Softmax Tap",
+      "shape": "box",
+      "position": [
+        1.12,
+        2.22,
+        0.36
+      ],
+      "size": [
+        0.62,
+        0.07,
+        0.08
+      ],
+      "material": "copper",
+      "role": "Softmax tap routes the fourth layer out to QK-Norm, RoPE, and the KV cache tower.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "softmax_layer_004",
+        "softmax_service_arm"
+      ]
+    },
+    {
+      "id": "layer_tap_005",
+      "name": "Layer 005 DeltaNet Tap",
+      "shape": "box",
+      "position": [
+        -1.05,
+        2.62,
+        0.36
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Narrow tap re-enters the DeltaNet side after the first softmax layer.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "linear_layer_005",
+        "deltanet_service_arm"
+      ]
+    },
+    {
+      "id": "layer_tap_006",
+      "name": "Layer 006 DeltaNet Tap",
+      "shape": "box",
+      "position": [
+        -1.05,
+        2.98,
+        0.36
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Narrow tap links the sixth layer to the fixed-size DeltaNet memory capsule.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "linear_layer_006",
+        "deltanet_service_arm",
+        "deltanet_state_memory"
+      ]
+    },
+    {
+      "id": "layer_tap_007",
+      "name": "Layer 007 DeltaNet Tap",
+      "shape": "box",
+      "position": [
+        -1.05,
+        3.34,
+        0.36
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Narrow tap connects the seventh layer to the DeltaNet output projection.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "linear_layer_007",
+        "deltanet_output_projection"
+      ]
+    },
+    {
+      "id": "layer_tap_008",
+      "name": "Layer 008 Softmax Tap",
+      "shape": "box",
+      "position": [
+        1.12,
+        3.72,
+        0.36
+      ],
+      "size": [
+        0.62,
+        0.07,
+        0.08
+      ],
+      "material": "copper",
+      "role": "Softmax tap shows the second recovery layer sharing the KV cache tower.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "softmax_layer_008",
+        "softmax_service_arm",
+        "softmax_attention_plate"
+      ]
+    },
+    {
+      "id": "layer_tap_189",
+      "name": "Layer 189 DeltaNet Tap",
+      "shape": "box",
+      "position": [
+        -1.05,
+        4.42,
+        0.36
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Late-stack tap makes the sampled top DeltaNet block visibly share the same linear path.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "linear_layer_189",
+        "deltanet_service_arm"
+      ]
+    },
+    {
+      "id": "layer_tap_190",
+      "name": "Layer 190 DeltaNet Tap",
+      "shape": "box",
+      "position": [
+        -1.05,
+        4.78,
+        0.36
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Late-stack tap connects the penultimate DeltaNet memory path.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "linear_layer_190",
+        "deltanet_service_arm",
+        "deltanet_state_memory"
+      ]
+    },
+    {
+      "id": "layer_tap_191",
+      "name": "Layer 191 DeltaNet Tap",
+      "shape": "box",
+      "position": [
+        -1.05,
+        5.14,
+        0.36
+      ],
+      "size": [
+        0.55,
+        0.06,
+        0.08
+      ],
+      "material": "aluminum",
+      "role": "Final DeltaNet tap shows the linear path returning before the last softmax layer.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "linear_layer_191",
+        "deltanet_output_projection"
+      ]
+    },
+    {
+      "id": "layer_tap_192",
+      "name": "Layer 192 Softmax Tap",
+      "shape": "box",
+      "position": [
+        1.12,
+        5.52,
+        0.36
+      ],
+      "size": [
+        0.62,
+        0.07,
+        0.08
+      ],
+      "material": "copper",
+      "role": "Final softmax tap connects the top attention layer to output gating and long-context cache.",
+      "compute_profile": "negligible",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "softmax_layer_192",
+        "softmax_output_gate",
+        "softmax_service_arm"
+      ]
+    },
+    {
+      "id": "deltanet_lower_support",
+      "name": "DeltaNet Lower Support Post",
+      "shape": "cylinder",
+      "position": [
+        -2.55,
+        1.55,
+        0.75
+      ],
+      "size": [
+        0.045,
+        2.85
+      ],
+      "material": "steel",
+      "role": "Lower post carries the left-side DeltaNet plates from the base outrigger up to the service arm.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "left_outrigger",
+        "left_base_rail",
+        "deltanet_service_arm"
+      ]
+    },
+    {
+      "id": "deltanet_upper_support",
+      "name": "DeltaNet Upper Support Post",
+      "shape": "cylinder",
+      "position": [
+        -3.35,
+        3.4,
+        0.75
+      ],
+      "size": [
+        0.045,
+        3.6
+      ],
+      "material": "steel",
+      "role": "Upper post braces the DeltaNet kernel, state ring, and output projection so the subassembly reads as mounted hardware.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "left_base_rail",
+        "deltanet_service_arm",
+        "deltanet_state_torus"
       ]
     },
     {
@@ -753,13 +1361,21 @@
         0.12
       ],
       "material": "aluminum",
-      "role": "Cantilever arm physically connects the left-side DeltaNet modules to the open frame.",
+      "role": "Cantilever arm physically connects the left-side DeltaNet modules and all linear-layer taps to the frame.",
       "compute_profile": "negligible",
       "parallelism": "pipeline-parallel",
       "connections": [
-        "left_base_rail",
+        "deltanet_lower_support",
+        "deltanet_upper_support",
         "deltanet_qkv_gate_projection",
-        "deltanet_kernel"
+        "deltanet_kernel",
+        "layer_tap_001",
+        "layer_tap_002",
+        "layer_tap_003",
+        "layer_tap_005",
+        "layer_tap_006",
+        "layer_tap_189",
+        "layer_tap_190"
       ]
     },
     {
@@ -811,7 +1427,8 @@
         "deltanet_qkv_gate_projection",
         "deltanet_state_torus",
         "deltanet_state_memory",
-        "deltanet_output_projection"
+        "deltanet_output_projection",
+        "deltanet_service_arm"
       ]
     },
     {
@@ -833,7 +1450,8 @@
       "memory_footprint": "≈1 MB per sequence per layer, independent of token count",
       "parallelism": "data-parallel",
       "connections": [
-        "deltanet_kernel"
+        "deltanet_kernel",
+        "deltanet_upper_support"
       ]
     },
     {
@@ -855,13 +1473,14 @@
         0.82
       ],
       "material": "brushed steel",
-      "role": "Compact memory vessel showing that DeltaNet storage scales with layers and batch, not with context length.",
+      "role": "Compact memory vessel shows that DeltaNet storage scales with layers and batch, not context length.",
       "compute_profile": "gpu-memory-bound",
       "parallelism": "data-parallel",
       "connections": [
         "deltanet_kernel",
         "linear_layer_006",
-        "linear_layer_190"
+        "linear_layer_190",
+        "deltanet_upper_support"
       ]
     },
     {
@@ -886,7 +1505,54 @@
         "deltanet_kernel",
         "residual_spine",
         "linear_layer_007",
-        "linear_layer_191"
+        "linear_layer_191",
+        "deltanet_service_arm"
+      ]
+    },
+    {
+      "id": "softmax_lower_support",
+      "name": "Softmax Lower Support Post",
+      "shape": "cylinder",
+      "position": [
+        2.55,
+        1.7,
+        0.75
+      ],
+      "size": [
+        0.045,
+        3.1
+      ],
+      "material": "steel",
+      "role": "Lower support post carries the right-side softmax inspection modules from the outrigger to the service arm.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "right_outrigger",
+        "right_base_rail",
+        "softmax_service_arm"
+      ]
+    },
+    {
+      "id": "softmax_upper_support",
+      "name": "Softmax Cache Support Post",
+      "shape": "cylinder",
+      "position": [
+        4,
+        3.55,
+        0.75
+      ],
+      "size": [
+        0.055,
+        5
+      ],
+      "material": "steel",
+      "role": "Cache support post visually anchors the KV tower and long-context plates to the base.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "right_outrigger",
+        "softmax_kv_cache_tower",
+        "long_context_module"
       ]
     },
     {
@@ -904,13 +1570,17 @@
         0.12
       ],
       "material": "aluminum",
-      "role": "Right-side arm connects the softmax inspection modules to the frame and layer stack.",
+      "role": "Right-side arm connects softmax taps, QKV projection, and attention plate to the frame and cache tower.",
       "compute_profile": "negligible",
       "parallelism": "pipeline-parallel",
       "connections": [
-        "right_base_rail",
+        "right_top_side_rail",
+        "softmax_lower_support",
         "softmax_qkv_projection",
-        "softmax_attention_plate"
+        "softmax_attention_plate",
+        "layer_tap_004",
+        "layer_tap_008",
+        "layer_tap_192"
       ]
     },
     {
@@ -934,17 +1604,17 @@
       "algorithm": "Q,K,V=proj(x); Q,K=qk_rmsnorm(Q,K)",
       "connections": [
         "softmax_service_arm",
-        "qk_norm_rope",
+        "qk_norm_stage",
         "softmax_layer_004"
       ]
     },
     {
-      "id": "qk_norm_rope",
-      "name": "QK-Norm and RoPE Stage",
+      "id": "qk_norm_stage",
+      "name": "QK-Norm Stage",
       "shape": "cylinder",
       "position": [
-        3.6,
-        3.18,
+        3.45,
+        3.1,
         0.75
       ],
       "rotation": [
@@ -953,15 +1623,42 @@
         1.5708
       ],
       "size": [
-        0.12,
-        0.55
+        0.1,
+        0.45
       ],
       "material": "white composite",
-      "role": "Normalizes query and key vectors and applies rotary position embedding before attention.",
+      "role": "Normalizes query and key vectors before rotary position embedding is applied.",
       "compute_profile": "gpu-bandwidth-bound",
       "parallelism": "tensor-parallel",
       "connections": [
         "softmax_qkv_projection",
+        "rope_stage"
+      ]
+    },
+    {
+      "id": "rope_stage",
+      "name": "RoPE Rotary Position Ring",
+      "shape": "torus",
+      "position": [
+        3.82,
+        3.1,
+        0.75
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.035
+      ],
+      "material": "brass",
+      "role": "Rotary ring marks position encoding on softmax Q and K streams before attention.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "qk_norm_stage",
         "softmax_attention_plate"
       ]
     },
@@ -985,10 +1682,11 @@
       "parallelism": "tensor-parallel",
       "algorithm": "attn=flash_attn(Q,K,V,mask=causal)",
       "connections": [
-        "qk_norm_rope",
+        "rope_stage",
         "softmax_kv_cache_tower",
         "softmax_output_gate",
-        "softmax_layer_008"
+        "softmax_layer_008",
+        "softmax_service_arm"
       ]
     },
     {
@@ -1010,6 +1708,7 @@
       "memory_footprint": "≈1 KB/token/softmax-layer ×48×256K ≈12 GiB per sequence",
       "parallelism": "tensor-parallel",
       "connections": [
+        "softmax_upper_support",
         "softmax_attention_plate",
         "softmax_layer_004",
         "softmax_layer_008",
@@ -1017,7 +1716,9 @@
         "kv_cache_slice_1",
         "kv_cache_slice_2",
         "kv_cache_slice_3",
-        "kv_cache_slice_4"
+        "kv_cache_slice_4",
+        "dca_window_plate",
+        "yarn_scale_plate"
       ]
     },
     {
@@ -1035,7 +1736,7 @@
         0.44
       ],
       "material": "glass display",
-      "role": "First visible cache slice representing the initial 64K portion of native 256K context.",
+      "role": "First visible cache slice represents the initial 64K portion of native 256K context.",
       "compute_profile": "memory-capacity-bound",
       "parallelism": "tensor-parallel",
       "connections": [
@@ -1057,7 +1758,7 @@
         0.44
       ],
       "material": "glass display",
-      "role": "Second visible cache slice representing the next 64K native context segment.",
+      "role": "Second visible cache slice represents the next 64K native context segment.",
       "compute_profile": "memory-capacity-bound",
       "parallelism": "tensor-parallel",
       "connections": [
@@ -1079,7 +1780,7 @@
         0.44
       ],
       "material": "glass display",
-      "role": "Third visible cache slice representing the 128K to 192K context range.",
+      "role": "Third visible cache slice represents the 128K to 192K context range.",
       "compute_profile": "memory-capacity-bound",
       "parallelism": "tensor-parallel",
       "connections": [
@@ -1101,12 +1802,13 @@
         0.44
       ],
       "material": "glass display",
-      "role": "Fourth visible cache slice completing the projected 256K native window.",
+      "role": "Fourth visible cache slice completes the projected 256K native window.",
       "compute_profile": "memory-capacity-bound",
       "parallelism": "tensor-parallel",
       "connections": [
         "softmax_kv_cache_tower",
-        "long_context_module"
+        "dca_window_plate",
+        "yarn_scale_plate"
       ]
     },
     {
@@ -1138,6 +1840,79 @@
       ]
     },
     {
+      "id": "long_context_module",
+      "name": "DCA plus YaRN Long-Context Module",
+      "shape": "box",
+      "position": [
+        3.85,
+        5.75,
+        0.75
+      ],
+      "size": [
+        1.15,
+        0.16,
+        0.62
+      ],
+      "material": "glass display",
+      "role": "Open top rail groups the DCA and YaRN plates that extend softmax attention from 256K native to projected 1M context.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "embarrassingly-parallel",
+      "connections": [
+        "softmax_upper_support",
+        "dca_window_plate",
+        "yarn_scale_plate",
+        "softmax_layer_192"
+      ]
+    },
+    {
+      "id": "dca_window_plate",
+      "name": "Dual-Chunk Attention Window Plate",
+      "shape": "box",
+      "position": [
+        3.55,
+        5.98,
+        0.75
+      ],
+      "size": [
+        0.48,
+        0.12,
+        0.5
+      ],
+      "material": "aluminum",
+      "role": "DCA plate depicts chunked attention scheduling used to make million-token softmax windows tractable.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "long_context_module",
+        "kv_cache_slice_4",
+        "softmax_kv_cache_tower"
+      ]
+    },
+    {
+      "id": "yarn_scale_plate",
+      "name": "YaRN RoPE Scaling Plate",
+      "shape": "box",
+      "position": [
+        4.15,
+        5.98,
+        0.75
+      ],
+      "size": [
+        0.48,
+        0.12,
+        0.5
+      ],
+      "material": "brass",
+      "role": "YaRN plate marks rotary-position scaling that extrapolates context beyond the native training window.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "long_context_module",
+        "kv_cache_slice_4",
+        "rope_stage"
+      ]
+    },
+    {
       "id": "moe_bridge",
       "name": "Per-Layer MoE Bridge",
       "shape": "box",
@@ -1152,7 +1927,7 @@
         0.16
       ],
       "material": "aluminum",
-      "role": "Vertical bridge shows that every transformer layer routes through a per-layer MoE feed-forward block.",
+      "role": "Vertical bridge shows that every transformer layer routes through a per-layer sparse MoE feed-forward block.",
       "compute_profile": "communication-bound",
       "parallelism": "expert-parallel",
       "connections": [
@@ -1192,7 +1967,11 @@
       "connections": [
         "moe_bridge",
         "dispatch_manifold",
-        "all_to_all_ring"
+        "all_to_all_ring",
+        "inactive_expert_bank_shelf_1",
+        "inactive_expert_bank_shelf_2",
+        "inactive_expert_bank_shelf_3",
+        "inactive_expert_bank_shelf_4"
       ]
     },
     {
@@ -1226,6 +2005,54 @@
       ]
     },
     {
+      "id": "expert_rack_post_front",
+      "name": "Expert Rack Front Post",
+      "shape": "cylinder",
+      "position": [
+        3.48,
+        3.35,
+        -0.22
+      ],
+      "size": [
+        0.045,
+        3.1
+      ],
+      "material": "steel",
+      "role": "Front post anchors the open expert rack and keeps active cartridges in a readable plane.",
+      "compute_profile": "negligible",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "right_outrigger",
+        "dispatch_manifold",
+        "combine_manifold",
+        "inactive_expert_bank_shelf_1"
+      ]
+    },
+    {
+      "id": "expert_rack_post_rear",
+      "name": "Expert Rack Rear Post",
+      "shape": "cylinder",
+      "position": [
+        3.48,
+        3.35,
+        -1.15
+      ],
+      "size": [
+        0.045,
+        3.1
+      ],
+      "material": "steel",
+      "role": "Rear post carries the inactive expert shelves without covering the active top-8 route.",
+      "compute_profile": "negligible",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "right_outrigger",
+        "inactive_expert_bank_shelf_2",
+        "inactive_expert_bank_shelf_3",
+        "inactive_expert_bank_shelf_4"
+      ]
+    },
+    {
       "id": "expert_active_1",
       "name": "Active Expert 1 of Top-8",
       "shape": "box",
@@ -1240,12 +2067,13 @@
         0.34
       ],
       "material": "white composite",
-      "role": "One selected SwiGLU expert cartridge from the projected 256 routed experts.",
+      "role": "First selected SwiGLU expert cartridge from the projected 256 routed experts.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "expert-parallel",
       "connections": [
         "dispatch_manifold",
-        "combine_manifold"
+        "combine_manifold",
+        "expert_rack_post_front"
       ]
     },
     {
@@ -1263,12 +2091,13 @@
         0.34
       ],
       "material": "white composite",
-      "role": "Second selected expert showing top-8 activation rather than a single shared expert.",
+      "role": "Second selected expert shows top-8 activation rather than a single shared expert.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "expert-parallel",
       "connections": [
         "dispatch_manifold",
-        "combine_manifold"
+        "combine_manifold",
+        "expert_rack_post_front"
       ]
     },
     {
@@ -1286,12 +2115,13 @@
         0.34
       ],
       "material": "white composite",
-      "role": "Third selected SwiGLU expert with intermediate dimension around 1536.",
+      "role": "Third selected SwiGLU expert carries intermediate dimension around 1536.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "expert-parallel",
       "connections": [
         "dispatch_manifold",
-        "combine_manifold"
+        "combine_manifold",
+        "expert_rack_post_front"
       ]
     },
     {
@@ -1309,12 +2139,13 @@
         0.34
       ],
       "material": "white composite",
-      "role": "Fourth selected expert in the per-token sparse feed-forward path.",
+      "role": "Fourth selected expert participates in the per-token sparse feed-forward path.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "expert-parallel",
       "connections": [
         "dispatch_manifold",
-        "combine_manifold"
+        "combine_manifold",
+        "expert_rack_post_front"
       ]
     },
     {
@@ -1332,12 +2163,13 @@
         0.34
       ],
       "material": "white composite",
-      "role": "Fifth selected expert cartridge, making the top-8 routing count visible.",
+      "role": "Fifth selected expert cartridge makes the top-8 routing count visible.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "expert-parallel",
       "connections": [
         "dispatch_manifold",
-        "combine_manifold"
+        "combine_manifold",
+        "expert_rack_post_rear"
       ]
     },
     {
@@ -1355,12 +2187,13 @@
         0.34
       ],
       "material": "white composite",
-      "role": "Sixth selected expert in the activated 30B-parameter token path.",
+      "role": "Sixth selected expert contributes to the activated 30B-parameter token path.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "expert-parallel",
       "connections": [
         "dispatch_manifold",
-        "combine_manifold"
+        "combine_manifold",
+        "expert_rack_post_rear"
       ]
     },
     {
@@ -1378,12 +2211,13 @@
         0.34
       ],
       "material": "white composite",
-      "role": "Seventh active expert, separated from the inactive bank to avoid hiding the sparse route.",
+      "role": "Seventh active expert is separated from the inactive bank to avoid hiding the sparse route.",
       "compute_profile": "gpu-compute-bound",
       "parallelism": "expert-parallel",
       "connections": [
         "dispatch_manifold",
-        "combine_manifold"
+        "combine_manifold",
+        "expert_rack_post_rear"
       ]
     },
     {
@@ -1406,30 +2240,106 @@
       "parallelism": "expert-parallel",
       "connections": [
         "dispatch_manifold",
-        "combine_manifold"
+        "combine_manifold",
+        "expert_rack_post_rear"
       ]
     },
     {
-      "id": "inactive_expert_bank",
-      "name": "Inactive Expert Bank: Remaining 248 of 256",
-      "shape": "cylinder",
+      "id": "inactive_expert_bank_shelf_1",
+      "name": "Inactive Expert Bank Shelf 1",
+      "shape": "box",
       "position": [
         3.55,
-        3.35,
+        2.55,
         -1.28
       ],
       "size": [
-        0.88,
+        1,
+        0.08,
         0.18
       ],
       "material": "dark anodized aluminum",
-      "role": "Thin background disk marks the full 256-expert pool while the eight selected cartridges remain exposed.",
+      "role": "First open shelf represents a quarter of the 248 inactive experts without hiding the active top-8 cartridges.",
       "compute_profile": "gpu-compute-bound",
-      "memory_footprint": "256 × 3·d·d_ff × BF16 ≈9.3 GiB per layer",
+      "memory_footprint": "≈62 inactive experts represented on this shelf",
       "parallelism": "expert-parallel",
       "connections": [
         "moe_router",
-        "dispatch_manifold"
+        "expert_rack_post_front",
+        "expert_rack_post_rear"
+      ]
+    },
+    {
+      "id": "inactive_expert_bank_shelf_2",
+      "name": "Inactive Expert Bank Shelf 2",
+      "shape": "box",
+      "position": [
+        3.55,
+        3.05,
+        -1.28
+      ],
+      "size": [
+        1,
+        0.08,
+        0.18
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second open shelf marks more parked experts while preserving a cutaway view through the rack.",
+      "compute_profile": "gpu-compute-bound",
+      "memory_footprint": "≈62 inactive experts represented on this shelf",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_router",
+        "expert_rack_post_rear"
+      ]
+    },
+    {
+      "id": "inactive_expert_bank_shelf_3",
+      "name": "Inactive Expert Bank Shelf 3",
+      "shape": "box",
+      "position": [
+        3.55,
+        3.55,
+        -1.28
+      ],
+      "size": [
+        1,
+        0.08,
+        0.18
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Third open shelf shows unused expert capacity as a rack rather than a featureless opaque disk.",
+      "compute_profile": "gpu-compute-bound",
+      "memory_footprint": "≈62 inactive experts represented on this shelf",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_router",
+        "expert_rack_post_rear"
+      ]
+    },
+    {
+      "id": "inactive_expert_bank_shelf_4",
+      "name": "Inactive Expert Bank Shelf 4",
+      "shape": "box",
+      "position": [
+        3.55,
+        4.05,
+        -1.28
+      ],
+      "size": [
+        1,
+        0.08,
+        0.18
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Fourth open shelf completes the remaining 248-of-256 expert pool representation.",
+      "compute_profile": "gpu-compute-bound",
+      "memory_footprint": "Total MoE bank ≈256 × 3·d·d_ff × BF16 ≈9.3 GiB per layer",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_router",
+        "expert_rack_post_rear",
+        "combine_manifold"
       ]
     },
     {
@@ -1459,7 +2369,8 @@
         "expert_active_6",
         "expert_active_7",
         "expert_active_8",
-        "residual_spine"
+        "residual_spine",
+        "all_to_all_ring"
       ]
     },
     {
@@ -1491,30 +2402,6 @@
       ]
     },
     {
-      "id": "long_context_module",
-      "name": "DCA plus YaRN Long-Context Module",
-      "shape": "box",
-      "position": [
-        3.85,
-        5.75,
-        0.75
-      ],
-      "size": [
-        1.15,
-        0.3,
-        0.62
-      ],
-      "material": "glass display",
-      "role": "Dual-Chunk Attention and YaRN extension module applies only to softmax layers to reach projected 1M context.",
-      "compute_profile": "gpu-compute-bound",
-      "parallelism": "embarrassingly-parallel",
-      "connections": [
-        "kv_cache_slice_4",
-        "softmax_kv_cache_tower",
-        "softmax_layer_192"
-      ]
-    },
-    {
       "id": "prediction_head",
       "name": "Tied LM Head",
       "shape": "box",
@@ -1533,11 +2420,14 @@
       "compute_profile": "gpu-compute-bound",
       "parallelism": "tensor-parallel",
       "connections": [
-        "top_cross_rail",
+        "rear_top_cross_rail",
+        "front_top_cross_rail",
         "residual_spine",
         "softmax_layer_192",
         "mtp_head",
-        "lm_loss_marker"
+        "lm_loss_marker",
+        "mode_think_plate",
+        "mode_no_think_plate"
       ]
     },
     {
@@ -1602,7 +2492,8 @@
       "compute_profile": "negligible",
       "parallelism": "data-parallel",
       "connections": [
-        "prediction_head"
+        "prediction_head",
+        "post_train_pipeline"
       ]
     },
     {
@@ -1651,7 +2542,9 @@
       "parallelism": "data-parallel",
       "connections": [
         "input_plate",
-        "open_frame_base"
+        "open_frame_base",
+        "left_outrigger",
+        "optimizer_adamw"
       ]
     },
     {
@@ -1675,7 +2568,31 @@
       "connections": [
         "left_base_rail",
         "training_data_pipe",
+        "optimizer_support",
         "post_train_pipeline"
+      ]
+    },
+    {
+      "id": "optimizer_support",
+      "name": "Optimizer Support Bracket",
+      "shape": "box",
+      "position": [
+        -3.35,
+        0.72,
+        -1
+      ],
+      "size": [
+        0.12,
+        1.15,
+        0.12
+      ],
+      "material": "steel",
+      "role": "Vertical bracket grounds the AdamW module to the left service rail and prevents it reading as a floating block.",
+      "compute_profile": "negligible",
+      "parallelism": "data-parallel",
+      "connections": [
+        "left_base_rail",
+        "optimizer_adamw"
       ]
     },
     {
@@ -1699,7 +2616,32 @@
       "connections": [
         "optimizer_adamw",
         "lm_loss_marker",
-        "mode_think_plate"
+        "mode_think_plate",
+        "post_train_support"
+      ]
+    },
+    {
+      "id": "post_train_support",
+      "name": "Post-Training Support Bracket",
+      "shape": "box",
+      "position": [
+        -3.35,
+        4.05,
+        -1
+      ],
+      "size": [
+        0.12,
+        2.7,
+        0.12
+      ],
+      "material": "steel",
+      "role": "Tall bracket ties the elevated post-training module to the left frame rail and top brace.",
+      "compute_profile": "negligible",
+      "parallelism": "data-parallel",
+      "connections": [
+        "left_base_rail",
+        "post_train_pipeline",
+        "left_top_side_rail"
       ]
     },
     {
@@ -1722,6 +2664,7 @@
       "parallelism": "pipeline-parallel",
       "connections": [
         "rear_base_rail",
+        "rear_top_cross_rail",
         "residual_spine",
         "all_to_all_ring",
         "optimizer_adamw"

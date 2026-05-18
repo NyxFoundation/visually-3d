@@ -1,10 +1,14 @@
 {
   "machine_name": "TABBY EVO Open-Source EV Platform",
-  "assembly_instructions": "Open-source 'skateboard' electric-vehicle chassis — a bolted square-tube steel space frame with a flat battery tray, ready to have any body shell dropped on top. Two long side rails and two cross members frame the floor pan, which carries a flat under-floor Li-ion pack. At each corner: a wheel, a vertical coilover strut, and a lower lateral A-arm connecting the chassis to the wheel hub. Front: a rack-and-pinion steering bar between the wheels, a driver-side steering column, and a front bumper tube. Rear: a transverse electric motor coupled to a reduction gearbox and a transverse drive shaft to the rear wheels. On-floor electronics: motor controller, BMS, DC/DC converter. A side-mounted charge port, two seats, and 2.33 × 1.49 × 1.38 m overall dimensions.",
+  "assembly_instructions": "1. Clamp the port and starboard 2.33 m square-tube side rails on a flat jig at the 1.49 m overall track envelope. 2. Bolt or weld the front, middle, and rear cross members between the rails, then check diagonals so the ladder frame is square before adding braces. 3. Install the thin open battery-tray floor, four raised tray rim members, and four diagonal floor braces, leaving the tray top open for module service. 4. Add the front and rear bumper tubes plus four suspension towers and their top tabs, then verify all wheel centers sit at y = 0.30 m so the tires touch the ground plane. 5. Lower six removable battery modules into the tray, fasten the two hold-down straps and terminal blocks, then connect the front and rear copper bus bars to the BMS, DC/DC converter, charge socket, and inverter. 6. Mount the BMS, inverter, DC/DC converter, low-voltage lead, charge-port cable, and inverter-to-motor cable above the open tray where they remain visible without removing a body shell. 7. Assemble each corner with lower A-arm links, upper control-arm links, hub upright, brake disc, brake caliper, wheel rim, tire, damper body, and visible coil spring. 8. Fit the steering rack to the front cross member, connect the tie rods and spherical tie-rod ends to the front uprights, then install the pinion joint, tilted steering column, steering wheel, pedal box, throttle pedal, and brake pedal. 9. Bolt the rear transverse traction motor and single-speed gearbox to the rear cross member, install the output housing, inner CV joints, and both rear half-shafts to the driven hubs. 10. Install the driver and passenger seat rails, thin cushions, back panels, bolsters, and head pads, then perform final checks for wheel-ground contact, tray service clearance, brake-caliper clearance, steering linkage alignment, and a continuous connection path from every part back to the welded frame.",
   "metadata": {
     "reference": "https://www.openmotors.co/download/",
     "domain": "electric-vehicles",
-    "thumbnail_camera": [4.5, 3.0, 4.5],
+    "thumbnail_camera": [
+      4.5,
+      3,
+      4.5
+    ],
     "info": {
       "japanese_name": "TABBY EVO（オープンソース EV プラットフォーム）",
       "english_name": "Open Motors TABBY EVO — Open-Source Electric Vehicle Platform",
@@ -16,59 +20,3001 @@
       "contract_value": "Reference BOM published; no fixed list price",
       "status": "Open-source; documents and CAD archived and publicly downloadable",
       "facts": [
-        { "label": "Length × Width × Height", "value": "2.33 m × 1.49 m × 1.38 m" },
-        { "label": "Architecture",           "value": "'Skateboard' floor frame with rear-drive electric powertrain" },
-        { "label": "Seating",                "value": "2 + (optional) 2 seats, body-shell dependent" },
-        { "label": "Powertrain",             "value": "Transverse electric motor → reduction gearbox → transverse drive shaft (rear wheels)" },
-        { "label": "Battery",                "value": "Flat under-floor Li-ion pack + BMS" },
-        { "label": "Electronics",            "value": "Motor controller + DC/DC converter + BMS, floor-mounted" },
-        { "label": "Chassis",                "value": "Bolted square-tube steel space frame with corner A-arm suspension" },
-        { "label": "License",                "value": "CC BY-SA 4.0 (all CAD, BOM, and docs)" }
+        {
+          "label": "Length × Width × Height",
+          "value": "2.33 m × 1.49 m × 1.38 m"
+        },
+        {
+          "label": "Wheel outside diameter represented",
+          "value": "0.60 m tire diameter from 0.30 m torus ring radius"
+        },
+        {
+          "label": "Architecture",
+          "value": "'Skateboard' floor frame with rear-drive electric powertrain"
+        },
+        {
+          "label": "Battery layout in model",
+          "value": "Six visible removable modules in two rows of three, each 0.66 m × 0.10 m × 0.25 m"
+        },
+        {
+          "label": "Powertrain",
+          "value": "Transverse electric motor → reduction gearbox → transverse rear half-shafts"
+        },
+        {
+          "label": "Electronics",
+          "value": "Motor controller, DC/DC converter, BMS, bus bars, terminal blocks, and charge-port lead are floor-mounted and exposed"
+        },
+        {
+          "label": "Chassis",
+          "value": "Bolted square-tube steel space frame with separate rails, cross members, tray rim, braces, and towers"
+        },
+        {
+          "label": "Suspension represented",
+          "value": "Four-corner double-wishbone layout with upper links, lower A-arm links, upright, damper, and coil spring"
+        },
+        {
+          "label": "Seating",
+          "value": "Two exposed low seats shown as rails, cushion, back panel, side bolsters, and head pad"
+        },
+        {
+          "label": "License",
+          "value": "CC BY-SA 4.0 (all CAD, BOM, and docs)"
+        }
       ],
       "sources": [
-        { "title": "Open Motors — downloads & documentation portal", "url": "https://www.openmotors.co/download/" },
-        { "title": "Open Motors — TABBY EVO product page",            "url": "https://www.openmotors.co/tabbyevo/" }
+        {
+          "title": "Open Motors — downloads & documentation portal",
+          "url": "https://www.openmotors.co/download/"
+        },
+        {
+          "title": "Open Motors — TABBY EVO product page",
+          "url": "https://www.openmotors.co/tabbyevo/"
+        },
+        {
+          "title": "OSVehicle / Open Motors archived open-source vehicle documentation",
+          "url": "https://github.com/OSVehicle"
+        },
+        {
+          "title": "Creative Commons BY-SA 4.0 license summary",
+          "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "chassis_floor",       "name": "Chassis Floor Pan / Battery Tray", "shape": "box", "position": [0, 0.25, 0],          "size": [1.80, 0.08, 1.10], "material": "welded steel",          "role": "Central floor pan welded into the chassis rails — carries the flat battery pack underneath.", "connections": ["chassis_rail_port", "chassis_rail_stbd", "chassis_cross_front", "chassis_cross_rear", "battery_pack", "bms", "motor_controller", "dc_dc_converter", "seat_driver", "seat_passenger"] },
-    { "id": "chassis_rail_port",   "name": "Side Rail (Port)",                 "shape": "box", "position": [0, 0.30, 0.60],       "size": [2.30, 0.08, 0.08], "material": "welded steel",          "role": "Port-side longitudinal square-tube rail — full 2.33 m chassis length.", "connections": ["chassis_cross_front", "chassis_cross_rear", "strut_fl", "strut_rl", "a_arm_fl", "a_arm_rl", "charge_port"] },
-    { "id": "chassis_rail_stbd",   "name": "Side Rail (Starboard)",            "shape": "box", "position": [0, 0.30, -0.60],      "size": [2.30, 0.08, 0.08], "material": "welded steel",          "role": "Starboard-side longitudinal square-tube rail.", "connections": ["chassis_cross_front", "chassis_cross_rear", "strut_fr", "strut_rr", "a_arm_fr", "a_arm_rr"] },
-    { "id": "chassis_cross_front", "name": "Front Cross Member",               "shape": "box", "position": [ 1.10, 0.30, 0],      "size": [0.08, 0.08, 1.28], "material": "welded steel",          "role": "Forward cross member tying the two side rails together and carrying the steering rack + bumper.", "connections": ["chassis_rail_port", "chassis_rail_stbd", "steering_rack", "front_bumper"] },
-    { "id": "chassis_cross_rear",  "name": "Rear Cross Member",                "shape": "box", "position": [-1.10, 0.30, 0],      "size": [0.08, 0.08, 1.28], "material": "welded steel",          "role": "Rear cross member — the powertrain mounts to it.", "connections": ["chassis_rail_port", "chassis_rail_stbd", "electric_motor", "reduction_gearbox"] },
-
-    { "id": "wheel_fl", "name": "Wheel (Fwd-Left)",  "shape": "cylinder", "position": [ 0.85, 0.30,  0.72], "rotation": [1.5708, 0, 0], "size": [0.30, 0.18], "material": "rubber", "role": "Front-left wheel.",  "connections": ["a_arm_fl", "strut_fl", "steering_rack"] },
-    { "id": "wheel_fr", "name": "Wheel (Fwd-Right)", "shape": "cylinder", "position": [ 0.85, 0.30, -0.72], "rotation": [1.5708, 0, 0], "size": [0.30, 0.18], "material": "rubber", "role": "Front-right wheel.", "connections": ["a_arm_fr", "strut_fr", "steering_rack"] },
-    { "id": "wheel_rl", "name": "Wheel (Rear-Left)", "shape": "cylinder", "position": [-0.85, 0.30,  0.72], "rotation": [1.5708, 0, 0], "size": [0.30, 0.18], "material": "rubber", "role": "Rear-left wheel — driven by the transverse drive shaft.",  "connections": ["a_arm_rl", "strut_rl", "drive_shaft"] },
-    { "id": "wheel_rr", "name": "Wheel (Rear-Right)","shape": "cylinder", "position": [-0.85, 0.30, -0.72], "rotation": [1.5708, 0, 0], "size": [0.30, 0.18], "material": "rubber", "role": "Rear-right wheel — driven by the transverse drive shaft.", "connections": ["a_arm_rr", "strut_rr", "drive_shaft"] },
-
-    { "id": "strut_fl",    "name": "Coilover Strut (FL)",   "shape": "cylinder", "position": [ 0.85, 0.48, 0.50],  "size": [0.035, 0.30], "material": "dark anodized aluminum","role": "Front-left coilover strut — shock absorber + spring on top of the A-arm.", "connections": ["chassis_rail_port", "wheel_fl"] },
-    { "id": "strut_fr",    "name": "Coilover Strut (FR)",   "shape": "cylinder", "position": [ 0.85, 0.48, -0.50], "size": [0.035, 0.30], "material": "dark anodized aluminum","role": "Front-right coilover strut.", "connections": ["chassis_rail_stbd", "wheel_fr"] },
-    { "id": "strut_rl",    "name": "Coilover Strut (RL)",   "shape": "cylinder", "position": [-0.85, 0.48, 0.50],  "size": [0.035, 0.30], "material": "dark anodized aluminum","role": "Rear-left coilover strut.", "connections": ["chassis_rail_port", "wheel_rl"] },
-    { "id": "strut_rr",    "name": "Coilover Strut (RR)",   "shape": "cylinder", "position": [-0.85, 0.48, -0.50], "size": [0.035, 0.30], "material": "dark anodized aluminum","role": "Rear-right coilover strut.", "connections": ["chassis_rail_stbd", "wheel_rr"] },
-
-    { "id": "a_arm_fl",    "name": "Lower A-Arm (FL)",      "shape": "box",      "position": [ 0.85, 0.25, 0.48],  "size": [0.05, 0.04, 0.36], "material": "forged steel",         "role": "Front-left lower lateral A-arm between the chassis and the wheel hub.", "connections": ["chassis_rail_port", "wheel_fl"] },
-    { "id": "a_arm_fr",    "name": "Lower A-Arm (FR)",      "shape": "box",      "position": [ 0.85, 0.25, -0.48], "size": [0.05, 0.04, 0.36], "material": "forged steel",         "role": "Front-right lower A-arm.", "connections": ["chassis_rail_stbd", "wheel_fr"] },
-    { "id": "a_arm_rl",    "name": "Lower A-Arm (RL)",      "shape": "box",      "position": [-0.85, 0.25, 0.48],  "size": [0.05, 0.04, 0.36], "material": "forged steel",         "role": "Rear-left lower A-arm.", "connections": ["chassis_rail_port", "wheel_rl"] },
-    { "id": "a_arm_rr",    "name": "Lower A-Arm (RR)",      "shape": "box",      "position": [-0.85, 0.25, -0.48], "size": [0.05, 0.04, 0.36], "material": "forged steel",         "role": "Rear-right lower A-arm.", "connections": ["chassis_rail_stbd", "wheel_rr"] },
-
-    { "id": "steering_rack",  "name": "Steering Rack",        "shape": "cylinder", "position": [0.95, 0.35, 0], "rotation": [1.5708, 0, 0], "size": [0.025, 1.10], "material": "brushed steel",        "role": "Rack-and-pinion steering bar between the front wheels.", "connections": ["chassis_cross_front", "wheel_fl", "wheel_fr", "steering_column"] },
-    { "id": "steering_column","name": "Steering Column",     "shape": "cylinder", "position": [0.60, 0.72, -0.30], "rotation": [0, 0, -0.5], "size": [0.025, 0.55], "material": "brushed steel",        "role": "Tilted steering column on the driver side (LHD).", "connections": ["steering_rack"] },
-
-    { "id": "electric_motor",  "name": "Electric Motor",     "shape": "cylinder", "position": [-0.95, 0.40, 0.15], "rotation": [1.5708, 0, 0], "size": [0.12, 0.35], "material": "brushed steel",       "role": "Transverse AC traction motor.", "connections": ["chassis_cross_rear", "reduction_gearbox", "motor_controller"] },
-    { "id": "reduction_gearbox","name": "Reduction Gearbox", "shape": "box",      "position": [-0.95, 0.40, -0.15], "size": [0.25, 0.22, 0.25], "material": "dark anodized aluminum","role": "Single-speed reduction box between motor and drive shaft.", "connections": ["electric_motor", "drive_shaft"] },
-    { "id": "drive_shaft",     "name": "Rear Drive Shaft",   "shape": "cylinder", "position": [-0.95, 0.30, 0],   "rotation": [1.5708, 0, 0], "size": [0.025, 1.30], "material": "brushed steel",        "role": "Transverse drive shaft — delivers torque from the gearbox to both rear wheels.", "connections": ["reduction_gearbox", "wheel_rl", "wheel_rr"] },
-
-    { "id": "battery_pack",    "name": "Under-Floor Battery Pack","shape": "box","position": [0, 0.18, 0],        "size": [1.50, 0.08, 1.00], "material": "dark anodized aluminum","role": "Flat Li-ion battery pack under the chassis floor between the axles.", "connections": ["chassis_floor", "bms", "motor_controller", "dc_dc_converter"] },
-    { "id": "bms",             "name": "Battery Management System",        "shape": "box", "position": [0.20, 0.40, 0.35], "size": [0.25, 0.08, 0.18], "material": "dark anodized aluminum","role": "BMS — per-cell voltage/temperature monitoring and balancing.", "connections": ["chassis_floor", "battery_pack"] },
-    { "id": "motor_controller","name": "Motor Controller / Inverter","shape": "box", "position": [-0.40, 0.48, 0.40], "size": [0.30, 0.15, 0.25], "material": "dark anodized aluminum","role": "Three-phase inverter — DC to AC for the traction motor.", "connections": ["chassis_floor", "battery_pack", "electric_motor"] },
-    { "id": "dc_dc_converter", "name": "DC/DC Converter",    "shape": "box",      "position": [0.20, 0.40, -0.35], "size": [0.20, 0.08, 0.15], "material": "dark anodized aluminum","role": "Steps the high-voltage traction pack down to 12 V for the accessory bus.", "connections": ["chassis_floor", "battery_pack"] },
-    { "id": "charge_port",     "name": "Charge Port",         "shape": "cylinder", "position": [0.10, 0.36, 0.65],"rotation": [1.5708, 0, 0], "size": [0.028, 0.05], "material": "dark anodized aluminum","role": "Exterior AC/DC charge port on the port side rail.", "connections": ["chassis_rail_port", "battery_pack"] },
-
-    { "id": "seat_driver",     "name": "Driver Seat",        "shape": "box",      "position": [0.20, 0.68, -0.30], "size": [0.50, 0.50, 0.50], "material": "black composite",       "role": "Driver's seat on the port side (LHD).", "connections": ["chassis_floor"] },
-    { "id": "seat_passenger",  "name": "Passenger Seat",     "shape": "box",      "position": [0.20, 0.68,  0.30], "size": [0.50, 0.50, 0.50], "material": "black composite",       "role": "Front-right passenger seat.", "connections": ["chassis_floor"] },
-
-    { "id": "front_bumper",    "name": "Front Bumper",       "shape": "box",      "position": [1.18, 0.35, 0],     "size": [0.08, 0.10, 1.30], "material": "welded steel",          "role": "Front bumper tube spanning the two side rails.", "connections": ["chassis_cross_front"] }
+    {
+      "id": "rail_port",
+      "name": "Port Longitudinal Side Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.32,
+        0.62
+      ],
+      "size": [
+        2.33,
+        0.07,
+        0.07
+      ],
+      "material": "welded steel",
+      "role": "Full-length square-tube rail that forms the port edge of the TABBY EVO ladder frame.",
+      "connections": [
+        "cross_front",
+        "cross_mid",
+        "cross_rear",
+        "tray_rim_port",
+        "tower_fl",
+        "tower_rl",
+        "charge_port_body",
+        "brace_front_left",
+        "brace_rear_left"
+      ]
+    },
+    {
+      "id": "rail_starboard",
+      "name": "Starboard Longitudinal Side Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.32,
+        -0.62
+      ],
+      "size": [
+        2.33,
+        0.07,
+        0.07
+      ],
+      "material": "welded steel",
+      "role": "Full-length square-tube rail that forms the starboard edge of the TABBY EVO ladder frame.",
+      "connections": [
+        "cross_front",
+        "cross_mid",
+        "cross_rear",
+        "tray_rim_starboard",
+        "tower_fr",
+        "tower_rr",
+        "brace_front_right",
+        "brace_rear_right"
+      ]
+    },
+    {
+      "id": "cross_front",
+      "name": "Front Cross Member",
+      "shape": "box",
+      "position": [
+        1.1,
+        0.32,
+        0
+      ],
+      "size": [
+        0.07,
+        0.07,
+        1.31
+      ],
+      "material": "welded steel",
+      "role": "Forward transverse tube tying both side rails together and carrying the steering rack and front bumper.",
+      "connections": [
+        "rail_port",
+        "rail_starboard",
+        "steering_rack",
+        "front_bumper"
+      ]
+    },
+    {
+      "id": "cross_mid",
+      "name": "Middle Battery Cross Member",
+      "shape": "box",
+      "position": [
+        0,
+        0.32,
+        0
+      ],
+      "size": [
+        0.06,
+        0.06,
+        1.24
+      ],
+      "material": "welded steel",
+      "role": "Central transverse tube that keeps the battery tray square under seat and electronics loads.",
+      "connections": [
+        "rail_port",
+        "rail_starboard",
+        "tray_floor",
+        "brace_front_left",
+        "brace_front_right",
+        "brace_rear_left",
+        "brace_rear_right"
+      ]
+    },
+    {
+      "id": "cross_rear",
+      "name": "Rear Cross Member",
+      "shape": "box",
+      "position": [
+        -1.1,
+        0.32,
+        0
+      ],
+      "size": [
+        0.07,
+        0.07,
+        1.31
+      ],
+      "material": "welded steel",
+      "role": "Rear transverse tube that supports the motor, gearbox, suspension pick-ups, and rear bumper.",
+      "connections": [
+        "rail_port",
+        "rail_starboard",
+        "motor_mount_left",
+        "motor_mount_right",
+        "rear_bumper"
+      ]
+    },
+    {
+      "id": "tray_floor",
+      "name": "Open Battery Tray Floor",
+      "shape": "box",
+      "position": [
+        0,
+        0.18,
+        0
+      ],
+      "size": [
+        1.58,
+        0.045,
+        1.02
+      ],
+      "material": "welded steel",
+      "role": "Thin flat tray floor under the seats; the top is open so individual battery modules remain visible.",
+      "connections": [
+        "cross_mid",
+        "tray_rim_front",
+        "tray_rim_rear",
+        "tray_rim_port",
+        "tray_rim_starboard",
+        "battery_module_fwd_port",
+        "battery_module_fwd_center",
+        "battery_module_fwd_starboard",
+        "battery_module_rear_port",
+        "battery_module_rear_center",
+        "battery_module_rear_starboard",
+        "battery_hold_down_front",
+        "battery_hold_down_rear"
+      ]
+    },
+    {
+      "id": "tray_rim_front",
+      "name": "Battery Tray Front Rim",
+      "shape": "box",
+      "position": [
+        0.79,
+        0.25,
+        0
+      ],
+      "size": [
+        0.045,
+        0.12,
+        1.02
+      ],
+      "material": "welded steel",
+      "role": "Raised front lip of the serviceable battery tray, preventing module movement under braking.",
+      "connections": [
+        "tray_floor",
+        "tray_rim_port",
+        "tray_rim_starboard"
+      ]
+    },
+    {
+      "id": "tray_rim_rear",
+      "name": "Battery Tray Rear Rim",
+      "shape": "box",
+      "position": [
+        -0.79,
+        0.25,
+        0
+      ],
+      "size": [
+        0.045,
+        0.12,
+        1.02
+      ],
+      "material": "welded steel",
+      "role": "Raised rear lip of the serviceable battery tray, preventing module movement under acceleration.",
+      "connections": [
+        "tray_floor",
+        "tray_rim_port",
+        "tray_rim_starboard"
+      ]
+    },
+    {
+      "id": "tray_rim_port",
+      "name": "Battery Tray Port Rim",
+      "shape": "box",
+      "position": [
+        0,
+        0.25,
+        0.51
+      ],
+      "size": [
+        1.58,
+        0.12,
+        0.045
+      ],
+      "material": "welded steel",
+      "role": "Port-side tray lip bolted inside the side rail and pierced by the charge-port cable route.",
+      "connections": [
+        "rail_port",
+        "tray_floor",
+        "tray_rim_front",
+        "tray_rim_rear",
+        "charge_port_cable",
+        "bms",
+        "motor_controller"
+      ]
+    },
+    {
+      "id": "tray_rim_starboard",
+      "name": "Battery Tray Starboard Rim",
+      "shape": "box",
+      "position": [
+        0,
+        0.25,
+        -0.51
+      ],
+      "size": [
+        1.58,
+        0.12,
+        0.045
+      ],
+      "material": "welded steel",
+      "role": "Starboard tray lip bolted inside the side rail and exposing the battery service opening from above.",
+      "connections": [
+        "rail_starboard",
+        "tray_floor",
+        "tray_rim_front",
+        "tray_rim_rear",
+        "dc_dc_converter"
+      ]
+    },
+    {
+      "id": "brace_front_left",
+      "name": "Front-Port Diagonal Floor Brace",
+      "shape": "box",
+      "position": [
+        0.43,
+        0.275,
+        0.31
+      ],
+      "rotation": [
+        0,
+        0.48,
+        0
+      ],
+      "size": [
+        0.7,
+        0.035,
+        0.035
+      ],
+      "material": "welded steel",
+      "role": "Diagonal tube that triangulates the front half of the tray against torsion.",
+      "connections": [
+        "rail_port",
+        "cross_mid",
+        "cross_front"
+      ]
+    },
+    {
+      "id": "brace_front_right",
+      "name": "Front-Starboard Diagonal Floor Brace",
+      "shape": "box",
+      "position": [
+        0.43,
+        0.275,
+        -0.31
+      ],
+      "rotation": [
+        0,
+        -0.48,
+        0
+      ],
+      "size": [
+        0.7,
+        0.035,
+        0.035
+      ],
+      "material": "welded steel",
+      "role": "Diagonal tube that mirrors the front-port brace and resists steering rack loads.",
+      "connections": [
+        "rail_starboard",
+        "cross_mid",
+        "cross_front"
+      ]
+    },
+    {
+      "id": "brace_rear_left",
+      "name": "Rear-Port Diagonal Floor Brace",
+      "shape": "box",
+      "position": [
+        -0.43,
+        0.275,
+        0.31
+      ],
+      "rotation": [
+        0,
+        -0.48,
+        0
+      ],
+      "size": [
+        0.7,
+        0.035,
+        0.035
+      ],
+      "material": "welded steel",
+      "role": "Diagonal tube that carries rear powertrain torque into the port side rail.",
+      "connections": [
+        "rail_port",
+        "cross_mid",
+        "cross_rear"
+      ]
+    },
+    {
+      "id": "brace_rear_right",
+      "name": "Rear-Starboard Diagonal Floor Brace",
+      "shape": "box",
+      "position": [
+        -0.43,
+        0.275,
+        -0.31
+      ],
+      "rotation": [
+        0,
+        0.48,
+        0
+      ],
+      "size": [
+        0.7,
+        0.035,
+        0.035
+      ],
+      "material": "welded steel",
+      "role": "Diagonal tube that mirrors the rear-port brace and triangulates the motor bay.",
+      "connections": [
+        "rail_starboard",
+        "cross_mid",
+        "cross_rear"
+      ]
+    },
+    {
+      "id": "front_bumper",
+      "name": "Front Bumper Tube",
+      "shape": "cylinder",
+      "position": [
+        1.2,
+        0.37,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.04,
+        1.34
+      ],
+      "material": "welded steel",
+      "role": "Round front bumper tube spanning the front of the chassis ahead of the steering rack.",
+      "connections": [
+        "cross_front",
+        "rail_port",
+        "rail_starboard"
+      ]
+    },
+    {
+      "id": "rear_bumper",
+      "name": "Rear Bumper Tube",
+      "shape": "cylinder",
+      "position": [
+        -1.2,
+        0.37,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.04,
+        1.34
+      ],
+      "material": "welded steel",
+      "role": "Round rear bumper tube protecting the rear-mounted motor and gearbox.",
+      "connections": [
+        "cross_rear",
+        "rail_port",
+        "rail_starboard"
+      ]
+    },
+    {
+      "id": "battery_module_fwd_port",
+      "name": "Battery Module Front-Port",
+      "shape": "box",
+      "position": [
+        0.38,
+        0.255,
+        0.31
+      ],
+      "size": [
+        0.66,
+        0.1,
+        0.25
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Removable Li-ion module in the front-left tray bay, visible through the open service top.",
+      "connections": [
+        "tray_floor",
+        "hv_bus_front",
+        "battery_hold_down_front",
+        "terminal_front_port"
+      ]
+    },
+    {
+      "id": "battery_module_fwd_center",
+      "name": "Battery Module Front-Center",
+      "shape": "box",
+      "position": [
+        0.38,
+        0.255,
+        0
+      ],
+      "size": [
+        0.66,
+        0.1,
+        0.25
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Removable Li-ion module in the front-center tray bay that contributes to the flat skateboard pack.",
+      "connections": [
+        "tray_floor",
+        "hv_bus_front",
+        "battery_hold_down_front"
+      ]
+    },
+    {
+      "id": "battery_module_fwd_starboard",
+      "name": "Battery Module Front-Starboard",
+      "shape": "box",
+      "position": [
+        0.38,
+        0.255,
+        -0.31
+      ],
+      "size": [
+        0.66,
+        0.1,
+        0.25
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Removable Li-ion module in the front-right tray bay, accessible without removing a body shell.",
+      "connections": [
+        "tray_floor",
+        "hv_bus_front",
+        "battery_hold_down_front"
+      ]
+    },
+    {
+      "id": "battery_module_rear_port",
+      "name": "Battery Module Rear-Port",
+      "shape": "box",
+      "position": [
+        -0.38,
+        0.255,
+        0.31
+      ],
+      "size": [
+        0.66,
+        0.1,
+        0.25
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Removable Li-ion module in the rear-left tray bay feeding the inverter bus.",
+      "connections": [
+        "tray_floor",
+        "hv_bus_rear",
+        "battery_hold_down_rear"
+      ]
+    },
+    {
+      "id": "battery_module_rear_center",
+      "name": "Battery Module Rear-Center",
+      "shape": "box",
+      "position": [
+        -0.38,
+        0.255,
+        0
+      ],
+      "size": [
+        0.66,
+        0.1,
+        0.25
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Removable Li-ion module in the rear-center tray bay, strapped to the steel tray floor.",
+      "connections": [
+        "tray_floor",
+        "hv_bus_rear",
+        "battery_hold_down_rear"
+      ]
+    },
+    {
+      "id": "battery_module_rear_starboard",
+      "name": "Battery Module Rear-Starboard",
+      "shape": "box",
+      "position": [
+        -0.38,
+        0.255,
+        -0.31
+      ],
+      "size": [
+        0.66,
+        0.1,
+        0.25
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Removable Li-ion module in the rear-right tray bay completing the flat under-floor pack.",
+      "connections": [
+        "tray_floor",
+        "hv_bus_rear",
+        "battery_hold_down_rear",
+        "terminal_rear_starboard"
+      ]
+    },
+    {
+      "id": "battery_hold_down_front",
+      "name": "Front Battery Hold-Down Strap",
+      "shape": "box",
+      "position": [
+        0.38,
+        0.33,
+        0
+      ],
+      "size": [
+        0.04,
+        0.025,
+        0.95
+      ],
+      "material": "brushed steel",
+      "role": "Narrow transverse clamp strap that locks the three front battery modules into the open tray.",
+      "connections": [
+        "tray_floor",
+        "battery_module_fwd_port",
+        "battery_module_fwd_center",
+        "battery_module_fwd_starboard"
+      ]
+    },
+    {
+      "id": "battery_hold_down_rear",
+      "name": "Rear Battery Hold-Down Strap",
+      "shape": "box",
+      "position": [
+        -0.38,
+        0.33,
+        0
+      ],
+      "size": [
+        0.04,
+        0.025,
+        0.95
+      ],
+      "material": "brushed steel",
+      "role": "Narrow transverse clamp strap that locks the three rear battery modules into the open tray.",
+      "connections": [
+        "tray_floor",
+        "battery_module_rear_port",
+        "battery_module_rear_center",
+        "battery_module_rear_starboard"
+      ]
+    },
+    {
+      "id": "terminal_front_port",
+      "name": "Front Pack Positive Terminal",
+      "shape": "box",
+      "position": [
+        0.62,
+        0.34,
+        0.31
+      ],
+      "size": [
+        0.08,
+        0.035,
+        0.06
+      ],
+      "material": "copper",
+      "role": "Visible positive terminal block where the front bus bar exits the battery module row.",
+      "connections": [
+        "battery_module_fwd_port",
+        "hv_bus_front",
+        "bms"
+      ]
+    },
+    {
+      "id": "terminal_rear_starboard",
+      "name": "Rear Pack Negative Terminal",
+      "shape": "box",
+      "position": [
+        -0.62,
+        0.34,
+        -0.31
+      ],
+      "size": [
+        0.08,
+        0.035,
+        0.06
+      ],
+      "material": "copper",
+      "role": "Visible negative terminal block where the rear module row feeds the inverter bus.",
+      "connections": [
+        "battery_module_rear_starboard",
+        "hv_bus_rear",
+        "motor_controller"
+      ]
+    },
+    {
+      "id": "hv_bus_front",
+      "name": "Front High-Voltage Bus Bar",
+      "shape": "cylinder",
+      "position": [
+        0.38,
+        0.365,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.012,
+        0.86
+      ],
+      "material": "copper",
+      "role": "Copper bus bar connecting the three front battery modules in the open tray.",
+      "connections": [
+        "battery_module_fwd_port",
+        "battery_module_fwd_center",
+        "battery_module_fwd_starboard",
+        "bms",
+        "terminal_front_port"
+      ]
+    },
+    {
+      "id": "hv_bus_rear",
+      "name": "Rear High-Voltage Bus Bar",
+      "shape": "cylinder",
+      "position": [
+        -0.38,
+        0.365,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.012,
+        0.86
+      ],
+      "material": "copper",
+      "role": "Copper bus bar connecting the three rear battery modules and feeding the inverter cable.",
+      "connections": [
+        "battery_module_rear_port",
+        "battery_module_rear_center",
+        "battery_module_rear_starboard",
+        "motor_controller",
+        "terminal_rear_starboard"
+      ]
+    },
+    {
+      "id": "bms",
+      "name": "Battery Management System",
+      "shape": "box",
+      "position": [
+        0.18,
+        0.47,
+        0.42
+      ],
+      "size": [
+        0.25,
+        0.08,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "BMS enclosure monitors cell voltage and temperature from the visible module stack.",
+      "connections": [
+        "tray_rim_port",
+        "hv_bus_front",
+        "battery_module_fwd_port",
+        "battery_module_rear_port",
+        "terminal_front_port"
+      ]
+    },
+    {
+      "id": "motor_controller",
+      "name": "Motor Controller / Inverter",
+      "shape": "box",
+      "position": [
+        -0.34,
+        0.5,
+        0.4
+      ],
+      "size": [
+        0.32,
+        0.14,
+        0.22
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Three-phase inverter converting pack DC to AC current for the rear traction motor.",
+      "connections": [
+        "tray_rim_port",
+        "hv_bus_rear",
+        "inverter_to_motor_cable",
+        "electric_motor",
+        "terminal_rear_starboard"
+      ]
+    },
+    {
+      "id": "dc_dc_converter",
+      "name": "DC/DC Converter",
+      "shape": "box",
+      "position": [
+        0.18,
+        0.47,
+        -0.4
+      ],
+      "size": [
+        0.22,
+        0.08,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Accessory converter that steps the traction pack down to the 12 V vehicle bus.",
+      "connections": [
+        "tray_rim_starboard",
+        "hv_bus_front",
+        "low_voltage_bus"
+      ]
+    },
+    {
+      "id": "low_voltage_bus",
+      "name": "12 V Accessory Bus Lead",
+      "shape": "cylinder",
+      "position": [
+        0.48,
+        0.48,
+        -0.36
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.01,
+        0.52
+      ],
+      "material": "copper",
+      "role": "Low-voltage cable from the DC/DC converter toward the front controls and instrumentation.",
+      "connections": [
+        "dc_dc_converter",
+        "pedal_box"
+      ]
+    },
+    {
+      "id": "charge_port_body",
+      "name": "Side Charge Port Socket",
+      "shape": "cylinder",
+      "position": [
+        0.08,
+        0.38,
+        0.685
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.06
+      ],
+      "material": "dark anodized aluminum",
+      "role": "External charging socket mounted through the port rail for AC or DC charging access.",
+      "connections": [
+        "rail_port",
+        "charge_port_cable"
+      ]
+    },
+    {
+      "id": "charge_port_cable",
+      "name": "Charge Port HV Cable",
+      "shape": "cylinder",
+      "position": [
+        0.08,
+        0.35,
+        0.58
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.012,
+        0.18
+      ],
+      "material": "copper",
+      "role": "Short high-voltage cable from the side charge socket into the open battery tray.",
+      "connections": [
+        "charge_port_body",
+        "tray_rim_port",
+        "bms"
+      ]
+    },
+    {
+      "id": "electric_motor",
+      "name": "Transverse Electric Traction Motor",
+      "shape": "cylinder",
+      "position": [
+        -0.93,
+        0.43,
+        0.18
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.13,
+        0.34
+      ],
+      "material": "brushed steel",
+      "role": "Rear-mounted cylindrical traction motor installed transversely ahead of the rear axle line.",
+      "connections": [
+        "motor_mount_left",
+        "motor_mount_right",
+        "reduction_gearbox",
+        "inverter_to_motor_cable"
+      ]
+    },
+    {
+      "id": "motor_mount_left",
+      "name": "Port Motor Mount Bracket",
+      "shape": "box",
+      "position": [
+        -0.93,
+        0.35,
+        0.38
+      ],
+      "size": [
+        0.2,
+        0.08,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "Port bracket bolting the traction motor casing to the rear cross member.",
+      "connections": [
+        "cross_rear",
+        "electric_motor"
+      ]
+    },
+    {
+      "id": "motor_mount_right",
+      "name": "Starboard Motor Mount Bracket",
+      "shape": "box",
+      "position": [
+        -0.93,
+        0.35,
+        -0.38
+      ],
+      "size": [
+        0.2,
+        0.08,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "Starboard bracket bolting the traction motor casing to the rear cross member.",
+      "connections": [
+        "cross_rear",
+        "electric_motor"
+      ]
+    },
+    {
+      "id": "reduction_gearbox",
+      "name": "Single-Speed Reduction Gearbox",
+      "shape": "box",
+      "position": [
+        -0.93,
+        0.43,
+        -0.12
+      ],
+      "size": [
+        0.25,
+        0.22,
+        0.22
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Compact reduction gearbox coupling motor speed to the rear half-shafts.",
+      "connections": [
+        "electric_motor",
+        "gearbox_output",
+        "halfshaft_left",
+        "halfshaft_right"
+      ]
+    },
+    {
+      "id": "gearbox_output",
+      "name": "Differential Output Housing",
+      "shape": "cylinder",
+      "position": [
+        -0.93,
+        0.39,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.055,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Central output housing aligned with the transverse rear axle shafts.",
+      "connections": [
+        "reduction_gearbox",
+        "halfshaft_left",
+        "halfshaft_right"
+      ]
+    },
+    {
+      "id": "inverter_to_motor_cable",
+      "name": "Inverter-to-Motor Cable",
+      "shape": "cylinder",
+      "position": [
+        -0.62,
+        0.5,
+        0.29
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.014,
+        0.45
+      ],
+      "material": "copper",
+      "role": "Three-phase cable bundle routing inverter output to the rear traction motor.",
+      "connections": [
+        "motor_controller",
+        "electric_motor"
+      ]
+    },
+    {
+      "id": "halfshaft_left",
+      "name": "Rear Port Half-Shaft",
+      "shape": "cylinder",
+      "position": [
+        -0.93,
+        0.32,
+        0.44
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.018,
+        0.58
+      ],
+      "material": "brushed steel",
+      "role": "Left rear axle shaft transferring gearbox torque to the port rear hub.",
+      "connections": [
+        "gearbox_output",
+        "cv_joint_rl_inner",
+        "hub_rl"
+      ]
+    },
+    {
+      "id": "halfshaft_right",
+      "name": "Rear Starboard Half-Shaft",
+      "shape": "cylinder",
+      "position": [
+        -0.93,
+        0.32,
+        -0.44
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.018,
+        0.58
+      ],
+      "material": "brushed steel",
+      "role": "Right rear axle shaft transferring gearbox torque to the starboard rear hub.",
+      "connections": [
+        "gearbox_output",
+        "cv_joint_rr_inner",
+        "hub_rr"
+      ]
+    },
+    {
+      "id": "cv_joint_rl_inner",
+      "name": "Rear Port Inner CV Joint",
+      "shape": "sphere",
+      "position": [
+        -0.93,
+        0.32,
+        0.18
+      ],
+      "size": [
+        0.055
+      ],
+      "material": "brushed steel",
+      "role": "Inner constant-velocity joint allowing rear suspension travel at the port half-shaft.",
+      "connections": [
+        "halfshaft_left",
+        "gearbox_output"
+      ]
+    },
+    {
+      "id": "cv_joint_rr_inner",
+      "name": "Rear Starboard Inner CV Joint",
+      "shape": "sphere",
+      "position": [
+        -0.93,
+        0.32,
+        -0.18
+      ],
+      "size": [
+        0.055
+      ],
+      "material": "brushed steel",
+      "role": "Inner constant-velocity joint allowing rear suspension travel at the starboard half-shaft.",
+      "connections": [
+        "halfshaft_right",
+        "gearbox_output"
+      ]
+    },
+    {
+      "id": "wheel_fl_tire",
+      "name": "Front Port Tire",
+      "shape": "torus",
+      "position": [
+        0.86,
+        0.3,
+        0.75
+      ],
+      "size": [
+        0.3,
+        0.075
+      ],
+      "material": "rubber",
+      "role": "Front-left rubber tire contacting the ground at y = 0 and defining the open-wheel silhouette.",
+      "connections": [
+        "wheel_fl_rim",
+        "hub_fl"
+      ]
+    },
+    {
+      "id": "wheel_fr_tire",
+      "name": "Front Starboard Tire",
+      "shape": "torus",
+      "position": [
+        0.86,
+        0.3,
+        -0.75
+      ],
+      "size": [
+        0.3,
+        0.075
+      ],
+      "material": "rubber",
+      "role": "Front-right rubber tire contacting the ground at y = 0 and defining the open-wheel silhouette.",
+      "connections": [
+        "wheel_fr_rim",
+        "hub_fr"
+      ]
+    },
+    {
+      "id": "wheel_rl_tire",
+      "name": "Rear Port Tire",
+      "shape": "torus",
+      "position": [
+        -0.86,
+        0.3,
+        0.75
+      ],
+      "size": [
+        0.3,
+        0.075
+      ],
+      "material": "rubber",
+      "role": "Rear-left driven tire receiving torque through the port half-shaft.",
+      "connections": [
+        "wheel_rl_rim",
+        "hub_rl"
+      ]
+    },
+    {
+      "id": "wheel_rr_tire",
+      "name": "Rear Starboard Tire",
+      "shape": "torus",
+      "position": [
+        -0.86,
+        0.3,
+        -0.75
+      ],
+      "size": [
+        0.3,
+        0.075
+      ],
+      "material": "rubber",
+      "role": "Rear-right driven tire receiving torque through the starboard half-shaft.",
+      "connections": [
+        "wheel_rr_rim",
+        "hub_rr"
+      ]
+    },
+    {
+      "id": "wheel_fl_rim",
+      "name": "Front Port Wheel Rim",
+      "shape": "cylinder",
+      "position": [
+        0.86,
+        0.3,
+        0.75
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.2,
+        0.14
+      ],
+      "material": "aluminum",
+      "role": "Aluminum front-left rim nested inside the tire and bolted to the hub.",
+      "connections": [
+        "wheel_fl_tire",
+        "hub_fl",
+        "brake_disc_fl"
+      ]
+    },
+    {
+      "id": "wheel_fr_rim",
+      "name": "Front Starboard Wheel Rim",
+      "shape": "cylinder",
+      "position": [
+        0.86,
+        0.3,
+        -0.75
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.2,
+        0.14
+      ],
+      "material": "aluminum",
+      "role": "Aluminum front-right rim nested inside the tire and bolted to the hub.",
+      "connections": [
+        "wheel_fr_tire",
+        "hub_fr",
+        "brake_disc_fr"
+      ]
+    },
+    {
+      "id": "wheel_rl_rim",
+      "name": "Rear Port Wheel Rim",
+      "shape": "cylinder",
+      "position": [
+        -0.86,
+        0.3,
+        0.75
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.2,
+        0.14
+      ],
+      "material": "aluminum",
+      "role": "Aluminum rear-left rim nested inside the driven tire and bolted to the hub.",
+      "connections": [
+        "wheel_rl_tire",
+        "hub_rl",
+        "brake_disc_rl"
+      ]
+    },
+    {
+      "id": "wheel_rr_rim",
+      "name": "Rear Starboard Wheel Rim",
+      "shape": "cylinder",
+      "position": [
+        -0.86,
+        0.3,
+        -0.75
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.2,
+        0.14
+      ],
+      "material": "aluminum",
+      "role": "Aluminum rear-right rim nested inside the driven tire and bolted to the hub.",
+      "connections": [
+        "wheel_rr_tire",
+        "hub_rr",
+        "brake_disc_rr"
+      ]
+    },
+    {
+      "id": "hub_fl",
+      "name": "Front Port Hub Upright",
+      "shape": "box",
+      "position": [
+        0.86,
+        0.31,
+        0.6
+      ],
+      "size": [
+        0.1,
+        0.22,
+        0.08
+      ],
+      "material": "forged steel",
+      "role": "Front-left upright joining the wheel bearing, control arms, strut, brake, and steering tie rod.",
+      "connections": [
+        "wheel_fl_rim",
+        "brake_disc_fl",
+        "brake_caliper_fl",
+        "a_arm_fl_front",
+        "a_arm_fl_rear",
+        "upper_arm_fl_front",
+        "upper_arm_fl_rear",
+        "strut_fl_body",
+        "tie_rod_left",
+        "tie_rod_end_left"
+      ]
+    },
+    {
+      "id": "hub_fr",
+      "name": "Front Starboard Hub Upright",
+      "shape": "box",
+      "position": [
+        0.86,
+        0.31,
+        -0.6
+      ],
+      "size": [
+        0.1,
+        0.22,
+        0.08
+      ],
+      "material": "forged steel",
+      "role": "Front-right upright joining the wheel bearing, control arms, strut, brake, and steering tie rod.",
+      "connections": [
+        "wheel_fr_rim",
+        "brake_disc_fr",
+        "brake_caliper_fr",
+        "a_arm_fr_front",
+        "a_arm_fr_rear",
+        "upper_arm_fr_front",
+        "upper_arm_fr_rear",
+        "strut_fr_body",
+        "tie_rod_right",
+        "tie_rod_end_right"
+      ]
+    },
+    {
+      "id": "hub_rl",
+      "name": "Rear Port Hub Upright",
+      "shape": "box",
+      "position": [
+        -0.86,
+        0.31,
+        0.6
+      ],
+      "size": [
+        0.1,
+        0.22,
+        0.08
+      ],
+      "material": "forged steel",
+      "role": "Rear-left upright joining the driven hub, control links, brake, strut, and half-shaft.",
+      "connections": [
+        "wheel_rl_rim",
+        "brake_disc_rl",
+        "brake_caliper_rl",
+        "a_arm_rl_front",
+        "a_arm_rl_rear",
+        "upper_arm_rl_front",
+        "upper_arm_rl_rear",
+        "strut_rl_body",
+        "halfshaft_left"
+      ]
+    },
+    {
+      "id": "hub_rr",
+      "name": "Rear Starboard Hub Upright",
+      "shape": "box",
+      "position": [
+        -0.86,
+        0.31,
+        -0.6
+      ],
+      "size": [
+        0.1,
+        0.22,
+        0.08
+      ],
+      "material": "forged steel",
+      "role": "Rear-right upright joining the driven hub, control links, brake, strut, and half-shaft.",
+      "connections": [
+        "wheel_rr_rim",
+        "brake_disc_rr",
+        "brake_caliper_rr",
+        "a_arm_rr_front",
+        "a_arm_rr_rear",
+        "upper_arm_rr_front",
+        "upper_arm_rr_rear",
+        "strut_rr_body",
+        "halfshaft_right"
+      ]
+    },
+    {
+      "id": "brake_disc_fl",
+      "name": "Front Port Brake Disc",
+      "shape": "cylinder",
+      "position": [
+        0.86,
+        0.3,
+        0.655
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.15,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Front-left disc brake rotor visible between rim and hub for service inspection.",
+      "connections": [
+        "wheel_fl_rim",
+        "hub_fl",
+        "brake_caliper_fl"
+      ]
+    },
+    {
+      "id": "brake_disc_fr",
+      "name": "Front Starboard Brake Disc",
+      "shape": "cylinder",
+      "position": [
+        0.86,
+        0.3,
+        -0.655
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.15,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Front-right disc brake rotor visible between rim and hub for service inspection.",
+      "connections": [
+        "wheel_fr_rim",
+        "hub_fr",
+        "brake_caliper_fr"
+      ]
+    },
+    {
+      "id": "brake_disc_rl",
+      "name": "Rear Port Brake Disc",
+      "shape": "cylinder",
+      "position": [
+        -0.86,
+        0.3,
+        0.655
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.15,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Rear-left disc brake rotor packaged inboard of the driven wheel rim.",
+      "connections": [
+        "wheel_rl_rim",
+        "hub_rl",
+        "brake_caliper_rl"
+      ]
+    },
+    {
+      "id": "brake_disc_rr",
+      "name": "Rear Starboard Brake Disc",
+      "shape": "cylinder",
+      "position": [
+        -0.86,
+        0.3,
+        -0.655
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.15,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Rear-right disc brake rotor packaged inboard of the driven wheel rim.",
+      "connections": [
+        "wheel_rr_rim",
+        "hub_rr",
+        "brake_caliper_rr"
+      ]
+    },
+    {
+      "id": "brake_caliper_fl",
+      "name": "Front Port Brake Caliper",
+      "shape": "box",
+      "position": [
+        0.86,
+        0.42,
+        0.64
+      ],
+      "size": [
+        0.07,
+        0.08,
+        0.045
+      ],
+      "material": "forged steel",
+      "role": "Front-left caliper straddles the brake disc and bolts to the hub upright.",
+      "connections": [
+        "brake_disc_fl",
+        "hub_fl"
+      ]
+    },
+    {
+      "id": "brake_caliper_fr",
+      "name": "Front Starboard Brake Caliper",
+      "shape": "box",
+      "position": [
+        0.86,
+        0.42,
+        -0.64
+      ],
+      "size": [
+        0.07,
+        0.08,
+        0.045
+      ],
+      "material": "forged steel",
+      "role": "Front-right caliper straddles the brake disc and bolts to the hub upright.",
+      "connections": [
+        "brake_disc_fr",
+        "hub_fr"
+      ]
+    },
+    {
+      "id": "brake_caliper_rl",
+      "name": "Rear Port Brake Caliper",
+      "shape": "box",
+      "position": [
+        -0.86,
+        0.42,
+        0.64
+      ],
+      "size": [
+        0.07,
+        0.08,
+        0.045
+      ],
+      "material": "forged steel",
+      "role": "Rear-left caliper clamps the driven wheel brake disc from the inboard side.",
+      "connections": [
+        "brake_disc_rl",
+        "hub_rl"
+      ]
+    },
+    {
+      "id": "brake_caliper_rr",
+      "name": "Rear Starboard Brake Caliper",
+      "shape": "box",
+      "position": [
+        -0.86,
+        0.42,
+        -0.64
+      ],
+      "size": [
+        0.07,
+        0.08,
+        0.045
+      ],
+      "material": "forged steel",
+      "role": "Rear-right caliper clamps the driven wheel brake disc from the inboard side.",
+      "connections": [
+        "brake_disc_rr",
+        "hub_rr"
+      ]
+    },
+    {
+      "id": "a_arm_fl_front",
+      "name": "Front Port A-Arm Forward Link",
+      "shape": "box",
+      "position": [
+        0.91,
+        0.23,
+        0.49
+      ],
+      "rotation": [
+        0,
+        0.22,
+        0
+      ],
+      "size": [
+        0.4,
+        0.035,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Forward leg of the front-left lower A-arm running from the chassis rail to the hub upright.",
+      "connections": [
+        "rail_port",
+        "hub_fl"
+      ]
+    },
+    {
+      "id": "a_arm_fl_rear",
+      "name": "Front Port A-Arm Rear Link",
+      "shape": "box",
+      "position": [
+        0.78,
+        0.23,
+        0.49
+      ],
+      "rotation": [
+        0,
+        -0.22,
+        0
+      ],
+      "size": [
+        0.4,
+        0.035,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Rear leg of the front-left lower A-arm, forming a visible triangular control arm.",
+      "connections": [
+        "rail_port",
+        "hub_fl"
+      ]
+    },
+    {
+      "id": "a_arm_fr_front",
+      "name": "Front Starboard A-Arm Forward Link",
+      "shape": "box",
+      "position": [
+        0.91,
+        0.23,
+        -0.49
+      ],
+      "rotation": [
+        0,
+        -0.22,
+        0
+      ],
+      "size": [
+        0.4,
+        0.035,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Forward leg of the front-right lower A-arm running from the chassis rail to the hub upright.",
+      "connections": [
+        "rail_starboard",
+        "hub_fr"
+      ]
+    },
+    {
+      "id": "a_arm_fr_rear",
+      "name": "Front Starboard A-Arm Rear Link",
+      "shape": "box",
+      "position": [
+        0.78,
+        0.23,
+        -0.49
+      ],
+      "rotation": [
+        0,
+        0.22,
+        0
+      ],
+      "size": [
+        0.4,
+        0.035,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Rear leg of the front-right lower A-arm, forming a visible triangular control arm.",
+      "connections": [
+        "rail_starboard",
+        "hub_fr"
+      ]
+    },
+    {
+      "id": "a_arm_rl_front",
+      "name": "Rear Port A-Arm Forward Link",
+      "shape": "box",
+      "position": [
+        -0.78,
+        0.23,
+        0.49
+      ],
+      "rotation": [
+        0,
+        0.22,
+        0
+      ],
+      "size": [
+        0.4,
+        0.035,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Forward leg of the rear-left lower A-arm locating the driven hub laterally.",
+      "connections": [
+        "rail_port",
+        "hub_rl"
+      ]
+    },
+    {
+      "id": "a_arm_rl_rear",
+      "name": "Rear Port A-Arm Rear Link",
+      "shape": "box",
+      "position": [
+        -0.91,
+        0.23,
+        0.49
+      ],
+      "rotation": [
+        0,
+        -0.22,
+        0
+      ],
+      "size": [
+        0.4,
+        0.035,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Rear leg of the rear-left lower A-arm completing the triangular wheel link.",
+      "connections": [
+        "rail_port",
+        "hub_rl"
+      ]
+    },
+    {
+      "id": "a_arm_rr_front",
+      "name": "Rear Starboard A-Arm Forward Link",
+      "shape": "box",
+      "position": [
+        -0.78,
+        0.23,
+        -0.49
+      ],
+      "rotation": [
+        0,
+        -0.22,
+        0
+      ],
+      "size": [
+        0.4,
+        0.035,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Forward leg of the rear-right lower A-arm locating the driven hub laterally.",
+      "connections": [
+        "rail_starboard",
+        "hub_rr"
+      ]
+    },
+    {
+      "id": "a_arm_rr_rear",
+      "name": "Rear Starboard A-Arm Rear Link",
+      "shape": "box",
+      "position": [
+        -0.91,
+        0.23,
+        -0.49
+      ],
+      "rotation": [
+        0,
+        0.22,
+        0
+      ],
+      "size": [
+        0.4,
+        0.035,
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Rear leg of the rear-right lower A-arm completing the triangular wheel link.",
+      "connections": [
+        "rail_starboard",
+        "hub_rr"
+      ]
+    },
+    {
+      "id": "upper_arm_fl_front",
+      "name": "Front Port Upper Control Arm Forward Link",
+      "shape": "box",
+      "position": [
+        0.91,
+        0.48,
+        0.52
+      ],
+      "rotation": [
+        0,
+        0.18,
+        0
+      ],
+      "size": [
+        0.34,
+        0.028,
+        0.028
+      ],
+      "material": "forged steel",
+      "role": "Upper forward link locating the front-left upright above the lower A-arm.",
+      "connections": [
+        "tower_fl",
+        "hub_fl"
+      ]
+    },
+    {
+      "id": "upper_arm_fl_rear",
+      "name": "Front Port Upper Control Arm Rear Link",
+      "shape": "box",
+      "position": [
+        0.79,
+        0.48,
+        0.52
+      ],
+      "rotation": [
+        0,
+        -0.18,
+        0
+      ],
+      "size": [
+        0.34,
+        0.028,
+        0.028
+      ],
+      "material": "forged steel",
+      "role": "Upper rear link completing the front-left wishbone triangle.",
+      "connections": [
+        "tower_fl",
+        "hub_fl"
+      ]
+    },
+    {
+      "id": "upper_arm_fr_front",
+      "name": "Front Starboard Upper Control Arm Forward Link",
+      "shape": "box",
+      "position": [
+        0.91,
+        0.48,
+        -0.52
+      ],
+      "rotation": [
+        0,
+        -0.18,
+        0
+      ],
+      "size": [
+        0.34,
+        0.028,
+        0.028
+      ],
+      "material": "forged steel",
+      "role": "Upper forward link locating the front-right upright above the lower A-arm.",
+      "connections": [
+        "tower_fr",
+        "hub_fr"
+      ]
+    },
+    {
+      "id": "upper_arm_fr_rear",
+      "name": "Front Starboard Upper Control Arm Rear Link",
+      "shape": "box",
+      "position": [
+        0.79,
+        0.48,
+        -0.52
+      ],
+      "rotation": [
+        0,
+        0.18,
+        0
+      ],
+      "size": [
+        0.34,
+        0.028,
+        0.028
+      ],
+      "material": "forged steel",
+      "role": "Upper rear link completing the front-right wishbone triangle.",
+      "connections": [
+        "tower_fr",
+        "hub_fr"
+      ]
+    },
+    {
+      "id": "upper_arm_rl_front",
+      "name": "Rear Port Upper Control Arm Forward Link",
+      "shape": "box",
+      "position": [
+        -0.79,
+        0.48,
+        0.52
+      ],
+      "rotation": [
+        0,
+        0.18,
+        0
+      ],
+      "size": [
+        0.34,
+        0.028,
+        0.028
+      ],
+      "material": "forged steel",
+      "role": "Upper forward link controlling camber of the rear-left driven upright.",
+      "connections": [
+        "tower_rl",
+        "hub_rl"
+      ]
+    },
+    {
+      "id": "upper_arm_rl_rear",
+      "name": "Rear Port Upper Control Arm Rear Link",
+      "shape": "box",
+      "position": [
+        -0.91,
+        0.48,
+        0.52
+      ],
+      "rotation": [
+        0,
+        -0.18,
+        0
+      ],
+      "size": [
+        0.34,
+        0.028,
+        0.028
+      ],
+      "material": "forged steel",
+      "role": "Upper rear link completing the rear-left wishbone triangle.",
+      "connections": [
+        "tower_rl",
+        "hub_rl"
+      ]
+    },
+    {
+      "id": "upper_arm_rr_front",
+      "name": "Rear Starboard Upper Control Arm Forward Link",
+      "shape": "box",
+      "position": [
+        -0.79,
+        0.48,
+        -0.52
+      ],
+      "rotation": [
+        0,
+        -0.18,
+        0
+      ],
+      "size": [
+        0.34,
+        0.028,
+        0.028
+      ],
+      "material": "forged steel",
+      "role": "Upper forward link controlling camber of the rear-right driven upright.",
+      "connections": [
+        "tower_rr",
+        "hub_rr"
+      ]
+    },
+    {
+      "id": "upper_arm_rr_rear",
+      "name": "Rear Starboard Upper Control Arm Rear Link",
+      "shape": "box",
+      "position": [
+        -0.91,
+        0.48,
+        -0.52
+      ],
+      "rotation": [
+        0,
+        0.18,
+        0
+      ],
+      "size": [
+        0.34,
+        0.028,
+        0.028
+      ],
+      "material": "forged steel",
+      "role": "Upper rear link completing the rear-right wishbone triangle.",
+      "connections": [
+        "tower_rr",
+        "hub_rr"
+      ]
+    },
+    {
+      "id": "tower_fl",
+      "name": "Front Port Suspension Tower",
+      "shape": "box",
+      "position": [
+        0.86,
+        0.55,
+        0.55
+      ],
+      "size": [
+        0.07,
+        0.42,
+        0.07
+      ],
+      "material": "welded steel",
+      "role": "Vertical front-left tower that carries the upper coilover mount above the open frame rail.",
+      "connections": [
+        "rail_port",
+        "strut_fl_body",
+        "spring_fl",
+        "upper_arm_fl_front",
+        "upper_arm_fl_rear",
+        "tower_top_fl"
+      ]
+    },
+    {
+      "id": "tower_fr",
+      "name": "Front Starboard Suspension Tower",
+      "shape": "box",
+      "position": [
+        0.86,
+        0.55,
+        -0.55
+      ],
+      "size": [
+        0.07,
+        0.42,
+        0.07
+      ],
+      "material": "welded steel",
+      "role": "Vertical front-right tower that carries the upper coilover mount above the open frame rail.",
+      "connections": [
+        "rail_starboard",
+        "strut_fr_body",
+        "spring_fr",
+        "upper_arm_fr_front",
+        "upper_arm_fr_rear",
+        "tower_top_fr"
+      ]
+    },
+    {
+      "id": "tower_rl",
+      "name": "Rear Port Suspension Tower",
+      "shape": "box",
+      "position": [
+        -0.86,
+        0.55,
+        0.55
+      ],
+      "size": [
+        0.07,
+        0.42,
+        0.07
+      ],
+      "material": "welded steel",
+      "role": "Vertical rear-left tower that carries coilover loads into the port side rail.",
+      "connections": [
+        "rail_port",
+        "strut_rl_body",
+        "spring_rl",
+        "upper_arm_rl_front",
+        "upper_arm_rl_rear",
+        "tower_top_rl"
+      ]
+    },
+    {
+      "id": "tower_rr",
+      "name": "Rear Starboard Suspension Tower",
+      "shape": "box",
+      "position": [
+        -0.86,
+        0.55,
+        -0.55
+      ],
+      "size": [
+        0.07,
+        0.42,
+        0.07
+      ],
+      "material": "welded steel",
+      "role": "Vertical rear-right tower that carries coilover loads into the starboard side rail.",
+      "connections": [
+        "rail_starboard",
+        "strut_rr_body",
+        "spring_rr",
+        "upper_arm_rr_front",
+        "upper_arm_rr_rear",
+        "tower_top_rr"
+      ]
+    },
+    {
+      "id": "tower_top_fl",
+      "name": "Front Port Tower Top Tab",
+      "shape": "box",
+      "position": [
+        0.86,
+        0.78,
+        0.55
+      ],
+      "size": [
+        0.14,
+        0.035,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Flat tab at the top of the front-left tower for the coilover eye bolt.",
+      "connections": [
+        "tower_fl",
+        "strut_fl_body"
+      ]
+    },
+    {
+      "id": "tower_top_fr",
+      "name": "Front Starboard Tower Top Tab",
+      "shape": "box",
+      "position": [
+        0.86,
+        0.78,
+        -0.55
+      ],
+      "size": [
+        0.14,
+        0.035,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Flat tab at the top of the front-right tower for the coilover eye bolt.",
+      "connections": [
+        "tower_fr",
+        "strut_fr_body"
+      ]
+    },
+    {
+      "id": "tower_top_rl",
+      "name": "Rear Port Tower Top Tab",
+      "shape": "box",
+      "position": [
+        -0.86,
+        0.78,
+        0.55
+      ],
+      "size": [
+        0.14,
+        0.035,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Flat tab at the top of the rear-left tower for the coilover eye bolt.",
+      "connections": [
+        "tower_rl",
+        "strut_rl_body"
+      ]
+    },
+    {
+      "id": "tower_top_rr",
+      "name": "Rear Starboard Tower Top Tab",
+      "shape": "box",
+      "position": [
+        -0.86,
+        0.78,
+        -0.55
+      ],
+      "size": [
+        0.14,
+        0.035,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Flat tab at the top of the rear-right tower for the coilover eye bolt.",
+      "connections": [
+        "tower_rr",
+        "strut_rr_body"
+      ]
+    },
+    {
+      "id": "strut_fl_body",
+      "name": "Front Port Damper Body",
+      "shape": "capsule",
+      "position": [
+        0.86,
+        0.47,
+        0.56
+      ],
+      "size": [
+        0.025,
+        0.32
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Front-left damper body linking the lower hub upright to the suspension tower.",
+      "connections": [
+        "tower_fl",
+        "tower_top_fl",
+        "hub_fl",
+        "spring_fl"
+      ]
+    },
+    {
+      "id": "strut_fr_body",
+      "name": "Front Starboard Damper Body",
+      "shape": "capsule",
+      "position": [
+        0.86,
+        0.47,
+        -0.56
+      ],
+      "size": [
+        0.025,
+        0.32
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Front-right damper body linking the lower hub upright to the suspension tower.",
+      "connections": [
+        "tower_fr",
+        "tower_top_fr",
+        "hub_fr",
+        "spring_fr"
+      ]
+    },
+    {
+      "id": "strut_rl_body",
+      "name": "Rear Port Damper Body",
+      "shape": "capsule",
+      "position": [
+        -0.86,
+        0.47,
+        0.56
+      ],
+      "size": [
+        0.025,
+        0.32
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear-left damper body controlling vertical movement of the driven hub.",
+      "connections": [
+        "tower_rl",
+        "tower_top_rl",
+        "hub_rl",
+        "spring_rl"
+      ]
+    },
+    {
+      "id": "strut_rr_body",
+      "name": "Rear Starboard Damper Body",
+      "shape": "capsule",
+      "position": [
+        -0.86,
+        0.47,
+        -0.56
+      ],
+      "size": [
+        0.025,
+        0.32
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear-right damper body controlling vertical movement of the driven hub.",
+      "connections": [
+        "tower_rr",
+        "tower_top_rr",
+        "hub_rr",
+        "spring_rr"
+      ]
+    },
+    {
+      "id": "spring_fl",
+      "name": "Front Port Coil Spring",
+      "shape": "cylinder",
+      "position": [
+        0.86,
+        0.5,
+        0.56
+      ],
+      "size": [
+        0.045,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Visible front-left coil spring surrounding the damper to support corner weight.",
+      "connections": [
+        "tower_fl",
+        "strut_fl_body",
+        "hub_fl"
+      ]
+    },
+    {
+      "id": "spring_fr",
+      "name": "Front Starboard Coil Spring",
+      "shape": "cylinder",
+      "position": [
+        0.86,
+        0.5,
+        -0.56
+      ],
+      "size": [
+        0.045,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Visible front-right coil spring surrounding the damper to support corner weight.",
+      "connections": [
+        "tower_fr",
+        "strut_fr_body",
+        "hub_fr"
+      ]
+    },
+    {
+      "id": "spring_rl",
+      "name": "Rear Port Coil Spring",
+      "shape": "cylinder",
+      "position": [
+        -0.86,
+        0.5,
+        0.56
+      ],
+      "size": [
+        0.045,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Visible rear-left coil spring supporting the rear-drive corner load.",
+      "connections": [
+        "tower_rl",
+        "strut_rl_body",
+        "hub_rl"
+      ]
+    },
+    {
+      "id": "spring_rr",
+      "name": "Rear Starboard Coil Spring",
+      "shape": "cylinder",
+      "position": [
+        -0.86,
+        0.5,
+        -0.56
+      ],
+      "size": [
+        0.045,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Visible rear-right coil spring supporting the rear-drive corner load.",
+      "connections": [
+        "tower_rr",
+        "strut_rr_body",
+        "hub_rr"
+      ]
+    },
+    {
+      "id": "steering_rack",
+      "name": "Rack-and-Pinion Steering Bar",
+      "shape": "cylinder",
+      "position": [
+        0.96,
+        0.37,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.022,
+        1.08
+      ],
+      "material": "brushed steel",
+      "role": "Transverse rack that moves the two front tie rods for steering input.",
+      "connections": [
+        "cross_front",
+        "tie_rod_left",
+        "tie_rod_right",
+        "pinion_joint"
+      ]
+    },
+    {
+      "id": "tie_rod_left",
+      "name": "Front Port Tie Rod",
+      "shape": "cylinder",
+      "position": [
+        0.91,
+        0.35,
+        0.43
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.014,
+        0.36
+      ],
+      "material": "brushed steel",
+      "role": "Left steering link from the rack end to the front-left upright steering arm.",
+      "connections": [
+        "steering_rack",
+        "hub_fl",
+        "tie_rod_end_left"
+      ]
+    },
+    {
+      "id": "tie_rod_right",
+      "name": "Front Starboard Tie Rod",
+      "shape": "cylinder",
+      "position": [
+        0.91,
+        0.35,
+        -0.43
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.014,
+        0.36
+      ],
+      "material": "brushed steel",
+      "role": "Right steering link from the rack end to the front-right upright steering arm.",
+      "connections": [
+        "steering_rack",
+        "hub_fr",
+        "tie_rod_end_right"
+      ]
+    },
+    {
+      "id": "tie_rod_end_left",
+      "name": "Front Port Tie-Rod End Joint",
+      "shape": "sphere",
+      "position": [
+        0.89,
+        0.35,
+        0.58
+      ],
+      "size": [
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Ball joint at the front-left upright where steering motion enters the knuckle.",
+      "connections": [
+        "tie_rod_left",
+        "hub_fl"
+      ]
+    },
+    {
+      "id": "tie_rod_end_right",
+      "name": "Front Starboard Tie-Rod End Joint",
+      "shape": "sphere",
+      "position": [
+        0.89,
+        0.35,
+        -0.58
+      ],
+      "size": [
+        0.035
+      ],
+      "material": "forged steel",
+      "role": "Ball joint at the front-right upright where steering motion enters the knuckle.",
+      "connections": [
+        "tie_rod_right",
+        "hub_fr"
+      ]
+    },
+    {
+      "id": "pinion_joint",
+      "name": "Steering Pinion Joint",
+      "shape": "sphere",
+      "position": [
+        0.76,
+        0.43,
+        -0.22
+      ],
+      "size": [
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Universal joint where the tilted steering column drives the steering rack pinion.",
+      "connections": [
+        "steering_rack",
+        "steering_column"
+      ]
+    },
+    {
+      "id": "steering_column",
+      "name": "Tilted Steering Column",
+      "shape": "cylinder",
+      "position": [
+        0.55,
+        0.69,
+        -0.28
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.62
+      ],
+      "size": [
+        0.025,
+        0.62
+      ],
+      "material": "brushed steel",
+      "role": "Inclined driver-side steering shaft rising from the rack pinion toward the wheel.",
+      "connections": [
+        "pinion_joint",
+        "steering_wheel",
+        "pedal_box"
+      ]
+    },
+    {
+      "id": "steering_wheel",
+      "name": "Steering Wheel",
+      "shape": "torus",
+      "position": [
+        0.36,
+        0.96,
+        -0.28
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.14,
+        0.015
+      ],
+      "material": "black composite",
+      "role": "Driver hand wheel mounted at the top of the tilted steering column.",
+      "connections": [
+        "steering_column"
+      ]
+    },
+    {
+      "id": "pedal_box",
+      "name": "Driver Pedal Box",
+      "shape": "box",
+      "position": [
+        0.63,
+        0.36,
+        -0.29
+      ],
+      "size": [
+        0.16,
+        0.1,
+        0.22
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Pedal support box mounted ahead of the driver seat for throttle and brake inputs.",
+      "connections": [
+        "tray_floor",
+        "low_voltage_bus",
+        "steering_column",
+        "brake_pedal",
+        "throttle_pedal"
+      ]
+    },
+    {
+      "id": "brake_pedal",
+      "name": "Brake Pedal Face",
+      "shape": "box",
+      "position": [
+        0.72,
+        0.42,
+        -0.35
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.25
+      ],
+      "size": [
+        0.035,
+        0.12,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Wide brake pedal face that transfers driver force into the hydraulic brake system.",
+      "connections": [
+        "pedal_box"
+      ]
+    },
+    {
+      "id": "throttle_pedal",
+      "name": "Throttle Pedal Face",
+      "shape": "box",
+      "position": [
+        0.72,
+        0.41,
+        -0.23
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.25
+      ],
+      "size": [
+        0.03,
+        0.1,
+        0.055
+      ],
+      "material": "brushed steel",
+      "role": "Narrow accelerator pedal face for electronic torque demand to the motor controller.",
+      "connections": [
+        "pedal_box",
+        "low_voltage_bus"
+      ]
+    },
+    {
+      "id": "seat_driver_rail_left",
+      "name": "Driver Seat Port Rail",
+      "shape": "box",
+      "position": [
+        0.16,
+        0.39,
+        -0.18
+      ],
+      "size": [
+        0.5,
+        0.045,
+        0.04
+      ],
+      "material": "welded steel",
+      "role": "Left sliding rail that bolts the driver seat base to the floor frame.",
+      "connections": [
+        "tray_floor",
+        "driver_seat_cushion"
+      ]
+    },
+    {
+      "id": "seat_driver_rail_right",
+      "name": "Driver Seat Starboard Rail",
+      "shape": "box",
+      "position": [
+        0.16,
+        0.39,
+        -0.42
+      ],
+      "size": [
+        0.5,
+        0.045,
+        0.04
+      ],
+      "material": "welded steel",
+      "role": "Right sliding rail that keeps the driver seat cushion low and visible above electronics.",
+      "connections": [
+        "tray_floor",
+        "driver_seat_cushion"
+      ]
+    },
+    {
+      "id": "driver_seat_cushion",
+      "name": "Driver Thin Seat Cushion",
+      "shape": "box",
+      "position": [
+        0.16,
+        0.49,
+        -0.3
+      ],
+      "size": [
+        0.46,
+        0.09,
+        0.34
+      ],
+      "material": "black composite",
+      "role": "Low driver cushion split from the back and bolsters so it does not hide the battery tray.",
+      "connections": [
+        "seat_driver_rail_left",
+        "seat_driver_rail_right",
+        "driver_seat_back",
+        "driver_seat_bolster_port",
+        "driver_seat_bolster_starboard"
+      ]
+    },
+    {
+      "id": "driver_seat_back",
+      "name": "Driver Thin Back Panel",
+      "shape": "box",
+      "position": [
+        -0.04,
+        0.77,
+        -0.3
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.2
+      ],
+      "size": [
+        0.08,
+        0.5,
+        0.32
+      ],
+      "material": "black composite",
+      "role": "Thin driver back panel showing the occupant package without forming a solid opaque cube.",
+      "connections": [
+        "driver_seat_cushion",
+        "driver_head_pad",
+        "driver_seat_bolster_port",
+        "driver_seat_bolster_starboard"
+      ]
+    },
+    {
+      "id": "driver_seat_bolster_port",
+      "name": "Driver Seat Port Side Bolster",
+      "shape": "box",
+      "position": [
+        0.06,
+        0.62,
+        -0.12
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.18
+      ],
+      "size": [
+        0.08,
+        0.38,
+        0.045
+      ],
+      "material": "black composite",
+      "role": "Narrow outer side bolster defines the driver bucket seat while leaving the center tray visible.",
+      "connections": [
+        "driver_seat_cushion",
+        "driver_seat_back"
+      ]
+    },
+    {
+      "id": "driver_seat_bolster_starboard",
+      "name": "Driver Seat Starboard Side Bolster",
+      "shape": "box",
+      "position": [
+        0.06,
+        0.62,
+        -0.48
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.18
+      ],
+      "size": [
+        0.08,
+        0.38,
+        0.045
+      ],
+      "material": "black composite",
+      "role": "Narrow inner side bolster defines the driver bucket seat without hiding electronics.",
+      "connections": [
+        "driver_seat_cushion",
+        "driver_seat_back"
+      ]
+    },
+    {
+      "id": "driver_head_pad",
+      "name": "Driver Head Pad",
+      "shape": "box",
+      "position": [
+        -0.12,
+        1.05,
+        -0.3
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.2
+      ],
+      "size": [
+        0.08,
+        0.14,
+        0.24
+      ],
+      "material": "black composite",
+      "role": "Small head pad at the top of the driver seat back that identifies seat orientation.",
+      "connections": [
+        "driver_seat_back"
+      ]
+    },
+    {
+      "id": "seat_pass_rail_left",
+      "name": "Passenger Seat Port Rail",
+      "shape": "box",
+      "position": [
+        0.16,
+        0.39,
+        0.42
+      ],
+      "size": [
+        0.5,
+        0.045,
+        0.04
+      ],
+      "material": "welded steel",
+      "role": "Outer sliding rail bolting the passenger seat base to the floor frame.",
+      "connections": [
+        "tray_floor",
+        "passenger_seat_cushion"
+      ]
+    },
+    {
+      "id": "seat_pass_rail_right",
+      "name": "Passenger Seat Starboard Rail",
+      "shape": "box",
+      "position": [
+        0.16,
+        0.39,
+        0.18
+      ],
+      "size": [
+        0.5,
+        0.045,
+        0.04
+      ],
+      "material": "welded steel",
+      "role": "Inner sliding rail supporting the passenger cushion while leaving electronics visible.",
+      "connections": [
+        "tray_floor",
+        "passenger_seat_cushion"
+      ]
+    },
+    {
+      "id": "passenger_seat_cushion",
+      "name": "Passenger Thin Seat Cushion",
+      "shape": "box",
+      "position": [
+        0.16,
+        0.49,
+        0.3
+      ],
+      "size": [
+        0.46,
+        0.09,
+        0.34
+      ],
+      "material": "black composite",
+      "role": "Low passenger cushion mounted beside the driver seat on separate steel rails.",
+      "connections": [
+        "seat_pass_rail_left",
+        "seat_pass_rail_right",
+        "passenger_seat_back",
+        "passenger_seat_bolster_port",
+        "passenger_seat_bolster_starboard"
+      ]
+    },
+    {
+      "id": "passenger_seat_back",
+      "name": "Passenger Thin Back Panel",
+      "shape": "box",
+      "position": [
+        -0.04,
+        0.77,
+        0.3
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.2
+      ],
+      "size": [
+        0.08,
+        0.5,
+        0.32
+      ],
+      "material": "black composite",
+      "role": "Thin passenger back panel split from the cushion to expose the open platform layout.",
+      "connections": [
+        "passenger_seat_cushion",
+        "passenger_head_pad",
+        "passenger_seat_bolster_port",
+        "passenger_seat_bolster_starboard"
+      ]
+    },
+    {
+      "id": "passenger_seat_bolster_port",
+      "name": "Passenger Seat Port Side Bolster",
+      "shape": "box",
+      "position": [
+        0.06,
+        0.62,
+        0.48
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.18
+      ],
+      "size": [
+        0.08,
+        0.38,
+        0.045
+      ],
+      "material": "black composite",
+      "role": "Narrow outer side bolster defines the passenger bucket seat while leaving frame tubes visible.",
+      "connections": [
+        "passenger_seat_cushion",
+        "passenger_seat_back"
+      ]
+    },
+    {
+      "id": "passenger_seat_bolster_starboard",
+      "name": "Passenger Seat Starboard Side Bolster",
+      "shape": "box",
+      "position": [
+        0.06,
+        0.62,
+        0.12
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.18
+      ],
+      "size": [
+        0.08,
+        0.38,
+        0.045
+      ],
+      "material": "black composite",
+      "role": "Narrow inner side bolster defines the passenger bucket seat without covering the battery modules.",
+      "connections": [
+        "passenger_seat_cushion",
+        "passenger_seat_back"
+      ]
+    },
+    {
+      "id": "passenger_head_pad",
+      "name": "Passenger Head Pad",
+      "shape": "box",
+      "position": [
+        -0.12,
+        1.05,
+        0.3
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.2
+      ],
+      "size": [
+        0.08,
+        0.14,
+        0.24
+      ],
+      "material": "black composite",
+      "role": "Small head pad at the top of the passenger seat back that identifies seat orientation.",
+      "connections": [
+        "passenger_seat_back"
+      ]
+    }
   ]
 }

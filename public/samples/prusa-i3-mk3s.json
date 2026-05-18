@@ -2,15 +2,16 @@
   "machine_name": "Original Prusa i3 MK3S+",
   "assembly_instructions": [
     "1. Place four rubber feet on the floor, then bolt the left and right 2020 Y-axis extrusions to the front and rear 2020 cross-bars to make a 0.50 m by 0.44 m rectangular base.",
-    "2. Fasten the split rear aluminium frame to the rear cross-bar: install the left upright, right upright, bottom bridge, top bridge, and angled sheet legs so the central window remains open.",
-    "3. Install the two 8 mm Y smooth rods on the base rails, add the front Y idler and rear Y motor pulley, then loop the GT2 Y belt along the centreline.",
-    "4. Fit the three Y linear bearing blocks to the rods, bolt the Y-carriage plate to them, add nine heatbed spacers, then mount the MK52 heatbed and PEI spring-steel print sheet.",
+    "2. Fasten the split rear aluminium sheet frame to the rear cross-bar: install the left upright, right upright, bottom bridge, top bridge, angled sheet legs, rounded cutout markers, and Z motor mounting hole markers so the central window remains open.",
+    "3. Install the two 8 mm Y smooth rods on the base rails, add the front Y idler, rear Y motor pulley, and Y belt clamp, then loop the GT2 Y belt along the centreline.",
+    "4. Fit the three Y linear bearing blocks to the rods, bolt the Y-carriage plate to them, add the nine heatbed spacers in a 3 by 3 grid, then mount the MK52 heatbed and PEI spring-steel print sheet.",
     "5. Clamp the two 10 mm Z smooth rods and two T8 lead screws into the rear frame, add top Z motors and couplers, and connect each lead screw to the X-axis gantry.",
-    "6. Build the X-axis gantry from the 2020 X extrusion, X motor pulley, left idler pulley, X belt, and three X bearing blocks, then attach the X-carriage.",
-    "7. Assemble the direct-drive extruder on the X-carriage: mount the printed body, E motor, Bondtech gears, heatsink, fan, heatblock, brass nozzle, SuperPINDA probe, and filament sensor.",
-    "8. Bolt the Einsy RAMBo electronics case to the right rear frame, route the X/Z and bed wiring looms, and mount the LCD with rotary encoder on the front cross-bar.",
-    "9. Fit the top spool holder brackets and axle, place the 1 kg filament spool on the axle, and feed 1.75 mm filament through the guide into the extruder inlet.",
-    "10. Square the base, tension the X and Y belts, verify all feet sit at y = 0, then mesh-level the 250 x 210 mm print surface."
+    "6. Build the X-axis gantry from the paired 8 mm X smooth rods, left and right printed X-end blocks, rear belt support bar, X motor pulley, left idler pulley, X belt runs, and carriage belt clamp.",
+    "7. Assemble the direct-drive extruder on the X-carriage: mount the printed body, E motor, idler door, Bondtech gears, PTFE inlet sleeve, filament sensor, heatsink, fan, part-cooling blower and duct, heatbreak, heatblock, heater cartridge, thermistor, brass nozzle, and SuperPINDA probe.",
+    "8. Bolt the cutaway Einsy RAMBo electronics case to the right rear frame, leave the ventilated lid offset, install the exposed controller board, three TMC driver blocks, terminal subdivisions, power input, X/Z wiring loom, and heatbed wiring loom.",
+    "9. Mount the LCD bracket, glass display, and rotary encoder to the front cross-bar, then connect the LCD ribbon to the electronics case.",
+    "10. Fit the top spool holder brackets and axle, place the 1 kg filament spool with hub, flanges, and wound coil bands on the axle, then route 1.75 mm filament through the spool eyelet, guide tube, PTFE inlet, Bondtech gears, and hotend throat.",
+    "11. Square the base, tension the X and Y belts, verify all feet sit at y = 0, confirm the nozzle sits just above the sheet, and mesh-level the 250 x 210 mm print surface."
   ],
   "metadata": {
     "reference": "https://help.prusa3d.com/category/original-prusa-i3-mk3s_221",
@@ -24,7 +25,7 @@
       "japanese_name": "Original Prusa i3 MK3S+",
       "english_name": "Original Prusa i3 MK3S+ FDM 3D Printer",
       "summary": "Flagship open-source bed-slinger FDM printer from Prusa Research. 250×210×210 mm build volume, direct-drive Bondtech extruder, magnetic removable spring-steel sheet, filament and power-loss sensors.",
-      "description": "The Original Prusa i3 MK3S+ is the production workhorse of the Prusa i3 family — itself the longest-running open-source derivative of Josef Prusa's original RepRap i3. The printer follows the classic 'bed-slinger' kinematics: the heat bed moves on the Y axis along two parallel M8 smooth rods on a 2020 aluminium base, while a cantilevered single-sheet aluminium frame at the rear carries the XZ gantry. Two Z-motors with T8 lead screws raise and lower the X-extrusion; the X-carriage rides on the extrusion and carries the MK3S+ direct-drive extruder with a Bondtech dual-gear feeder, an E3D V6-compatible hotend, and a 0.4 mm brass nozzle. The removable magnetic spring-steel PEI sheet on top of the heated bed lets prints pop off by flexing. A SuperPINDA probe handles mesh bed levelling; an IR filament sensor and power-panic detection are built into the extruder. Firmware, electronics (Einsy RAMBo with TMC2130 drivers), and full CAD are released on GitHub — the printer is one of the most-cloned FDM designs in existence.",
+      "description": "The Original Prusa i3 MK3S+ is the production workhorse of the Prusa i3 family — itself the longest-running open-source derivative of Josef Prusa's original RepRap i3. The printer follows the classic bed-slinger kinematics: the heat bed moves on the Y axis along two parallel M8 smooth rods on a 2020 aluminium base, while a cantilevered single-sheet aluminium frame at the rear carries the XZ gantry. Two Z-motors with T8 lead screws raise and lower the X-axis assembly; the X-carriage rides on paired smooth rods and carries the MK3S+ direct-drive extruder with a Bondtech dual-gear feeder, an E3D V6-compatible hotend, and a 0.4 mm brass nozzle. The removable magnetic spring-steel PEI sheet on top of the heated bed lets prints pop off by flexing. A SuperPINDA probe handles mesh bed levelling; an IR filament sensor and power-panic detection are built into the extruder. Firmware, electronics (Einsy RAMBo with TMC2130 drivers), and full CAD are released on GitHub — the printer is one of the most-cloned FDM designs in existence.",
       "operator": "Prusa Research customers + the wider open FDM community",
       "contractor": "Prusa Research (Josef Prusa et al., Prague)",
       "contract_date": "MK3S released Feb 2019 · MK3S+ upgrade released Oct 2020",
@@ -53,7 +54,7 @@
         },
         {
           "label": "Axes",
-          "value": "X: 2020 extrusion · Y: 2× M8 smooth rods · Z: 2× lead screws + 2× smooth rods"
+          "value": "X: paired 8 mm smooth rods · Y: 2× M8 smooth rods · Z: 2× lead screws + 2× smooth rods"
         },
         {
           "label": "Electronics",
@@ -277,7 +278,9 @@
         "frame_top_bridge",
         "frame_bottom_bridge",
         "z_rod_left",
-        "z_screw_left"
+        "z_screw_left",
+        "frame_left_top_cutout",
+        "frame_left_motor_hole"
       ]
     },
     {
@@ -302,7 +305,9 @@
         "frame_bottom_bridge",
         "z_rod_right",
         "z_screw_right",
-        "einsy_case"
+        "einsy_case",
+        "frame_right_top_cutout",
+        "frame_right_motor_hole"
       ]
     },
     {
@@ -324,7 +329,8 @@
       "connections": [
         "frame_left_upright",
         "frame_right_upright",
-        "base_cross_rear"
+        "base_cross_rear",
+        "frame_bottom_service_cutout"
       ]
     },
     {
@@ -349,7 +355,8 @@
         "motor_z_left",
         "motor_z_right",
         "spool_holder_left",
-        "spool_holder_right"
+        "spool_holder_right",
+        "frame_top_center_cutout"
       ]
     },
     {
@@ -401,6 +408,146 @@
       "role": "Mirrored lower sheet web gives the rear frame stiffness without hiding the carriage.",
       "connections": [
         "frame_right_upright",
+        "frame_bottom_bridge"
+      ]
+    },
+    {
+      "id": "frame_left_top_cutout",
+      "name": "Left Rounded Frame Cutout Marker",
+      "shape": "cylinder",
+      "position": [
+        -0.18,
+        0.505,
+        -0.249
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.017,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Dark circular marker represents the rounded relief cutout in the laser-cut left frame plate.",
+      "connections": [
+        "frame_left_upright"
+      ]
+    },
+    {
+      "id": "frame_right_top_cutout",
+      "name": "Right Rounded Frame Cutout Marker",
+      "shape": "cylinder",
+      "position": [
+        0.18,
+        0.505,
+        -0.249
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.017,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Dark circular marker represents the rounded relief cutout in the laser-cut right frame plate.",
+      "connections": [
+        "frame_right_upright"
+      ]
+    },
+    {
+      "id": "frame_left_motor_hole",
+      "name": "Left Z Motor Mount Hole Marker",
+      "shape": "cylinder",
+      "position": [
+        -0.085,
+        0.555,
+        -0.249
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.012,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Round surface marker shows the bolt pattern area for the left Z motor mount in the frame sheet.",
+      "connections": [
+        "frame_left_upright",
+        "frame_top_bridge",
+        "motor_z_left"
+      ]
+    },
+    {
+      "id": "frame_right_motor_hole",
+      "name": "Right Z Motor Mount Hole Marker",
+      "shape": "cylinder",
+      "position": [
+        0.085,
+        0.555,
+        -0.249
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.012,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Round surface marker shows the bolt pattern area for the right Z motor mount in the frame sheet.",
+      "connections": [
+        "frame_right_upright",
+        "frame_top_bridge",
+        "motor_z_right"
+      ]
+    },
+    {
+      "id": "frame_top_center_cutout",
+      "name": "Top Bridge Central Cutout Marker",
+      "shape": "box",
+      "position": [
+        0,
+        0.555,
+        -0.248
+      ],
+      "size": [
+        0.09,
+        0.018,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Dark slot marker indicates the central lightening cutout in the top of the sheet frame.",
+      "connections": [
+        "frame_top_bridge"
+      ]
+    },
+    {
+      "id": "frame_bottom_service_cutout",
+      "name": "Bottom Bridge Service Cutout Marker",
+      "shape": "box",
+      "position": [
+        0,
+        0.105,
+        -0.248
+      ],
+      "size": [
+        0.1,
+        0.018,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Dark slot marker indicates the lower sheet-frame opening around the Y motor and wiring route.",
+      "connections": [
         "frame_bottom_bridge"
       ]
     },
@@ -539,6 +686,28 @@
         "y_bearing_left_rear",
         "y_bearing_right_center",
         "heatbed_mk52",
+        "y_belt_upper",
+        "y_belt_clamp"
+      ]
+    },
+    {
+      "id": "y_belt_clamp",
+      "name": "Y-Carriage Belt Clamp",
+      "shape": "box",
+      "position": [
+        0,
+        0.132,
+        -0.065
+      ],
+      "size": [
+        0.06,
+        0.018,
+        0.025
+      ],
+      "material": "black composite",
+      "role": "Printed clamp fastens the upper Y belt run to the underside of the moving carriage.",
+      "connections": [
+        "y_carriage",
         "y_belt_upper"
       ]
     },
@@ -557,12 +726,17 @@
         0.215
       ],
       "material": "dark anodized aluminum",
-      "role": "Heated magnetic PCB provides the 250 x 210 mm print area and mounts above spacer standoffs.",
+      "role": "Heated magnetic PCB provides the 250 x 210 mm print area and mounts above a nine-point spacer grid.",
       "connections": [
         "y_carriage",
         "bed_spacer_front_left",
+        "bed_spacer_front_center",
         "bed_spacer_front_right",
+        "bed_spacer_mid_left",
+        "bed_spacer_mid_center",
+        "bed_spacer_mid_right",
         "bed_spacer_rear_left",
+        "bed_spacer_rear_center",
         "bed_spacer_rear_right",
         "print_sheet"
       ]
@@ -650,6 +824,26 @@
       ]
     },
     {
+      "id": "bed_spacer_front_center",
+      "name": "Heatbed Spacer Front Center",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.152,
+        0.125
+      ],
+      "size": [
+        0.006,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Center-front standoff supports the MK52 bed near the front edge screw.",
+      "connections": [
+        "y_carriage",
+        "heatbed_mk52"
+      ]
+    },
+    {
       "id": "bed_spacer_front_right",
       "name": "Heatbed Spacer Front Right",
       "shape": "cylinder",
@@ -670,6 +864,66 @@
       ]
     },
     {
+      "id": "bed_spacer_mid_left",
+      "name": "Heatbed Spacer Middle Left",
+      "shape": "cylinder",
+      "position": [
+        -0.105,
+        0.152,
+        0.04
+      ],
+      "size": [
+        0.006,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Middle-left standoff keeps the heated PCB flat across the left side.",
+      "connections": [
+        "y_carriage",
+        "heatbed_mk52"
+      ]
+    },
+    {
+      "id": "bed_spacer_mid_center",
+      "name": "Heatbed Spacer Middle Center",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.152,
+        0.04
+      ],
+      "size": [
+        0.006,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Central standoff is the middle screw point of the nine-point MK52 mounting grid.",
+      "connections": [
+        "y_carriage",
+        "heatbed_mk52"
+      ]
+    },
+    {
+      "id": "bed_spacer_mid_right",
+      "name": "Heatbed Spacer Middle Right",
+      "shape": "cylinder",
+      "position": [
+        0.105,
+        0.152,
+        0.04
+      ],
+      "size": [
+        0.006,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Middle-right standoff keeps the heated PCB flat across the electronics side.",
+      "connections": [
+        "y_carriage",
+        "heatbed_mk52"
+      ]
+    },
+    {
       "id": "bed_spacer_rear_left",
       "name": "Heatbed Spacer Rear Left",
       "shape": "cylinder",
@@ -684,6 +938,26 @@
       ],
       "material": "brushed steel",
       "role": "Rear-left standoff keeps the heated bed parallel to the carriage plate.",
+      "connections": [
+        "y_carriage",
+        "heatbed_mk52"
+      ]
+    },
+    {
+      "id": "bed_spacer_rear_center",
+      "name": "Heatbed Spacer Rear Center",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.152,
+        -0.045
+      ],
+      "size": [
+        0.006,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Rear-center standoff supports the MK52 bed near the rear cable exit.",
       "connections": [
         "y_carriage",
         "heatbed_mk52"
@@ -801,7 +1075,8 @@
       "connections": [
         "y_motor_pulley",
         "y_idler_pulley",
-        "y_carriage"
+        "y_carriage",
+        "y_belt_clamp"
       ]
     },
     {
@@ -883,11 +1158,12 @@
         0.38
       ],
       "material": "brushed steel",
-      "role": "Left T8 lead screw raises and lowers the left end of the X-axis extrusion.",
+      "role": "Left T8 lead screw raises and lowers the left end of the X-axis gantry.",
       "connections": [
         "motor_z_left",
         "z_coupler_left",
-        "x_extrusion"
+        "x_rear_belt_support",
+        "x_left_end_block"
       ]
     },
     {
@@ -904,11 +1180,12 @@
         0.38
       ],
       "material": "brushed steel",
-      "role": "Right T8 lead screw raises and lowers the right end of the X-axis extrusion.",
+      "role": "Right T8 lead screw raises and lowers the right end of the X-axis gantry.",
       "connections": [
         "motor_z_right",
         "z_coupler_right",
-        "x_extrusion"
+        "x_rear_belt_support",
+        "x_right_end_block"
       ]
     },
     {
@@ -1013,7 +1290,8 @@
       "role": "Left Z-axis stepper sits at the top of the frame and turns the left lead screw.",
       "connections": [
         "frame_top_bridge",
-        "z_coupler_left"
+        "z_coupler_left",
+        "frame_left_motor_hole"
       ]
     },
     {
@@ -1034,7 +1312,8 @@
       "role": "Right Z-axis stepper sits at the top of the frame and turns the right lead screw.",
       "connections": [
         "frame_top_bridge",
-        "z_coupler_right"
+        "z_coupler_right",
+        "frame_right_motor_hole"
       ]
     },
     {
@@ -1078,8 +1357,8 @@
       ]
     },
     {
-      "id": "x_extrusion",
-      "name": "X-Axis 2020 Extrusion",
+      "id": "x_rear_belt_support",
+      "name": "Rear X Belt Support Bar",
       "shape": "box",
       "position": [
         0,
@@ -1088,14 +1367,18 @@
       ],
       "size": [
         0.405,
-        0.04,
-        0.04
+        0.018,
+        0.018
       ],
       "material": "dark anodized aluminum",
-      "role": "Horizontal 2020 extrusion spans the Z rods and carries the moving X carriage.",
+      "role": "Slim rear support visually carries the belt loop while the paired X smooth rods provide the actual carriage guide geometry.",
       "connections": [
         "z_screw_left",
         "z_screw_right",
+        "x_left_end_block",
+        "x_right_end_block",
+        "x_smooth_rod_upper",
+        "x_smooth_rod_lower",
         "x_bearing_left",
         "x_bearing_center",
         "x_bearing_right",
@@ -1105,13 +1388,118 @@
       ]
     },
     {
+      "id": "x_left_end_block",
+      "name": "Left X-End Printed Block",
+      "shape": "box",
+      "position": [
+        -0.205,
+        0.335,
+        -0.185
+      ],
+      "size": [
+        0.045,
+        0.07,
+        0.055
+      ],
+      "material": "black composite",
+      "role": "Left printed X-end ties the X rods to the left Z rod and carries the idler pulley.",
+      "connections": [
+        "x_rear_belt_support",
+        "x_smooth_rod_upper",
+        "x_smooth_rod_lower",
+        "z_rod_left",
+        "z_screw_left",
+        "x_idler_pulley"
+      ]
+    },
+    {
+      "id": "x_right_end_block",
+      "name": "Right X-End Printed Block",
+      "shape": "box",
+      "position": [
+        0.205,
+        0.335,
+        -0.185
+      ],
+      "size": [
+        0.045,
+        0.07,
+        0.055
+      ],
+      "material": "black composite",
+      "role": "Right printed X-end ties the X rods to the right Z rod and supports the X motor.",
+      "connections": [
+        "x_rear_belt_support",
+        "x_smooth_rod_upper",
+        "x_smooth_rod_lower",
+        "z_rod_right",
+        "z_screw_right",
+        "motor_x"
+      ]
+    },
+    {
+      "id": "x_smooth_rod_upper",
+      "name": "Upper X Smooth Rod 8 mm",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.358,
+        -0.142
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.39
+      ],
+      "material": "brushed steel",
+      "role": "Upper horizontal rod gives the X carriage a visible precision guide surface across the frame.",
+      "connections": [
+        "x_left_end_block",
+        "x_right_end_block",
+        "x_carriage",
+        "x_bearing_left",
+        "x_bearing_right"
+      ]
+    },
+    {
+      "id": "x_smooth_rod_lower",
+      "name": "Lower X Smooth Rod 8 mm",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.317,
+        -0.142
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.39
+      ],
+      "material": "brushed steel",
+      "role": "Lower horizontal rod keeps the X carriage from rotating under extruder load.",
+      "connections": [
+        "x_left_end_block",
+        "x_right_end_block",
+        "x_carriage",
+        "x_bearing_center"
+      ]
+    },
+    {
       "id": "x_bearing_left",
       "name": "Left X-Axis Bearing Block",
       "shape": "box",
       "position": [
         -0.115,
         0.35,
-        -0.165
+        -0.155
       ],
       "size": [
         0.055,
@@ -1119,9 +1507,10 @@
         0.035
       ],
       "material": "black composite",
-      "role": "Bearing block grips the X extrusion and transfers the left Z rod guidance into the gantry.",
+      "role": "Bearing block grips the upper X rod and transfers left-side guidance into the carriage.",
       "connections": [
-        "x_extrusion",
+        "x_rear_belt_support",
+        "x_smooth_rod_upper",
         "z_rod_left"
       ]
     },
@@ -1132,7 +1521,7 @@
       "position": [
         0,
         0.35,
-        -0.165
+        -0.155
       ],
       "size": [
         0.055,
@@ -1140,9 +1529,10 @@
         0.035
       ],
       "material": "black composite",
-      "role": "Central bearing support keeps the X carriage aligned on the horizontal extrusion.",
+      "role": "Central bearing support keeps the X carriage aligned on the lower rod.",
       "connections": [
-        "x_extrusion",
+        "x_rear_belt_support",
+        "x_smooth_rod_lower",
         "x_carriage"
       ]
     },
@@ -1153,7 +1543,7 @@
       "position": [
         0.115,
         0.35,
-        -0.165
+        -0.155
       ],
       "size": [
         0.055,
@@ -1161,9 +1551,10 @@
         0.035
       ],
       "material": "black composite",
-      "role": "Bearing block grips the X extrusion and transfers the right Z rod guidance into the gantry.",
+      "role": "Bearing block grips the upper X rod and transfers right-side guidance into the carriage.",
       "connections": [
-        "x_extrusion",
+        "x_rear_belt_support",
+        "x_smooth_rod_upper",
         "z_rod_right"
       ]
     },
@@ -1184,7 +1575,8 @@
       "material": "brushed steel",
       "role": "Right-end X stepper drives the belt that moves the extruder across the build plate.",
       "connections": [
-        "x_extrusion",
+        "x_rear_belt_support",
+        "x_right_end_block",
         "x_motor_pulley"
       ]
     },
@@ -1233,9 +1625,10 @@
         0.016
       ],
       "material": "brushed steel",
-      "role": "Left idler pulley returns the X belt at the opposite end of the extrusion.",
+      "role": "Left idler pulley returns the X belt at the opposite end of the gantry.",
       "connections": [
-        "x_extrusion",
+        "x_rear_belt_support",
+        "x_left_end_block",
         "x_belt_front",
         "x_belt_rear"
       ]
@@ -1259,7 +1652,8 @@
       "connections": [
         "x_motor_pulley",
         "x_idler_pulley",
-        "x_carriage"
+        "x_carriage",
+        "x_belt_clamp"
       ]
     },
     {
@@ -1294,15 +1688,39 @@
       ],
       "size": [
         0.095,
-        0.07,
-        0.035
+        0.06,
+        0.028
       ],
       "material": "black composite",
       "role": "Printed PETG carriage bolts to the X belt and supports the complete direct-drive extruder.",
       "connections": [
-        "x_extrusion",
+        "x_rear_belt_support",
+        "x_smooth_rod_upper",
+        "x_smooth_rod_lower",
         "x_belt_front",
+        "x_belt_clamp",
         "extruder_body"
+      ]
+    },
+    {
+      "id": "x_belt_clamp",
+      "name": "X-Carriage Belt Clamp",
+      "shape": "box",
+      "position": [
+        -0.02,
+        0.353,
+        -0.145
+      ],
+      "size": [
+        0.055,
+        0.014,
+        0.018
+      ],
+      "material": "black composite",
+      "role": "Small clamp on the carriage locks the front X belt run to the moving extruder assembly.",
+      "connections": [
+        "x_carriage",
+        "x_belt_front"
       ]
     },
     {
@@ -1315,20 +1733,44 @@
         -0.085
       ],
       "size": [
-        0.09,
-        0.11,
-        0.075
+        0.075,
+        0.095,
+        0.06
       ],
       "material": "black composite",
-      "role": "Printed extruder body houses the filament path, Bondtech drive gears, idler door, and hotend clamp.",
+      "role": "Printed extruder body houses the open filament path, Bondtech gears, idler door, and hotend clamp.",
       "connections": [
         "x_carriage",
         "motor_e",
+        "extruder_idler_door",
         "bondtech_gear_left",
         "bondtech_gear_right",
+        "filament_inlet",
+        "ptfe_inlet_sleeve",
         "v6_heatsink",
         "filament_sensor",
         "pinda_probe"
+      ]
+    },
+    {
+      "id": "extruder_idler_door",
+      "name": "Bondtech Idler Door",
+      "shape": "box",
+      "position": [
+        -0.06,
+        0.302,
+        -0.047
+      ],
+      "size": [
+        0.012,
+        0.055,
+        0.045
+      ],
+      "material": "black composite",
+      "role": "Hinged printed door exposes the idler gear side of the Bondtech feed mechanism.",
+      "connections": [
+        "extruder_body",
+        "bondtech_gear_right"
       ]
     },
     {
@@ -1375,7 +1817,7 @@
       "connections": [
         "extruder_body",
         "motor_e",
-        "filament_strand"
+        "filament_gears_to_throat"
       ]
     },
     {
@@ -1400,7 +1842,51 @@
       "role": "Counter gear pinches filament against the driven gear for reliable direct extrusion.",
       "connections": [
         "extruder_body",
-        "filament_strand"
+        "extruder_idler_door",
+        "filament_gears_to_throat"
+      ]
+    },
+    {
+      "id": "filament_inlet",
+      "name": "Extruder Filament Inlet",
+      "shape": "cylinder",
+      "position": [
+        -0.02,
+        0.362,
+        -0.055
+      ],
+      "size": [
+        0.006,
+        0.035
+      ],
+      "material": "black composite",
+      "role": "Short vertical guide tube aligns 1.75 mm filament before it reaches the IR sensor and gears.",
+      "connections": [
+        "extruder_body",
+        "filament_sensor",
+        "ptfe_inlet_sleeve",
+        "filament_inlet_to_gears"
+      ]
+    },
+    {
+      "id": "ptfe_inlet_sleeve",
+      "name": "PTFE Inlet Sleeve",
+      "shape": "cylinder",
+      "position": [
+        -0.02,
+        0.342,
+        -0.052
+      ],
+      "size": [
+        0.004,
+        0.032
+      ],
+      "material": "white composite",
+      "role": "White PTFE sleeve marks the constrained feed bore between the top inlet and the drive gears.",
+      "connections": [
+        "extruder_body",
+        "filament_inlet",
+        "filament_inlet_to_gears"
       ]
     },
     {
@@ -1421,7 +1907,8 @@
       "role": "IR optical sensor above the drive path detects filament presence before it reaches the gears.",
       "connections": [
         "extruder_body",
-        "filament_strand"
+        "filament_inlet",
+        "filament_guide_to_inlet"
       ]
     },
     {
@@ -1441,8 +1928,29 @@
       "role": "Finned metal heatsink keeps the upper hotend cool above the heatbreak.",
       "connections": [
         "extruder_body",
-        "hotend_heatblock",
+        "hotend_heatbreak",
         "hotend_fan"
+      ]
+    },
+    {
+      "id": "hotend_heatbreak",
+      "name": "V6 Heatbreak Throat",
+      "shape": "cylinder",
+      "position": [
+        -0.02,
+        0.225,
+        -0.085
+      ],
+      "size": [
+        0.004,
+        0.026
+      ],
+      "material": "brushed steel",
+      "role": "Narrow metal heatbreak connects the cool heatsink to the hot heater block while limiting heat flow.",
+      "connections": [
+        "v6_heatsink",
+        "hotend_heatblock",
+        "filament_gears_to_throat"
       ]
     },
     {
@@ -1467,6 +1975,53 @@
       ]
     },
     {
+      "id": "part_cooling_fan",
+      "name": "Part Cooling Blower Fan",
+      "shape": "box",
+      "position": [
+        0.033,
+        0.252,
+        -0.048
+      ],
+      "size": [
+        0.038,
+        0.034,
+        0.018
+      ],
+      "material": "black composite",
+      "role": "Radial blower fan cools freshly extruded plastic independently from the hotend heatsink fan.",
+      "connections": [
+        "extruder_body",
+        "part_cooling_duct"
+      ]
+    },
+    {
+      "id": "part_cooling_duct",
+      "name": "Nozzle Cooling Duct",
+      "shape": "box",
+      "position": [
+        0.018,
+        0.214,
+        -0.06
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.25
+      ],
+      "size": [
+        0.055,
+        0.014,
+        0.018
+      ],
+      "material": "black composite",
+      "role": "Printed air duct aims blower output at the nozzle tip and newly deposited bead.",
+      "connections": [
+        "part_cooling_fan",
+        "nozzle_tip"
+      ]
+    },
+    {
       "id": "hotend_heatblock",
       "name": "E3D V6 Heater Block",
       "shape": "box",
@@ -1483,8 +2038,54 @@
       "material": "brushed steel",
       "role": "Heater block contains the cartridge heater and thermistor and transfers heat to the nozzle.",
       "connections": [
-        "v6_heatsink",
+        "hotend_heatbreak",
+        "heater_cartridge",
+        "thermistor_bead",
         "nozzle"
+      ]
+    },
+    {
+      "id": "heater_cartridge",
+      "name": "Heater Cartridge",
+      "shape": "cylinder",
+      "position": [
+        -0.02,
+        0.211,
+        -0.072
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.004,
+        0.028
+      ],
+      "material": "brushed steel",
+      "role": "Cylindrical heater cartridge passes through the aluminium block to melt filament.",
+      "connections": [
+        "hotend_heatblock",
+        "x_z_wiring_loom"
+      ]
+    },
+    {
+      "id": "thermistor_bead",
+      "name": "Hotend Thermistor Bead",
+      "shape": "sphere",
+      "position": [
+        -0.036,
+        0.213,
+        -0.086
+      ],
+      "size": [
+        0.004
+      ],
+      "material": "glass display",
+      "role": "Small temperature sensor bead reads heater-block temperature for closed-loop control.",
+      "connections": [
+        "hotend_heatblock",
+        "x_z_wiring_loom"
       ]
     },
     {
@@ -1496,6 +2097,11 @@
         0.188,
         -0.085
       ],
+      "rotation": [
+        3.1416,
+        0,
+        0
+      ],
       "size": [
         0.008,
         0.02
@@ -1503,7 +2109,28 @@
       "material": "brass",
       "role": "Tapered brass nozzle forms the final molten plastic outlet just above the print sheet.",
       "connections": [
-        "hotend_heatblock"
+        "hotend_heatblock",
+        "nozzle_tip"
+      ]
+    },
+    {
+      "id": "nozzle_tip",
+      "name": "Nozzle Exit Tip",
+      "shape": "cylinder",
+      "position": [
+        -0.02,
+        0.178,
+        -0.085
+      ],
+      "size": [
+        0.002,
+        0.004
+      ],
+      "material": "brass",
+      "role": "Tiny cylindrical outlet marks the 0.4 mm extrusion point directly above the build surface.",
+      "connections": [
+        "nozzle",
+        "part_cooling_duct"
       ]
     },
     {
@@ -1522,7 +2149,27 @@
       "material": "dark anodized aluminum",
       "role": "Inductive probe sits beside the nozzle and measures the steel sheet for mesh bed levelling.",
       "connections": [
-        "extruder_body"
+        "extruder_body",
+        "pinda_tip"
+      ]
+    },
+    {
+      "id": "pinda_tip",
+      "name": "SuperPINDA Sensing Face",
+      "shape": "cylinder",
+      "position": [
+        0.03,
+        0.203,
+        -0.07
+      ],
+      "size": [
+        0.008,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Flat lower sensing face shows the probe height relative to the brass nozzle and sheet.",
+      "connections": [
+        "pinda_probe"
       ]
     },
     {
@@ -1540,20 +2187,171 @@
         0.115
       ],
       "material": "black composite",
-      "role": "Controller enclosure bolts to the right rear frame and contains the Einsy RAMBo board and TMC2130 drivers.",
+      "role": "Controller enclosure bolts to the right rear frame and is shown as a cutaway around the exposed board.",
       "connections": [
         "frame_right_upright",
+        "einsy_board",
         "einsy_lid",
         "x_z_wiring_loom",
+        "bed_wiring_loom",
+        "power_input_socket"
+      ]
+    },
+    {
+      "id": "einsy_board",
+      "name": "Exposed Einsy RAMBo Board",
+      "shape": "box",
+      "position": [
+        0.213,
+        0.255,
+        -0.232
+      ],
+      "size": [
+        0.006,
+        0.135,
+        0.085
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Visible controller PCB inside the open case carries the stepper drivers and wiring terminals.",
+      "connections": [
+        "einsy_case",
+        "tmc_driver_x",
+        "tmc_driver_y",
+        "tmc_driver_z",
+        "einsy_terminal_power",
+        "einsy_terminal_bed",
+        "einsy_terminal_hotend"
+      ]
+    },
+    {
+      "id": "tmc_driver_x",
+      "name": "X-Axis TMC2130 Driver Block",
+      "shape": "box",
+      "position": [
+        0.208,
+        0.305,
+        -0.255
+      ],
+      "size": [
+        0.008,
+        0.026,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Individual heat-spreader block marks the X-axis Trinamic driver on the exposed controller board.",
+      "connections": [
+        "einsy_board"
+      ]
+    },
+    {
+      "id": "tmc_driver_y",
+      "name": "Y-Axis TMC2130 Driver Block",
+      "shape": "box",
+      "position": [
+        0.208,
+        0.305,
+        -0.232
+      ],
+      "size": [
+        0.008,
+        0.026,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Individual heat-spreader block marks the Y-axis Trinamic driver on the exposed controller board.",
+      "connections": [
+        "einsy_board"
+      ]
+    },
+    {
+      "id": "tmc_driver_z",
+      "name": "Z/E TMC2130 Driver Block",
+      "shape": "box",
+      "position": [
+        0.208,
+        0.305,
+        -0.209
+      ],
+      "size": [
+        0.008,
+        0.026,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Individual heat-spreader block marks the combined Z and extruder driver area on the exposed board.",
+      "connections": [
+        "einsy_board"
+      ]
+    },
+    {
+      "id": "einsy_terminal_power",
+      "name": "Einsy Power Terminal Pair",
+      "shape": "box",
+      "position": [
+        0.208,
+        0.205,
+        -0.258
+      ],
+      "size": [
+        0.008,
+        0.022,
+        0.02
+      ],
+      "material": "brass",
+      "role": "Power terminal pair receives supply input and power-panic wiring at the bottom of the board.",
+      "connections": [
+        "einsy_board",
+        "power_input_socket"
+      ]
+    },
+    {
+      "id": "einsy_terminal_bed",
+      "name": "Einsy Heatbed Terminal Pair",
+      "shape": "box",
+      "position": [
+        0.208,
+        0.205,
+        -0.232
+      ],
+      "size": [
+        0.008,
+        0.022,
+        0.02
+      ],
+      "material": "brass",
+      "role": "Heatbed terminal pair anchors the moving bed heater and thermistor loom.",
+      "connections": [
+        "einsy_board",
         "bed_wiring_loom"
       ]
     },
     {
-      "id": "einsy_lid",
-      "name": "Einsy Case Ventilated Lid",
+      "id": "einsy_terminal_hotend",
+      "name": "Einsy Hotend Terminal Pair",
       "shape": "box",
       "position": [
-        0.276,
+        0.208,
+        0.205,
+        -0.206
+      ],
+      "size": [
+        0.008,
+        0.022,
+        0.02
+      ],
+      "material": "brass",
+      "role": "Hotend terminal pair anchors heater, thermistor, fan, and X carriage wiring.",
+      "connections": [
+        "einsy_board",
+        "x_z_wiring_loom"
+      ]
+    },
+    {
+      "id": "einsy_lid",
+      "name": "Einsy Case Offset Ventilated Lid",
+      "shape": "box",
+      "position": [
+        0.296,
         0.255,
         -0.232
       ],
@@ -1563,9 +2361,72 @@
         0.09
       ],
       "material": "black composite",
-      "role": "Removable side lid shows the electronics case opening without making the controller a featureless block.",
+      "role": "Removable side lid is offset from the case as an exploded cutaway so the controller interior remains visible.",
       "connections": [
-        "einsy_case"
+        "einsy_case",
+        "einsy_vent_slot_top",
+        "einsy_vent_slot_bottom"
+      ]
+    },
+    {
+      "id": "einsy_vent_slot_top",
+      "name": "Upper Einsy Lid Vent Slot",
+      "shape": "box",
+      "position": [
+        0.303,
+        0.29,
+        -0.232
+      ],
+      "size": [
+        0.006,
+        0.01,
+        0.065
+      ],
+      "material": "glass display",
+      "role": "Bright slit marks the upper ventilation opening in the offset controller lid.",
+      "connections": [
+        "einsy_lid"
+      ]
+    },
+    {
+      "id": "einsy_vent_slot_bottom",
+      "name": "Lower Einsy Lid Vent Slot",
+      "shape": "box",
+      "position": [
+        0.303,
+        0.22,
+        -0.232
+      ],
+      "size": [
+        0.006,
+        0.01,
+        0.065
+      ],
+      "material": "glass display",
+      "role": "Bright slit marks the lower ventilation opening in the offset controller lid.",
+      "connections": [
+        "einsy_lid"
+      ]
+    },
+    {
+      "id": "power_input_socket",
+      "name": "Rear Power Input Socket",
+      "shape": "box",
+      "position": [
+        0.276,
+        0.18,
+        -0.287
+      ],
+      "size": [
+        0.028,
+        0.03,
+        0.012
+      ],
+      "material": "black composite",
+      "role": "Rear connector block indicates where mains and power-panic wiring enter the electronics case.",
+      "connections": [
+        "einsy_case",
+        "einsy_terminal_power"
       ]
     },
     {
@@ -1587,11 +2448,14 @@
         0.23
       ],
       "material": "rubber",
-      "role": "Bundled cable run from the electronics case to the X carriage and Z motors.",
+      "role": "Bundled cable run from the electronics case to the X carriage, hotend sensors, and Z motors.",
       "connections": [
         "einsy_case",
+        "einsy_terminal_hotend",
         "motor_x",
-        "extruder_body"
+        "extruder_body",
+        "heater_cartridge",
+        "thermistor_bead"
       ]
     },
     {
@@ -1616,7 +2480,30 @@
       "role": "Flexible heated-bed cable bundle routes from the moving bed to the controller case.",
       "connections": [
         "einsy_case",
-        "heatbed_mk52"
+        "einsy_terminal_bed",
+        "heatbed_mk52",
+        "bed_cable_strain_relief"
+      ]
+    },
+    {
+      "id": "bed_cable_strain_relief",
+      "name": "Heatbed Cable Strain Relief",
+      "shape": "box",
+      "position": [
+        0.09,
+        0.155,
+        -0.075
+      ],
+      "size": [
+        0.055,
+        0.018,
+        0.025
+      ],
+      "material": "black composite",
+      "role": "Printed strain-relief block fixes the moving heatbed cable where it exits the rear of the bed.",
+      "connections": [
+        "heatbed_mk52",
+        "bed_wiring_loom"
       ]
     },
     {
@@ -1638,7 +2525,8 @@
       "connections": [
         "base_cross_front",
         "lcd_display",
-        "rotary_encoder"
+        "rotary_encoder",
+        "lcd_ribbon_cable"
       ]
     },
     {
@@ -1683,6 +2571,31 @@
       "role": "Round push encoder beside the LCD provides the single-knob user interface.",
       "connections": [
         "lcd_bracket"
+      ]
+    },
+    {
+      "id": "lcd_ribbon_cable",
+      "name": "LCD Ribbon Cable",
+      "shape": "capsule",
+      "position": [
+        0.12,
+        0.145,
+        0.08
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        -0.15
+      ],
+      "size": [
+        0.004,
+        0.32
+      ],
+      "material": "rubber",
+      "role": "Flat cable routes the front LCD controls back toward the electronics case.",
+      "connections": [
+        "lcd_bracket",
+        "einsy_case"
       ]
     },
     {
@@ -1777,7 +2690,10 @@
         "spool_axle",
         "spool_flange_left",
         "spool_flange_right",
-        "filament_strand"
+        "spool_coil_front",
+        "spool_coil_mid",
+        "spool_coil_rear",
+        "spool_exit_eyelet"
       ]
     },
     {
@@ -1829,30 +2745,251 @@
       ]
     },
     {
-      "id": "filament_strand",
-      "name": "1.75 mm Filament Feed Strand",
-      "shape": "capsule",
+      "id": "spool_coil_front",
+      "name": "Front Wound Filament Coil",
+      "shape": "torus",
       "position": [
         -0.02,
-        0.485,
-        -0.1
+        0.625,
+        -0.155
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.067,
+        0.006
+      ],
+      "material": "fiberglass",
+      "role": "Front visible loop indicates the filament is wound as layered coil on the spool core.",
+      "connections": [
+        "spool_hub"
+      ]
+    },
+    {
+      "id": "spool_coil_mid",
+      "name": "Middle Wound Filament Coil",
+      "shape": "torus",
+      "position": [
+        0,
+        0.625,
+        -0.155
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.071,
+        0.006
+      ],
+      "material": "fiberglass",
+      "role": "Middle visible loop shows the bulk of the 1 kg filament wound between the flanges.",
+      "connections": [
+        "spool_hub"
+      ]
+    },
+    {
+      "id": "spool_coil_rear",
+      "name": "Rear Wound Filament Coil",
+      "shape": "torus",
+      "position": [
+        0.02,
+        0.625,
+        -0.155
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.067,
+        0.006
+      ],
+      "material": "fiberglass",
+      "role": "Rear visible loop completes the wound filament pack between the spool flanges.",
+      "connections": [
+        "spool_hub"
+      ]
+    },
+    {
+      "id": "spool_exit_eyelet",
+      "name": "Filament Spool Exit Eyelet",
+      "shape": "torus",
+      "position": [
+        -0.055,
+        0.585,
+        -0.13
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.012,
+        0.0025
+      ],
+      "material": "fiberglass",
+      "role": "Small loop marks the point where free filament leaves the wound spool before entering the guide path.",
+      "connections": [
+        "spool_hub",
+        "filament_spool_to_eyelet",
+        "filament_eyelet_to_guide"
+      ]
+    },
+    {
+      "id": "filament_guide_tube",
+      "name": "Filament Guide Tube",
+      "shape": "capsule",
+      "position": [
+        -0.032,
+        0.505,
+        -0.108
+      ],
+      "rotation": [
+        0.55,
+        0,
+        -0.08
+      ],
+      "size": [
+        0.005,
+        0.22
+      ],
+      "material": "rubber",
+      "role": "Short guide tube keeps the feed path aimed from the top spool toward the extruder inlet.",
+      "connections": [
+        "spool_exit_eyelet",
+        "filament_eyelet_to_guide",
+        "filament_guide_to_inlet"
+      ]
+    },
+    {
+      "id": "filament_spool_to_eyelet",
+      "name": "Filament Segment Spool to Eyelet",
+      "shape": "capsule",
+      "position": [
+        -0.035,
+        0.608,
+        -0.142
+      ],
+      "rotation": [
+        0.3,
+        0,
+        -0.45
+      ],
+      "size": [
+        0.002,
+        0.07
+      ],
+      "material": "fiberglass",
+      "role": "First free filament segment peels off the coil and reaches the spool exit eyelet.",
+      "connections": [
+        "spool_hub",
+        "spool_exit_eyelet"
+      ]
+    },
+    {
+      "id": "filament_eyelet_to_guide",
+      "name": "Filament Segment Eyelet to Guide",
+      "shape": "capsule",
+      "position": [
+        -0.045,
+        0.548,
+        -0.12
       ],
       "rotation": [
         0.45,
         0,
-        -0.1
+        0.18
       ],
       "size": [
         0.002,
-        0.3
+        0.105
       ],
       "material": "fiberglass",
-      "role": "Visible filament strand runs from the top spool down through the sensor into the Bondtech drive path.",
+      "role": "Second filament segment drops from the spool eyelet into the upper guide tube rather than passing as an unsupported straight line.",
       "connections": [
-        "spool_hub",
-        "filament_sensor",
+        "spool_exit_eyelet",
+        "filament_guide_tube"
+      ]
+    },
+    {
+      "id": "filament_guide_to_inlet",
+      "name": "Filament Segment Guide to Inlet",
+      "shape": "capsule",
+      "position": [
+        -0.028,
+        0.43,
+        -0.08
+      ],
+      "rotation": [
+        0.3,
+        0,
+        -0.12
+      ],
+      "size": [
+        0.002,
+        0.14
+      ],
+      "material": "fiberglass",
+      "role": "Third filament segment leaves the guide tube and enters the extruder filament inlet above the IR sensor.",
+      "connections": [
+        "filament_guide_tube",
+        "filament_inlet",
+        "filament_sensor"
+      ]
+    },
+    {
+      "id": "filament_inlet_to_gears",
+      "name": "Filament Segment Inlet to Bondtech Gears",
+      "shape": "capsule",
+      "position": [
+        -0.02,
+        0.326,
+        -0.048
+      ],
+      "size": [
+        0.002,
+        0.06
+      ],
+      "material": "fiberglass",
+      "role": "Short vertical segment shows constrained filament passing through the PTFE sleeve into the Bondtech gears.",
+      "connections": [
+        "filament_inlet",
+        "ptfe_inlet_sleeve",
         "bondtech_gear_left",
         "bondtech_gear_right"
+      ]
+    },
+    {
+      "id": "filament_gears_to_throat",
+      "name": "Filament Segment Gears to Heatbreak",
+      "shape": "capsule",
+      "position": [
+        -0.02,
+        0.265,
+        -0.065
+      ],
+      "rotation": [
+        0.12,
+        0,
+        0
+      ],
+      "size": [
+        0.002,
+        0.08
+      ],
+      "material": "fiberglass",
+      "role": "Final internal feed segment continues from the Bondtech gears down into the hotend throat.",
+      "connections": [
+        "bondtech_gear_left",
+        "bondtech_gear_right",
+        "hotend_heatbreak"
       ]
     }
   ]

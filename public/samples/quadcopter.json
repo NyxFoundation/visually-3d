@@ -1,6 +1,6 @@
 {
   "machine_name": "FPV Racing Quadcopter",
-  "assembly_instructions": "1) Lay the 0.95 m scaled lower carbon sandwich plate at y=0.155 and bolt the four 5 mm scaled X arms to it using the eight arm clamp screws. 2) Add the four aluminum frame standoffs at the plate corners, then fasten the split left and right top rails so the center stack remains open. 3) Install the four 30.5 mm-pattern stack standoffs on the bottom plate, place the 4-in-1 ESC board first, add the flight controller board above it, then add the VTX board on the upper spacers. 4) Solder or plug the four motor phase wire bundles from the ESC board to each arm and motor stator. 5) Bolt each 2207 stator to its arm tip with four screws, drop the rotor bell over the stator, then install the prop hub, three pitched blades, and prop nut on each motor. 6) Assemble the FPV camera between the two camera side cheeks, tilt it about 30 degrees upward, and connect its signal lead to the flight controller. 7) Mount the rear TPU antenna block, route the VTX coax from the VTX board, and seat the angled 5.8 GHz antenna whip clear of the prop discs. 8) In flight configuration, lower the exploded LiPo pack and strap onto the split top rails, connect the XT60 lead to the ESC input, and tighten the strap across the pack.",
+  "assembly_instructions": "1) Lay the 0.95 m scaled lower carbon sandwich plate at y=0.155, align the visible relief-hole markers, and bolt the four 5 mm scaled true-X arms to it with the eight inner and outer arm clamp screws. 2) Add the four aluminum frame standoffs at the plate corners, then fasten the split left and right top rails so the center stack remains open from above and from the ISO view. 3) Install the four 30.5 mm-pattern stack standoffs on the bottom plate, place the 4-in-1 ESC board first, add the flight-controller board above it, then add the VTX board on the upper spacers. 4) Route each copper three-phase wire bundle flat along its matching carbon arm and solder it from the ESC edge to the corresponding 2207 stator. 5) Bolt each 2207 stator to its arm tip with four visible M3 motor screws, drop the rotor bell and shaft over the stator, then install the prop hub, three pitched blades, tapered blade tips, swept-disc reference ring, and prop nut on each motor. 6) Assemble the FPV camera between the two camera side cheeks, set its body and lens about 30 degrees upward, install both pivot screws, and connect its signal lead to the flight controller. 7) Mount the rear TPU antenna block, route the VTX coax from the VTX board, and seat the angled 5.8 GHz antenna whip behind the airframe clear of the propeller discs. 8) Use the thin battery footprint on the top rails as the installed location, then inspect the staggered exploded six-cell LiPo pack above and aft, connect its lead to the XT60 connector, and tighten the hook-and-loop strap across the pack in the final build.",
   "metadata": {
     "domain": "aerial-robotics",
     "thumbnail_camera": [
@@ -65,7 +65,87 @@
         "arm_screw_fl_in",
         "arm_screw_fr_in",
         "arm_screw_rl_in",
-        "arm_screw_rr_in"
+        "arm_screw_rr_in",
+        "plate_relief_front",
+        "plate_relief_rear",
+        "plate_relief_left",
+        "plate_relief_right"
+      ]
+    },
+    {
+      "id": "plate_relief_front",
+      "name": "Front Lower Plate Relief Hole Marker",
+      "shape": "cylinder",
+      "position": [
+        0.24,
+        0.182,
+        0
+      ],
+      "size": [
+        0.065,
+        0.012
+      ],
+      "material": "brushed steel",
+      "role": "Bright circular marker shows the front lightening cutout in the carbon bottom plate.",
+      "connections": [
+        "bottom_plate"
+      ]
+    },
+    {
+      "id": "plate_relief_rear",
+      "name": "Rear Lower Plate Relief Hole Marker",
+      "shape": "cylinder",
+      "position": [
+        -0.24,
+        0.182,
+        0
+      ],
+      "size": [
+        0.065,
+        0.012
+      ],
+      "material": "brushed steel",
+      "role": "Bright circular marker shows the rear lightening cutout in the carbon bottom plate.",
+      "connections": [
+        "bottom_plate"
+      ]
+    },
+    {
+      "id": "plate_relief_left",
+      "name": "Left Lower Plate Relief Hole Marker",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.182,
+        0.22
+      ],
+      "size": [
+        0.055,
+        0.012
+      ],
+      "material": "brushed steel",
+      "role": "Bright circular marker shows the port-side lightening cutout in the carbon bottom plate.",
+      "connections": [
+        "bottom_plate"
+      ]
+    },
+    {
+      "id": "plate_relief_right",
+      "name": "Right Lower Plate Relief Hole Marker",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.182,
+        -0.22
+      ],
+      "size": [
+        0.055,
+        0.012
+      ],
+      "material": "brushed steel",
+      "role": "Bright circular marker shows the starboard-side lightening cutout in the carbon bottom plate.",
+      "connections": [
+        "bottom_plate"
       ]
     },
     {
@@ -87,8 +167,29 @@
       "connections": [
         "standoff_fl",
         "standoff_rl",
-        "battery",
-        "battery_strap"
+        "battery_footprint_left",
+        "battery_strap",
+        "top_rail_left_relief"
+      ]
+    },
+    {
+      "id": "top_rail_left_relief",
+      "name": "Left Top Rail Slot Marker",
+      "shape": "box",
+      "position": [
+        0,
+        0.433,
+        0.28
+      ],
+      "size": [
+        0.28,
+        0.01,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Bright slot marker identifies the lightened cut carbon rail instead of a solid bar.",
+      "connections": [
+        "top_rail_left"
       ]
     },
     {
@@ -110,7 +211,70 @@
       "connections": [
         "standoff_fr",
         "standoff_rr",
-        "battery",
+        "battery_footprint_right",
+        "battery_strap",
+        "top_rail_right_relief"
+      ]
+    },
+    {
+      "id": "top_rail_right_relief",
+      "name": "Right Top Rail Slot Marker",
+      "shape": "box",
+      "position": [
+        0,
+        0.433,
+        -0.28
+      ],
+      "size": [
+        0.28,
+        0.01,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Bright slot marker identifies the lightened cut carbon rail instead of a solid bar.",
+      "connections": [
+        "top_rail_right"
+      ]
+    },
+    {
+      "id": "battery_footprint_left",
+      "name": "Left Battery Flight Footprint",
+      "shape": "box",
+      "position": [
+        -0.05,
+        0.455,
+        0.17
+      ],
+      "size": [
+        0.94,
+        0.018,
+        0.035
+      ],
+      "material": "rubber",
+      "role": "Thin rail-top pad marks the installed LiPo location without covering the exposed electronics stack.",
+      "connections": [
+        "top_rail_left",
+        "battery_strap"
+      ]
+    },
+    {
+      "id": "battery_footprint_right",
+      "name": "Right Battery Flight Footprint",
+      "shape": "box",
+      "position": [
+        -0.05,
+        0.455,
+        -0.17
+      ],
+      "size": [
+        0.94,
+        0.018,
+        0.035
+      ],
+      "material": "rubber",
+      "role": "Second thin rail-top pad completes the visible flight-position footprint for the exploded LiPo pack.",
+      "connections": [
+        "top_rail_right",
         "battery_strap"
       ]
     },
@@ -810,46 +974,173 @@
       "name": "Exploded Battery Lead",
       "shape": "capsule",
       "position": [
-        -0.29,
-        0.78,
-        -0.2
+        -0.55,
+        0.83,
+        -0.5
       ],
       "rotation": [
-        0.35,
+        0.25,
         0,
-        0.2
+        0.38
       ],
       "size": [
         0.025,
-        0.92
+        0.86
       ],
       "material": "rubber",
       "role": "Power lead shown lifted with the exploded LiPo so the XT60 connection path remains visible.",
       "connections": [
         "xt60_connector",
-        "battery"
+        "battery_cell_1"
       ]
     },
     {
-      "id": "battery",
-      "name": "Exploded 6S LiPo Battery",
+      "id": "battery_cell_1",
+      "name": "Exploded LiPo Cell 1",
       "shape": "box",
       "position": [
-        -0.05,
-        0.9,
-        0
+        -0.8,
+        1.02,
+        -0.62
       ],
       "size": [
         1.05,
-        0.28,
+        0.045,
         0.42
       ],
       "material": "black composite",
-      "role": "6S 1300 mAh pack shown exploded upward from its flight position to expose the boards below.",
+      "role": "Lowest pouch cell of the 6S LiPo pack, staggered upward and aft to expose the flight stack.",
       "connections": [
-        "top_rail_left",
-        "top_rail_right",
+        "battery_cell_2",
+        "battery_lead",
+        "battery_end_cap"
+      ]
+    },
+    {
+      "id": "battery_cell_2",
+      "name": "Exploded LiPo Cell 2",
+      "shape": "box",
+      "position": [
+        -0.8,
+        1.1,
+        -0.54
+      ],
+      "size": [
+        1.05,
+        0.045,
+        0.42
+      ],
+      "material": "black composite",
+      "role": "Second pouch cell is offset so the cell layer remains visible in the exploded pack.",
+      "connections": [
+        "battery_cell_1",
+        "battery_cell_3"
+      ]
+    },
+    {
+      "id": "battery_cell_3",
+      "name": "Exploded LiPo Cell 3",
+      "shape": "box",
+      "position": [
+        -0.8,
+        1.18,
+        -0.46
+      ],
+      "size": [
+        1.05,
+        0.045,
+        0.42
+      ],
+      "material": "black composite",
+      "role": "Third pouch cell shows the layered battery construction instead of a single opaque block.",
+      "connections": [
+        "battery_cell_2",
+        "battery_cell_4"
+      ]
+    },
+    {
+      "id": "battery_cell_4",
+      "name": "Exploded LiPo Cell 4",
+      "shape": "box",
+      "position": [
+        -0.8,
+        1.26,
+        -0.38
+      ],
+      "size": [
+        1.05,
+        0.045,
+        0.42
+      ],
+      "material": "black composite",
+      "role": "Fourth pouch cell in the six-cell 22.2 V nominal LiPo pack.",
+      "connections": [
+        "battery_cell_3",
+        "battery_cell_5"
+      ]
+    },
+    {
+      "id": "battery_cell_5",
+      "name": "Exploded LiPo Cell 5",
+      "shape": "box",
+      "position": [
+        -0.8,
+        1.34,
+        -0.3
+      ],
+      "size": [
+        1.05,
+        0.045,
+        0.42
+      ],
+      "material": "black composite",
+      "role": "Fifth pouch cell continues the staggered visible construction of the LiPo pack.",
+      "connections": [
+        "battery_cell_4",
+        "battery_cell_6"
+      ]
+    },
+    {
+      "id": "battery_cell_6",
+      "name": "Exploded LiPo Cell 6",
+      "shape": "box",
+      "position": [
+        -0.8,
+        1.42,
+        -0.22
+      ],
+      "size": [
+        1.05,
+        0.045,
+        0.42
+      ],
+      "material": "black composite",
+      "role": "Top pouch cell completes the exploded 6S pack while staying clear of the electronics view.",
+      "connections": [
+        "battery_cell_5",
         "battery_strap",
+        "battery_end_cap"
+      ]
+    },
+    {
+      "id": "battery_end_cap",
+      "name": "LiPo Balance Lead End Cap",
+      "shape": "box",
+      "position": [
+        -0.25,
+        1.22,
+        -0.42
+      ],
+      "size": [
+        0.06,
+        0.36,
+        0.42
+      ],
+      "material": "rubber",
+      "role": "Soft end cap represents the wire-exit end of the staggered LiPo pouch stack.",
+      "connections": [
+        "battery_cell_1",
+        "battery_cell_6",
         "battery_lead"
       ]
     },
@@ -858,21 +1149,23 @@
       "name": "Exploded Hook-and-Loop Strap",
       "shape": "box",
       "position": [
-        -0.05,
-        1.065,
-        0
+        -0.8,
+        1.49,
+        -0.22
       ],
       "size": [
         0.34,
         0.05,
-        0.52
+        0.56
       ],
       "material": "rubber",
       "role": "Strap shown above the exploded LiPo to indicate it wraps across the pack and ties into both top rails.",
       "connections": [
-        "battery",
+        "battery_cell_6",
         "top_rail_left",
-        "top_rail_right"
+        "top_rail_right",
+        "battery_footprint_left",
+        "battery_footprint_right"
       ]
     },
     {
@@ -895,7 +1188,9 @@
         "motor_bell_fl",
         "phase_wires_fl",
         "motor_screw_fl_a",
-        "motor_screw_fl_b"
+        "motor_screw_fl_b",
+        "motor_screw_fl_c",
+        "motor_screw_fl_d"
       ]
     },
     {
@@ -915,7 +1210,29 @@
       "role": "Rotating outrunner bell carries magnets and spins the front-left propeller.",
       "connections": [
         "motor_stator_fl",
+        "motor_shaft_fl",
         "prop_hub_fl"
+      ]
+    },
+    {
+      "id": "motor_shaft_fl",
+      "name": "Front-Left Motor Shaft",
+      "shape": "cylinder",
+      "position": [
+        1.1,
+        0.53,
+        1.1
+      ],
+      "size": [
+        0.035,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Central steel shaft carries torque from the motor bell through the prop hub and nut.",
+      "connections": [
+        "motor_bell_fl",
+        "prop_hub_fl",
+        "prop_nut_fl"
       ]
     },
     {
@@ -935,10 +1252,39 @@
       "role": "Central molded hub joins the three front-left propeller blades to the motor shaft.",
       "connections": [
         "motor_bell_fl",
+        "motor_shaft_fl",
         "prop_fl_b1",
         "prop_fl_b2",
         "prop_fl_b3",
+        "prop_fl_tip1",
+        "prop_fl_tip2",
+        "prop_fl_tip3",
+        "prop_disc_fl",
         "prop_nut_fl"
+      ]
+    },
+    {
+      "id": "prop_disc_fl",
+      "name": "Front-Left Prop Swept Disc",
+      "shape": "torus",
+      "position": [
+        1.1,
+        0.535,
+        1.1
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.635,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Thin ring marks the 5 inch propeller swept diameter so rotor clearance is visible.",
+      "connections": [
+        "prop_hub_fl"
       ]
     },
     {
@@ -957,7 +1303,8 @@
       "material": "brushed steel",
       "role": "Threaded nut clamps the front-left prop hub to the motor shaft.",
       "connections": [
-        "prop_hub_fl"
+        "prop_hub_fl",
+        "motor_shaft_fl"
       ]
     },
     {
@@ -980,8 +1327,35 @@
         0.13
       ],
       "material": "black composite",
-      "role": "Pitched blade of the CCW front-left propeller that contributes one third of the rotor disc area.",
+      "role": "Pitched blade root and midspan of the CCW front-left propeller.",
       "connections": [
+        "prop_hub_fl",
+        "prop_fl_tip1"
+      ]
+    },
+    {
+      "id": "prop_fl_tip1",
+      "name": "Front-Left Prop Blade 1 Taper Tip",
+      "shape": "complex",
+      "position": [
+        1.72,
+        0.545,
+        1.1
+      ],
+      "rotation": [
+        0.28,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.02,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Narrow outer tip makes the front-left blade read as a tapered airfoil instead of a constant bar.",
+      "connections": [
+        "prop_fl_b1",
         "prop_hub_fl"
       ]
     },
@@ -1005,8 +1379,35 @@
         0.13
       ],
       "material": "black composite",
-      "role": "Second pitched blade of the front-left tri-blade propeller.",
+      "role": "Second pitched blade root and midspan of the front-left tri-blade propeller.",
       "connections": [
+        "prop_hub_fl",
+        "prop_fl_tip2"
+      ]
+    },
+    {
+      "id": "prop_fl_tip2",
+      "name": "Front-Left Prop Blade 2 Taper Tip",
+      "shape": "complex",
+      "position": [
+        0.79,
+        0.545,
+        0.563
+      ],
+      "rotation": [
+        0.28,
+        2.0944,
+        0
+      ],
+      "size": [
+        0.18,
+        0.02,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Narrow outer tip makes the second front-left blade read as tapered.",
+      "connections": [
+        "prop_fl_b2",
         "prop_hub_fl"
       ]
     },
@@ -1030,8 +1431,35 @@
         0.13
       ],
       "material": "black composite",
-      "role": "Third pitched blade of the front-left tri-blade propeller.",
+      "role": "Third pitched blade root and midspan of the front-left tri-blade propeller.",
       "connections": [
+        "prop_hub_fl",
+        "prop_fl_tip3"
+      ]
+    },
+    {
+      "id": "prop_fl_tip3",
+      "name": "Front-Left Prop Blade 3 Taper Tip",
+      "shape": "complex",
+      "position": [
+        0.79,
+        0.545,
+        1.637
+      ],
+      "rotation": [
+        0.28,
+        4.1888,
+        0
+      ],
+      "size": [
+        0.18,
+        0.02,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Narrow outer tip makes the third front-left blade read as tapered.",
+      "connections": [
+        "prop_fl_b3",
         "prop_hub_fl"
       ]
     },
@@ -1069,7 +1497,47 @@
         0.08
       ],
       "material": "brushed steel",
-      "role": "Second visible screw fixing the front-left motor to the arm tip.",
+      "role": "Second screw fixing the front-left motor to the arm tip.",
+      "connections": [
+        "arm_fl",
+        "motor_stator_fl"
+      ]
+    },
+    {
+      "id": "motor_screw_fl_c",
+      "name": "Front-Left Motor Screw C",
+      "shape": "cylinder",
+      "position": [
+        1.04,
+        0.245,
+        1.16
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Third screw completes the visible four-bolt 2207 mount on the front-left arm.",
+      "connections": [
+        "arm_fl",
+        "motor_stator_fl"
+      ]
+    },
+    {
+      "id": "motor_screw_fl_d",
+      "name": "Front-Left Motor Screw D",
+      "shape": "cylinder",
+      "position": [
+        1.16,
+        0.245,
+        1.04
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Fourth screw completes the visible four-bolt 2207 mount on the front-left arm.",
       "connections": [
         "arm_fl",
         "motor_stator_fl"
@@ -1078,7 +1546,7 @@
     {
       "id": "phase_wires_fl",
       "name": "Front-Left Motor Phase Wires",
-      "shape": "capsule",
+      "shape": "box",
       "position": [
         0.55,
         0.245,
@@ -1086,15 +1554,16 @@
       ],
       "rotation": [
         0,
-        0,
-        -0.7854
+        -0.7854,
+        0
       ],
       "size": [
-        0.02,
-        1.45
+        1.28,
+        0.025,
+        0.055
       ],
       "material": "copper",
-      "role": "Bundled three-phase motor wires run along the front-left arm from ESC to stator.",
+      "role": "Bundled three-phase motor wires lie flat along the front-left arm from ESC to stator.",
       "connections": [
         "esc_board",
         "arm_fl",
@@ -1121,7 +1590,9 @@
         "motor_bell_fr",
         "phase_wires_fr",
         "motor_screw_fr_a",
-        "motor_screw_fr_b"
+        "motor_screw_fr_b",
+        "motor_screw_fr_c",
+        "motor_screw_fr_d"
       ]
     },
     {
@@ -1141,7 +1612,29 @@
       "role": "Rotating outrunner bell carries magnets and spins the front-right propeller.",
       "connections": [
         "motor_stator_fr",
+        "motor_shaft_fr",
         "prop_hub_fr"
+      ]
+    },
+    {
+      "id": "motor_shaft_fr",
+      "name": "Front-Right Motor Shaft",
+      "shape": "cylinder",
+      "position": [
+        1.1,
+        0.53,
+        -1.1
+      ],
+      "size": [
+        0.035,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Central steel shaft carries torque from the front-right motor bell through the prop hub and nut.",
+      "connections": [
+        "motor_bell_fr",
+        "prop_hub_fr",
+        "prop_nut_fr"
       ]
     },
     {
@@ -1161,10 +1654,39 @@
       "role": "Central molded hub joins the three front-right propeller blades to the motor shaft.",
       "connections": [
         "motor_bell_fr",
+        "motor_shaft_fr",
         "prop_fr_b1",
         "prop_fr_b2",
         "prop_fr_b3",
+        "prop_fr_tip1",
+        "prop_fr_tip2",
+        "prop_fr_tip3",
+        "prop_disc_fr",
         "prop_nut_fr"
+      ]
+    },
+    {
+      "id": "prop_disc_fr",
+      "name": "Front-Right Prop Swept Disc",
+      "shape": "torus",
+      "position": [
+        1.1,
+        0.535,
+        -1.1
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.635,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Thin ring marks the 5 inch propeller swept diameter so front rotor clearance is visible.",
+      "connections": [
+        "prop_hub_fr"
       ]
     },
     {
@@ -1183,7 +1705,8 @@
       "material": "brushed steel",
       "role": "Threaded nut clamps the front-right prop hub to the motor shaft.",
       "connections": [
-        "prop_hub_fr"
+        "prop_hub_fr",
+        "motor_shaft_fr"
       ]
     },
     {
@@ -1206,8 +1729,35 @@
         0.13
       ],
       "material": "black composite",
-      "role": "Pitched blade of the CW front-right propeller that contributes one third of the rotor disc area.",
+      "role": "Pitched blade root and midspan of the CW front-right propeller.",
       "connections": [
+        "prop_hub_fr",
+        "prop_fr_tip1"
+      ]
+    },
+    {
+      "id": "prop_fr_tip1",
+      "name": "Front-Right Prop Blade 1 Taper Tip",
+      "shape": "complex",
+      "position": [
+        1.72,
+        0.545,
+        -1.1
+      ],
+      "rotation": [
+        -0.28,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.02,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Narrow outer tip makes the front-right blade read as a tapered airfoil instead of a constant bar.",
+      "connections": [
+        "prop_fr_b1",
         "prop_hub_fr"
       ]
     },
@@ -1231,8 +1781,35 @@
         0.13
       ],
       "material": "black composite",
-      "role": "Second pitched blade of the front-right tri-blade propeller.",
+      "role": "Second pitched blade root and midspan of the front-right tri-blade propeller.",
       "connections": [
+        "prop_hub_fr",
+        "prop_fr_tip2"
+      ]
+    },
+    {
+      "id": "prop_fr_tip2",
+      "name": "Front-Right Prop Blade 2 Taper Tip",
+      "shape": "complex",
+      "position": [
+        0.79,
+        0.545,
+        -1.637
+      ],
+      "rotation": [
+        -0.28,
+        2.0944,
+        0
+      ],
+      "size": [
+        0.18,
+        0.02,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Narrow outer tip makes the second front-right blade read as tapered.",
+      "connections": [
+        "prop_fr_b2",
         "prop_hub_fr"
       ]
     },
@@ -1256,8 +1833,35 @@
         0.13
       ],
       "material": "black composite",
-      "role": "Third pitched blade of the front-right tri-blade propeller.",
+      "role": "Third pitched blade root and midspan of the front-right tri-blade propeller.",
       "connections": [
+        "prop_hub_fr",
+        "prop_fr_tip3"
+      ]
+    },
+    {
+      "id": "prop_fr_tip3",
+      "name": "Front-Right Prop Blade 3 Taper Tip",
+      "shape": "complex",
+      "position": [
+        0.79,
+        0.545,
+        -0.563
+      ],
+      "rotation": [
+        -0.28,
+        4.1888,
+        0
+      ],
+      "size": [
+        0.18,
+        0.02,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Narrow outer tip makes the third front-right blade read as tapered.",
+      "connections": [
+        "prop_fr_b3",
         "prop_hub_fr"
       ]
     },
@@ -1295,7 +1899,47 @@
         0.08
       ],
       "material": "brushed steel",
-      "role": "Second visible screw fixing the front-right motor to the arm tip.",
+      "role": "Second screw fixing the front-right motor to the arm tip.",
+      "connections": [
+        "arm_fr",
+        "motor_stator_fr"
+      ]
+    },
+    {
+      "id": "motor_screw_fr_c",
+      "name": "Front-Right Motor Screw C",
+      "shape": "cylinder",
+      "position": [
+        1.04,
+        0.245,
+        -1.16
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Third screw completes the visible four-bolt 2207 mount on the front-right arm.",
+      "connections": [
+        "arm_fr",
+        "motor_stator_fr"
+      ]
+    },
+    {
+      "id": "motor_screw_fr_d",
+      "name": "Front-Right Motor Screw D",
+      "shape": "cylinder",
+      "position": [
+        1.16,
+        0.245,
+        -1.04
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Fourth screw completes the visible four-bolt 2207 mount on the front-right arm.",
       "connections": [
         "arm_fr",
         "motor_stator_fr"
@@ -1304,7 +1948,7 @@
     {
       "id": "phase_wires_fr",
       "name": "Front-Right Motor Phase Wires",
-      "shape": "capsule",
+      "shape": "box",
       "position": [
         0.55,
         0.245,
@@ -1312,15 +1956,16 @@
       ],
       "rotation": [
         0,
-        0,
-        -0.7854
+        0.7854,
+        0
       ],
       "size": [
-        0.02,
-        1.45
+        1.28,
+        0.025,
+        0.055
       ],
       "material": "copper",
-      "role": "Bundled three-phase motor wires run along the front-right arm from ESC to stator.",
+      "role": "Bundled three-phase motor wires lie flat along the front-right arm from ESC to stator.",
       "connections": [
         "esc_board",
         "arm_fr",
@@ -1347,7 +1992,9 @@
         "motor_bell_rl",
         "phase_wires_rl",
         "motor_screw_rl_a",
-        "motor_screw_rl_b"
+        "motor_screw_rl_b",
+        "motor_screw_rl_c",
+        "motor_screw_rl_d"
       ]
     },
     {
@@ -1367,7 +2014,29 @@
       "role": "Rotating outrunner bell carries magnets and spins the rear-left propeller.",
       "connections": [
         "motor_stator_rl",
+        "motor_shaft_rl",
         "prop_hub_rl"
+      ]
+    },
+    {
+      "id": "motor_shaft_rl",
+      "name": "Rear-Left Motor Shaft",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.53,
+        1.1
+      ],
+      "size": [
+        0.035,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Central steel shaft carries torque from the rear-left motor bell through the prop hub and nut.",
+      "connections": [
+        "motor_bell_rl",
+        "prop_hub_rl",
+        "prop_nut_rl"
       ]
     },
     {
@@ -1387,10 +2056,39 @@
       "role": "Central molded hub joins the three rear-left propeller blades to the motor shaft.",
       "connections": [
         "motor_bell_rl",
+        "motor_shaft_rl",
         "prop_rl_b1",
         "prop_rl_b2",
         "prop_rl_b3",
+        "prop_rl_tip1",
+        "prop_rl_tip2",
+        "prop_rl_tip3",
+        "prop_disc_rl",
         "prop_nut_rl"
+      ]
+    },
+    {
+      "id": "prop_disc_rl",
+      "name": "Rear-Left Prop Swept Disc",
+      "shape": "torus",
+      "position": [
+        -1.1,
+        0.535,
+        1.1
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.635,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Thin ring marks the 5 inch propeller swept diameter so rear rotor clearance is visible.",
+      "connections": [
+        "prop_hub_rl"
       ]
     },
     {
@@ -1409,7 +2107,8 @@
       "material": "brushed steel",
       "role": "Threaded nut clamps the rear-left prop hub to the motor shaft.",
       "connections": [
-        "prop_hub_rl"
+        "prop_hub_rl",
+        "motor_shaft_rl"
       ]
     },
     {
@@ -1432,8 +2131,35 @@
         0.13
       ],
       "material": "black composite",
-      "role": "Pitched blade of the CW rear-left propeller that contributes one third of the rotor disc area.",
+      "role": "Pitched blade root and midspan of the CW rear-left propeller.",
       "connections": [
+        "prop_hub_rl",
+        "prop_rl_tip1"
+      ]
+    },
+    {
+      "id": "prop_rl_tip1",
+      "name": "Rear-Left Prop Blade 1 Taper Tip",
+      "shape": "complex",
+      "position": [
+        -0.48,
+        0.545,
+        1.1
+      ],
+      "rotation": [
+        -0.28,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.02,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Narrow outer tip makes the rear-left blade read as a tapered airfoil instead of a constant bar.",
+      "connections": [
+        "prop_rl_b1",
         "prop_hub_rl"
       ]
     },
@@ -1457,8 +2183,35 @@
         0.13
       ],
       "material": "black composite",
-      "role": "Second pitched blade of the rear-left tri-blade propeller.",
+      "role": "Second pitched blade root and midspan of the rear-left tri-blade propeller.",
       "connections": [
+        "prop_hub_rl",
+        "prop_rl_tip2"
+      ]
+    },
+    {
+      "id": "prop_rl_tip2",
+      "name": "Rear-Left Prop Blade 2 Taper Tip",
+      "shape": "complex",
+      "position": [
+        -1.41,
+        0.545,
+        0.563
+      ],
+      "rotation": [
+        -0.28,
+        2.0944,
+        0
+      ],
+      "size": [
+        0.18,
+        0.02,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Narrow outer tip makes the second rear-left blade read as tapered.",
+      "connections": [
+        "prop_rl_b2",
         "prop_hub_rl"
       ]
     },
@@ -1482,8 +2235,35 @@
         0.13
       ],
       "material": "black composite",
-      "role": "Third pitched blade of the rear-left tri-blade propeller.",
+      "role": "Third pitched blade root and midspan of the rear-left tri-blade propeller.",
       "connections": [
+        "prop_hub_rl",
+        "prop_rl_tip3"
+      ]
+    },
+    {
+      "id": "prop_rl_tip3",
+      "name": "Rear-Left Prop Blade 3 Taper Tip",
+      "shape": "complex",
+      "position": [
+        -1.41,
+        0.545,
+        1.637
+      ],
+      "rotation": [
+        -0.28,
+        4.1888,
+        0
+      ],
+      "size": [
+        0.18,
+        0.02,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Narrow outer tip makes the third rear-left blade read as tapered.",
+      "connections": [
+        "prop_rl_b3",
         "prop_hub_rl"
       ]
     },
@@ -1521,7 +2301,47 @@
         0.08
       ],
       "material": "brushed steel",
-      "role": "Second visible screw fixing the rear-left motor to the arm tip.",
+      "role": "Second screw fixing the rear-left motor to the arm tip.",
+      "connections": [
+        "arm_rl",
+        "motor_stator_rl"
+      ]
+    },
+    {
+      "id": "motor_screw_rl_c",
+      "name": "Rear-Left Motor Screw C",
+      "shape": "cylinder",
+      "position": [
+        -1.04,
+        0.245,
+        1.16
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Third screw completes the visible four-bolt 2207 mount on the rear-left arm.",
+      "connections": [
+        "arm_rl",
+        "motor_stator_rl"
+      ]
+    },
+    {
+      "id": "motor_screw_rl_d",
+      "name": "Rear-Left Motor Screw D",
+      "shape": "cylinder",
+      "position": [
+        -1.16,
+        0.245,
+        1.04
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Fourth screw completes the visible four-bolt 2207 mount on the rear-left arm.",
       "connections": [
         "arm_rl",
         "motor_stator_rl"
@@ -1530,7 +2350,7 @@
     {
       "id": "phase_wires_rl",
       "name": "Rear-Left Motor Phase Wires",
-      "shape": "capsule",
+      "shape": "box",
       "position": [
         -0.55,
         0.245,
@@ -1538,15 +2358,16 @@
       ],
       "rotation": [
         0,
-        0,
-        0.7854
+        -2.3562,
+        0
       ],
       "size": [
-        0.02,
-        1.45
+        1.28,
+        0.025,
+        0.055
       ],
       "material": "copper",
-      "role": "Bundled three-phase motor wires run along the rear-left arm from ESC to stator.",
+      "role": "Bundled three-phase motor wires lie flat along the rear-left arm from ESC to stator.",
       "connections": [
         "esc_board",
         "arm_rl",
@@ -1573,7 +2394,9 @@
         "motor_bell_rr",
         "phase_wires_rr",
         "motor_screw_rr_a",
-        "motor_screw_rr_b"
+        "motor_screw_rr_b",
+        "motor_screw_rr_c",
+        "motor_screw_rr_d"
       ]
     },
     {
@@ -1593,7 +2416,29 @@
       "role": "Rotating outrunner bell carries magnets and spins the rear-right propeller.",
       "connections": [
         "motor_stator_rr",
+        "motor_shaft_rr",
         "prop_hub_rr"
+      ]
+    },
+    {
+      "id": "motor_shaft_rr",
+      "name": "Rear-Right Motor Shaft",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.53,
+        -1.1
+      ],
+      "size": [
+        0.035,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Central steel shaft carries torque from the rear-right motor bell through the prop hub and nut.",
+      "connections": [
+        "motor_bell_rr",
+        "prop_hub_rr",
+        "prop_nut_rr"
       ]
     },
     {
@@ -1613,10 +2458,39 @@
       "role": "Central molded hub joins the three rear-right propeller blades to the motor shaft.",
       "connections": [
         "motor_bell_rr",
+        "motor_shaft_rr",
         "prop_rr_b1",
         "prop_rr_b2",
         "prop_rr_b3",
+        "prop_rr_tip1",
+        "prop_rr_tip2",
+        "prop_rr_tip3",
+        "prop_disc_rr",
         "prop_nut_rr"
+      ]
+    },
+    {
+      "id": "prop_disc_rr",
+      "name": "Rear-Right Prop Swept Disc",
+      "shape": "torus",
+      "position": [
+        -1.1,
+        0.535,
+        -1.1
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.635,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Thin ring marks the 5 inch propeller swept diameter so rear-right rotor clearance is visible.",
+      "connections": [
+        "prop_hub_rr"
       ]
     },
     {
@@ -1635,7 +2509,8 @@
       "material": "brushed steel",
       "role": "Threaded nut clamps the rear-right prop hub to the motor shaft.",
       "connections": [
-        "prop_hub_rr"
+        "prop_hub_rr",
+        "motor_shaft_rr"
       ]
     },
     {
@@ -1658,8 +2533,35 @@
         0.13
       ],
       "material": "black composite",
-      "role": "Pitched blade of the CCW rear-right propeller that contributes one third of the rotor disc area.",
+      "role": "Pitched blade root and midspan of the CCW rear-right propeller.",
       "connections": [
+        "prop_hub_rr",
+        "prop_rr_tip1"
+      ]
+    },
+    {
+      "id": "prop_rr_tip1",
+      "name": "Rear-Right Prop Blade 1 Taper Tip",
+      "shape": "complex",
+      "position": [
+        -0.48,
+        0.545,
+        -1.1
+      ],
+      "rotation": [
+        0.28,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.02,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Narrow outer tip makes the rear-right blade read as a tapered airfoil instead of a constant bar.",
+      "connections": [
+        "prop_rr_b1",
         "prop_hub_rr"
       ]
     },
@@ -1683,8 +2585,35 @@
         0.13
       ],
       "material": "black composite",
-      "role": "Second pitched blade of the rear-right tri-blade propeller.",
+      "role": "Second pitched blade root and midspan of the rear-right tri-blade propeller.",
       "connections": [
+        "prop_hub_rr",
+        "prop_rr_tip2"
+      ]
+    },
+    {
+      "id": "prop_rr_tip2",
+      "name": "Rear-Right Prop Blade 2 Taper Tip",
+      "shape": "complex",
+      "position": [
+        -1.41,
+        0.545,
+        -1.637
+      ],
+      "rotation": [
+        0.28,
+        2.0944,
+        0
+      ],
+      "size": [
+        0.18,
+        0.02,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Narrow outer tip makes the second rear-right blade read as tapered.",
+      "connections": [
+        "prop_rr_b2",
         "prop_hub_rr"
       ]
     },
@@ -1708,8 +2637,35 @@
         0.13
       ],
       "material": "black composite",
-      "role": "Third pitched blade of the rear-right tri-blade propeller.",
+      "role": "Third pitched blade root and midspan of the rear-right tri-blade propeller.",
       "connections": [
+        "prop_hub_rr",
+        "prop_rr_tip3"
+      ]
+    },
+    {
+      "id": "prop_rr_tip3",
+      "name": "Rear-Right Prop Blade 3 Taper Tip",
+      "shape": "complex",
+      "position": [
+        -1.41,
+        0.545,
+        -0.563
+      ],
+      "rotation": [
+        0.28,
+        4.1888,
+        0
+      ],
+      "size": [
+        0.18,
+        0.02,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Narrow outer tip makes the third rear-right blade read as tapered.",
+      "connections": [
+        "prop_rr_b3",
         "prop_hub_rr"
       ]
     },
@@ -1747,7 +2703,47 @@
         0.08
       ],
       "material": "brushed steel",
-      "role": "Second visible screw fixing the rear-right motor to the arm tip.",
+      "role": "Second screw fixing the rear-right motor to the arm tip.",
+      "connections": [
+        "arm_rr",
+        "motor_stator_rr"
+      ]
+    },
+    {
+      "id": "motor_screw_rr_c",
+      "name": "Rear-Right Motor Screw C",
+      "shape": "cylinder",
+      "position": [
+        -1.04,
+        0.245,
+        -1.16
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Third screw completes the visible four-bolt 2207 mount on the rear-right arm.",
+      "connections": [
+        "arm_rr",
+        "motor_stator_rr"
+      ]
+    },
+    {
+      "id": "motor_screw_rr_d",
+      "name": "Rear-Right Motor Screw D",
+      "shape": "cylinder",
+      "position": [
+        -1.16,
+        0.245,
+        -1.04
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Fourth screw completes the visible four-bolt 2207 mount on the rear-right arm.",
       "connections": [
         "arm_rr",
         "motor_stator_rr"
@@ -1756,7 +2752,7 @@
     {
       "id": "phase_wires_rr",
       "name": "Rear-Right Motor Phase Wires",
-      "shape": "capsule",
+      "shape": "box",
       "position": [
         -0.55,
         0.245,
@@ -1764,15 +2760,16 @@
       ],
       "rotation": [
         0,
-        0,
-        0.7854
+        2.3562,
+        0
       ],
       "size": [
-        0.02,
-        1.45
+        1.28,
+        0.025,
+        0.055
       ],
       "material": "copper",
-      "role": "Bundled three-phase motor wires run along the rear-right arm from ESC to stator.",
+      "role": "Bundled three-phase motor wires lie flat along the rear-right arm from ESC to stator.",
       "connections": [
         "esc_board",
         "arm_rr",

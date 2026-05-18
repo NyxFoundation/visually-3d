@@ -1,6 +1,6 @@
 {
   "machine_name": "Apollo Command & Service Module (CSM)",
-  "assembly_instructions": "1. Place the Service Module aft structural ring at y=1.15 m and bolt the SPS nozzle throat, bell, and exit ring below it so the exit lip rests on the ground reference at y=0. 2. Add the SM forward ring, intermediate ring, four longitudinal stringers, and three narrow external bay panels, leaving the -X sector open as a deliberate cutaway for the SIM bay and internal equipment. 3. Install the two exposed cryogenic tanks, two fuel-cell modules, and equipment shelf inside the open SM frame, then mount the SIM-bay floor, mapping camera, and panoramic camera in the recessed -X sector. 4. Attach radiator panels between the RCS stations and install four RCS mounting blocks at +X, -X, +Z, and -Z; fit four individual thruster bells to each block. 5. Hinge the S-band high-gain antenna mast to the +X/-Z quadrant, add the square hub, and mount four shallow dish reflectors around it. 6. Stack the CM aft heat shield, tapered lower cone, tapered mid cone, and forward compartment on the SM forward ring, then add the crew hatch, umbilical fairing, and docking probe. 7. Build the exploded CM cabin insert above the capsule by adding its pressure-vessel ring, cabin floor, three couches, instrument panel, forward tunnel, and parachute canisters so the hidden crew systems are legible. 8. Fasten the launch-escape tower base to the CM apex, install four tower legs and eight diagonal cross-braces, mount the LES solid rocket, then add the jettison motor and Q-ball nose cap.",
+  "assembly_instructions": "1. Set the Service Module aft structural ring on the SPS thrust axis at y=1.15 m, then bolt the SPS throat, injector plate, tapered bell, exit ring, four feed lines, and paired gimbal actuators below it so the nozzle exit lip rests on y=0. 2. Add the SM mid and forward rings, four main longitudinal stringers, eight diagonal cross-braces, and narrow exterior skin staves, leaving the -X sector open as a cutaway for the SIM bay and exposed internal equipment. 3. Install the equipment shelf, avionics box, four spherical SPS propellant tanks, two cryogenic reactant tanks, two fuel-cell modules, and visible feed lines inside the open SM frame, tying each item to the mid ring or shelf. 4. Build the SIM bay in the -X sector with a floor, upper and lower side rails, mapping camera, panoramic camera, and edge radiator strip so the science-bay interruption in the SM skin is explicit. 5. Mount four RCS quad blocks at +X, -X, +Z, and -Z, then attach four individual conical thruster bells to every block. 6. Attach radiator panels and narrow skin staves between RCS stations without closing the cutaway; keep them thin enough that tanks remain visible from the ISO view. 7. Hinge the S-band high-gain antenna mast to the +X/-Z quadrant, add the yoke, square hub, four shallow dish reflectors, four dish rim rings, and four feed-support rods. 8. Stack the CM aft heat shield, lower tapered shell, mid tapered shell, and forward compartment on the SM forward ring, then add the crew hatch, umbilical fairing, docking probe, docking drogue ring, and visible cutaway rim markers. 9. Assemble the exploded CM cabin insert directly above and left of the shell: pressure-vessel ring, floor, three couches with headrests, instrument panel, forward tunnel, parachute canisters, parachute divider, and leader struts back to the CM. 10. Fasten the launch-escape tower base ring to the CM apex, install the four tower legs, joint collars, eight diagonal braces, LES solid rocket, rocket attachment ring, jettison motor, and Q-ball nose cap.",
   "metadata": {
     "reference": "https://www.nasa.gov/history/historical-spacecraft-diagrams/",
     "domain": "human-spaceflight",
@@ -100,7 +100,9 @@
         "sm_stringer_px",
         "sm_stringer_nx",
         "sm_stringer_pz",
-        "sm_stringer_nz"
+        "sm_stringer_nz",
+        "sm_aft_cross_px_pz",
+        "sm_aft_cross_nx_nz"
       ]
     },
     {
@@ -130,7 +132,11 @@
         "fuel_cell_2",
         "cryotank_o2",
         "cryotank_h2",
-        "equipment_shelf"
+        "equipment_shelf",
+        "sps_fuel_tank_a",
+        "sps_fuel_tank_b",
+        "sps_oxidizer_tank_a",
+        "sps_oxidizer_tank_b"
       ]
     },
     {
@@ -157,9 +163,11 @@
         "sm_mid_ring",
         "cm_aft_hs",
         "umbilical",
-        "panel_px",
-        "panel_pz",
-        "panel_nz"
+        "skin_stave_px_upper",
+        "skin_stave_pz_upper",
+        "skin_stave_nz_upper",
+        "sm_forward_cross_px_nz",
+        "sm_forward_cross_nx_pz"
       ]
     },
     {
@@ -205,7 +213,9 @@
         "sm_aft_ring",
         "sm_forward_ring",
         "rcs_minus_x",
-        "sim_bay_floor"
+        "sim_bay_floor",
+        "sim_bay_upper_rail",
+        "sim_bay_lower_rail"
       ]
     },
     {
@@ -254,83 +264,262 @@
       ]
     },
     {
-      "id": "panel_px",
-      "name": "SM Outer Bay Panel +X",
+      "id": "sm_aft_cross_px_pz",
+      "name": "SM Aft Diagonal Brace +X to +Z",
+      "shape": "cylinder",
+      "position": [
+        0.49,
+        1.52,
+        0.49
+      ],
+      "rotation": [
+        0.58,
+        0,
+        -0.58
+      ],
+      "size": [
+        0.018,
+        1.38
+      ],
+      "material": "welded steel",
+      "role": "Diagonal aft bay brace that triangulates the open Service Module frame.",
+      "connections": [
+        "sm_aft_ring",
+        "sm_stringer_px",
+        "sm_stringer_pz"
+      ]
+    },
+    {
+      "id": "sm_aft_cross_nx_nz",
+      "name": "SM Aft Diagonal Brace -X to -Z",
+      "shape": "cylinder",
+      "position": [
+        -0.49,
+        1.52,
+        -0.49
+      ],
+      "rotation": [
+        -0.58,
+        0,
+        0.58
+      ],
+      "size": [
+        0.018,
+        1.38
+      ],
+      "material": "welded steel",
+      "role": "Opposite aft bay brace that shows the cutaway frame remains structurally tied.",
+      "connections": [
+        "sm_aft_ring",
+        "sm_stringer_nx",
+        "sm_stringer_nz"
+      ]
+    },
+    {
+      "id": "sm_forward_cross_px_nz",
+      "name": "SM Forward Diagonal Brace +X to -Z",
+      "shape": "cylinder",
+      "position": [
+        0.49,
+        3.03,
+        -0.49
+      ],
+      "rotation": [
+        -0.58,
+        0,
+        -0.58
+      ],
+      "size": [
+        0.018,
+        1.38
+      ],
+      "material": "welded steel",
+      "role": "Forward diagonal brace tying the upper SM frame to the antenna-side quadrant.",
+      "connections": [
+        "sm_forward_ring",
+        "sm_stringer_px",
+        "sm_stringer_nz"
+      ]
+    },
+    {
+      "id": "sm_forward_cross_nx_pz",
+      "name": "SM Forward Diagonal Brace -X to +Z",
+      "shape": "cylinder",
+      "position": [
+        -0.49,
+        3.03,
+        0.49
+      ],
+      "rotation": [
+        0.58,
+        0,
+        0.58
+      ],
+      "size": [
+        0.018,
+        1.38
+      ],
+      "material": "welded steel",
+      "role": "Forward diagonal brace over the open bay, making the missing skin read as an intentional cutaway.",
+      "connections": [
+        "sm_forward_ring",
+        "sm_stringer_nx",
+        "sm_stringer_pz"
+      ]
+    },
+    {
+      "id": "skin_stave_px_upper",
+      "name": "Narrow SM Skin Stave +X Upper",
       "shape": "box",
       "position": [
-        0.91,
-        2.28,
-        0.38
+        0.96,
+        2.86,
+        0.34
       ],
       "rotation": [
         0,
-        -0.38,
+        -0.32,
         0
       ],
       "size": [
-        0.045,
-        2.05,
-        0.66
+        0.035,
+        0.86,
+        0.28
       ],
       "material": "white composite",
-      "role": "Narrow removable exterior bay panel that preserves the cylindrical SM silhouette while leaving internal tanks visible.",
+      "role": "Thin exterior skin stave that preserves the cylindrical outline without hiding the internal tanks.",
       "connections": [
-        "sm_aft_ring",
         "sm_forward_ring",
         "radiator_px"
       ]
     },
     {
-      "id": "panel_pz",
-      "name": "SM Outer Bay Panel +Z",
+      "id": "skin_stave_px_lower",
+      "name": "Narrow SM Skin Stave +X Lower",
       "shape": "box",
       "position": [
-        0.38,
-        2.28,
-        0.91
+        0.96,
+        1.7,
+        0.34
       ],
       "rotation": [
         0,
-        0.38,
+        -0.32,
         0
       ],
       "size": [
-        0.66,
-        2.05,
-        0.045
+        0.035,
+        0.78,
+        0.28
       ],
       "material": "white composite",
-      "role": "Curved-sector approximation of an SM exterior panel between RCS quads.",
+      "role": "Lower removable skin stave showing the SM bay cover line while leaving the SPS tanks visible.",
       "connections": [
         "sm_aft_ring",
+        "radiator_px"
+      ]
+    },
+    {
+      "id": "skin_stave_pz_upper",
+      "name": "Narrow SM Skin Stave +Z Upper",
+      "shape": "box",
+      "position": [
+        0.34,
+        2.86,
+        0.96
+      ],
+      "rotation": [
+        0,
+        0.32,
+        0
+      ],
+      "size": [
+        0.28,
+        0.86,
+        0.035
+      ],
+      "material": "white composite",
+      "role": "Upper +Z skin stave preserving the Apollo SM cylindrical bay pattern.",
+      "connections": [
         "sm_forward_ring",
         "radiator_pz"
       ]
     },
     {
-      "id": "panel_nz",
-      "name": "SM Outer Bay Panel -Z",
+      "id": "skin_stave_pz_lower",
+      "name": "Narrow SM Skin Stave +Z Lower",
       "shape": "box",
       "position": [
-        0.38,
-        2.28,
-        -0.91
+        0.34,
+        1.7,
+        0.96
       ],
       "rotation": [
         0,
-        -0.38,
+        0.32,
         0
       ],
       "size": [
-        0.66,
-        2.05,
-        0.045
+        0.28,
+        0.78,
+        0.035
       ],
       "material": "white composite",
-      "role": "Exterior bay panel on the HGA side, kept narrow so the antenna mount and internal frame remain visible.",
+      "role": "Lower +Z skin stave that shows the outer mold line without acting as an opaque wall.",
       "connections": [
         "sm_aft_ring",
+        "radiator_pz"
+      ]
+    },
+    {
+      "id": "skin_stave_nz_upper",
+      "name": "Narrow SM Skin Stave -Z Upper",
+      "shape": "box",
+      "position": [
+        0.34,
+        2.86,
+        -0.96
+      ],
+      "rotation": [
+        0,
+        -0.32,
+        0
+      ],
+      "size": [
+        0.28,
+        0.86,
+        0.035
+      ],
+      "material": "white composite",
+      "role": "Upper -Z skin stave beside the deployed high-gain antenna hinge.",
+      "connections": [
         "sm_forward_ring",
+        "radiator_nz"
+      ]
+    },
+    {
+      "id": "skin_stave_nz_lower",
+      "name": "Narrow SM Skin Stave -Z Lower",
+      "shape": "box",
+      "position": [
+        0.34,
+        1.7,
+        -0.96
+      ],
+      "rotation": [
+        0,
+        -0.32,
+        0
+      ],
+      "size": [
+        0.28,
+        0.78,
+        0.035
+      ],
+      "material": "white composite",
+      "role": "Lower -Z skin stave that keeps the antenna-side silhouette without covering internal equipment.",
+      "connections": [
+        "sm_aft_ring",
         "radiator_nz"
       ]
     },
@@ -353,7 +542,51 @@
       "connections": [
         "sm_stringer_nx",
         "mapping_camera",
-        "panoramic_camera"
+        "panoramic_camera",
+        "sim_bay_upper_rail",
+        "sim_bay_lower_rail"
+      ]
+    },
+    {
+      "id": "sim_bay_upper_rail",
+      "name": "SIM Bay Upper Side Rail",
+      "shape": "box",
+      "position": [
+        -0.96,
+        2.72,
+        0.46
+      ],
+      "size": [
+        0.055,
+        0.8,
+        0.055
+      ],
+      "material": "welded steel",
+      "role": "Upper exposed rail framing one edge of the open Scientific Instrument Module bay.",
+      "connections": [
+        "sm_stringer_nx",
+        "sim_bay_floor"
+      ]
+    },
+    {
+      "id": "sim_bay_lower_rail",
+      "name": "SIM Bay Lower Side Rail",
+      "shape": "box",
+      "position": [
+        -0.96,
+        1.64,
+        -0.46
+      ],
+      "size": [
+        0.055,
+        0.8,
+        0.055
+      ],
+      "material": "welded steel",
+      "role": "Lower exposed rail framing the opposite edge of the SIM bay opening.",
+      "connections": [
+        "sm_stringer_nx",
+        "sim_bay_floor"
       ]
     },
     {
@@ -361,8 +594,8 @@
       "name": "SIM Mapping Camera Barrel",
       "shape": "cylinder",
       "position": [
-        -1.03,
-        2.52,
+        -1.05,
+        2.55,
         0.22
       ],
       "rotation": [
@@ -372,7 +605,7 @@
       ],
       "size": [
         0.08,
-        0.34
+        0.38
       ],
       "material": "brushed steel",
       "role": "Long-lens mapping camera barrel visible in the open SIM bay for lunar surface photography.",
@@ -381,12 +614,36 @@
       ]
     },
     {
+      "id": "mapping_camera_lens",
+      "name": "SIM Mapping Camera Lens",
+      "shape": "cylinder",
+      "position": [
+        -1.25,
+        2.55,
+        0.22
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.11,
+        0.04
+      ],
+      "material": "glass display",
+      "role": "Dark circular lens at the end of the mapping camera, making the outward-looking instrument readable.",
+      "connections": [
+        "mapping_camera"
+      ]
+    },
+    {
       "id": "panoramic_camera",
       "name": "SIM Panoramic Camera Barrel",
       "shape": "cylinder",
       "position": [
-        -1.04,
-        1.92,
+        -1.06,
+        1.9,
         -0.22
       ],
       "rotation": [
@@ -396,12 +653,81 @@
       ],
       "size": [
         0.07,
-        0.42
+        0.46
       ],
       "material": "brushed steel",
       "role": "Panoramic camera barrel in the SIM bay; it points outward through the exposed -X cutaway.",
       "connections": [
         "sim_bay_floor"
+      ]
+    },
+    {
+      "id": "panoramic_camera_lens",
+      "name": "SIM Panoramic Camera Lens",
+      "shape": "cylinder",
+      "position": [
+        -1.3,
+        1.9,
+        -0.22
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.1,
+        0.04
+      ],
+      "material": "glass display",
+      "role": "Dark lens cap on the panoramic camera showing the viewing direction from the SIM bay.",
+      "connections": [
+        "panoramic_camera"
+      ]
+    },
+    {
+      "id": "equipment_shelf",
+      "name": "SM Internal Equipment Shelf",
+      "shape": "box",
+      "position": [
+        0.02,
+        2.28,
+        -0.08
+      ],
+      "size": [
+        0.72,
+        0.05,
+        0.58
+      ],
+      "material": "aluminum",
+      "role": "Thin internal shelf that locates tanks, fuel cells, and avionics within the Service Module frame.",
+      "connections": [
+        "sm_mid_ring",
+        "cryotank_o2",
+        "cryotank_h2",
+        "fuel_cell_1",
+        "fuel_cell_2",
+        "avionics_box"
+      ]
+    },
+    {
+      "id": "avionics_box",
+      "name": "SM Avionics Electronics Box",
+      "shape": "box",
+      "position": [
+        0.34,
+        2.1,
+        0.22
+      ],
+      "size": [
+        0.22,
+        0.18,
+        0.28
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Visible electronics package on the shelf showing that guidance and power-control equipment sits inside the SM.",
+      "connections": [
+        "equipment_shelf"
       ]
     },
     {
@@ -420,7 +746,8 @@
       "role": "Spherical cryogenic oxygen tank exposed by the cutaway so the SM life-support storage is legible.",
       "connections": [
         "sm_mid_ring",
-        "equipment_shelf"
+        "equipment_shelf",
+        "cryotank_o2_line"
       ]
     },
     {
@@ -439,7 +766,58 @@
       "role": "Spherical cryogenic hydrogen tank feeding the fuel cells, shown inside the SM instead of hidden by a shell.",
       "connections": [
         "sm_mid_ring",
-        "equipment_shelf"
+        "equipment_shelf",
+        "cryotank_h2_line"
+      ]
+    },
+    {
+      "id": "cryotank_o2_line",
+      "name": "Oxygen Tank Feed Line",
+      "shape": "cylinder",
+      "position": [
+        -0.08,
+        2.54,
+        0.16
+      ],
+      "rotation": [
+        0.9,
+        0,
+        1.1
+      ],
+      "size": [
+        0.012,
+        0.44
+      ],
+      "material": "copper",
+      "role": "Small pipe routing oxygen from the spherical cryogenic tank toward the fuel-cell shelf.",
+      "connections": [
+        "cryotank_o2",
+        "fuel_cell_1"
+      ]
+    },
+    {
+      "id": "cryotank_h2_line",
+      "name": "Hydrogen Tank Feed Line",
+      "shape": "cylinder",
+      "position": [
+        -0.05,
+        2.08,
+        -0.28
+      ],
+      "rotation": [
+        0.6,
+        0,
+        -1
+      ],
+      "size": [
+        0.012,
+        0.42
+      ],
+      "material": "copper",
+      "role": "Small pipe routing hydrogen from the cryogenic tank toward the paired fuel cells.",
+      "connections": [
+        "cryotank_h2",
+        "fuel_cell_2"
       ]
     },
     {
@@ -485,27 +863,179 @@
       ]
     },
     {
-      "id": "equipment_shelf",
-      "name": "SM Internal Equipment Shelf",
-      "shape": "box",
+      "id": "sps_fuel_tank_a",
+      "name": "SPS Fuel Tank A",
+      "shape": "sphere",
       "position": [
-        0.02,
-        2.28,
-        -0.08
+        0.38,
+        2.66,
+        0.36
       ],
       "size": [
-        0.72,
-        0.05,
-        0.58
+        0.28
       ],
-      "material": "aluminum",
-      "role": "Thin internal shelf that locates tanks, fuel cells, and avionics within the Service Module frame.",
+      "material": "brushed steel",
+      "role": "One spherical Service Propulsion System fuel tank exposed in the open frame.",
       "connections": [
         "sm_mid_ring",
-        "cryotank_o2",
-        "cryotank_h2",
-        "fuel_cell_1",
-        "fuel_cell_2"
+        "sps_feed_line_a"
+      ]
+    },
+    {
+      "id": "sps_fuel_tank_b",
+      "name": "SPS Fuel Tank B",
+      "shape": "sphere",
+      "position": [
+        0.38,
+        1.88,
+        0.36
+      ],
+      "size": [
+        0.28
+      ],
+      "material": "brushed steel",
+      "role": "Second SPS fuel tank balanced below the first to show the stacked tank bay layout.",
+      "connections": [
+        "sm_mid_ring",
+        "sps_feed_line_b"
+      ]
+    },
+    {
+      "id": "sps_oxidizer_tank_a",
+      "name": "SPS Oxidizer Tank A",
+      "shape": "sphere",
+      "position": [
+        -0.42,
+        2.72,
+        -0.38
+      ],
+      "size": [
+        0.3
+      ],
+      "material": "brushed steel",
+      "role": "One larger oxidizer tank for the SPS engine, visible through the cutaway side.",
+      "connections": [
+        "sm_mid_ring",
+        "sps_feed_line_c"
+      ]
+    },
+    {
+      "id": "sps_oxidizer_tank_b",
+      "name": "SPS Oxidizer Tank B",
+      "shape": "sphere",
+      "position": [
+        -0.42,
+        1.82,
+        -0.38
+      ],
+      "size": [
+        0.3
+      ],
+      "material": "brushed steel",
+      "role": "Second oxidizer tank completing the visible four-tank SPS propellant set.",
+      "connections": [
+        "sm_mid_ring",
+        "sps_feed_line_d"
+      ]
+    },
+    {
+      "id": "sps_feed_line_a",
+      "name": "SPS Fuel Feed Line A",
+      "shape": "cylinder",
+      "position": [
+        0.18,
+        1.74,
+        0.2
+      ],
+      "rotation": [
+        0.4,
+        0,
+        0.3
+      ],
+      "size": [
+        0.014,
+        1.35
+      ],
+      "material": "copper",
+      "role": "Pipe routing propellant from fuel tank A toward the SPS throat.",
+      "connections": [
+        "sps_fuel_tank_a",
+        "sps_throat"
+      ]
+    },
+    {
+      "id": "sps_feed_line_b",
+      "name": "SPS Fuel Feed Line B",
+      "shape": "cylinder",
+      "position": [
+        0.18,
+        1.44,
+        0.18
+      ],
+      "rotation": [
+        0.25,
+        0,
+        -0.25
+      ],
+      "size": [
+        0.014,
+        0.94
+      ],
+      "material": "copper",
+      "role": "Pipe routing propellant from the lower fuel tank into the SPS engine mount.",
+      "connections": [
+        "sps_fuel_tank_b",
+        "sps_throat"
+      ]
+    },
+    {
+      "id": "sps_feed_line_c",
+      "name": "SPS Oxidizer Feed Line A",
+      "shape": "cylinder",
+      "position": [
+        -0.18,
+        1.76,
+        -0.2
+      ],
+      "rotation": [
+        -0.4,
+        0,
+        -0.3
+      ],
+      "size": [
+        0.014,
+        1.38
+      ],
+      "material": "copper",
+      "role": "Pipe routing oxidizer from the upper oxidizer tank toward the SPS throat.",
+      "connections": [
+        "sps_oxidizer_tank_a",
+        "sps_throat"
+      ]
+    },
+    {
+      "id": "sps_feed_line_d",
+      "name": "SPS Oxidizer Feed Line B",
+      "shape": "cylinder",
+      "position": [
+        -0.18,
+        1.42,
+        -0.18
+      ],
+      "rotation": [
+        -0.25,
+        0,
+        0.25
+      ],
+      "size": [
+        0.014,
+        0.94
+      ],
+      "material": "copper",
+      "role": "Pipe routing oxidizer from the lower oxidizer tank into the SPS engine mount.",
+      "connections": [
+        "sps_oxidizer_tank_b",
+        "sps_throat"
       ]
     },
     {
@@ -513,7 +1043,7 @@
       "name": "SM Radiator Panel +X",
       "shape": "box",
       "position": [
-        1.02,
+        1.04,
         2.3,
         0.36
       ],
@@ -523,14 +1053,15 @@
         0
       ],
       "size": [
-        0.035,
+        0.025,
         1.36,
-        0.62
+        0.44
       ],
       "material": "dark anodized aluminum",
       "role": "External radiator panel rejecting heat from the environmental-control and power systems.",
       "connections": [
-        "panel_px"
+        "skin_stave_px_upper",
+        "skin_stave_px_lower"
       ]
     },
     {
@@ -540,7 +1071,7 @@
       "position": [
         0.36,
         2.3,
-        1.02
+        1.04
       ],
       "rotation": [
         0,
@@ -548,14 +1079,15 @@
         0
       ],
       "size": [
-        0.62,
+        0.44,
         1.36,
-        0.035
+        0.025
       ],
       "material": "dark anodized aluminum",
       "role": "Second radiator panel wrapped around the SM between RCS quads.",
       "connections": [
-        "panel_pz"
+        "skin_stave_pz_upper",
+        "skin_stave_pz_lower"
       ]
     },
     {
@@ -565,7 +1097,7 @@
       "position": [
         0.36,
         2.3,
-        -1.02
+        -1.04
       ],
       "rotation": [
         0,
@@ -573,14 +1105,15 @@
         0
       ],
       "size": [
-        0.62,
+        0.44,
         1.36,
-        0.035
+        0.025
       ],
       "material": "dark anodized aluminum",
       "role": "Third radiator panel on the HGA side of the SM.",
       "connections": [
-        "panel_nz"
+        "skin_stave_nz_upper",
+        "skin_stave_nz_lower"
       ]
     },
     {
@@ -626,7 +1159,83 @@
       "role": "Narrow combustion-chamber throat that bolts the Service Propulsion System nozzle to the SM aft ring.",
       "connections": [
         "sm_aft_ring",
-        "nozzle_bell"
+        "sps_injector_plate",
+        "nozzle_bell",
+        "sps_gimbal_actuator_px",
+        "sps_gimbal_actuator_nz"
+      ]
+    },
+    {
+      "id": "sps_injector_plate",
+      "name": "SPS Injector Plate",
+      "shape": "cylinder",
+      "position": [
+        0,
+        1.18,
+        0
+      ],
+      "size": [
+        0.3,
+        0.035
+      ],
+      "material": "brass",
+      "role": "Circular injector/manifold plate showing where the four visible propellant feed lines enter the SPS engine head.",
+      "connections": [
+        "sps_throat",
+        "sps_feed_line_a",
+        "sps_feed_line_b",
+        "sps_feed_line_c",
+        "sps_feed_line_d"
+      ]
+    },
+    {
+      "id": "sps_gimbal_actuator_px",
+      "name": "SPS Gimbal Actuator +X",
+      "shape": "capsule",
+      "position": [
+        0.33,
+        0.94,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.55
+      ],
+      "size": [
+        0.025,
+        0.46
+      ],
+      "material": "brushed steel",
+      "role": "Linear actuator that tilts the SPS engine for thrust-vector control.",
+      "connections": [
+        "sm_aft_ring",
+        "sps_throat"
+      ]
+    },
+    {
+      "id": "sps_gimbal_actuator_nz",
+      "name": "SPS Gimbal Actuator -Z",
+      "shape": "capsule",
+      "position": [
+        0,
+        0.94,
+        -0.33
+      ],
+      "rotation": [
+        -0.55,
+        0,
+        0
+      ],
+      "size": [
+        0.025,
+        0.46
+      ],
+      "material": "brushed steel",
+      "role": "Second visible gimbal actuator at right angles to the first, completing the SPS steering pair.",
+      "connections": [
+        "sm_aft_ring",
+        "sps_throat"
       ]
     },
     {
@@ -1154,7 +1763,7 @@
       "name": "HGA Deployable Mast",
       "shape": "cylinder",
       "position": [
-        1.22,
+        1.18,
         1.74,
         -0.42
       ],
@@ -1165,13 +1774,39 @@
       ],
       "size": [
         0.025,
-        0.72
+        0.78
       ],
       "material": "brushed steel",
       "role": "Angled deployable boom that moves the S-band antenna cluster clear of the SM body.",
       "connections": [
         "sm_stringer_px",
         "sm_stringer_nz",
+        "hga_yoke"
+      ]
+    },
+    {
+      "id": "hga_yoke",
+      "name": "HGA Fork Yoke",
+      "shape": "box",
+      "position": [
+        1.43,
+        1.54,
+        -0.66
+      ],
+      "rotation": [
+        0,
+        0.35,
+        0
+      ],
+      "size": [
+        0.32,
+        0.06,
+        0.06
+      ],
+      "material": "brushed steel",
+      "role": "Short forked yoke between the deployable mast and the square antenna hub.",
+      "connections": [
+        "hga_mast",
         "hga_hub"
       ]
     },
@@ -1180,9 +1815,9 @@
       "name": "HGA Square Reflector Hub",
       "shape": "box",
       "position": [
-        1.48,
+        1.58,
         1.52,
-        -0.72
+        -0.78
       ],
       "rotation": [
         0,
@@ -1197,11 +1832,15 @@
       "material": "dark anodized aluminum",
       "role": "Central square reflector hub of the high-gain antenna, scaled from the 0.28 m Apollo unit.",
       "connections": [
-        "hga_mast",
+        "hga_yoke",
         "hga_dish_upper",
         "hga_dish_lower",
         "hga_dish_left",
-        "hga_dish_right"
+        "hga_dish_right",
+        "hga_feed_upper",
+        "hga_feed_lower",
+        "hga_feed_left",
+        "hga_feed_right"
       ]
     },
     {
@@ -1209,9 +1848,9 @@
       "name": "HGA Upper Shallow Dish",
       "shape": "cylinder",
       "position": [
-        1.48,
-        1.78,
-        -0.72
+        1.58,
+        1.84,
+        -0.78
       ],
       "rotation": [
         1.5708,
@@ -1219,14 +1858,15 @@
         0
       ],
       "size": [
-        0.08,
-        0.21,
+        0.06,
+        0.2,
         0.035
       ],
       "material": "dark anodized aluminum",
       "role": "One of four shallow tapered S-band dish reflectors, individually visible rather than merged into one disk.",
       "connections": [
-        "hga_hub"
+        "hga_hub",
+        "hga_rim_upper"
       ]
     },
     {
@@ -1234,9 +1874,9 @@
       "name": "HGA Lower Shallow Dish",
       "shape": "cylinder",
       "position": [
-        1.48,
-        1.26,
-        -0.72
+        1.58,
+        1.2,
+        -0.78
       ],
       "rotation": [
         1.5708,
@@ -1244,14 +1884,15 @@
         0
       ],
       "size": [
-        0.08,
-        0.21,
+        0.06,
+        0.2,
         0.035
       ],
       "material": "dark anodized aluminum",
       "role": "Lower shallow reflector in the four-dish deployed high-gain antenna cluster.",
       "connections": [
-        "hga_hub"
+        "hga_hub",
+        "hga_rim_lower"
       ]
     },
     {
@@ -1259,9 +1900,9 @@
       "name": "HGA Left Shallow Dish",
       "shape": "cylinder",
       "position": [
-        1.24,
+        1.26,
         1.52,
-        -0.72
+        -0.78
       ],
       "rotation": [
         1.5708,
@@ -1269,14 +1910,15 @@
         0
       ],
       "size": [
-        0.08,
-        0.21,
+        0.06,
+        0.2,
         0.035
       ],
       "material": "dark anodized aluminum",
       "role": "Left shallow reflector in the four-dish S-band antenna cluster.",
       "connections": [
-        "hga_hub"
+        "hga_hub",
+        "hga_rim_left"
       ]
     },
     {
@@ -1284,9 +1926,9 @@
       "name": "HGA Right Shallow Dish",
       "shape": "cylinder",
       "position": [
-        1.72,
+        1.9,
         1.52,
-        -0.72
+        -0.78
       ],
       "rotation": [
         1.5708,
@@ -1294,14 +1936,215 @@
         0
       ],
       "size": [
-        0.08,
-        0.21,
+        0.06,
+        0.2,
         0.035
       ],
       "material": "dark anodized aluminum",
       "role": "Right shallow reflector in the four-dish S-band antenna cluster.",
       "connections": [
-        "hga_hub"
+        "hga_hub",
+        "hga_rim_right"
+      ]
+    },
+    {
+      "id": "hga_rim_upper",
+      "name": "HGA Upper Dish Rim",
+      "shape": "torus",
+      "position": [
+        1.58,
+        1.84,
+        -0.765
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.2,
+        0.01
+      ],
+      "material": "brushed steel",
+      "role": "Thin circular rim around the upper HGA reflector, making the shallow dish read as a framed antenna.",
+      "connections": [
+        "hga_dish_upper",
+        "hga_feed_upper"
+      ]
+    },
+    {
+      "id": "hga_rim_lower",
+      "name": "HGA Lower Dish Rim",
+      "shape": "torus",
+      "position": [
+        1.58,
+        1.2,
+        -0.765
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.2,
+        0.01
+      ],
+      "material": "brushed steel",
+      "role": "Thin circular rim around the lower HGA reflector, separating it from the square hub silhouette.",
+      "connections": [
+        "hga_dish_lower",
+        "hga_feed_lower"
+      ]
+    },
+    {
+      "id": "hga_rim_left",
+      "name": "HGA Left Dish Rim",
+      "shape": "torus",
+      "position": [
+        1.26,
+        1.52,
+        -0.765
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.2,
+        0.01
+      ],
+      "material": "brushed steel",
+      "role": "Thin circular rim around the left HGA reflector.",
+      "connections": [
+        "hga_dish_left",
+        "hga_feed_left"
+      ]
+    },
+    {
+      "id": "hga_rim_right",
+      "name": "HGA Right Dish Rim",
+      "shape": "torus",
+      "position": [
+        1.9,
+        1.52,
+        -0.765
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.2,
+        0.01
+      ],
+      "material": "brushed steel",
+      "role": "Thin circular rim around the right HGA reflector.",
+      "connections": [
+        "hga_dish_right",
+        "hga_feed_right"
+      ]
+    },
+    {
+      "id": "hga_feed_upper",
+      "name": "HGA Upper Feed Support Rod",
+      "shape": "cylinder",
+      "position": [
+        1.58,
+        1.68,
+        -0.78
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0.008,
+        0.28
+      ],
+      "material": "brushed steel",
+      "role": "Short feed-support rod between the hub and upper dish, clarifying how the reflector is mounted.",
+      "connections": [
+        "hga_hub",
+        "hga_rim_upper"
+      ]
+    },
+    {
+      "id": "hga_feed_lower",
+      "name": "HGA Lower Feed Support Rod",
+      "shape": "cylinder",
+      "position": [
+        1.58,
+        1.36,
+        -0.78
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0.008,
+        0.28
+      ],
+      "material": "brushed steel",
+      "role": "Short feed-support rod between the hub and lower dish.",
+      "connections": [
+        "hga_hub",
+        "hga_rim_lower"
+      ]
+    },
+    {
+      "id": "hga_feed_left",
+      "name": "HGA Left Feed Support Rod",
+      "shape": "cylinder",
+      "position": [
+        1.42,
+        1.52,
+        -0.78
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.008,
+        0.28
+      ],
+      "material": "brushed steel",
+      "role": "Horizontal feed-support rod from the hub toward the left HGA reflector.",
+      "connections": [
+        "hga_hub",
+        "hga_rim_left"
+      ]
+    },
+    {
+      "id": "hga_feed_right",
+      "name": "HGA Right Feed Support Rod",
+      "shape": "cylinder",
+      "position": [
+        1.74,
+        1.52,
+        -0.78
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.008,
+        0.28
+      ],
+      "material": "brushed steel",
+      "role": "Horizontal feed-support rod from the hub toward the right HGA reflector.",
+      "connections": [
+        "hga_hub",
+        "hga_rim_right"
       ]
     },
     {
@@ -1365,7 +2208,8 @@
       "connections": [
         "cm_aft_hs",
         "cm_mid",
-        "hatch"
+        "hatch",
+        "cm_cutaway_lower_rim"
       ]
     },
     {
@@ -1388,7 +2232,10 @@
         "cm_lower",
         "cm_forward",
         "hatch",
-        "cm_exploded_pressure_ring"
+        "cm_exploded_pressure_ring",
+        "cm_exploded_leader_a",
+        "cm_exploded_leader_b",
+        "cm_cutaway_upper_rim"
       ]
     },
     {
@@ -1410,6 +2257,7 @@
       "connections": [
         "cm_mid",
         "docking_probe",
+        "docking_drogue_ring",
         "les_base_ring"
       ]
     },
@@ -1440,6 +2288,58 @@
       ]
     },
     {
+      "id": "cm_cutaway_lower_rim",
+      "name": "CM Cabin Cutaway Lower Rim Marker",
+      "shape": "box",
+      "position": [
+        -0.78,
+        4.02,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.46
+      ],
+      "size": [
+        0.035,
+        0.58,
+        0.5
+      ],
+      "material": "aluminum",
+      "role": "Bright rim marker showing the side of the CM shell conceptually opened to correspond to the exploded cabin insert.",
+      "connections": [
+        "cm_lower",
+        "cm_exploded_leader_a"
+      ]
+    },
+    {
+      "id": "cm_cutaway_upper_rim",
+      "name": "CM Cabin Cutaway Upper Rim Marker",
+      "shape": "box",
+      "position": [
+        -0.55,
+        4.53,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.38
+      ],
+      "size": [
+        0.03,
+        0.5,
+        0.42
+      ],
+      "material": "aluminum",
+      "role": "Upper rim marker that links the opaque tapered CM shell to the exposed pressure-vessel model beside it.",
+      "connections": [
+        "cm_mid",
+        "cm_exploded_leader_b"
+      ]
+    },
+    {
       "id": "docking_probe",
       "name": "Docking Probe",
       "shape": "cylinder",
@@ -1455,16 +2355,17 @@
       "material": "dark anodized aluminum",
       "role": "Central CM apex probe that engaged the Lunar Module drogue during docking.",
       "connections": [
-        "cm_forward"
+        "cm_forward",
+        "docking_drogue_ring"
       ]
     },
     {
-      "id": "cm_exploded_pressure_ring",
-      "name": "Exploded CM Pressure Vessel Ring",
+      "id": "docking_drogue_ring",
+      "name": "Docking Drogue Ring",
       "shape": "torus",
       "position": [
-        -1.55,
-        5.35,
+        0,
+        5.13,
         0
       ],
       "rotation": [
@@ -1473,7 +2374,84 @@
         0
       ],
       "size": [
-        0.42,
+        0.18,
+        0.018
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Small circular docking drogue rim around the probe at the CM apex.",
+      "connections": [
+        "cm_forward",
+        "docking_probe"
+      ]
+    },
+    {
+      "id": "cm_exploded_leader_a",
+      "name": "Exploded Cabin Leader Strut A",
+      "shape": "cylinder",
+      "position": [
+        -0.62,
+        5.02,
+        0.22
+      ],
+      "rotation": [
+        0.25,
+        0,
+        1.1
+      ],
+      "size": [
+        0.012,
+        1.16
+      ],
+      "material": "aluminum",
+      "role": "Thin leader strut visually tying the exploded cabin insert back to the opaque CM shell it explains.",
+      "connections": [
+        "cm_mid",
+        "cm_exploded_pressure_ring",
+        "cm_cutaway_lower_rim"
+      ]
+    },
+    {
+      "id": "cm_exploded_leader_b",
+      "name": "Exploded Cabin Leader Strut B",
+      "shape": "cylinder",
+      "position": [
+        -0.62,
+        5.02,
+        -0.22
+      ],
+      "rotation": [
+        -0.25,
+        0,
+        1.1
+      ],
+      "size": [
+        0.012,
+        1.16
+      ],
+      "material": "aluminum",
+      "role": "Second leader strut showing the cabin insert is an exploded view of the Command Module interior.",
+      "connections": [
+        "cm_mid",
+        "cm_exploded_pressure_ring",
+        "cm_cutaway_upper_rim"
+      ]
+    },
+    {
+      "id": "cm_exploded_pressure_ring",
+      "name": "Exploded CM Pressure Vessel Ring",
+      "shape": "torus",
+      "position": [
+        -1.12,
+        5.46,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.48,
         0.025
       ],
       "material": "aluminum",
@@ -1482,7 +2460,9 @@
         "cm_mid",
         "cm_exploded_floor",
         "cm_instrument_panel",
-        "cm_forward_tunnel"
+        "cm_forward_tunnel",
+        "cm_exploded_leader_a",
+        "cm_exploded_leader_b"
       ]
     },
     {
@@ -1490,14 +2470,14 @@
       "name": "Exploded CM Cabin Floor",
       "shape": "box",
       "position": [
-        -1.55,
-        5.18,
+        -1.12,
+        5.28,
         0
       ],
       "size": [
-        0.72,
+        0.82,
         0.055,
-        0.62
+        0.68
       ],
       "material": "dark anodized aluminum",
       "role": "Flat crew-cabin deck in the exploded insert; it locates the three couches relative to the pressure vessel.",
@@ -1513,9 +2493,9 @@
       "name": "Left Crew Couch",
       "shape": "box",
       "position": [
-        -1.74,
-        5.28,
-        0.18
+        -1.32,
+        5.38,
+        0.2
       ],
       "rotation": [
         0,
@@ -1523,14 +2503,15 @@
         -0.25
       ],
       "size": [
-        0.16,
+        0.18,
         0.1,
-        0.28
+        0.3
       ],
       "material": "black composite",
       "role": "Left astronaut couch in the exploded cabin insert, showing the CM was a three-seat pressure vessel.",
       "connections": [
-        "cm_exploded_floor"
+        "cm_exploded_floor",
+        "cm_couch_left_headrest"
       ]
     },
     {
@@ -1538,8 +2519,8 @@
       "name": "Center Crew Couch",
       "shape": "box",
       "position": [
-        -1.55,
-        5.3,
+        -1.12,
+        5.4,
         0
       ],
       "rotation": [
@@ -1548,14 +2529,15 @@
         -0.18
       ],
       "size": [
-        0.16,
+        0.18,
         0.1,
-        0.3
+        0.32
       ],
       "material": "black composite",
       "role": "Center astronaut couch positioned between the two side couches in the exploded CM cabin.",
       "connections": [
-        "cm_exploded_floor"
+        "cm_exploded_floor",
+        "cm_couch_center_headrest"
       ]
     },
     {
@@ -1563,9 +2545,9 @@
       "name": "Right Crew Couch",
       "shape": "box",
       "position": [
-        -1.36,
-        5.28,
-        -0.18
+        -0.92,
+        5.38,
+        -0.2
       ],
       "rotation": [
         0,
@@ -1573,14 +2555,90 @@
         -0.25
       ],
       "size": [
-        0.16,
+        0.18,
         0.1,
-        0.28
+        0.3
       ],
       "material": "black composite",
       "role": "Right astronaut couch completing the three-abreast Apollo crew arrangement.",
       "connections": [
-        "cm_exploded_floor"
+        "cm_exploded_floor",
+        "cm_couch_right_headrest"
+      ]
+    },
+    {
+      "id": "cm_couch_left_headrest",
+      "name": "Left Couch Headrest",
+      "shape": "box",
+      "position": [
+        -1.39,
+        5.49,
+        0.2
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.25
+      ],
+      "size": [
+        0.07,
+        0.12,
+        0.18
+      ],
+      "material": "black composite",
+      "role": "Raised headrest on the left couch, separating the crew station from a generic block.",
+      "connections": [
+        "cm_couch_left"
+      ]
+    },
+    {
+      "id": "cm_couch_center_headrest",
+      "name": "Center Couch Headrest",
+      "shape": "box",
+      "position": [
+        -1.18,
+        5.51,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.18
+      ],
+      "size": [
+        0.07,
+        0.12,
+        0.18
+      ],
+      "material": "black composite",
+      "role": "Raised headrest on the center couch, clarifying the astronaut seating orientation.",
+      "connections": [
+        "cm_couch_center"
+      ]
+    },
+    {
+      "id": "cm_couch_right_headrest",
+      "name": "Right Couch Headrest",
+      "shape": "box",
+      "position": [
+        -0.99,
+        5.49,
+        -0.2
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.25
+      ],
+      "size": [
+        0.07,
+        0.12,
+        0.18
+      ],
+      "material": "black composite",
+      "role": "Raised headrest on the right couch, completing the three distinct crew stations.",
+      "connections": [
+        "cm_couch_right"
       ]
     },
     {
@@ -1588,8 +2646,8 @@
       "name": "Exploded CM Instrument Panel",
       "shape": "box",
       "position": [
-        -1.2,
-        5.42,
+        -0.72,
+        5.52,
         0
       ],
       "rotation": [
@@ -1599,8 +2657,8 @@
       ],
       "size": [
         0.08,
-        0.28,
-        0.58
+        0.3,
+        0.62
       ],
       "material": "glass display",
       "role": "Forward instrument panel in the exploded cabin insert, visible ahead of the crew couches.",
@@ -1614,8 +2672,8 @@
       "name": "Exploded CM Forward Tunnel",
       "shape": "cylinder",
       "position": [
-        -1.55,
-        5.72,
+        -1.12,
+        5.84,
         0
       ],
       "size": [
@@ -1627,7 +2685,8 @@
       "connections": [
         "cm_exploded_pressure_ring",
         "cm_parachute_canister_a",
-        "cm_parachute_canister_b"
+        "cm_parachute_canister_b",
+        "cm_parachute_divider"
       ]
     },
     {
@@ -1635,9 +2694,9 @@
       "name": "Exploded CM Parachute Canister A",
       "shape": "cylinder",
       "position": [
-        -1.72,
-        5.78,
-        0.18
+        -1.31,
+        5.91,
+        0.2
       ],
       "size": [
         0.08,
@@ -1654,9 +2713,9 @@
       "name": "Exploded CM Parachute Canister B",
       "shape": "cylinder",
       "position": [
-        -1.38,
-        5.78,
-        -0.18
+        -0.93,
+        5.91,
+        -0.2
       ],
       "size": [
         0.08,
@@ -1666,6 +2725,28 @@
       "role": "Second forward-compartment parachute canister paired with the first to expose the recovery subsystem.",
       "connections": [
         "cm_forward_tunnel"
+      ]
+    },
+    {
+      "id": "cm_parachute_divider",
+      "name": "Exploded Parachute Bay Divider",
+      "shape": "box",
+      "position": [
+        -1.12,
+        5.94,
+        0
+      ],
+      "size": [
+        0.36,
+        0.035,
+        0.04
+      ],
+      "material": "aluminum",
+      "role": "Thin divider plate between parachute canisters in the exploded forward-compartment insert.",
+      "connections": [
+        "cm_forward_tunnel",
+        "cm_parachute_canister_a",
+        "cm_parachute_canister_b"
       ]
     },
     {
@@ -1693,7 +2774,68 @@
         "les_leg_px",
         "les_leg_nx",
         "les_leg_pz",
-        "les_leg_nz"
+        "les_leg_nz",
+        "les_lower_joint_collar"
+      ]
+    },
+    {
+      "id": "les_lower_joint_collar",
+      "name": "LES Lower Joint Collar",
+      "shape": "torus",
+      "position": [
+        0,
+        5.64,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.22,
+        0.018
+      ],
+      "material": "welded steel",
+      "role": "Lower truss collar where the first set of diagonal LES braces terminate at real fittings.",
+      "connections": [
+        "les_base_ring",
+        "les_brace_px_pz",
+        "les_brace_pz_nx",
+        "les_brace_nx_nz",
+        "les_brace_nz_px"
+      ]
+    },
+    {
+      "id": "les_upper_joint_collar",
+      "name": "LES Upper Joint Collar",
+      "shape": "torus",
+      "position": [
+        0,
+        6.32,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.018
+      ],
+      "material": "welded steel",
+      "role": "Upper truss collar below the escape motor that gives the diagonal braces a visible attachment level.",
+      "connections": [
+        "les_leg_px",
+        "les_leg_nx",
+        "les_leg_pz",
+        "les_leg_nz",
+        "les_brace_px_nz",
+        "les_brace_nz_nx",
+        "les_brace_nx_pz",
+        "les_brace_pz_px",
+        "les_rocket_attach_ring"
       ]
     },
     {
@@ -1720,7 +2862,8 @@
         "les_base_ring",
         "les_rocket",
         "les_brace_px_pz",
-        "les_brace_px_nz"
+        "les_brace_px_nz",
+        "les_upper_joint_collar"
       ]
     },
     {
@@ -1747,7 +2890,8 @@
         "les_base_ring",
         "les_rocket",
         "les_brace_nx_pz",
-        "les_brace_nx_nz"
+        "les_brace_nx_nz",
+        "les_upper_joint_collar"
       ]
     },
     {
@@ -1774,7 +2918,8 @@
         "les_base_ring",
         "les_rocket",
         "les_brace_pz_px",
-        "les_brace_pz_nx"
+        "les_brace_pz_nx",
+        "les_upper_joint_collar"
       ]
     },
     {
@@ -1801,7 +2946,8 @@
         "les_base_ring",
         "les_rocket",
         "les_brace_nz_px",
-        "les_brace_nz_nx"
+        "les_brace_nz_nx",
+        "les_upper_joint_collar"
       ]
     },
     {
@@ -1826,7 +2972,8 @@
       "role": "Diagonal cross-brace tying two adjacent tower legs so the LES reads as a triangulated truss.",
       "connections": [
         "les_leg_px",
-        "les_leg_pz"
+        "les_leg_pz",
+        "les_lower_joint_collar"
       ]
     },
     {
@@ -1851,7 +2998,8 @@
       "role": "Second lower diagonal brace around the LES tower base.",
       "connections": [
         "les_leg_pz",
-        "les_leg_nx"
+        "les_leg_nx",
+        "les_lower_joint_collar"
       ]
     },
     {
@@ -1876,7 +3024,8 @@
       "role": "Third lower diagonal brace preventing the tower legs from reading as isolated rods.",
       "connections": [
         "les_leg_nx",
-        "les_leg_nz"
+        "les_leg_nz",
+        "les_lower_joint_collar"
       ]
     },
     {
@@ -1901,7 +3050,8 @@
       "role": "Fourth lower diagonal brace closing the square truss bay at the LES base.",
       "connections": [
         "les_leg_nz",
-        "les_leg_px"
+        "les_leg_px",
+        "les_lower_joint_collar"
       ]
     },
     {
@@ -1926,7 +3076,8 @@
       "role": "Upper diagonal member tying the +X leg toward the -Z side below the escape rocket.",
       "connections": [
         "les_leg_px",
-        "les_leg_nz"
+        "les_leg_nz",
+        "les_upper_joint_collar"
       ]
     },
     {
@@ -1951,7 +3102,8 @@
       "role": "Upper diagonal member that triangulates the starboard side of the LES tower.",
       "connections": [
         "les_leg_nz",
-        "les_leg_nx"
+        "les_leg_nx",
+        "les_upper_joint_collar"
       ]
     },
     {
@@ -1976,7 +3128,8 @@
       "role": "Upper diagonal member that triangulates the aft side of the LES tower.",
       "connections": [
         "les_leg_nx",
-        "les_leg_pz"
+        "les_leg_pz",
+        "les_upper_joint_collar"
       ]
     },
     {
@@ -2001,7 +3154,33 @@
       "role": "Upper diagonal member completing the visible four-sided LES truss bay.",
       "connections": [
         "les_leg_pz",
-        "les_leg_px"
+        "les_leg_px",
+        "les_upper_joint_collar"
+      ]
+    },
+    {
+      "id": "les_rocket_attach_ring",
+      "name": "LES Rocket Attachment Ring",
+      "shape": "torus",
+      "position": [
+        0,
+        6.55,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.16,
+        0.018
+      ],
+      "material": "welded steel",
+      "role": "Small attachment ring that collects the four tower legs before they connect into the escape motor casing.",
+      "connections": [
+        "les_upper_joint_collar",
+        "les_rocket"
       ]
     },
     {
@@ -2024,6 +3203,7 @@
         "les_leg_nx",
         "les_leg_pz",
         "les_leg_nz",
+        "les_rocket_attach_ring",
         "les_jettison"
       ]
     },
