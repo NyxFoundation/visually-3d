@@ -6,3 +6,6 @@ __pycache__/
 *.py[cod]
 .venv/
 .env
+
+# self-improve iteration logs
+.self-improve/

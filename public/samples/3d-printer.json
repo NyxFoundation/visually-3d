@@ -1,22 +1,1632 @@
 {
   "machine_name": "Desktop FDM 3D Printer",
-  "assembly_instructions": "Cubic frame with vertical Z-rails at corners; gantry carries the print head along X-Y; heated bed rises on the Z axis; filament spool feeds from the side.",
+  "assembly_instructions": "1. Bolt the four rubber feet under the lower aluminum extrusion rectangle. 2. Assemble the lower frame from front, rear, left, and right 2020 extrusion rails and square it before tightening. 3. Fasten the four vertical 2020 corner posts to the lower frame. 4. Install the upper front, rear, left, and right extrusion rails to complete the cube frame. 5. Mount the two vertical Z guide rods and two Z lead screws to the base and upper frame, then couple the rear Z motor to the left lead screw and belt the right screw from the same drive. 6. Fit the bed carriage plate to the Z nuts and guide rods, add four leveling screws and springs, then fasten the heated bed and glass build plate above it. 7. Install left and right Y linear rails on the top side rails, then bolt the X gantry rail between their moving blocks. 8. Mount the X carriage on the X rail, attach the extruder body, heat sink, cooling fan, heater block, thermistor, and brass nozzle. 9. Mount the two XY stepper motors and four idler pulleys at the top frame corners, then tension the belt spans around the gantry and carriage. 10. Attach the spool bracket and spindle to the right side of the top frame, load the filament spool, and feed 1.75 mm filament through the PTFE tube into the extruder. 11. Install the PSU, controller board, display, and cable harness, then verify frame square, bed travel, nozzle clearance, and belt tension before first calibration.",
   "metadata": {
     "domain": "additive-manufacturing",
-    "thumbnail_camera": [4.5, 3.5, 4.5]
+    "thumbnail_camera": [
+      4.5,
+      3.5,
+      4.5
+    ],
+    "info": "Open-frame desktop CoreXY-style FDM printer with a vertically moving heated bed, side spool holder, Bowden-fed hotend, and exposed motion components for assembly legibility.",
+    "facts": [
+      "Nominal build volume represented as 235 mm x 235 mm x 250 mm, a common desktop FDM size class.",
+      "Frame members are modeled as 20 mm square aluminum extrusions, scaled to 3.4 m scene width for visibility while preserving relative proportions.",
+      "Filament path is sized for 1.75 mm filament and terminates at a 0.4 mm brass nozzle.",
+      "Heated bed glass plate is modeled as 2.35 m x 2.35 m x 0.06 m, corresponding to a 235 mm square build surface at 10:1 display scale.",
+      "Spool is represented as a 200 mm diameter by 70 mm wide 1 kg PLA spool, scaled to the scene.",
+      "Z screws are represented as paired 8 mm lead screws with anti-backlash nuts supporting the bed carriage.",
+      "XY belt spans represent 6 mm GT2 timing belts commonly used on desktop printers.",
+      "PSU is labeled as a 24 V, 350 W supply typical for bed-heated FDM machines."
+    ],
+    "sources": [
+      "Prusa Research, Original Prusa i3 MK3S+ handbook and technical specifications for 1.75 mm filament, 0.4 mm nozzle, and 250 mm class Z travel.",
+      "Voron Design V2.4 assembly manual for CoreXY belt routing, 2020 extrusion frame construction, and stationary gantry layout.",
+      "Creality Ender-3 S1 specifications for 220-235 mm class heated bed and 24 V desktop printer electronics."
+    ]
   },
   "parts": [
-    { "id": "base", "name": "Base Frame", "shape": "box", "position": [0, 0.15, 0], "size": [3.4, 0.3, 3.4], "material": "black composite", "role": "Rigid bottom frame housing electronics and PSU.", "connections": ["rail_fl", "rail_fr", "rail_rl", "rail_rr", "psu", "control_panel", "bed"] },
-    { "id": "rail_fl", "name": "Z Rail (Front-Left)", "shape": "cylinder", "position": [-1.5, 1.9, -1.5], "size": [0.08, 3.6], "material": "brushed steel", "role": "Linear guide for gantry motion.", "connections": ["base", "gantry"] },
-    { "id": "rail_fr", "name": "Z Rail (Front-Right)", "shape": "cylinder", "position": [1.5, 1.9, -1.5], "size": [0.08, 3.6], "material": "brushed steel", "role": "Linear guide for gantry motion.", "connections": ["base", "gantry"] },
-    { "id": "rail_rl", "name": "Z Rail (Rear-Left)", "shape": "cylinder", "position": [-1.5, 1.9, 1.5], "size": [0.08, 3.6], "material": "brushed steel", "role": "Linear guide for gantry motion.", "connections": ["base", "gantry"] },
-    { "id": "rail_rr", "name": "Z Rail (Rear-Right)", "shape": "cylinder", "position": [1.5, 1.9, 1.5], "size": [0.08, 3.6], "material": "brushed steel", "role": "Linear guide for gantry motion.", "connections": ["base", "gantry"] },
-    { "id": "gantry", "name": "X-Y Gantry", "shape": "box", "position": [0, 2.8, 0], "size": [3.2, 0.15, 3.2], "material": "dark anodized aluminum", "role": "Horizontal frame carrying the print head.", "connections": ["rail_fl", "rail_fr", "rail_rl", "rail_rr", "print_head"] },
-    { "id": "print_head", "name": "Print Head", "shape": "box", "position": [0.4, 2.55, 0.2], "size": [0.5, 0.55, 0.5], "material": "dark anodized aluminum", "role": "Hotend extruder assembly with cooling fan.", "connections": ["gantry", "nozzle"] },
-    { "id": "nozzle", "name": "Hotend Nozzle", "shape": "cylinder", "position": [0.4, 2.2, 0.2], "size": [0.05, 0.15], "material": "brass", "role": "0.4 mm brass nozzle for 1.75 mm filament.", "connections": ["print_head"] },
-    { "id": "bed", "name": "Heated Print Bed", "shape": "box", "position": [0, 0.95, 0], "size": [2.6, 0.08, 2.6], "material": "glass display", "role": "Borosilicate glass over silicone heater, 235×235 mm.", "connections": ["base"] },
-    { "id": "spool", "name": "Filament Spool", "shape": "cylinder", "position": [2.3, 2.8, -2.0], "rotation": [0, 0, 1.5707963], "size": [0.55, 0.3], "material": "white composite", "role": "1 kg PLA spool on side-mounted holder.", "connections": ["gantry"] },
-    { "id": "control_panel", "name": "LCD Control Panel", "shape": "box", "position": [0, 0.6, -1.85], "size": [1.0, 0.5, 0.1], "material": "glass display", "role": "Touch screen for prints, leveling, diagnostics.", "connections": ["base"] },
-    { "id": "psu", "name": "24V Power Supply", "shape": "box", "position": [-1.2, 0.45, 1.35], "size": [0.9, 0.3, 0.5], "material": "brushed steel", "role": "350W switching PSU powering heaters and motors.", "connections": ["base"] }
+    {
+      "id": "base_front_rail",
+      "name": "Lower Front 2020 Extrusion",
+      "shape": "box",
+      "position": [
+        0,
+        0.18,
+        -1.7
+      ],
+      "size": [
+        3.4,
+        0.16,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Front lower frame rail that establishes the square base and roots the assembly graph.",
+      "connections": [
+        "base_left_rail",
+        "base_right_rail",
+        "foot_fl",
+        "foot_fr",
+        "post_fl",
+        "post_fr",
+        "display_bezel"
+      ]
+    },
+    {
+      "id": "base_rear_rail",
+      "name": "Lower Rear 2020 Extrusion",
+      "shape": "box",
+      "position": [
+        0,
+        0.18,
+        1.7
+      ],
+      "size": [
+        3.4,
+        0.16,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear lower frame rail that closes the bottom rectangle and carries the PSU and controller mounts.",
+      "connections": [
+        "base_left_rail",
+        "base_right_rail",
+        "foot_rl",
+        "foot_rr",
+        "post_rl",
+        "post_rr",
+        "psu_shell",
+        "controller_board"
+      ]
+    },
+    {
+      "id": "base_left_rail",
+      "name": "Lower Left 2020 Extrusion",
+      "shape": "box",
+      "position": [
+        -1.7,
+        0.18,
+        0
+      ],
+      "size": [
+        0.16,
+        0.16,
+        3.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Left lower frame rail tying the front and rear lower extrusions together.",
+      "connections": [
+        "base_front_rail",
+        "base_rear_rail",
+        "z_rod_left",
+        "z_leadscrew_left"
+      ]
+    },
+    {
+      "id": "base_right_rail",
+      "name": "Lower Right 2020 Extrusion",
+      "shape": "box",
+      "position": [
+        1.7,
+        0.18,
+        0
+      ],
+      "size": [
+        0.16,
+        0.16,
+        3.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Right lower frame rail tying the front and rear lower extrusions together.",
+      "connections": [
+        "base_front_rail",
+        "base_rear_rail",
+        "z_rod_right",
+        "z_leadscrew_right",
+        "spool_lower_brace"
+      ]
+    },
+    {
+      "id": "foot_fl",
+      "name": "Front Left Rubber Foot",
+      "shape": "cylinder",
+      "position": [
+        -1.45,
+        0.05,
+        -1.45
+      ],
+      "size": [
+        0.16,
+        0.1
+      ],
+      "material": "rubber",
+      "role": "Compliant foot that supports and levels the front-left corner on the bench.",
+      "connections": [
+        "base_front_rail"
+      ]
+    },
+    {
+      "id": "foot_fr",
+      "name": "Front Right Rubber Foot",
+      "shape": "cylinder",
+      "position": [
+        1.45,
+        0.05,
+        -1.45
+      ],
+      "size": [
+        0.16,
+        0.1
+      ],
+      "material": "rubber",
+      "role": "Compliant foot that supports and levels the front-right corner on the bench.",
+      "connections": [
+        "base_front_rail"
+      ]
+    },
+    {
+      "id": "foot_rl",
+      "name": "Rear Left Rubber Foot",
+      "shape": "cylinder",
+      "position": [
+        -1.45,
+        0.05,
+        1.45
+      ],
+      "size": [
+        0.16,
+        0.1
+      ],
+      "material": "rubber",
+      "role": "Compliant foot that supports and levels the rear-left corner on the bench.",
+      "connections": [
+        "base_rear_rail"
+      ]
+    },
+    {
+      "id": "foot_rr",
+      "name": "Rear Right Rubber Foot",
+      "shape": "cylinder",
+      "position": [
+        1.45,
+        0.05,
+        1.45
+      ],
+      "size": [
+        0.16,
+        0.1
+      ],
+      "material": "rubber",
+      "role": "Compliant foot that supports and levels the rear-right corner on the bench.",
+      "connections": [
+        "base_rear_rail"
+      ]
+    },
+    {
+      "id": "post_fl",
+      "name": "Front Left Vertical 2020 Post",
+      "shape": "box",
+      "position": [
+        -1.7,
+        1.75,
+        -1.7
+      ],
+      "size": [
+        0.16,
+        3.14,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Vertical extrusion that carries top-frame loads and locates the front-left gantry corner.",
+      "connections": [
+        "base_front_rail",
+        "top_front_rail",
+        "top_left_rail"
+      ]
+    },
+    {
+      "id": "post_fr",
+      "name": "Front Right Vertical 2020 Post",
+      "shape": "box",
+      "position": [
+        1.7,
+        1.75,
+        -1.7
+      ],
+      "size": [
+        0.16,
+        3.14,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Vertical extrusion that carries top-frame loads and locates the front-right gantry corner.",
+      "connections": [
+        "base_front_rail",
+        "top_front_rail",
+        "top_right_rail"
+      ]
+    },
+    {
+      "id": "post_rl",
+      "name": "Rear Left Vertical 2020 Post",
+      "shape": "box",
+      "position": [
+        -1.7,
+        1.75,
+        1.7
+      ],
+      "size": [
+        0.16,
+        3.14,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Vertical extrusion that carries top-frame loads and locates the rear-left gantry corner.",
+      "connections": [
+        "base_rear_rail",
+        "top_rear_rail",
+        "top_left_rail"
+      ]
+    },
+    {
+      "id": "post_rr",
+      "name": "Rear Right Vertical 2020 Post",
+      "shape": "box",
+      "position": [
+        1.7,
+        1.75,
+        1.7
+      ],
+      "size": [
+        0.16,
+        3.14,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Vertical extrusion that carries top-frame loads and locates the rear-right gantry corner.",
+      "connections": [
+        "base_rear_rail",
+        "top_rear_rail",
+        "top_right_rail"
+      ]
+    },
+    {
+      "id": "top_front_rail",
+      "name": "Upper Front 2020 Extrusion",
+      "shape": "box",
+      "position": [
+        0,
+        3.32,
+        -1.7
+      ],
+      "size": [
+        3.4,
+        0.16,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Top front crossmember that supports idlers and braces the X-Y gantry plane.",
+      "connections": [
+        "post_fl",
+        "post_fr",
+        "idler_front_left",
+        "idler_front_right",
+        "belt_front_span"
+      ]
+    },
+    {
+      "id": "top_rear_rail",
+      "name": "Upper Rear 2020 Extrusion",
+      "shape": "box",
+      "position": [
+        0,
+        3.32,
+        1.7
+      ],
+      "size": [
+        3.4,
+        0.16,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Top rear crossmember that supports the XY motors and rear belt span.",
+      "connections": [
+        "post_rl",
+        "post_rr",
+        "xy_motor_left",
+        "xy_motor_right",
+        "belt_rear_span"
+      ]
+    },
+    {
+      "id": "top_left_rail",
+      "name": "Upper Left 2020 Extrusion",
+      "shape": "box",
+      "position": [
+        -1.7,
+        3.32,
+        0
+      ],
+      "size": [
+        0.16,
+        0.16,
+        3.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Left top side rail that carries the left Y linear rail and closes the top rectangle.",
+      "connections": [
+        "post_fl",
+        "post_rl",
+        "y_linear_rail_left"
+      ]
+    },
+    {
+      "id": "top_right_rail",
+      "name": "Upper Right 2020 Extrusion",
+      "shape": "box",
+      "position": [
+        1.7,
+        3.32,
+        0
+      ],
+      "size": [
+        0.16,
+        0.16,
+        3.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Right top side rail that carries the right Y linear rail and closes the top rectangle.",
+      "connections": [
+        "post_fr",
+        "post_rr",
+        "y_linear_rail_right",
+        "spool_upper_bracket"
+      ]
+    },
+    {
+      "id": "z_rod_left",
+      "name": "Left Z Guide Rod",
+      "shape": "cylinder",
+      "position": [
+        -1.25,
+        1.55,
+        1.25
+      ],
+      "size": [
+        0.045,
+        2.7
+      ],
+      "material": "brushed steel",
+      "role": "Polished vertical guide rod that constrains the bed carriage against yaw.",
+      "connections": [
+        "base_left_rail",
+        "top_left_rail",
+        "bed_carriage"
+      ]
+    },
+    {
+      "id": "z_rod_right",
+      "name": "Right Z Guide Rod",
+      "shape": "cylinder",
+      "position": [
+        1.25,
+        1.55,
+        1.25
+      ],
+      "size": [
+        0.045,
+        2.7
+      ],
+      "material": "brushed steel",
+      "role": "Polished vertical guide rod that constrains the bed carriage on the opposite side.",
+      "connections": [
+        "base_right_rail",
+        "top_right_rail",
+        "bed_carriage"
+      ]
+    },
+    {
+      "id": "z_leadscrew_left",
+      "name": "Left Z Lead Screw",
+      "shape": "cylinder",
+      "position": [
+        -1.25,
+        1.55,
+        -1.25
+      ],
+      "size": [
+        0.035,
+        2.7
+      ],
+      "material": "steel",
+      "role": "Threaded screw that raises and lowers the bed through the left anti-backlash nut.",
+      "connections": [
+        "base_left_rail",
+        "top_left_rail",
+        "z_nut_left",
+        "z_motor"
+      ]
+    },
+    {
+      "id": "z_leadscrew_right",
+      "name": "Right Z Lead Screw",
+      "shape": "cylinder",
+      "position": [
+        1.25,
+        1.55,
+        -1.25
+      ],
+      "size": [
+        0.035,
+        2.7
+      ],
+      "material": "steel",
+      "role": "Threaded screw that raises and lowers the bed through the right anti-backlash nut.",
+      "connections": [
+        "base_right_rail",
+        "top_right_rail",
+        "z_nut_right",
+        "z_sync_belt"
+      ]
+    },
+    {
+      "id": "z_motor",
+      "name": "Rear Z Stepper Motor",
+      "shape": "box",
+      "position": [
+        -1.25,
+        0.48,
+        1.45
+      ],
+      "size": [
+        0.42,
+        0.42,
+        0.42
+      ],
+      "material": "steel",
+      "role": "NEMA-17 stepper motor driving the paired Z lead screws for bed height control.",
+      "connections": [
+        "base_rear_rail",
+        "z_leadscrew_left",
+        "z_sync_belt"
+      ]
+    },
+    {
+      "id": "z_sync_belt",
+      "name": "Z Screw Synchronizing Belt",
+      "shape": "box",
+      "position": [
+        0,
+        0.58,
+        -1.25
+      ],
+      "size": [
+        2.5,
+        0.06,
+        0.08
+      ],
+      "material": "rubber",
+      "role": "Timing belt linking the two Z screws so the bed remains level during travel.",
+      "connections": [
+        "z_leadscrew_left",
+        "z_leadscrew_right",
+        "z_motor"
+      ]
+    },
+    {
+      "id": "z_nut_left",
+      "name": "Left Anti-Backlash Z Nut",
+      "shape": "cylinder",
+      "position": [
+        -1.25,
+        1,
+        -1.25
+      ],
+      "size": [
+        0.12,
+        0.16
+      ],
+      "material": "brass",
+      "role": "Threaded brass nut fixed to the carriage so the left lead screw can lift the bed.",
+      "connections": [
+        "z_leadscrew_left",
+        "bed_carriage"
+      ]
+    },
+    {
+      "id": "z_nut_right",
+      "name": "Right Anti-Backlash Z Nut",
+      "shape": "cylinder",
+      "position": [
+        1.25,
+        1,
+        -1.25
+      ],
+      "size": [
+        0.12,
+        0.16
+      ],
+      "material": "brass",
+      "role": "Threaded brass nut fixed to the carriage so the right lead screw can lift the bed.",
+      "connections": [
+        "z_leadscrew_right",
+        "bed_carriage"
+      ]
+    },
+    {
+      "id": "bed_carriage",
+      "name": "Aluminum Bed Carriage Plate",
+      "shape": "box",
+      "position": [
+        0,
+        0.92,
+        0
+      ],
+      "size": [
+        2.55,
+        0.08,
+        2.55
+      ],
+      "material": "aluminum",
+      "role": "Rigid moving plate that connects Z nuts, guide bearings, and bed leveling hardware.",
+      "connections": [
+        "z_rod_left",
+        "z_rod_right",
+        "z_nut_left",
+        "z_nut_right",
+        "level_spring_fl",
+        "level_spring_fr",
+        "level_spring_rl",
+        "level_spring_rr"
+      ]
+    },
+    {
+      "id": "heated_bed",
+      "name": "Heated Aluminum Bed",
+      "shape": "box",
+      "position": [
+        0,
+        1.08,
+        0
+      ],
+      "size": [
+        2.4,
+        0.07,
+        2.4
+      ],
+      "material": "aluminum",
+      "role": "Flat heated build platform that spreads heat under the removable glass plate.",
+      "connections": [
+        "bed_carriage",
+        "glass_build_plate",
+        "bed_heater_pad"
+      ]
+    },
+    {
+      "id": "bed_heater_pad",
+      "name": "Silicone Heater Pad",
+      "shape": "box",
+      "position": [
+        0,
+        1.015,
+        0
+      ],
+      "size": [
+        2.25,
+        0.035,
+        2.25
+      ],
+      "material": "rubber",
+      "role": "Flexible heater bonded under the bed to bring the build surface to printing temperature.",
+      "connections": [
+        "heated_bed",
+        "controller_board",
+        "psu_shell"
+      ]
+    },
+    {
+      "id": "glass_build_plate",
+      "name": "Borosilicate Glass Build Plate",
+      "shape": "box",
+      "position": [
+        0,
+        1.15,
+        0
+      ],
+      "size": [
+        2.35,
+        0.055,
+        2.35
+      ],
+      "material": "glass display",
+      "role": "Removable flat glass surface that defines the 235 mm square print area.",
+      "connections": [
+        "heated_bed"
+      ]
+    },
+    {
+      "id": "level_spring_fl",
+      "name": "Front Left Bed Level Spring",
+      "shape": "capsule",
+      "position": [
+        -1,
+        1,
+        -1
+      ],
+      "size": [
+        0.07,
+        0.18
+      ],
+      "material": "steel",
+      "role": "Compression spring around the front-left leveling screw to preload the bed.",
+      "connections": [
+        "bed_carriage",
+        "heated_bed",
+        "level_knob_fl"
+      ]
+    },
+    {
+      "id": "level_spring_fr",
+      "name": "Front Right Bed Level Spring",
+      "shape": "capsule",
+      "position": [
+        1,
+        1,
+        -1
+      ],
+      "size": [
+        0.07,
+        0.18
+      ],
+      "material": "steel",
+      "role": "Compression spring around the front-right leveling screw to preload the bed.",
+      "connections": [
+        "bed_carriage",
+        "heated_bed",
+        "level_knob_fr"
+      ]
+    },
+    {
+      "id": "level_spring_rl",
+      "name": "Rear Left Bed Level Spring",
+      "shape": "capsule",
+      "position": [
+        -1,
+        1,
+        1
+      ],
+      "size": [
+        0.07,
+        0.18
+      ],
+      "material": "steel",
+      "role": "Compression spring around the rear-left leveling screw to preload the bed.",
+      "connections": [
+        "bed_carriage",
+        "heated_bed",
+        "level_knob_rl"
+      ]
+    },
+    {
+      "id": "level_spring_rr",
+      "name": "Rear Right Bed Level Spring",
+      "shape": "capsule",
+      "position": [
+        1,
+        1,
+        1
+      ],
+      "size": [
+        0.07,
+        0.18
+      ],
+      "material": "steel",
+      "role": "Compression spring around the rear-right leveling screw to preload the bed.",
+      "connections": [
+        "bed_carriage",
+        "heated_bed",
+        "level_knob_rr"
+      ]
+    },
+    {
+      "id": "level_knob_fl",
+      "name": "Front Left Leveling Knob",
+      "shape": "cylinder",
+      "position": [
+        -1,
+        0.82,
+        -1
+      ],
+      "size": [
+        0.12,
+        0.08
+      ],
+      "material": "black composite",
+      "role": "Thumb wheel that adjusts the front-left bed screw height.",
+      "connections": [
+        "level_spring_fl"
+      ]
+    },
+    {
+      "id": "level_knob_fr",
+      "name": "Front Right Leveling Knob",
+      "shape": "cylinder",
+      "position": [
+        1,
+        0.82,
+        -1
+      ],
+      "size": [
+        0.12,
+        0.08
+      ],
+      "material": "black composite",
+      "role": "Thumb wheel that adjusts the front-right bed screw height.",
+      "connections": [
+        "level_spring_fr"
+      ]
+    },
+    {
+      "id": "level_knob_rl",
+      "name": "Rear Left Leveling Knob",
+      "shape": "cylinder",
+      "position": [
+        -1,
+        0.82,
+        1
+      ],
+      "size": [
+        0.12,
+        0.08
+      ],
+      "material": "black composite",
+      "role": "Thumb wheel that adjusts the rear-left bed screw height.",
+      "connections": [
+        "level_spring_rl"
+      ]
+    },
+    {
+      "id": "level_knob_rr",
+      "name": "Rear Right Leveling Knob",
+      "shape": "cylinder",
+      "position": [
+        1,
+        0.82,
+        1
+      ],
+      "size": [
+        0.12,
+        0.08
+      ],
+      "material": "black composite",
+      "role": "Thumb wheel that adjusts the rear-right bed screw height.",
+      "connections": [
+        "level_spring_rr"
+      ]
+    },
+    {
+      "id": "y_linear_rail_left",
+      "name": "Left Y Linear Rail",
+      "shape": "box",
+      "position": [
+        -1.38,
+        3.14,
+        0
+      ],
+      "size": [
+        0.08,
+        0.08,
+        2.65
+      ],
+      "material": "brushed steel",
+      "role": "Precision rail that guides the left end of the X gantry along the Y direction.",
+      "connections": [
+        "top_left_rail",
+        "x_gantry_rail",
+        "y_carriage_left"
+      ]
+    },
+    {
+      "id": "y_linear_rail_right",
+      "name": "Right Y Linear Rail",
+      "shape": "box",
+      "position": [
+        1.38,
+        3.14,
+        0
+      ],
+      "size": [
+        0.08,
+        0.08,
+        2.65
+      ],
+      "material": "brushed steel",
+      "role": "Precision rail that guides the right end of the X gantry along the Y direction.",
+      "connections": [
+        "top_right_rail",
+        "x_gantry_rail",
+        "y_carriage_right"
+      ]
+    },
+    {
+      "id": "y_carriage_left",
+      "name": "Left Y Carriage Block",
+      "shape": "box",
+      "position": [
+        -1.38,
+        3.05,
+        0.15
+      ],
+      "size": [
+        0.22,
+        0.14,
+        0.28
+      ],
+      "material": "steel",
+      "role": "Bearing block that clamps the left end of the X rail to the left Y rail.",
+      "connections": [
+        "y_linear_rail_left",
+        "x_gantry_rail"
+      ]
+    },
+    {
+      "id": "y_carriage_right",
+      "name": "Right Y Carriage Block",
+      "shape": "box",
+      "position": [
+        1.38,
+        3.05,
+        0.15
+      ],
+      "size": [
+        0.22,
+        0.14,
+        0.28
+      ],
+      "material": "steel",
+      "role": "Bearing block that clamps the right end of the X rail to the right Y rail.",
+      "connections": [
+        "y_linear_rail_right",
+        "x_gantry_rail"
+      ]
+    },
+    {
+      "id": "x_gantry_rail",
+      "name": "Moving X Gantry Rail",
+      "shape": "box",
+      "position": [
+        0,
+        3.05,
+        0.15
+      ],
+      "size": [
+        2.75,
+        0.12,
+        0.12
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Cross rail that carries the hotend carriage across the build surface in X.",
+      "connections": [
+        "y_carriage_left",
+        "y_carriage_right",
+        "x_linear_rail",
+        "x_carriage_plate"
+      ]
+    },
+    {
+      "id": "x_linear_rail",
+      "name": "X Linear Guide Rail",
+      "shape": "box",
+      "position": [
+        0,
+        2.93,
+        0.02
+      ],
+      "size": [
+        2.45,
+        0.06,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Steel guide on the X extrusion that constrains the print-head carriage.",
+      "connections": [
+        "x_gantry_rail",
+        "x_carriage_plate"
+      ]
+    },
+    {
+      "id": "x_carriage_plate",
+      "name": "X Carriage Plate",
+      "shape": "box",
+      "position": [
+        0.42,
+        2.82,
+        -0.05
+      ],
+      "size": [
+        0.42,
+        0.42,
+        0.12
+      ],
+      "material": "aluminum",
+      "role": "Moving plate that ties the belts, linear bearing, and hotend assembly together.",
+      "connections": [
+        "x_linear_rail",
+        "extruder_body",
+        "belt_front_span",
+        "belt_rear_span"
+      ]
+    },
+    {
+      "id": "extruder_body",
+      "name": "Bowden Extruder Body",
+      "shape": "box",
+      "position": [
+        0.42,
+        2.74,
+        -0.18
+      ],
+      "size": [
+        0.38,
+        0.32,
+        0.28
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Cold-end drive and mounting body that guides filament into the heat break.",
+      "connections": [
+        "x_carriage_plate",
+        "heat_sink",
+        "bowden_coupler",
+        "filament_strand"
+      ]
+    },
+    {
+      "id": "bowden_coupler",
+      "name": "Pneumatic Bowden Coupler",
+      "shape": "cylinder",
+      "position": [
+        0.42,
+        2.95,
+        -0.18
+      ],
+      "size": [
+        0.08,
+        0.12
+      ],
+      "material": "brass",
+      "role": "Threaded coupler that clamps the PTFE tube above the extruder body.",
+      "connections": [
+        "extruder_body",
+        "ptfe_tube"
+      ]
+    },
+    {
+      "id": "ptfe_tube",
+      "name": "Curved PTFE Filament Tube",
+      "shape": "capsule",
+      "position": [
+        1.38,
+        3.05,
+        -0.95
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        1.9
+      ],
+      "material": "white composite",
+      "role": "Visible Bowden tube spanning from the side spool area to the moving extruder.",
+      "connections": [
+        "bowden_coupler",
+        "spool_spindle",
+        "filament_strand"
+      ]
+    },
+    {
+      "id": "filament_strand",
+      "name": "Amber Filament Strand",
+      "shape": "capsule",
+      "position": [
+        1.62,
+        2.88,
+        -1.15
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.018,
+        1.55
+      ],
+      "material": "brass",
+      "role": "1.75 mm filament path showing how material leaves the spool and enters the extruder.",
+      "connections": [
+        "spool_hub",
+        "ptfe_tube",
+        "extruder_body"
+      ]
+    },
+    {
+      "id": "heat_sink",
+      "name": "Hotend Heat Sink",
+      "shape": "box",
+      "position": [
+        0.42,
+        2.48,
+        -0.18
+      ],
+      "size": [
+        0.34,
+        0.32,
+        0.24
+      ],
+      "material": "aluminum",
+      "role": "Finned cold side that removes heat before filament reaches the melt zone.",
+      "connections": [
+        "extruder_body",
+        "cooling_fan",
+        "heater_block"
+      ]
+    },
+    {
+      "id": "cooling_fan",
+      "name": "Part Cooling Fan",
+      "shape": "cylinder",
+      "position": [
+        0.16,
+        2.5,
+        -0.32
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.16,
+        0.08
+      ],
+      "material": "black composite",
+      "role": "Radial fan aimed at the nozzle area to cool newly deposited plastic.",
+      "connections": [
+        "heat_sink",
+        "x_carriage_plate"
+      ]
+    },
+    {
+      "id": "heater_block",
+      "name": "Brass Heater Block",
+      "shape": "box",
+      "position": [
+        0.42,
+        2.25,
+        -0.18
+      ],
+      "size": [
+        0.22,
+        0.14,
+        0.18
+      ],
+      "material": "brass",
+      "role": "Heated metal block containing cartridge heater and thermistor for melting filament.",
+      "connections": [
+        "heat_sink",
+        "brass_nozzle",
+        "heater_wire"
+      ]
+    },
+    {
+      "id": "brass_nozzle",
+      "name": "0.4 mm Brass Nozzle",
+      "shape": "cone",
+      "position": [
+        0.42,
+        2.08,
+        -0.18
+      ],
+      "rotation": [
+        3.1416,
+        0,
+        0
+      ],
+      "size": [
+        0.085,
+        0.18
+      ],
+      "material": "brass",
+      "role": "Tapered 0.4 mm outlet that deposits molten plastic onto the build plate.",
+      "connections": [
+        "heater_block"
+      ]
+    },
+    {
+      "id": "heater_wire",
+      "name": "Hotend Heater Wire Pair",
+      "shape": "capsule",
+      "position": [
+        0.68,
+        2.35,
+        -0.12
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.025,
+        0.5
+      ],
+      "material": "copper",
+      "role": "Electrical leads carrying controlled power from the board to the hotend heater.",
+      "connections": [
+        "heater_block",
+        "controller_board"
+      ]
+    },
+    {
+      "id": "xy_motor_left",
+      "name": "Left CoreXY Stepper Motor",
+      "shape": "box",
+      "position": [
+        -1.38,
+        3,
+        1.62
+      ],
+      "size": [
+        0.42,
+        0.42,
+        0.34
+      ],
+      "material": "steel",
+      "role": "NEMA-17 motor driving one CoreXY belt loop from the rear-left top corner.",
+      "connections": [
+        "top_rear_rail",
+        "belt_rear_span",
+        "belt_left_span"
+      ]
+    },
+    {
+      "id": "xy_motor_right",
+      "name": "Right CoreXY Stepper Motor",
+      "shape": "box",
+      "position": [
+        1.38,
+        3,
+        1.62
+      ],
+      "size": [
+        0.42,
+        0.42,
+        0.34
+      ],
+      "material": "steel",
+      "role": "NEMA-17 motor driving the second CoreXY belt loop from the rear-right top corner.",
+      "connections": [
+        "top_rear_rail",
+        "belt_rear_span",
+        "belt_right_span"
+      ]
+    },
+    {
+      "id": "idler_front_left",
+      "name": "Front Left Belt Idler Pulley",
+      "shape": "torus",
+      "position": [
+        -1.38,
+        3.05,
+        -1.52
+      ],
+      "size": [
+        0.14,
+        0.035
+      ],
+      "material": "steel",
+      "role": "Pulley that turns the timing belt around the front-left top corner.",
+      "connections": [
+        "top_front_rail",
+        "belt_front_span",
+        "belt_left_span"
+      ]
+    },
+    {
+      "id": "idler_front_right",
+      "name": "Front Right Belt Idler Pulley",
+      "shape": "torus",
+      "position": [
+        1.38,
+        3.05,
+        -1.52
+      ],
+      "size": [
+        0.14,
+        0.035
+      ],
+      "material": "steel",
+      "role": "Pulley that turns the timing belt around the front-right top corner.",
+      "connections": [
+        "top_front_rail",
+        "belt_front_span",
+        "belt_right_span"
+      ]
+    },
+    {
+      "id": "belt_front_span",
+      "name": "Front XY Timing Belt Span",
+      "shape": "box",
+      "position": [
+        0,
+        3.05,
+        -1.52
+      ],
+      "size": [
+        2.75,
+        0.035,
+        0.055
+      ],
+      "material": "rubber",
+      "role": "Visible 6 mm belt span across the front of the CoreXY gantry.",
+      "connections": [
+        "idler_front_left",
+        "idler_front_right",
+        "x_carriage_plate"
+      ]
+    },
+    {
+      "id": "belt_rear_span",
+      "name": "Rear XY Timing Belt Span",
+      "shape": "box",
+      "position": [
+        0,
+        3.05,
+        1.52
+      ],
+      "size": [
+        2.75,
+        0.035,
+        0.055
+      ],
+      "material": "rubber",
+      "role": "Visible 6 mm belt span across the rear motor side of the CoreXY gantry.",
+      "connections": [
+        "xy_motor_left",
+        "xy_motor_right",
+        "x_carriage_plate"
+      ]
+    },
+    {
+      "id": "belt_left_span",
+      "name": "Left Side Timing Belt Span",
+      "shape": "box",
+      "position": [
+        -1.38,
+        3.05,
+        0
+      ],
+      "size": [
+        0.055,
+        0.035,
+        3
+      ],
+      "material": "rubber",
+      "role": "Left longitudinal belt run linking the rear motor to the front idler.",
+      "connections": [
+        "xy_motor_left",
+        "idler_front_left",
+        "x_carriage_plate"
+      ]
+    },
+    {
+      "id": "belt_right_span",
+      "name": "Right Side Timing Belt Span",
+      "shape": "box",
+      "position": [
+        1.38,
+        3.05,
+        0
+      ],
+      "size": [
+        0.055,
+        0.035,
+        3
+      ],
+      "material": "rubber",
+      "role": "Right longitudinal belt run linking the rear motor to the front idler.",
+      "connections": [
+        "xy_motor_right",
+        "idler_front_right",
+        "x_carriage_plate"
+      ]
+    },
+    {
+      "id": "spool_upper_bracket",
+      "name": "Side Spool Upper Bracket",
+      "shape": "box",
+      "position": [
+        2,
+        3.18,
+        -0.95
+      ],
+      "size": [
+        0.6,
+        0.12,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Cantilever bracket bolted to the right top rail to carry the spool spindle.",
+      "connections": [
+        "top_right_rail",
+        "spool_spindle",
+        "spool_lower_brace"
+      ]
+    },
+    {
+      "id": "spool_lower_brace",
+      "name": "Side Spool Diagonal Brace",
+      "shape": "box",
+      "position": [
+        1.88,
+        2.6,
+        -0.95
+      ],
+      "rotation": [
+        0,
+        0,
+        0.42
+      ],
+      "size": [
+        0.12,
+        1,
+        0.12
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Brace that triangulates the side spool holder back to the lower right frame.",
+      "connections": [
+        "base_right_rail",
+        "spool_upper_bracket"
+      ]
+    },
+    {
+      "id": "spool_spindle",
+      "name": "Spool Holder Spindle",
+      "shape": "cylinder",
+      "position": [
+        2.35,
+        3.18,
+        -0.95
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.08,
+        0.75
+      ],
+      "material": "brushed steel",
+      "role": "Horizontal shaft through the spool hub allowing the filament roll to rotate freely.",
+      "connections": [
+        "spool_upper_bracket",
+        "spool_hub",
+        "ptfe_tube"
+      ]
+    },
+    {
+      "id": "spool_hub",
+      "name": "Filament Spool Hub",
+      "shape": "cylinder",
+      "position": [
+        2.55,
+        3.18,
+        -0.95
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.23,
+        0.42
+      ],
+      "material": "white composite",
+      "role": "Central plastic hub of the filament spool mounted concentrically on the spindle.",
+      "connections": [
+        "spool_spindle",
+        "spool_left_flange",
+        "spool_right_flange",
+        "filament_strand"
+      ]
+    },
+    {
+      "id": "spool_left_flange",
+      "name": "Inner Spool Flange",
+      "shape": "cylinder",
+      "position": [
+        2.34,
+        3.18,
+        -0.95
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.48,
+        0.06
+      ],
+      "material": "white composite",
+      "role": "Inner flange keeping the filament coil from walking off the spindle side.",
+      "connections": [
+        "spool_hub"
+      ]
+    },
+    {
+      "id": "spool_right_flange",
+      "name": "Outer Spool Flange",
+      "shape": "cylinder",
+      "position": [
+        2.76,
+        3.18,
+        -0.95
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.48,
+        0.06
+      ],
+      "material": "white composite",
+      "role": "Outer flange making the side-mounted spool recognizable as a filament reel.",
+      "connections": [
+        "spool_hub"
+      ]
+    },
+    {
+      "id": "filament_coil",
+      "name": "Blue PLA Filament Coil",
+      "shape": "torus",
+      "position": [
+        2.55,
+        3.18,
+        -0.95
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.37,
+        0.075
+      ],
+      "material": "fiberglass",
+      "role": "Coiled consumable filament wound around the spool hub before entering the Bowden tube.",
+      "connections": [
+        "spool_hub",
+        "filament_strand"
+      ]
+    },
+    {
+      "id": "display_bezel",
+      "name": "Front LCD Display Bezel",
+      "shape": "box",
+      "position": [
+        0,
+        0.62,
+        -1.86
+      ],
+      "size": [
+        0.82,
+        0.42,
+        0.08
+      ],
+      "material": "black composite",
+      "role": "Angled front panel housing the user interface near the lower frame.",
+      "connections": [
+        "base_front_rail",
+        "display_glass",
+        "controller_board"
+      ]
+    },
+    {
+      "id": "display_glass",
+      "name": "Color Touch Display",
+      "shape": "box",
+      "position": [
+        0,
+        0.64,
+        -1.91
+      ],
+      "size": [
+        0.64,
+        0.28,
+        0.025
+      ],
+      "material": "glass display",
+      "role": "Touch screen used for print selection, temperature settings, and bed leveling commands.",
+      "connections": [
+        "display_bezel"
+      ]
+    },
+    {
+      "id": "psu_shell",
+      "name": "24 V Power Supply Shell",
+      "shape": "box",
+      "position": [
+        -1.15,
+        0.48,
+        1.42
+      ],
+      "size": [
+        0.82,
+        0.32,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Enclosed 350 W switching supply that powers heaters, motors, fans, and control electronics.",
+      "connections": [
+        "base_rear_rail",
+        "controller_board",
+        "bed_heater_pad"
+      ]
+    },
+    {
+      "id": "controller_board",
+      "name": "Controller Electronics Board",
+      "shape": "box",
+      "position": [
+        0.35,
+        0.42,
+        1.48
+      ],
+      "size": [
+        0.72,
+        0.08,
+        0.46
+      ],
+      "material": "black composite",
+      "role": "Main motion-control PCB receiving display input and driving motors, heaters, and sensors.",
+      "connections": [
+        "base_rear_rail",
+        "display_bezel",
+        "psu_shell",
+        "heater_wire",
+        "bed_heater_pad",
+        "wire_harness"
+      ]
+    },
+    {
+      "id": "wire_harness",
+      "name": "Rear Wiring Harness",
+      "shape": "capsule",
+      "position": [
+        0.62,
+        1.64,
+        1.48
+      ],
+      "size": [
+        0.035,
+        2.25
+      ],
+      "material": "rubber",
+      "role": "Bundled cable run rising from the controller to the moving gantry and hotend wires.",
+      "connections": [
+        "controller_board",
+        "x_gantry_rail",
+        "heater_wire"
+      ]
+    }
   ]
 }
