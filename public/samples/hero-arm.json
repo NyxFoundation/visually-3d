@@ -1,77 +1,2375 @@
 {
   "machine_name": "Open Bionics Hero Arm",
-  "assembly_instructions": "Custom-fit 3D-printed myoelectric below-elbow prosthesis. A cylindrical printed Nylon-12 socket is scanned and printed to match the wearer's residual limb, with a soft rim at the open elbow end. Two skin-contact EMG sensors live on the inside wall of the socket. A 180° manual-rotation wrist ring connects the socket to the printed palm / hand frame. Five independently driven fingers (thumb opposed + index, middle, ring, pinky) extend forward, each shown as three visible segments (proximal, middle, distal). Each finger's small DC gearmotor sits at its root inside the palm. A control board and battery pack are shown above the socket for inspectability (physically they live inside the socket). A magnetic 'hero cover' outer plate and its latch are shown above, representing the swappable cosmetic skin.",
+  "assembly_instructions": [
+    "1. 3D scan the user's residual forearm and print the custom Nylon-12 socket at 0.26 m overall length with a 0.14 m outside elbow diameter, a 0.11 m distal diameter, and a longitudinal dorsal service cutaway left open in this scene.",
+    "2. Bond the soft black elbow rim to the proximal socket ring, then fasten the four white composite socket shell rails and the lower keel rail between the proximal and distal rings so the lowest rim just touches world y = 0.",
+    "3. Install the two inner rubber liner rails and place the port and starboard EMG electrode pads on opposite inner wall faces where they contact flexor and extensor muscle sites.",
+    "4. Fit the wrist bearing stack to the distal socket ring by adding the rear race, rotating wrist ring, detent pin, front race, and four visible adaptor bolts for the 180 degree manual rotation interface.",
+    "5. Assemble the palm as an open frame by joining the palmar plate, dorsal plate, and two side cheeks to the wrist adaptor so the five micro gearmotors remain inspectable.",
+    "6. Mount five brushed-steel micro gearmotors across the palm root and connect each motor to its own short copper branch lead from the five-channel harness bus.",
+    "7. Install the five short steel drive shafts between the motors and the proximal phalanx hinges for thumb, index, middle, ring, and pinky digits.",
+    "8. Build each digit from rounded capsule phalanges, inserting separate hinge pins at the MCP, PIP, and DIP or thumb IP joints, then add black rubber contact pads to the distal tips.",
+    "9. Route the flat motor harness from the palm motor bay through the wrist ring to the STM32 control board, and connect the two EMG leads to the board input edge.",
+    "10. Fit the Li-ion battery pack above the board in the exploded service stack, with vertical guide posts showing the drop-in direction from the cover opening to the real socket bay.",
+    "11. Assemble the removable hero cover as two side rails, two edge rails, and three cross ribs; in this exploded scene the cover is lifted 0.18 m above the socket so the board, battery, latch bosses, magnets, and removable cosmetic shell are simultaneously visible."
+  ],
   "metadata": {
     "reference": "https://openbionics.com/hero-arm/",
     "domain": "prosthetics",
-    "thumbnail_camera": [1.0, 0.6, 0.8],
+    "thumbnail_camera": [
+      1,
+      0.6,
+      0.8
+    ],
     "info": {
       "japanese_name": "Open Bionics Hero Arm（筋電義手）",
       "english_name": "Open Bionics Hero Arm — Myoelectric Prosthetic Arm",
       "summary": "3D-printed, direct-print, myoelectric below-elbow prosthesis from Open Bionics. EMG sensors on the residual limb translate muscle signals into six pre-programmed grips.",
-      "description": "The Hero Arm is a 3D-printed myoelectric below-elbow prosthesis developed by Open Bionics (Bristol, UK). It replaces the hand and forearm of a transradial amputee with a custom-fit socket that is 3D-scanned from the residual limb, ensuring a personalized, comfortable fit. Two skin-contact EMG sensors on the inner wall of the socket pick up muscle signals from the remaining forearm; an embedded STM32-based control board classifies those signals in real time and drives five independent finger motors to execute one of several pre-programmed grip patterns (fist, tripod, pinch, hook, key-grip, point). A 180°-rotation wrist ring lets the user pronate/supinate the hand for natural posing. The powered parts sit under a magnetically-attached external cover that snaps off for battery swaps and comes in multiple colors and themed 'hero covers' (Iron Man, Star Wars, Frozen, etc.). The entire structural shell is printed in laser-sintered Nylon 12 for toughness, and Open Bionics publishes portions of the design to support clinical fitting and aftermarket customization.",
+      "description": "The Hero Arm is a 3D-printed myoelectric below-elbow prosthesis developed by Open Bionics (Bristol, UK). It replaces the hand and forearm of a transradial amputee with a custom-fit socket that is 3D-scanned from the residual limb, ensuring a personalized, comfortable fit. Two skin-contact EMG sensors on the inner wall of the socket pick up muscle signals from the remaining forearm; an embedded STM32-based control board classifies those signals in real time and drives five independent finger motors to execute one of several pre-programmed grip patterns (fist, tripod, pinch, hook, key-grip, point). A 180 degree rotation wrist ring lets the user pronate or supinate the hand for natural posing. The powered parts sit under a magnetically attached external cover that snaps off for battery swaps and comes in multiple colors and themed hero covers. The entire structural shell is printed in laser-sintered Nylon 12 for toughness, and Open Bionics publishes portions of the design to support clinical fitting and aftermarket customization.",
       "operator": "Fitted by partner clinics; used worldwide by transradial amputees including pediatric users",
       "contractor": "Open Bionics Ltd. (Bristol, UK)",
       "contract_date": "First commercial delivery 2018; iterated through 2024",
-      "contract_value": "≈£10k (UK NHS reference pricing; varies by fit)",
-      "status": "In production (covered by the NHS in the UK, various insurers elsewhere)",
+      "contract_value": "approximately GBP 10k UK NHS reference pricing; varies by fit",
+      "status": "In production, covered by the NHS in the UK and various insurers elsewhere",
       "facts": [
-        { "label": "Type",         "value": "Below-elbow myoelectric prosthesis, five independently motored fingers" },
-        { "label": "Control",      "value": "Dual skin-contact EMG sensors → STM32-based classifier → 6 grip programs" },
-        { "label": "Wrist",        "value": "Manually-rotated 180° wrist ring" },
-        { "label": "Construction", "value": "SLS laser-sintered Nylon-12 shell; off-the-shelf motors, battery, STM32" },
-        { "label": "Socket",       "value": "Fully custom — 3D-scanned from the residual limb" },
-        { "label": "Covers",       "value": "Magnetic swap-out hero covers (many finishes and themed skins)" },
-        { "label": "License",      "value": "Commercial product; design elements open for clinical integration" }
+        {
+          "label": "Overall scene length",
+          "value": "0.49 m from elbow rim to longest middle fingertip, representative of a pediatric or small adult transradial Hero Arm scale"
+        },
+        {
+          "label": "Socket envelope",
+          "value": "0.26 m long custom SLS Nylon-12 socket with 0.14 m outside elbow diameter and 0.11 m distal diameter"
+        },
+        {
+          "label": "Control",
+          "value": "2 skin-contact EMG sensors feed an STM32-class controller driving 5 independent finger motor channels"
+        },
+        {
+          "label": "Grip programs",
+          "value": "6 programmed grip patterns: fist, tripod, pinch, hook, key-grip, and point"
+        },
+        {
+          "label": "Wrist rotation",
+          "value": "Manual wrist ring provides 180 degrees of pronation and supination indexing"
+        },
+        {
+          "label": "Palm motor bay",
+          "value": "5 gearmotors are shown across a 0.085 m wide palm root with individual drive shafts and branch leads to the MCP hinges"
+        },
+        {
+          "label": "Digit construction",
+          "value": "4 fingers use three capsule phalanges plus 3 visible hinge pins each; the thumb uses two capsule links plus 2 visible hinge pins"
+        },
+        {
+          "label": "Exploded service stack",
+          "value": "Control board is shown 0.155 m above the socket centerline, battery 0.195 m above, and cover rails 0.255 m above"
+        },
+        {
+          "label": "Cover retention",
+          "value": "4 magnetic latch bosses locate the removable hero cover over the socket for battery access"
+        },
+        {
+          "label": "Mass target",
+          "value": "Commercial Hero Arm is marketed as lightweight, typically under about 1 kg depending on user size and cover"
+        }
       ],
       "sources": [
-        { "title": "Open Bionics — Hero Arm product page", "url": "https://openbionics.com/en/hero-arm/" },
-        { "title": "Open Bionics — company site",          "url": "https://openbionics.com/" }
+        {
+          "title": "Open Bionics — Hero Arm product page",
+          "url": "https://openbionics.com/en/hero-arm/"
+        },
+        {
+          "title": "Open Bionics — company site",
+          "url": "https://openbionics.com/"
+        },
+        {
+          "title": "Open Bionics — Hero Arm user and clinical information",
+          "url": "https://openbionics.com/hero-arm/"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "forearm_socket",  "name": "Forearm Socket (Nylon-12)",     "shape": "cylinder", "position": [0.13, 0.15, 0],    "rotation": [0, 0, 1.5708], "size": [0.065, 0.26],  "material": "white composite",        "role": "Custom-fit cylindrical socket — 3D-scanned from the residual limb for a personalized, comfortable fit. Houses the control board, battery, and EMG sensors.", "connections": ["socket_rim", "wrist_ring", "emg_sensor_1", "emg_sensor_2", "control_board", "battery_pack", "external_cover"] },
-    { "id": "socket_rim",      "name": "Socket Rim (elbow end)",        "shape": "cylinder", "position": [0, 0.15, 0],       "rotation": [0, 0, 1.5708], "size": [0.070, 0.020], "material": "black composite",        "role": "Soft rubber rim at the open elbow end of the socket — comfort pad against the residual limb.", "connections": ["forearm_socket"] },
-
-    { "id": "wrist_ring",      "name": "Wrist Rotation Ring (180°)",    "shape": "cylinder", "position": [0.275, 0.15, 0],   "rotation": [0, 0, 1.5708], "size": [0.055, 0.025], "material": "dark anodized aluminum", "role": "Manual 180°-rotation ring between the socket and the hand — for pronation/supination.", "connections": ["forearm_socket", "palm"] },
-
-    { "id": "palm",            "name": "Palm / Hand Frame",             "shape": "box",      "position": [0.335, 0.15, 0],                              "size": [0.08, 0.090, 0.085], "material": "white composite",        "role": "Printed Nylon-12 palm frame. Roots all five fingers and houses the per-finger drive motors.", "connections": ["wrist_ring", "back_of_hand_plate", "thumb_prox", "index_prox", "middle_prox", "ring_prox", "pinky_prox", "motor_thumb", "motor_index", "motor_middle", "motor_ring", "motor_pinky"] },
-    { "id": "back_of_hand_plate","name": "Back-of-Hand Plate",           "shape": "box",      "position": [0.335, 0.198, 0],                             "size": [0.07, 0.012, 0.075], "material": "white composite",        "role": "Top-of-hand cosmetic cover plate.", "connections": ["palm"] },
-
-    { "id": "thumb_prox",      "name": "Thumb — Proximal",              "shape": "box",      "position": [0.370, 0.150, 0.055],                         "size": [0.028, 0.018, 0.018],"material": "white composite",        "role": "Opposed thumb, proximal segment.", "connections": ["palm", "thumb_mid", "motor_thumb"] },
-    { "id": "thumb_mid",       "name": "Thumb — Middle",                "shape": "box",      "position": [0.398, 0.150, 0.055],                         "size": [0.024, 0.016, 0.016],"material": "white composite",        "role": "Thumb middle segment.", "connections": ["thumb_prox", "thumb_dist"] },
-    { "id": "thumb_dist",      "name": "Thumb — Distal",                "shape": "box",      "position": [0.423, 0.150, 0.055],                         "size": [0.020, 0.014, 0.014],"material": "white composite",        "role": "Thumb tip.", "connections": ["thumb_mid"] },
-
-    { "id": "index_prox",      "name": "Index — Proximal",              "shape": "box",      "position": [0.393, 0.150, 0.030],                         "size": [0.028, 0.018, 0.018],"material": "white composite",        "role": "Index finger, proximal segment.", "connections": ["palm", "index_mid", "motor_index"] },
-    { "id": "index_mid",       "name": "Index — Middle",                "shape": "box",      "position": [0.423, 0.150, 0.030],                         "size": [0.024, 0.016, 0.016],"material": "white composite",        "role": "Index middle segment.", "connections": ["index_prox", "index_dist"] },
-    { "id": "index_dist",      "name": "Index — Distal",                "shape": "box",      "position": [0.448, 0.150, 0.030],                         "size": [0.020, 0.014, 0.014],"material": "white composite",        "role": "Index tip.", "connections": ["index_mid"] },
-
-    { "id": "middle_prox",     "name": "Middle — Proximal",             "shape": "box",      "position": [0.394, 0.150, 0.010],                         "size": [0.030, 0.018, 0.018],"material": "white composite",        "role": "Middle finger, proximal segment.", "connections": ["palm", "middle_mid", "motor_middle"] },
-    { "id": "middle_mid",      "name": "Middle — Middle",               "shape": "box",      "position": [0.426, 0.150, 0.010],                         "size": [0.026, 0.016, 0.016],"material": "white composite",        "role": "Middle finger middle segment.", "connections": ["middle_prox", "middle_dist"] },
-    { "id": "middle_dist",     "name": "Middle — Distal",               "shape": "box",      "position": [0.454, 0.150, 0.010],                         "size": [0.022, 0.014, 0.014],"material": "white composite",        "role": "Middle tip.", "connections": ["middle_mid"] },
-
-    { "id": "ring_prox",       "name": "Ring — Proximal",               "shape": "box",      "position": [0.393, 0.150, -0.010],                        "size": [0.028, 0.018, 0.018],"material": "white composite",        "role": "Ring finger, proximal segment.", "connections": ["palm", "ring_mid", "motor_ring"] },
-    { "id": "ring_mid",        "name": "Ring — Middle",                 "shape": "box",      "position": [0.423, 0.150, -0.010],                        "size": [0.024, 0.016, 0.016],"material": "white composite",        "role": "Ring middle segment.", "connections": ["ring_prox", "ring_dist"] },
-    { "id": "ring_dist",       "name": "Ring — Distal",                 "shape": "box",      "position": [0.448, 0.150, -0.010],                        "size": [0.020, 0.014, 0.014],"material": "white composite",        "role": "Ring tip.", "connections": ["ring_mid"] },
-
-    { "id": "pinky_prox",      "name": "Pinky — Proximal",              "shape": "box",      "position": [0.393, 0.150, -0.032],                        "size": [0.026, 0.017, 0.017],"material": "white composite",        "role": "Pinky finger, proximal segment.", "connections": ["palm", "pinky_mid", "motor_pinky"] },
-    { "id": "pinky_mid",       "name": "Pinky — Middle",                "shape": "box",      "position": [0.421, 0.150, -0.032],                        "size": [0.022, 0.015, 0.015],"material": "white composite",        "role": "Pinky middle segment.", "connections": ["pinky_prox", "pinky_dist"] },
-    { "id": "pinky_dist",      "name": "Pinky — Distal",                "shape": "box",      "position": [0.444, 0.150, -0.032],                        "size": [0.018, 0.013, 0.013],"material": "white composite",        "role": "Pinky tip.", "connections": ["pinky_mid"] },
-
-    { "id": "motor_thumb",     "name": "Finger Motor — Thumb",          "shape": "cylinder", "position": [0.355, 0.150, 0.048], "rotation": [0, 0, 1.5708], "size": [0.010, 0.028], "material": "brushed steel",           "role": "Small DC gearmotor at the thumb root — one of five independent finger motors.", "connections": ["palm", "thumb_prox"] },
-    { "id": "motor_index",     "name": "Finger Motor — Index",          "shape": "cylinder", "position": [0.358, 0.150, 0.030], "rotation": [0, 0, 1.5708], "size": [0.010, 0.028], "material": "brushed steel",           "role": "Index finger drive motor.", "connections": ["palm", "index_prox"] },
-    { "id": "motor_middle",    "name": "Finger Motor — Middle",         "shape": "cylinder", "position": [0.358, 0.150, 0.010], "rotation": [0, 0, 1.5708], "size": [0.010, 0.028], "material": "brushed steel",           "role": "Middle finger drive motor.", "connections": ["palm", "middle_prox"] },
-    { "id": "motor_ring",      "name": "Finger Motor — Ring",           "shape": "cylinder", "position": [0.358, 0.150, -0.010],"rotation": [0, 0, 1.5708], "size": [0.010, 0.028], "material": "brushed steel",           "role": "Ring finger drive motor.", "connections": ["palm", "ring_prox"] },
-    { "id": "motor_pinky",     "name": "Finger Motor — Pinky",          "shape": "cylinder", "position": [0.358, 0.150, -0.032],"rotation": [0, 0, 1.5708], "size": [0.010, 0.028], "material": "brushed steel",           "role": "Pinky finger drive motor.", "connections": ["palm", "pinky_prox"] },
-
-    { "id": "emg_sensor_1",    "name": "EMG Sensor (Port)",             "shape": "box",      "position": [0.050, 0.115, 0.055],                         "size": [0.020, 0.015, 0.030],"material": "dark anodized aluminum", "role": "Skin-contact surface-EMG electrode on the interior wall of the socket — picks up flexor muscle signals.", "connections": ["forearm_socket", "control_board"] },
-    { "id": "emg_sensor_2",    "name": "EMG Sensor (Starboard)",        "shape": "box",      "position": [0.050, 0.115, -0.055],                        "size": [0.020, 0.015, 0.030],"material": "dark anodized aluminum", "role": "Second EMG electrode on the opposite interior wall — extensor muscle signals.", "connections": ["forearm_socket", "control_board"] },
-
-    { "id": "control_board",   "name": "STM32 Control Board (shown)",   "shape": "box",      "position": [0.10, 0.24, 0],                                "size": [0.12, 0.015, 0.05], "material": "dark anodized aluminum", "role": "STM32-based classifier + 5-channel motor driver. Physically inside the socket; shown above for inspectability.", "connections": ["forearm_socket", "emg_sensor_1", "emg_sensor_2", "battery_pack"] },
-    { "id": "battery_pack",    "name": "Battery Pack (shown)",          "shape": "box",      "position": [0.10, 0.28, 0],                                "size": [0.12, 0.030, 0.05], "material": "black composite",        "role": "Li-ion battery pack — swapped through the external cover. Shown above for inspectability.", "connections": ["control_board", "forearm_socket"] },
-
-    { "id": "external_cover",  "name": "External 'Hero' Cover",         "shape": "box",      "position": [0.13, 0.33, 0],                                "size": [0.22, 0.015, 0.12], "material": "white composite",        "role": "Magnetically-attached outer cover — available in themed 'hero' finishes. Snaps off for battery swaps.", "connections": ["forearm_socket", "cover_latch"] },
-    { "id": "cover_latch",     "name": "Cover Magnetic Latch",          "shape": "cylinder", "position": [0.24, 0.33, 0],  "rotation": [1.5708, 0, 0],    "size": [0.006, 0.012], "material": "brushed steel",            "role": "Representative magnetic latch pin — one of several that hold the hero cover on.", "connections": ["external_cover"] }
+    {
+      "id": "proximal_socket_ring",
+      "name": "Proximal Soft Socket Rim",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.072,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.072,
+        0.018
+      ],
+      "material": "rubber",
+      "role": "Soft black rim forms the open elbow-side contact edge and sets the root datum for the custom socket.",
+      "connections": [
+        "socket_upper_left_shell",
+        "socket_upper_right_shell",
+        "socket_lower_left_shell",
+        "socket_lower_right_shell",
+        "socket_lower_keel_rail",
+        "inner_liner_left",
+        "inner_liner_right"
+      ]
+    },
+    {
+      "id": "distal_socket_ring",
+      "name": "Distal Socket Ring",
+      "shape": "cylinder",
+      "position": [
+        0.255,
+        0.06,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.058,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Printed distal ring closes the tapered socket shell and carries the wrist bearing stack.",
+      "connections": [
+        "proximal_socket_ring",
+        "socket_upper_left_shell",
+        "socket_upper_right_shell",
+        "socket_lower_left_shell",
+        "socket_lower_right_shell",
+        "socket_lower_keel_rail",
+        "wrist_rear_race"
+      ]
+    },
+    {
+      "id": "socket_upper_left_shell",
+      "name": "Socket Shell Upper Port Rail",
+      "shape": "box",
+      "position": [
+        0.128,
+        0.103,
+        0.041
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0.245,
+        0.026,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Longitudinal Nylon-12 shell rail leaves the dorsal service window open while preserving the socket outline.",
+      "connections": [
+        "proximal_socket_ring",
+        "distal_socket_ring",
+        "cover_standoff_front_left",
+        "cover_standoff_rear_left"
+      ]
+    },
+    {
+      "id": "socket_upper_right_shell",
+      "name": "Socket Shell Upper Starboard Rail",
+      "shape": "box",
+      "position": [
+        0.128,
+        0.103,
+        -0.041
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0.245,
+        0.026,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Opposite longitudinal shell rail frames the removable hero-cover opening and exposes the electronics bay.",
+      "connections": [
+        "proximal_socket_ring",
+        "distal_socket_ring",
+        "cover_standoff_front_right",
+        "cover_standoff_rear_right"
+      ]
+    },
+    {
+      "id": "socket_lower_left_shell",
+      "name": "Socket Shell Lower Port Rail",
+      "shape": "box",
+      "position": [
+        0.128,
+        0.027,
+        0.041
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0.245,
+        0.026,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Lower port shell strip carries residual-limb load and makes the socket visibly hollow instead of a solid cylinder.",
+      "connections": [
+        "proximal_socket_ring",
+        "distal_socket_ring",
+        "emg_sensor_port",
+        "socket_lower_keel_rail"
+      ]
+    },
+    {
+      "id": "socket_lower_right_shell",
+      "name": "Socket Shell Lower Starboard Rail",
+      "shape": "box",
+      "position": [
+        0.128,
+        0.027,
+        -0.041
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0.245,
+        0.026,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Lower starboard shell strip completes the open socket cradle and keeps the second EMG pad visible.",
+      "connections": [
+        "proximal_socket_ring",
+        "distal_socket_ring",
+        "emg_sensor_starboard",
+        "socket_lower_keel_rail"
+      ]
+    },
+    {
+      "id": "socket_lower_keel_rail",
+      "name": "Socket Lower Keel Rail",
+      "shape": "box",
+      "position": [
+        0.128,
+        0.009,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0.235,
+        0.018,
+        0.03
+      ],
+      "material": "white composite",
+      "role": "Thin underside rail ties the lower socket quadrants together and gives the assembly a clear ground-touching datum.",
+      "connections": [
+        "proximal_socket_ring",
+        "distal_socket_ring",
+        "socket_lower_left_shell",
+        "socket_lower_right_shell"
+      ]
+    },
+    {
+      "id": "inner_liner_left",
+      "name": "Inner Comfort Liner Port Rail",
+      "shape": "box",
+      "position": [
+        0.115,
+        0.051,
+        0.028
+      ],
+      "size": [
+        0.205,
+        0.01,
+        0.012
+      ],
+      "material": "rubber",
+      "role": "Soft inner liner rail spaces the residual limb from the printed shell and locates the port-side electrode.",
+      "connections": [
+        "proximal_socket_ring",
+        "emg_sensor_port"
+      ]
+    },
+    {
+      "id": "inner_liner_right",
+      "name": "Inner Comfort Liner Starboard Rail",
+      "shape": "box",
+      "position": [
+        0.115,
+        0.051,
+        -0.028
+      ],
+      "size": [
+        0.205,
+        0.01,
+        0.012
+      ],
+      "material": "rubber",
+      "role": "Soft inner liner rail mirrors the port rail and keeps the starboard electrode in skin contact.",
+      "connections": [
+        "proximal_socket_ring",
+        "emg_sensor_starboard"
+      ]
+    },
+    {
+      "id": "emg_sensor_port",
+      "name": "Port EMG Electrode Pad",
+      "shape": "box",
+      "position": [
+        0.06,
+        0.061,
+        0.05
+      ],
+      "size": [
+        0.032,
+        0.012,
+        0.021
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Skin-contact surface EMG pad reads one residual forearm muscle group through the cutaway socket wall.",
+      "connections": [
+        "socket_lower_left_shell",
+        "inner_liner_left",
+        "emg_lead_port"
+      ]
+    },
+    {
+      "id": "emg_sensor_starboard",
+      "name": "Starboard EMG Electrode Pad",
+      "shape": "box",
+      "position": [
+        0.06,
+        0.061,
+        -0.05
+      ],
+      "size": [
+        0.032,
+        0.012,
+        0.021
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second EMG pad reads an opposing muscle site so the controller can distinguish open and close commands.",
+      "connections": [
+        "socket_lower_right_shell",
+        "inner_liner_right",
+        "emg_lead_starboard"
+      ]
+    },
+    {
+      "id": "emg_lead_port",
+      "name": "Port EMG Lead",
+      "shape": "box",
+      "position": [
+        0.115,
+        0.087,
+        0.046
+      ],
+      "size": [
+        0.1,
+        0.006,
+        0.006
+      ],
+      "material": "copper",
+      "role": "Low-voltage signal lead routes the port electrode to the exposed controller input edge.",
+      "connections": [
+        "emg_sensor_port",
+        "control_board"
+      ]
+    },
+    {
+      "id": "emg_lead_starboard",
+      "name": "Starboard EMG Lead",
+      "shape": "box",
+      "position": [
+        0.115,
+        0.087,
+        -0.046
+      ],
+      "size": [
+        0.1,
+        0.006,
+        0.006
+      ],
+      "material": "copper",
+      "role": "Second signal lead routes the starboard electrode to the controller input pair.",
+      "connections": [
+        "emg_sensor_starboard",
+        "control_board"
+      ]
+    },
+    {
+      "id": "wrist_rear_race",
+      "name": "Wrist Rear Bearing Race",
+      "shape": "cylinder",
+      "position": [
+        0.276,
+        0.06,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.052,
+        0.012
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear bearing race bolts to the distal socket ring and supports the rotating wrist interface.",
+      "connections": [
+        "distal_socket_ring",
+        "wrist_rotation_ring",
+        "wrist_bolt_top",
+        "wrist_bolt_bottom"
+      ]
+    },
+    {
+      "id": "wrist_rotation_ring",
+      "name": "Manual 180 Degree Wrist Ring",
+      "shape": "cylinder",
+      "position": [
+        0.292,
+        0.06,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.056,
+        0.016
+      ],
+      "material": "brushed steel",
+      "role": "Manually indexed ring lets the user pronate or supinate the terminal hand through a half-turn.",
+      "connections": [
+        "wrist_rear_race",
+        "wrist_front_race",
+        "wrist_detent_pin"
+      ]
+    },
+    {
+      "id": "wrist_front_race",
+      "name": "Wrist Front Bearing Race",
+      "shape": "cylinder",
+      "position": [
+        0.31,
+        0.06,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.05,
+        0.012
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Front race transfers wrist rotation loads into the palm frame.",
+      "connections": [
+        "wrist_rotation_ring",
+        "palm_palmar_plate",
+        "wrist_bolt_left",
+        "wrist_bolt_right"
+      ]
+    },
+    {
+      "id": "wrist_detent_pin",
+      "name": "Wrist Detent Pin",
+      "shape": "cylinder",
+      "position": [
+        0.292,
+        0.106,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.005,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Small pin marks the indexed stop mechanism that holds the wrist at selected rotation angles.",
+      "connections": [
+        "wrist_rotation_ring"
+      ]
+    },
+    {
+      "id": "wrist_bolt_top",
+      "name": "Upper Wrist Adaptor Bolt",
+      "shape": "cylinder",
+      "position": [
+        0.276,
+        0.101,
+        0.024
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.0035,
+        0.012
+      ],
+      "material": "brushed steel",
+      "role": "Small visible fastener shows the rear race is bolted to the printed distal socket ring.",
+      "connections": [
+        "wrist_rear_race",
+        "distal_socket_ring"
+      ]
+    },
+    {
+      "id": "wrist_bolt_bottom",
+      "name": "Lower Wrist Adaptor Bolt",
+      "shape": "cylinder",
+      "position": [
+        0.276,
+        0.019,
+        -0.024
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.0035,
+        0.012
+      ],
+      "material": "brushed steel",
+      "role": "Opposite fastener completes the socket-side wrist bearing attachment pattern.",
+      "connections": [
+        "wrist_rear_race",
+        "distal_socket_ring"
+      ]
+    },
+    {
+      "id": "wrist_bolt_left",
+      "name": "Port Palm Adaptor Bolt",
+      "shape": "cylinder",
+      "position": [
+        0.31,
+        0.096,
+        0.03
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.0035,
+        0.012
+      ],
+      "material": "brushed steel",
+      "role": "Small fastener shows the front race is mechanically tied into the palm frame.",
+      "connections": [
+        "wrist_front_race",
+        "palm_palmar_plate"
+      ]
+    },
+    {
+      "id": "wrist_bolt_right",
+      "name": "Starboard Palm Adaptor Bolt",
+      "shape": "cylinder",
+      "position": [
+        0.31,
+        0.024,
+        -0.03
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.0035,
+        0.012
+      ],
+      "material": "brushed steel",
+      "role": "Matching palm-side fastener completes the visible wrist-to-hand assembly joint.",
+      "connections": [
+        "wrist_front_race",
+        "palm_palmar_plate"
+      ]
+    },
+    {
+      "id": "palm_palmar_plate",
+      "name": "Open Palm Palmar Plate",
+      "shape": "box",
+      "position": [
+        0.353,
+        0.026,
+        0
+      ],
+      "size": [
+        0.08,
+        0.018,
+        0.09
+      ],
+      "material": "white composite",
+      "role": "Lower printed palm frame plate supports the motor bay while leaving the gearmotors visible above it.",
+      "connections": [
+        "wrist_front_race",
+        "palm_dorsal_plate",
+        "palm_port_cheek",
+        "palm_starboard_cheek",
+        "motor_thumb",
+        "motor_index",
+        "motor_middle",
+        "motor_ring",
+        "motor_pinky"
+      ]
+    },
+    {
+      "id": "palm_dorsal_plate",
+      "name": "Open Palm Dorsal Plate",
+      "shape": "box",
+      "position": [
+        0.353,
+        0.096,
+        0
+      ],
+      "size": [
+        0.078,
+        0.014,
+        0.086
+      ],
+      "material": "white composite",
+      "role": "Top palm plate is lifted above the motor bay so the drive layout is visible rather than hidden in a block.",
+      "connections": [
+        "palm_palmar_plate",
+        "back_of_hand_badge"
+      ]
+    },
+    {
+      "id": "palm_port_cheek",
+      "name": "Palm Port Side Cheek",
+      "shape": "box",
+      "position": [
+        0.353,
+        0.061,
+        0.049
+      ],
+      "size": [
+        0.08,
+        0.07,
+        0.01
+      ],
+      "material": "white composite",
+      "role": "Side cheek ties the palm plates together and forms the outer wall for the thumb-side motor bay.",
+      "connections": [
+        "palm_palmar_plate",
+        "palm_dorsal_plate"
+      ]
+    },
+    {
+      "id": "palm_starboard_cheek",
+      "name": "Palm Starboard Side Cheek",
+      "shape": "box",
+      "position": [
+        0.353,
+        0.061,
+        -0.049
+      ],
+      "size": [
+        0.08,
+        0.07,
+        0.01
+      ],
+      "material": "white composite",
+      "role": "Opposite palm cheek leaves the center open so the five root motors can be inspected.",
+      "connections": [
+        "palm_palmar_plate",
+        "palm_dorsal_plate"
+      ]
+    },
+    {
+      "id": "back_of_hand_badge",
+      "name": "Back-of-Hand Small Cover Badge",
+      "shape": "box",
+      "position": [
+        0.382,
+        0.112,
+        0
+      ],
+      "size": [
+        0.036,
+        0.008,
+        0.052
+      ],
+      "material": "white composite",
+      "role": "Small dorsal cosmetic badge shows the Hero Arm back-of-hand cover without hiding the motor bay.",
+      "connections": [
+        "palm_dorsal_plate"
+      ]
+    },
+    {
+      "id": "motor_thumb",
+      "name": "Thumb Micro Gearmotor",
+      "shape": "cylinder",
+      "position": [
+        0.342,
+        0.062,
+        0.037
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.009,
+        0.032
+      ],
+      "material": "brushed steel",
+      "role": "Dedicated thumb motor drives the opposed thumb through its short shaft and MCP hinge.",
+      "connections": [
+        "palm_palmar_plate",
+        "shaft_thumb",
+        "lead_thumb"
+      ]
+    },
+    {
+      "id": "motor_index",
+      "name": "Index Micro Gearmotor",
+      "shape": "cylinder",
+      "position": [
+        0.342,
+        0.062,
+        0.019
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.009,
+        0.032
+      ],
+      "material": "brushed steel",
+      "role": "Index motor independently flexes the index finger for point, pinch, and tripod grip programs.",
+      "connections": [
+        "palm_palmar_plate",
+        "shaft_index",
+        "lead_index"
+      ]
+    },
+    {
+      "id": "motor_middle",
+      "name": "Middle Micro Gearmotor",
+      "shape": "cylinder",
+      "position": [
+        0.342,
+        0.062,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.009,
+        0.032
+      ],
+      "material": "brushed steel",
+      "role": "Middle motor gives the longest finger its own powered channel for full fist closure.",
+      "connections": [
+        "palm_palmar_plate",
+        "shaft_middle",
+        "lead_middle"
+      ]
+    },
+    {
+      "id": "motor_ring",
+      "name": "Ring Micro Gearmotor",
+      "shape": "cylinder",
+      "position": [
+        0.342,
+        0.062,
+        -0.019
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.009,
+        0.032
+      ],
+      "material": "brushed steel",
+      "role": "Ring finger motor drives the fourth digit as an independent actuator rather than a cosmetic duplicate.",
+      "connections": [
+        "palm_palmar_plate",
+        "shaft_ring",
+        "lead_ring"
+      ]
+    },
+    {
+      "id": "motor_pinky",
+      "name": "Pinky Micro Gearmotor",
+      "shape": "cylinder",
+      "position": [
+        0.342,
+        0.062,
+        -0.037
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.009,
+        0.032
+      ],
+      "material": "brushed steel",
+      "role": "Pinky motor powers the shortest finger and preserves five-motor recognizability.",
+      "connections": [
+        "palm_palmar_plate",
+        "shaft_pinky",
+        "lead_pinky"
+      ]
+    },
+    {
+      "id": "motor_harness_bus",
+      "name": "Five-Channel Motor Harness Bus",
+      "shape": "box",
+      "position": [
+        0.323,
+        0.089,
+        0
+      ],
+      "size": [
+        0.01,
+        0.008,
+        0.09
+      ],
+      "material": "copper",
+      "role": "Flat copper-colored bus distributes five motor driver channels from the controller through the wrist into the palm.",
+      "connections": [
+        "control_board",
+        "lead_thumb",
+        "lead_index",
+        "lead_middle",
+        "lead_ring",
+        "lead_pinky"
+      ]
+    },
+    {
+      "id": "lead_thumb",
+      "name": "Thumb Motor Branch Lead",
+      "shape": "box",
+      "position": [
+        0.333,
+        0.078,
+        0.037
+      ],
+      "size": [
+        0.018,
+        0.005,
+        0.005
+      ],
+      "material": "copper",
+      "role": "Individual branch lead makes the thumb motor's separate controller channel visible.",
+      "connections": [
+        "motor_harness_bus",
+        "motor_thumb"
+      ]
+    },
+    {
+      "id": "lead_index",
+      "name": "Index Motor Branch Lead",
+      "shape": "box",
+      "position": [
+        0.333,
+        0.078,
+        0.019
+      ],
+      "size": [
+        0.018,
+        0.005,
+        0.005
+      ],
+      "material": "copper",
+      "role": "Individual branch lead connects the harness bus to the index gearmotor.",
+      "connections": [
+        "motor_harness_bus",
+        "motor_index"
+      ]
+    },
+    {
+      "id": "lead_middle",
+      "name": "Middle Motor Branch Lead",
+      "shape": "box",
+      "position": [
+        0.333,
+        0.078,
+        0
+      ],
+      "size": [
+        0.018,
+        0.005,
+        0.005
+      ],
+      "material": "copper",
+      "role": "Individual branch lead connects the harness bus to the middle gearmotor.",
+      "connections": [
+        "motor_harness_bus",
+        "motor_middle"
+      ]
+    },
+    {
+      "id": "lead_ring",
+      "name": "Ring Motor Branch Lead",
+      "shape": "box",
+      "position": [
+        0.333,
+        0.078,
+        -0.019
+      ],
+      "size": [
+        0.018,
+        0.005,
+        0.005
+      ],
+      "material": "copper",
+      "role": "Individual branch lead connects the harness bus to the ring gearmotor.",
+      "connections": [
+        "motor_harness_bus",
+        "motor_ring"
+      ]
+    },
+    {
+      "id": "lead_pinky",
+      "name": "Pinky Motor Branch Lead",
+      "shape": "box",
+      "position": [
+        0.333,
+        0.078,
+        -0.037
+      ],
+      "size": [
+        0.018,
+        0.005,
+        0.005
+      ],
+      "material": "copper",
+      "role": "Individual branch lead connects the harness bus to the pinky gearmotor.",
+      "connections": [
+        "motor_harness_bus",
+        "motor_pinky"
+      ]
+    },
+    {
+      "id": "shaft_thumb",
+      "name": "Thumb Drive Shaft",
+      "shape": "cylinder",
+      "position": [
+        0.376,
+        0.062,
+        0.049
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.036
+      ],
+      "material": "forged steel",
+      "role": "Short shaft links the thumb motor output to the opposed thumb MCP hinge.",
+      "connections": [
+        "motor_thumb",
+        "thumb_mcp_pin",
+        "thumb_proximal"
+      ]
+    },
+    {
+      "id": "shaft_index",
+      "name": "Index Drive Shaft",
+      "shape": "cylinder",
+      "position": [
+        0.379,
+        0.062,
+        0.027
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.04
+      ],
+      "material": "forged steel",
+      "role": "Index output shaft carries torque from the gearmotor to the MCP hinge.",
+      "connections": [
+        "motor_index",
+        "index_mcp_pin",
+        "index_proximal"
+      ]
+    },
+    {
+      "id": "shaft_middle",
+      "name": "Middle Drive Shaft",
+      "shape": "cylinder",
+      "position": [
+        0.38,
+        0.062,
+        0.008
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.042
+      ],
+      "material": "forged steel",
+      "role": "Middle shaft transmits motor torque to the longest finger's proximal joint.",
+      "connections": [
+        "motor_middle",
+        "middle_mcp_pin",
+        "middle_proximal"
+      ]
+    },
+    {
+      "id": "shaft_ring",
+      "name": "Ring Drive Shaft",
+      "shape": "cylinder",
+      "position": [
+        0.379,
+        0.062,
+        -0.012
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.04
+      ],
+      "material": "forged steel",
+      "role": "Ring shaft exposes the mechanical link between the fourth motor and fourth finger.",
+      "connections": [
+        "motor_ring",
+        "ring_mcp_pin",
+        "ring_proximal"
+      ]
+    },
+    {
+      "id": "shaft_pinky",
+      "name": "Pinky Drive Shaft",
+      "shape": "cylinder",
+      "position": [
+        0.377,
+        0.062,
+        -0.033
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.036
+      ],
+      "material": "forged steel",
+      "role": "Pinky shaft connects the fifth motor to the shortest finger's MCP hinge.",
+      "connections": [
+        "motor_pinky",
+        "pinky_mcp_pin",
+        "pinky_proximal"
+      ]
+    },
+    {
+      "id": "thumb_mcp_pin",
+      "name": "Thumb MCP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.391,
+        0.062,
+        0.055
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.005,
+        0.024
+      ],
+      "material": "brushed steel",
+      "role": "Visible hinge pin anchors the opposed thumb to the palm frame.",
+      "connections": [
+        "shaft_thumb",
+        "thumb_proximal",
+        "palm_port_cheek"
+      ]
+    },
+    {
+      "id": "thumb_proximal",
+      "name": "Thumb Proximal Rounded Phalanx",
+      "shape": "capsule",
+      "position": [
+        0.405,
+        0.06,
+        0.065
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.0085,
+        0.032
+      ],
+      "material": "white composite",
+      "role": "Rounded first thumb segment is angled across the palm to show the Hero Arm's opposed thumb posture.",
+      "connections": [
+        "thumb_mcp_pin",
+        "thumb_pip_pin"
+      ]
+    },
+    {
+      "id": "thumb_pip_pin",
+      "name": "Thumb IP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.425,
+        0.06,
+        0.075
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.004,
+        0.019
+      ],
+      "material": "brushed steel",
+      "role": "Thumb interphalangeal hinge separates the proximal and distal thumb links.",
+      "connections": [
+        "thumb_proximal",
+        "thumb_middle"
+      ]
+    },
+    {
+      "id": "thumb_middle",
+      "name": "Thumb Distal Rounded Link",
+      "shape": "capsule",
+      "position": [
+        0.442,
+        0.06,
+        0.083
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.0075,
+        0.028
+      ],
+      "material": "white composite",
+      "role": "Rounded thumb tip link closes against the index and middle fingers for pinch grips.",
+      "connections": [
+        "thumb_pip_pin",
+        "thumb_tip_pad"
+      ]
+    },
+    {
+      "id": "thumb_tip_pad",
+      "name": "Thumb Rubber Contact Pad",
+      "shape": "box",
+      "position": [
+        0.457,
+        0.052,
+        0.09
+      ],
+      "rotation": [
+        0,
+        -0.45,
+        0
+      ],
+      "size": [
+        0.012,
+        0.005,
+        0.014
+      ],
+      "material": "rubber",
+      "role": "Black contact pad marks the thumb surface that presses against objects in pinch and key grips.",
+      "connections": [
+        "thumb_middle"
+      ]
+    },
+    {
+      "id": "index_mcp_pin",
+      "name": "Index MCP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.397,
+        0.062,
+        0.027
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.005,
+        0.022
+      ],
+      "material": "brushed steel",
+      "role": "Index root hinge pin makes the powered knuckle visible at the palm edge.",
+      "connections": [
+        "shaft_index",
+        "index_proximal",
+        "palm_palmar_plate"
+      ]
+    },
+    {
+      "id": "index_proximal",
+      "name": "Index Proximal Rounded Phalanx",
+      "shape": "capsule",
+      "position": [
+        0.416,
+        0.062,
+        0.027
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.008,
+        0.034
+      ],
+      "material": "white composite",
+      "role": "Rounded index proximal segment projects from the palm and forms the first link of the pointing finger.",
+      "connections": [
+        "index_mcp_pin",
+        "index_pip_pin"
+      ]
+    },
+    {
+      "id": "index_pip_pin",
+      "name": "Index PIP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.435,
+        0.062,
+        0.027
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.004,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Index middle knuckle hinge separates proximal and middle links.",
+      "connections": [
+        "index_proximal",
+        "index_middle"
+      ]
+    },
+    {
+      "id": "index_middle",
+      "name": "Index Middle Rounded Phalanx",
+      "shape": "capsule",
+      "position": [
+        0.453,
+        0.062,
+        0.027
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.007,
+        0.03
+      ],
+      "material": "white composite",
+      "role": "Rounded index middle segment gives the finger realistic three-link articulation.",
+      "connections": [
+        "index_pip_pin",
+        "index_dip_pin"
+      ]
+    },
+    {
+      "id": "index_dip_pin",
+      "name": "Index DIP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.47,
+        0.062,
+        0.027
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.0035,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Index fingertip hinge marks the distal joint rather than merging the tip into one block.",
+      "connections": [
+        "index_middle",
+        "index_distal"
+      ]
+    },
+    {
+      "id": "index_distal",
+      "name": "Index Distal Rounded Tip",
+      "shape": "capsule",
+      "position": [
+        0.485,
+        0.062,
+        0.027
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.006,
+        0.024
+      ],
+      "material": "white composite",
+      "role": "Rounded index fingertip is the contact link used for pointing and precision pinch.",
+      "connections": [
+        "index_dip_pin",
+        "index_tip_pad"
+      ]
+    },
+    {
+      "id": "index_tip_pad",
+      "name": "Index Rubber Fingertip Pad",
+      "shape": "box",
+      "position": [
+        0.499,
+        0.054,
+        0.027
+      ],
+      "size": [
+        0.011,
+        0.005,
+        0.012
+      ],
+      "material": "rubber",
+      "role": "Soft black fingertip pad shows where the index finger contacts objects.",
+      "connections": [
+        "index_distal"
+      ]
+    },
+    {
+      "id": "middle_mcp_pin",
+      "name": "Middle MCP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.399,
+        0.062,
+        0.008
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.005,
+        0.022
+      ],
+      "material": "brushed steel",
+      "role": "Middle root hinge locates the longest finger at the center of the palm.",
+      "connections": [
+        "shaft_middle",
+        "middle_proximal",
+        "palm_palmar_plate"
+      ]
+    },
+    {
+      "id": "middle_proximal",
+      "name": "Middle Proximal Rounded Phalanx",
+      "shape": "capsule",
+      "position": [
+        0.419,
+        0.062,
+        0.008
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.008,
+        0.037
+      ],
+      "material": "white composite",
+      "role": "Longest rounded proximal phalanx establishes the middle finger's greater reach.",
+      "connections": [
+        "middle_mcp_pin",
+        "middle_pip_pin"
+      ]
+    },
+    {
+      "id": "middle_pip_pin",
+      "name": "Middle PIP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.44,
+        0.062,
+        0.008
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.004,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Middle finger central hinge separates the long proximal and middle phalanges.",
+      "connections": [
+        "middle_proximal",
+        "middle_middle"
+      ]
+    },
+    {
+      "id": "middle_middle",
+      "name": "Middle Middle Rounded Phalanx",
+      "shape": "capsule",
+      "position": [
+        0.46,
+        0.062,
+        0.008
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.007,
+        0.033
+      ],
+      "material": "white composite",
+      "role": "Rounded middle segment continues the longest digit and helps the fist silhouette read correctly.",
+      "connections": [
+        "middle_pip_pin",
+        "middle_dip_pin"
+      ]
+    },
+    {
+      "id": "middle_dip_pin",
+      "name": "Middle DIP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.479,
+        0.062,
+        0.008
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.0035,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Middle distal hinge defines the final flexion joint before the fingertip.",
+      "connections": [
+        "middle_middle",
+        "middle_distal"
+      ]
+    },
+    {
+      "id": "middle_distal",
+      "name": "Middle Distal Rounded Tip",
+      "shape": "capsule",
+      "position": [
+        0.496,
+        0.062,
+        0.008
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.006,
+        0.026
+      ],
+      "material": "white composite",
+      "role": "Longest rounded fingertip reaches slightly farther than neighboring digits as on a human-like hand.",
+      "connections": [
+        "middle_dip_pin",
+        "middle_tip_pad"
+      ]
+    },
+    {
+      "id": "middle_tip_pad",
+      "name": "Middle Rubber Fingertip Pad",
+      "shape": "box",
+      "position": [
+        0.511,
+        0.054,
+        0.008
+      ],
+      "size": [
+        0.012,
+        0.005,
+        0.012
+      ],
+      "material": "rubber",
+      "role": "Soft black fingertip pad marks the middle finger's primary grasp contact.",
+      "connections": [
+        "middle_distal"
+      ]
+    },
+    {
+      "id": "ring_mcp_pin",
+      "name": "Ring MCP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.397,
+        0.062,
+        -0.012
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.005,
+        0.022
+      ],
+      "material": "brushed steel",
+      "role": "Ring finger root hinge is a separate mechanical joint with its own motor channel.",
+      "connections": [
+        "shaft_ring",
+        "ring_proximal",
+        "palm_palmar_plate"
+      ]
+    },
+    {
+      "id": "ring_proximal",
+      "name": "Ring Proximal Rounded Phalanx",
+      "shape": "capsule",
+      "position": [
+        0.416,
+        0.062,
+        -0.012
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.008,
+        0.034
+      ],
+      "material": "white composite",
+      "role": "Rounded ring proximal phalanx mirrors the index length to complete the four-finger array.",
+      "connections": [
+        "ring_mcp_pin",
+        "ring_pip_pin"
+      ]
+    },
+    {
+      "id": "ring_pip_pin",
+      "name": "Ring PIP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.435,
+        0.062,
+        -0.012
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.004,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Ring middle hinge shows the finger is articulated rather than a single printed prong.",
+      "connections": [
+        "ring_proximal",
+        "ring_middle"
+      ]
+    },
+    {
+      "id": "ring_middle",
+      "name": "Ring Middle Rounded Phalanx",
+      "shape": "capsule",
+      "position": [
+        0.453,
+        0.062,
+        -0.012
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.007,
+        0.03
+      ],
+      "material": "white composite",
+      "role": "Rounded ring middle segment flexes with the proximal segment for fist and hook grips.",
+      "connections": [
+        "ring_pip_pin",
+        "ring_dip_pin"
+      ]
+    },
+    {
+      "id": "ring_dip_pin",
+      "name": "Ring DIP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.47,
+        0.062,
+        -0.012
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.0035,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Ring distal hinge makes the tip joint visible in plan and isometric views.",
+      "connections": [
+        "ring_middle",
+        "ring_distal"
+      ]
+    },
+    {
+      "id": "ring_distal",
+      "name": "Ring Distal Rounded Tip",
+      "shape": "capsule",
+      "position": [
+        0.485,
+        0.062,
+        -0.012
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.006,
+        0.024
+      ],
+      "material": "white composite",
+      "role": "Rounded ring fingertip contributes to full-hand grasp contact.",
+      "connections": [
+        "ring_dip_pin",
+        "ring_tip_pad"
+      ]
+    },
+    {
+      "id": "ring_tip_pad",
+      "name": "Ring Rubber Fingertip Pad",
+      "shape": "box",
+      "position": [
+        0.499,
+        0.054,
+        -0.012
+      ],
+      "size": [
+        0.011,
+        0.005,
+        0.012
+      ],
+      "material": "rubber",
+      "role": "Soft black fingertip pad marks the ring finger's grasp contact surface.",
+      "connections": [
+        "ring_distal"
+      ]
+    },
+    {
+      "id": "pinky_mcp_pin",
+      "name": "Pinky MCP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.394,
+        0.062,
+        -0.033
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.005,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Pinky root hinge sits slightly shorter and lower in the finger fan.",
+      "connections": [
+        "shaft_pinky",
+        "pinky_proximal",
+        "palm_palmar_plate"
+      ]
+    },
+    {
+      "id": "pinky_proximal",
+      "name": "Pinky Proximal Rounded Phalanx",
+      "shape": "capsule",
+      "position": [
+        0.411,
+        0.062,
+        -0.033
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.007,
+        0.03
+      ],
+      "material": "white composite",
+      "role": "Shorter rounded pinky proximal segment gives the hand a recognizable tapered finger row.",
+      "connections": [
+        "pinky_mcp_pin",
+        "pinky_pip_pin"
+      ]
+    },
+    {
+      "id": "pinky_pip_pin",
+      "name": "Pinky PIP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.428,
+        0.062,
+        -0.033
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.004,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Pinky middle hinge separates the shorter fifth finger into functional links.",
+      "connections": [
+        "pinky_proximal",
+        "pinky_middle"
+      ]
+    },
+    {
+      "id": "pinky_middle",
+      "name": "Pinky Middle Rounded Phalanx",
+      "shape": "capsule",
+      "position": [
+        0.444,
+        0.062,
+        -0.033
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.0065,
+        0.026
+      ],
+      "material": "white composite",
+      "role": "Rounded pinky middle segment keeps the fifth digit articulated while visibly shorter than the ring finger.",
+      "connections": [
+        "pinky_pip_pin",
+        "pinky_dip_pin"
+      ]
+    },
+    {
+      "id": "pinky_dip_pin",
+      "name": "Pinky DIP Hinge Pin",
+      "shape": "cylinder",
+      "position": [
+        0.459,
+        0.062,
+        -0.033
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.0035,
+        0.016
+      ],
+      "material": "brushed steel",
+      "role": "Pinky distal hinge gives the smallest finger a separate tip joint.",
+      "connections": [
+        "pinky_middle",
+        "pinky_distal"
+      ]
+    },
+    {
+      "id": "pinky_distal",
+      "name": "Pinky Distal Rounded Tip",
+      "shape": "capsule",
+      "position": [
+        0.472,
+        0.062,
+        -0.033
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.0055,
+        0.021
+      ],
+      "material": "white composite",
+      "role": "Shortest rounded fingertip completes the four-finger cascade for grasping small objects.",
+      "connections": [
+        "pinky_dip_pin",
+        "pinky_tip_pad"
+      ]
+    },
+    {
+      "id": "pinky_tip_pad",
+      "name": "Pinky Rubber Fingertip Pad",
+      "shape": "box",
+      "position": [
+        0.484,
+        0.054,
+        -0.033
+      ],
+      "size": [
+        0.01,
+        0.005,
+        0.011
+      ],
+      "material": "rubber",
+      "role": "Soft black fingertip pad marks the pinky finger's smaller grasp contact.",
+      "connections": [
+        "pinky_distal"
+      ]
+    },
+    {
+      "id": "control_board",
+      "name": "STM32 Control Board Exploded Above Socket",
+      "shape": "box",
+      "position": [
+        0.135,
+        0.155,
+        0
+      ],
+      "size": [
+        0.118,
+        0.012,
+        0.052
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Controller and five-channel motor driver are shown exploded above their socket bay so the signal and motor paths are inspectable.",
+      "connections": [
+        "board_front_guide",
+        "board_rear_guide",
+        "battery_pack",
+        "emg_lead_port",
+        "emg_lead_starboard",
+        "motor_harness_bus"
+      ]
+    },
+    {
+      "id": "board_front_guide",
+      "name": "Control Board Front Guide Post",
+      "shape": "box",
+      "position": [
+        0.195,
+        0.115,
+        0.03
+      ],
+      "size": [
+        0.01,
+        0.08,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Exploded-view guide post shows the control board's physical drop-in path into the socket bay.",
+      "connections": [
+        "control_board",
+        "socket_upper_left_shell"
+      ]
+    },
+    {
+      "id": "board_rear_guide",
+      "name": "Control Board Rear Guide Post",
+      "shape": "box",
+      "position": [
+        0.075,
+        0.115,
+        -0.03
+      ],
+      "size": [
+        0.01,
+        0.08,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Second guide post ties the exploded electronics board to its real socket mounting envelope.",
+      "connections": [
+        "control_board",
+        "socket_upper_right_shell"
+      ]
+    },
+    {
+      "id": "battery_pack",
+      "name": "Li-ion Battery Pack Exploded Above Board",
+      "shape": "box",
+      "position": [
+        0.135,
+        0.195,
+        0
+      ],
+      "size": [
+        0.112,
+        0.03,
+        0.05
+      ],
+      "material": "black composite",
+      "role": "Removable battery pack sits above the controller in the exploded stack to show the service part accessed under the hero cover.",
+      "connections": [
+        "control_board",
+        "battery_positive_tab",
+        "battery_negative_tab",
+        "cover_standoff_front_left",
+        "cover_standoff_front_right"
+      ]
+    },
+    {
+      "id": "battery_positive_tab",
+      "name": "Battery Positive Contact Tab",
+      "shape": "box",
+      "position": [
+        0.188,
+        0.176,
+        0.018
+      ],
+      "size": [
+        0.012,
+        0.01,
+        0.01
+      ],
+      "material": "copper",
+      "role": "Copper contact tab indicates the battery's removable electrical interface to the controller.",
+      "connections": [
+        "battery_pack",
+        "control_board"
+      ]
+    },
+    {
+      "id": "battery_negative_tab",
+      "name": "Battery Negative Contact Tab",
+      "shape": "box",
+      "position": [
+        0.188,
+        0.176,
+        -0.018
+      ],
+      "size": [
+        0.012,
+        0.01,
+        0.01
+      ],
+      "material": "copper",
+      "role": "Second contact tab completes the battery power pair for the motor controller.",
+      "connections": [
+        "battery_pack",
+        "control_board"
+      ]
+    },
+    {
+      "id": "hero_cover_port_rail",
+      "name": "Removable Hero Cover Port Rail Exploded",
+      "shape": "box",
+      "position": [
+        0.132,
+        0.255,
+        0.058
+      ],
+      "size": [
+        0.225,
+        0.016,
+        0.014
+      ],
+      "material": "white composite",
+      "role": "Lifted port edge of the cosmetic cover shows the removable shell without hiding the electronics beneath it.",
+      "connections": [
+        "cover_standoff_front_left",
+        "cover_standoff_rear_left",
+        "hero_cover_front_rib",
+        "hero_cover_mid_rib",
+        "hero_cover_rear_rib",
+        "cover_magnet_front_left",
+        "cover_magnet_rear_left"
+      ]
+    },
+    {
+      "id": "hero_cover_starboard_rail",
+      "name": "Removable Hero Cover Starboard Rail Exploded",
+      "shape": "box",
+      "position": [
+        0.132,
+        0.255,
+        -0.058
+      ],
+      "size": [
+        0.225,
+        0.016,
+        0.014
+      ],
+      "material": "white composite",
+      "role": "Lifted starboard edge of the cover leaves the center window open for the board and battery view.",
+      "connections": [
+        "cover_standoff_front_right",
+        "cover_standoff_rear_right",
+        "hero_cover_front_rib",
+        "hero_cover_mid_rib",
+        "hero_cover_rear_rib",
+        "cover_magnet_front_right",
+        "cover_magnet_rear_right"
+      ]
+    },
+    {
+      "id": "hero_cover_front_rib",
+      "name": "Hero Cover Front Cross Rib",
+      "shape": "box",
+      "position": [
+        0.23,
+        0.255,
+        0
+      ],
+      "size": [
+        0.016,
+        0.016,
+        0.124
+      ],
+      "material": "white composite",
+      "role": "Front cross rib represents the cover's magnetic latch bridge while preserving the exploded X-ray window.",
+      "connections": [
+        "hero_cover_port_rail",
+        "hero_cover_starboard_rail",
+        "cover_standoff_front_left",
+        "cover_standoff_front_right"
+      ]
+    },
+    {
+      "id": "hero_cover_mid_rib",
+      "name": "Hero Cover Middle Cross Rib",
+      "shape": "box",
+      "position": [
+        0.132,
+        0.255,
+        0
+      ],
+      "size": [
+        0.016,
+        0.014,
+        0.114
+      ],
+      "material": "white composite",
+      "role": "Narrow middle rib keeps the removed cover recognizable as one shell without becoming an opaque slab.",
+      "connections": [
+        "hero_cover_port_rail",
+        "hero_cover_starboard_rail"
+      ]
+    },
+    {
+      "id": "hero_cover_rear_rib",
+      "name": "Hero Cover Rear Cross Rib",
+      "shape": "box",
+      "position": [
+        0.035,
+        0.255,
+        0
+      ],
+      "size": [
+        0.016,
+        0.016,
+        0.124
+      ],
+      "material": "white composite",
+      "role": "Rear cross rib completes the lifted cover frame and shows the elbow-side magnetic latch bridge.",
+      "connections": [
+        "hero_cover_port_rail",
+        "hero_cover_starboard_rail",
+        "cover_standoff_rear_left",
+        "cover_standoff_rear_right"
+      ]
+    },
+    {
+      "id": "cover_standoff_front_left",
+      "name": "Exploded Cover Standoff Front Port",
+      "shape": "box",
+      "position": [
+        0.23,
+        0.18,
+        0.048
+      ],
+      "size": [
+        0.008,
+        0.15,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Vertical guide line shows the front port cover latch path from shell boss to exploded cover.",
+      "connections": [
+        "socket_upper_left_shell",
+        "hero_cover_front_rib",
+        "battery_pack"
+      ]
+    },
+    {
+      "id": "cover_standoff_front_right",
+      "name": "Exploded Cover Standoff Front Starboard",
+      "shape": "box",
+      "position": [
+        0.23,
+        0.18,
+        -0.048
+      ],
+      "size": [
+        0.008,
+        0.15,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Vertical guide line shows the front starboard magnetic latch alignment.",
+      "connections": [
+        "socket_upper_right_shell",
+        "hero_cover_front_rib",
+        "battery_pack"
+      ]
+    },
+    {
+      "id": "cover_standoff_rear_left",
+      "name": "Exploded Cover Standoff Rear Port",
+      "shape": "box",
+      "position": [
+        0.035,
+        0.18,
+        0.048
+      ],
+      "size": [
+        0.008,
+        0.15,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Rear port guide line prevents the removable cover from reading as a floating unrelated plate.",
+      "connections": [
+        "socket_upper_left_shell",
+        "hero_cover_rear_rib"
+      ]
+    },
+    {
+      "id": "cover_standoff_rear_right",
+      "name": "Exploded Cover Standoff Rear Starboard",
+      "shape": "box",
+      "position": [
+        0.035,
+        0.18,
+        -0.048
+      ],
+      "size": [
+        0.008,
+        0.15,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Rear starboard guide line completes the four-point cover latch pattern.",
+      "connections": [
+        "socket_upper_right_shell",
+        "hero_cover_rear_rib"
+      ]
+    },
+    {
+      "id": "cover_magnet_front_left",
+      "name": "Cover Magnet Front Port",
+      "shape": "cylinder",
+      "position": [
+        0.23,
+        0.243,
+        0.048
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.006,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Round magnet insert in the lifted cover aligns with the front port latch boss.",
+      "connections": [
+        "hero_cover_port_rail",
+        "cover_standoff_front_left"
+      ]
+    },
+    {
+      "id": "cover_magnet_front_right",
+      "name": "Cover Magnet Front Starboard",
+      "shape": "cylinder",
+      "position": [
+        0.23,
+        0.243,
+        -0.048
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.006,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Second front cover magnet shows the swappable skin is retained by paired magnetic points.",
+      "connections": [
+        "hero_cover_starboard_rail",
+        "cover_standoff_front_right"
+      ]
+    },
+    {
+      "id": "cover_magnet_rear_left",
+      "name": "Cover Magnet Rear Port",
+      "shape": "cylinder",
+      "position": [
+        0.035,
+        0.243,
+        0.048
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.006,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Rear port magnet locates the cover at the elbow-side end of the socket.",
+      "connections": [
+        "hero_cover_port_rail",
+        "cover_standoff_rear_left"
+      ]
+    },
+    {
+      "id": "cover_magnet_rear_right",
+      "name": "Cover Magnet Rear Starboard",
+      "shape": "cylinder",
+      "position": [
+        0.035,
+        0.243,
+        -0.048
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.006,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Rear starboard magnet completes the four-magnet removable cover interface.",
+      "connections": [
+        "hero_cover_starboard_rail",
+        "cover_standoff_rear_right"
+      ]
+    }
   ]
 }

@@ -1,101 +1,2214 @@
 {
   "machine_name": "MiniMax-M2.7 (projected flagship)",
-  "assembly_instructions": "Read MiniMax-M2.7 as the LIKELY next step beyond MiniMax-M1: push the lightning-attention philosophy further. 96 transformer blocks climb the orange residual pillar. Pattern: 11 LIGHTNING (linear with learnable gating, Mamba-style) blocks for every 1 SOFTMAX (sliding-window 4096) block — was 7:1 in M1 with full-context softmax. Lightning blocks are pale-amber; softmax blocks are deep-crimson. Lightning attention now has a LEARNABLE GATE on the state update (Mamba-style decay), not just a fixed feature map — this is the projected upgrade. Cyan torus at X=-2.5 is the lightning state; small amber column at X=-3.5 is the much smaller softmax KV cache (only 8 layers × 4096-token window). To the right at X=6 sits the per-layer MoE FFN (64 routed experts, top-3, 1 shared). Above the stack at X=2/Y=9.5 is the next-gen RL trainer (projected MARS — Multi-Agent Reasoning with Self-play). The translucent slab at X=8 marks the parallelism + 4M-context-input plan. Click any part for details. THIS IS A FORWARD-LOOKING PROJECTION — numbers should be read as plausible extrapolation, not fact.",
+  "assembly_instructions": "1. Lay the base_frame at y=0 and bolt the input_plate, embedding_table, token_flow_bus, and curriculum datum hardware to the left and rear edges; these establish the token stream width, V≈200K vocabulary datum, and 4M-context curriculum path. 2. Install the vertical residual_pipe through the centerline, then mount each stage as two split cutaway half-trays around the pipe so the spine remains visible: stage_01_left/right through stage_08_left/right represent eight 12-layer macrocycles. 3. Attach the 96-layer count comb beside the residual pipe: mount eight 12-layer macro teeth and align one blue softmax checkpoint bead to the top of each macrocycle. 4. Mount the exposed lightning branch on the front-left rail: lightning_pre_norm feeds lightning_qkv_gate_proj, then gated_lightning_scan_kernel, lightning_state_bank, and lightning_o_proj back into the residual pipe. 5. Mount the exposed softmax branch on the rear-left rail: softmax_qkv_proj feeds rope_rotary_unit, sliding_window_mask_4096, softmax_kv_cache_stack, and flash_attention_output back into the residual pipe. 6. Build the MoE module on the right: install moe_router above the residual tap, connect it to moe_dispatch_bus, sixteen visible routed expert cartridges arranged as a 4×4 detail view of the 64-expert bank, the moe_shared_expert, moe_combine_bus, expert_index_slab_64, fp4_weight_shelf, and the residual_return_bus. 7. Install the tied prediction_head and lm_loss_probe at the top of the residual pipe. 8. Add the MARS post-training loop above the model: mars_policy_swarm connects to reward_model_bank, rollout_buffer_200k, and optimizer_adamw_muon, with gradients returning through trainer_feedback_bus. 9. Add the parallelism_backplane and context_curriculum_pipe at the rear-right edge, tied by the parallelism_datum_bus, to document TP, EP, PP, DP, chunk-scan prefill, and the 4M-token curriculum. 10. Verify that every non-root part connects to base_frame directly or through residual_pipe, token_flow_bus, or a named support rail, and that no major subsystem is hidden inside an opaque enclosure.",
   "metadata": {
     "domain": "ml-architecture",
     "reference": "https://huggingface.co/MiniMaxAI/MiniMax-M1-80k",
-    "thumbnail_camera": [13, 9, 14],
+    "thumbnail_camera": [
+      13,
+      9,
+      14
+    ],
     "info": {
       "english_name": "MiniMax-M2.7 (projected flagship, ~720B-A55B reasoning MoE)",
       "summary": "PROJECTED next-generation reasoning flagship from MiniMax, extrapolated from MiniMax-Text-01 → M1 research direction. No public paper at scene time. Best guess: pushes lightning attention further — 11:1 LIGHTNING:SOFTMAX ratio (was 7:1 in M1), learnable gating on the state update (Mamba-style), softmax replaced with sliding-window 4096 (full-context dropped). 96 layers, ~720B total / ~55B activated, 64 routed + 1 shared expert top-3 (was 32+1 top-2), 4M native input context, 200K output budget, post-trained with a projected MARS (Multi-Agent Reasoning with Self-play) RL successor to CISPO.",
       "description": "MiniMax-M2.7 is presented here as a research-trajectory PROJECTION, not a paper. Where MiniMax-M1 was 7:1 lightning:softmax over 80 layers with full-context softmax and 32 experts top-2, M2.7 likely (i) PUSHES the lightning ratio to 11:1 — the M1 paper hinted that recall could be preserved with fewer softmax layers if the softmax is smarter, (ii) replaces full-context softmax with SLIDING-WINDOW softmax (4096-token window) — an operational simplification that bounds KV memory cleanly, (iii) adds LEARNABLE GATING to the lightning kernel (Mamba/Mamba-2 style decay) — measurably better long-range recall than fixed-feature-map linear attention, (iv) doubles routed-expert count (32 → 64) at top-3 (was top-2) for ~50% more active capacity, (v) extends native input context 1M → 4M with a multi-stage curriculum, (vi) succeeds CISPO with a projected 'MARS' (Multi-Agent Reasoning with Self-play) algorithm that matches multiple policies against each other on math/code/agent tasks.\n\nDesign rationale, in one line each:\n• 11:1 lightning ratio: KV memory at 4M ctx is dominated almost entirely by the 8 softmax layers — and they only carry a 4096 window.\n• Mamba-style gating: the single biggest reason linear attention finally matches softmax on long-range recall.\n• Sliding-window softmax: bounds the KV cache regardless of input length — an operational win at 4M ctx.\n• 64 experts top-3: more active capacity per token without proportionally growing all-to-all traffic.\n• MARS RL: M1's CISPO solved long-rollout stability; the next problem is reasoning-via-debate and self-play.",
       "facts": [
-        { "label": "status",                  "value": "PROJECTED / SPECULATIVE — no public paper" },
-        { "label": "total parameters",        "value": "≈ 720 B (≈ 55 B activated / token)" },
-        { "label": "context length",          "value": "4,000,000 tokens (input) / 200,000 (output budget)" },
-        { "label": "transformer layers (L)",  "value": "96 (88 lightning + 8 sliding-softmax)" },
-        { "label": "hidden dimension (d)",    "value": "≈ 6144" },
-        { "label": "vocabulary size",         "value": "≈ 200,000" },
-        { "label": "attention pattern",       "value": "11 LIGHTNING (gated linear) : 1 SOFTMAX (sliding-window 4096)" },
-        { "label": "softmax heads",           "value": "64 Q / 8 KV (GQA, ratio 8)" },
-        { "label": "softmax window",          "value": "4096 tokens (replaces full ctx in M1)" },
-        { "label": "lightning kernel",        "value": "Gated Lightning (Mamba-2-style learnable decay)" },
-        { "label": "MoE per layer",           "value": "1 shared + 64 routed experts (top-3)" },
-        { "label": "expert intermediate dim", "value": "≈ 9216" },
-        { "label": "router gate",             "value": "Softmax (token-choice + capacity factor)" },
-        { "label": "post-training RL",        "value": "MARS — Multi-Agent Reasoning with Self-play (projected successor to CISPO)" },
-        { "label": "RL training duration",    "value": "Projected ~60+ days on H800/H200 cluster" },
-        { "label": "RL reward sources",       "value": "Math, code, agentic tool-use, SWE, multi-agent debate" },
-        { "label": "optimiser",               "value": "AdamW (or Muon — projected adoption)" },
-        { "label": "precision",               "value": "BF16 weights + FP4/FP8 GEMMs (projected FP4 expert QAT)" }
+        {
+          "label": "status",
+          "value": "PROJECTED / SPECULATIVE — no public paper"
+        },
+        {
+          "label": "total parameters",
+          "value": "≈ 720 B (≈ 55 B activated / token)"
+        },
+        {
+          "label": "context length",
+          "value": "4,000,000 tokens input / 200,000 output budget"
+        },
+        {
+          "label": "transformer layers",
+          "value": "96 total: 88 gated-lightning + 8 sliding-softmax"
+        },
+        {
+          "label": "macrocycle",
+          "value": "8 repeated stages × 12 layers = 96 layers"
+        },
+        {
+          "label": "hidden dimension",
+          "value": "≈ 6144"
+        },
+        {
+          "label": "vocabulary size",
+          "value": "≈ 200,000"
+        },
+        {
+          "label": "attention pattern",
+          "value": "11 LIGHTNING gated-linear layers : 1 SOFTMAX sliding-window layer"
+        },
+        {
+          "label": "softmax heads",
+          "value": "64 Q / 8 KV grouped-query attention"
+        },
+        {
+          "label": "softmax window",
+          "value": "4096 tokens"
+        },
+        {
+          "label": "MoE per layer",
+          "value": "1 shared + 64 routed experts, top-3 active"
+        },
+        {
+          "label": "expert intermediate dim",
+          "value": "≈ 9216"
+        },
+        {
+          "label": "precision",
+          "value": "BF16 weights + projected FP4/FP8 expert GEMMs"
+        },
+        {
+          "label": "post-training RL",
+          "value": "MARS — Multi-Agent Reasoning with Self-play"
+        }
       ],
       "comparisons": [
         {
           "versus": "vs MiniMax-M1 (real, 456B-A45.9B)",
-          "delta": "Same family. Projected M2.7 grows: total params 456B → 720B, activated 45.9B → 55B (~20% bigger compute / token). Layers stay similar (80 → 96). Lightning:softmax ratio pushed 7:1 → 11:1 (more linear, less softmax). Softmax full-context → sliding-window 4096. Lightning kernel gains learnable gating (Mamba-style), the single biggest known fix to linear attention's long-range recall problem. Experts double (32 → 64), top-k lifts 2 → 3. Input context 1M → 4M; output 80K → 200K. CISPO RL → projected MARS RL."
+          "delta": "Same family. Projected M2.7 grows: total params 456B → 720B, activated 45.9B → 55B. Layers move 80 → 96, lightning:softmax ratio moves 7:1 → 11:1, experts move 32 → 64, top-k moves 2 → 3, context moves 1M → 4M, and CISPO RL is projected forward into MARS RL."
         },
         {
-          "versus": "vs MiniMax-Text-01 (the linear-hybrid base)",
-          "delta": "Two generations of distance. Text-01 introduced the 7:1 hybrid. M2.7 keeps the hybrid but pushes ratio, replaces fixed-feature-map linear attention with gated linear, replaces full-ctx softmax with sliding-window softmax, scales experts and depth, and adds reasoning-specific RL post-training."
-        },
-        {
-          "versus": "vs Qwen3.6 (projected 480B-A30B 3:1 hybrid)",
-          "delta": "Both are hybrid-attention reasoning MoEs but at OPPOSITE extremes. Qwen3.6 stays at 3:1 LINEAR:SOFTMAX with full-context softmax — favours short-context quality. M2.7 goes 11:1 with sliding-window-only softmax — favours million-token context economics. M2.7 uses Mamba-style gated linear attention; Qwen3.6 uses Gated DeltaNet (delta-rule). Different bets on the linear-attention design space."
-        },
-        {
-          "versus": "vs DeepSeek-V4-Pro (1.6T-A49B sparse-attention MoE)",
-          "delta": "V4-Pro keeps full softmax (CSA + HCA hybrid + lightning indexer + top-k=1024). M2.7 takes the orthogonal route: 92% LINEAR attention layers + 8% sliding-window softmax. At 4M context M2.7's KV is dominated by 8 layers × 4096-token windows ≈ ~1 GB / sequence; V4-Pro at 1M ctx is ~4 GiB / sequence. Different cost profiles: V4 is read-bandwidth-bound on the indexer GEMM, M2.7 is sequential-state-update-bound on the gated lightning layers."
+          "versus": "vs MiniMax-Text-01",
+          "delta": "Text-01 introduced the 7:1 hybrid; M2.7 keeps the hybrid idea but pushes gated linear attention, sliding-window softmax, deeper sparse MoE capacity, and reasoning-specific post-training."
         }
       ],
       "sources": [
-        { "title": "MiniMax-M1 technical report (predecessor)", "url": "https://arxiv.org/abs/2506.13585" },
-        { "title": "MiniMax-M1 model card",                    "url": "https://huggingface.co/MiniMaxAI/MiniMax-M1-80k" },
-        { "title": "Mamba-2 (gated linear attention)",         "url": "https://arxiv.org/abs/2405.21060" },
-        { "title": "Lightning Attention (Transnormer-2)",      "url": "https://arxiv.org/abs/2401.04658" }
+        {
+          "title": "MiniMax-M1 technical report (predecessor)",
+          "url": "https://arxiv.org/abs/2506.13585"
+        },
+        {
+          "title": "MiniMax-M1 model card",
+          "url": "https://huggingface.co/MiniMaxAI/MiniMax-M1-80k"
+        },
+        {
+          "title": "Mamba-2 (gated linear attention)",
+          "url": "https://arxiv.org/abs/2405.21060"
+        },
+        {
+          "title": "Lightning Attention (Transnormer-2)",
+          "url": "https://arxiv.org/abs/2401.04658"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "input_plate", "name": "Input Tokens (V≈200K)", "shape": "box", "position": [0, 0, 0], "size": [4.0, 0.18, 2.2], "material": "brushed graphite plate", "role": "Token-ID stream from MiniMax's BPE.", "compute_profile": "host-cpu", "parallelism": "embarrassingly-parallel", "connections": ["embedding_table"] },
-    { "id": "embedding_table", "name": "Embedding (V≈200K, d=6144)", "shape": "box", "position": [0, 0.55, 0], "size": [3.6, 0.32, 1.8], "material": "indigo glass slab", "role": "Tied embedding / LM head.", "compute_profile": "gpu-bandwidth-bound", "memory_footprint": "≈ 200K × 6144 × BF16 ≈ 2.46 GiB", "parallelism": "tensor-parallel", "connections": ["residual_pipe"] },
-    { "id": "residual_pipe", "name": "Residual Stream (d=6144, 96 layers)", "shape": "cylinder", "position": [0, 5.6, 0], "size": [0.18, 9.8], "material": "translucent amber polymer", "role": "Pre-norm RMSNorm residual carry through 96 layers.", "compute_profile": "gpu-memory-bound", "parallelism": "tensor-parallel", "connections": ["embedding_table", "block_lightning_1", "block_lightning_2", "block_lightning_3", "block_lightning_4", "block_lightning_5", "block_softmax_1", "block_lightning_6", "block_lightning_7", "block_softmax_2", "block_softmax_3", "prediction_head"] },
-    { "id": "layer_count_marker", "name": "× 96 Layers (11 LIGHTNING : 1 SLIDING-SOFTMAX)", "shape": "box", "position": [-2.3, 5.6, 0], "size": [0.05, 9.0, 0.7], "material": "etched graphite gridline", "role": "Marker: 88 lightning + 8 sliding-softmax. Pattern repeats 11 lightning : 1 softmax × 8.", "compute_profile": "negligible", "parallelism": "pipeline-parallel" },
-
-    { "id": "block_lightning_1", "name": "Block 1 — LIGHTNING (gated)", "shape": "box", "position": [0, 1.4, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile", "role": "Gated lightning attention block. Mamba-style learnable decay on the state update — the projected upgrade over M1's fixed-feature lightning.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel", "connections": ["lightning_state"] },
-    { "id": "block_lightning_2", "name": "Block 2 — LIGHTNING", "shape": "box", "position": [0, 1.95, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile", "role": "Lightning block 2.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_lightning_3", "name": "Block 3 — LIGHTNING", "shape": "box", "position": [0, 2.5, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile", "role": "Lightning block 3.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_lightning_4", "name": "Block 4 — LIGHTNING", "shape": "box", "position": [0, 3.05, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile", "role": "Lightning block 4.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_lightning_5", "name": "Block 5 — LIGHTNING", "shape": "box", "position": [0, 3.6, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile", "role": "Lightning block 5.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_softmax_1", "name": "Block 12 — SOFTMAX (sliding-window 4096)", "shape": "box", "position": [0, 4.25, 0], "size": [3.2, 0.55, 1.5], "material": "deep crimson tile", "role": "Sliding-window softmax block — only attends to the previous 4096 tokens. Restores associative recall lost by linear attention. (Layers 6–11 lightning, elided.)", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["softmax_kv_cache"] },
-    { "id": "block_lightning_6", "name": "Block 13 — LIGHTNING", "shape": "box", "position": [0, 4.9, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile", "role": "Lightning block 13. Pattern resumes.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_lightning_7", "name": "Block 14 — LIGHTNING", "shape": "box", "position": [0, 5.45, 0], "size": [3.0, 0.45, 1.4], "material": "pale amber tile", "role": "Lightning block 14.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_softmax_2", "name": "Block 24 — SOFTMAX", "shape": "box", "position": [0, 6.1, 0], "size": [3.2, 0.55, 1.5], "material": "deep crimson tile", "role": "Second softmax block. (Layers 15–23 lightning, elided.)", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "block_softmax_3", "name": "Block 96 — SOFTMAX (final)", "shape": "box", "position": [0, 8.2, 0], "size": [3.2, 0.55, 1.5], "material": "deep crimson tile", "role": "Final softmax block before LM head.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-
-    { "id": "lightning_pre_norm", "name": "Lightning · Pre-RMSNorm", "shape": "box", "position": [-1.8, 2.45, 0], "size": [0.55, 0.18, 0.6], "material": "matte ivory tile", "role": "Pre-norm before the lightning sublayer.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel", "connections": ["lightning_qkv_proj"] },
-    { "id": "lightning_qkv_proj", "name": "Lightning · QKV + decay-gate Proj (Δ_t)", "shape": "box", "position": [-1.8, 2.85, 0], "size": [0.7, 0.22, 0.7], "material": "anodised aluminium tile", "role": "Project x to Q, K, V plus a per-token DECAY GATE Δ_t ∈ (0,1) (Mamba-style). Δ_t controls how fast old state is forgotten.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "algorithm": "Q, K, V = projections(x)\nΔ_t     = sigmoid(x @ W_decay)   # per-token decay (Mamba)", "connections": ["lightning_kernel"] },
-    { "id": "lightning_kernel", "name": "Gated Lightning Kernel (Mamba-style)", "shape": "box", "position": [-1.8, 3.3, 0], "size": [0.85, 0.28, 0.85], "material": "electric cyan tile", "role": "Updated lightning kernel with Mamba-2 style learnable decay. Per-token cost is O(d_k·d_v), independent of context length, but the state now decays selectively rather than uniformly — the single biggest fix to linear attention's long-range recall.", "compute_profile": "gpu-bandwidth-bound", "flops_per_token": "≈ 4·d_k·d_v ≈ low MFLOP", "memory_footprint": "S: d_k × d_v per layer per sequence ≈ 1–2 MB / sequence / layer", "parallelism": "sequential", "algorithm": "# per token (decode):\nS = (1 - Δ_t) * S + Δ_t * outer(K_t, V_t)   # gated update\nout_t = Q_t @ S\n# prefill: scan-parallel (Mamba-2 chunk-scan kernel)", "bottleneck": "Sequential along time at decode — chunked-scan prefill recovers parallelism for long inputs.", "improvement_ideas": ["FP8 state with periodic FP16 stabilisation.", "Multi-head gated lightning with shared keys."], "connections": ["lightning_state", "lightning_o_proj"] },
-    { "id": "lightning_state", "name": "Lightning State (S, fixed-size)", "shape": "cylinder", "position": [-2.5, 4.6, 0], "size": [0.55, 0.55], "material": "electric cyan torus", "role": "Per-sequence per-layer recurrent state. Size INDEPENDENT of context length — what makes 4M context affordable.", "compute_profile": "gpu-memory-bound", "memory_footprint": "≈ 1–2 MB per sequence per layer, regardless of T", "parallelism": "data-parallel" },
-    { "id": "lightning_o_proj", "name": "Lightning · O-Projection", "shape": "box", "position": [-1.8, 3.95, 0], "size": [0.7, 0.22, 0.7], "material": "burnished bronze tile", "role": "Output projection back to d=6144.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["residual_pipe"] },
-
-    { "id": "softmax_qkv_proj", "name": "Softmax · QKV Proj (GQA 64/8)", "shape": "box", "position": [1.8, 4.0, 0], "size": [0.7, 0.22, 0.7], "material": "anodised aluminium tile", "role": "QKV for the 1-in-12 sliding-window softmax layers.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "algorithm": "Q, K, V = projections(x)\nQ, K = apply_rope(Q, K)\nout = flash_attn(Q, K, V, mask=causal_sliding(window=4096))", "connections": ["softmax_kv_cache"] },
-    { "id": "softmax_kv_cache", "name": "Softmax KV Cache (8 layers × 4096 window)", "shape": "cylinder", "position": [-3.5, 5.0, 0], "size": [0.55, 6.0], "material": "amber translucent silica", "role": "Tiny GQA(8) KV cache: 8 softmax layers × 4096-token window. Constant in input length.", "compute_profile": "memory-capacity-bound", "memory_footprint": "≈ 4 KB / token / layer × 4096 × 8 layers ≈ 130 MiB / sequence — TINY at 4M ctx", "parallelism": "tensor-parallel" },
-
-    { "id": "moe_router", "name": "Top-3 Softmax Router (capacity)", "shape": "cylinder", "position": [6.0, 5.6, 0], "size": [0.55, 0.18], "material": "ruby-tinted glass disk", "role": "Per-token softmax over 64 experts, top-3. Token-choice with capacity factor; over-capacity tokens fall through to the shared expert.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "tensor-parallel", "connections": ["moe_routed_ring", "moe_alltoall"] },
-    { "id": "moe_routed_ring", "name": "Routed Experts (64, top-3, d_ff=9216)", "shape": "cylinder", "position": [6.0, 4.8, 0], "size": [1.9, 0.45], "material": "iridescent micro-array", "role": "Per-MoE-layer bank of 64 SwiGLU experts (d_ff=9216). 3 active per token (was 2 in M1).", "compute_profile": "gpu-compute-bound", "flops_per_token": "≈ 3 × 3 × 2·d·d_ff ≈ 1 GFLOP / layer", "memory_footprint": "64 × 3·d·d_ff × BF16 ≈ 72 GiB / layer; 96 layers ≈ 6.7 TiB total routed weights", "parallelism": "expert-parallel" },
-    { "id": "moe_shared_expert", "name": "Shared Expert (×1)", "shape": "box", "position": [6.0, 5.55, 0], "size": [0.55, 0.55, 0.55], "material": "polished platinum", "role": "Always-on overflow + common-computation expert.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel" },
-    { "id": "moe_alltoall", "name": "Expert All-to-All", "shape": "cylinder", "position": [6.0, 6.55, 0], "size": [1.0, 0.16], "material": "copper coil ring", "role": "NCCL all-to-all dispatch + combine. Bigger than M1 because top-3 (was top-2).", "compute_profile": "communication-bound", "parallelism": "expert-parallel" },
-    { "id": "fp4_expert_disk", "name": "FP4 Expert Weights (projected QAT)", "shape": "cylinder", "position": [6.0, 4.32, 0], "size": [1.95, 0.06], "material": "rose-gold annulus", "role": "Projected FP4 quantisation-aware training on routed experts (cross-pollination from DeepSeek-V4).", "compute_profile": "gpu-bandwidth-bound", "parallelism": "expert-parallel" },
-
-    { "id": "prediction_head", "name": "LM Head (tied)", "shape": "box", "position": [0, 9.05, 0], "size": [3.4, 0.4, 1.6], "material": "white marble slab", "role": "Tied projection back to ~200K vocab.", "compute_profile": "gpu-compute-bound", "parallelism": "tensor-parallel", "connections": ["lm_loss"] },
-    { "id": "lm_loss", "name": "LM Loss", "shape": "sphere", "position": [-1.4, 10.0, 0], "size": [0.28], "material": "incandescent ivory", "role": "Pre-training next-token loss.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "data-parallel" },
-
-    { "id": "mars_trainer", "name": "MARS RL Trainer (projected: Multi-Agent Reasoning + Self-play)", "shape": "sphere", "position": [2.5, 10.4, 0], "size": [0.4], "material": "incandescent ruby", "role": "PROJECTED successor to CISPO. Multiple policy copies debate / cooperate on math, code, agent and SWE tasks; rewards include outcome correctness AND inter-agent agreement. Designed for very long (200K) reasoning rollouts.", "compute_profile": "communication-bound", "parallelism": "data-parallel", "algorithm": "for round in range(R):\n    agents = [policy.copy() for _ in range(N)]\n    rollouts, debate_log = self_play(agents, prompts)\n    rewards = score_outcome(rollouts) + λ * agreement(debate_log)\n    loss = clipped_is_loss(rollouts, rewards)\n    policy.update(loss)" },
-    { "id": "reward_models", "name": "Reward Models (math / code / agent / SWE / debate)", "shape": "box", "position": [4.5, 10.4, 0], "size": [1.2, 0.5, 0.9], "material": "deep navy slab", "role": "Domain-specific rewards used by MARS, plus the new debate-agreement reward.", "compute_profile": "gpu-compute-bound", "parallelism": "data-parallel" },
-
-    { "id": "optimizer_adamw", "name": "AdamW (or Muon — projected)", "shape": "box", "position": [-6.0, 4.0, 0], "size": [1.4, 1.0, 1.0], "material": "anodised navy block", "role": "Standard AdamW; Muon adoption is plausible given DeepSeek-V4's results.", "compute_profile": "gpu-bandwidth-bound", "parallelism": "data-parallel" },
-
-    { "id": "parallelism_marker", "name": "TP × EP × PP × DP", "shape": "box", "position": [8.5, 5.0, 0], "size": [1.4, 2.4, 0.8], "material": "smoked acrylic translucent", "role": "Multi-axis parallelism plan. Lightning layers need sequence-parallel chunked-scan prefill + state-passing across PP boundaries.", "compute_profile": "communication-bound", "parallelism": "pipeline-parallel" },
-    { "id": "training_data_pipe", "name": "Pre-training + Long-Output MARS RL (4M ctx curriculum)", "shape": "box", "position": [8.5, 0.6, 0], "size": [1.4, 0.4, 0.8], "material": "etched obsidian plate", "role": "Projected pre-training + multi-stage RL with long-output (200K) rollouts.", "compute_profile": "storage-bound", "parallelism": "data-parallel" }
+    {
+      "id": "base_frame",
+      "name": "Open Assembly Base Frame",
+      "shape": "box",
+      "position": [
+        1.1,
+        0.05,
+        0
+      ],
+      "size": [
+        8.4,
+        0.1,
+        3.4
+      ],
+      "material": "brushed steel",
+      "role": "Thin datum plate that grounds the whole schematic and prevents subsystems from appearing to float.",
+      "compute_profile": "negligible",
+      "parallelism": "none",
+      "connections": [
+        "input_plate",
+        "embedding_table",
+        "token_flow_bus",
+        "residual_pipe",
+        "attention_branch_rail",
+        "softmax_branch_rail",
+        "moe_module_rail",
+        "trainer_backplane",
+        "parallelism_datum_bus"
+      ]
+    },
+    {
+      "id": "input_plate",
+      "name": "Input Tokens Plate (V≈200K)",
+      "shape": "box",
+      "position": [
+        -2.9,
+        0.22,
+        -1
+      ],
+      "size": [
+        2,
+        0.18,
+        0.55
+      ],
+      "material": "black composite",
+      "role": "Token-ID entry plate for the projected 200K-token vocabulary stream.",
+      "compute_profile": "host-cpu",
+      "parallelism": "embarrassingly-parallel",
+      "connections": [
+        "base_frame",
+        "embedding_table",
+        "token_flow_bus"
+      ]
+    },
+    {
+      "id": "embedding_table",
+      "name": "Embedding Table (V≈200K, d=6144)",
+      "shape": "box",
+      "position": [
+        -1.05,
+        0.48,
+        -1
+      ],
+      "size": [
+        1.55,
+        0.32,
+        0.75
+      ],
+      "material": "glass display",
+      "role": "Tied embedding and LM-head weight table; it maps token ids into the d=6144 residual stream.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "memory_footprint": "≈ 200K × 6144 × BF16 ≈ 2.46 GiB",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "input_plate",
+        "token_flow_bus",
+        "residual_pipe"
+      ]
+    },
+    {
+      "id": "token_flow_bus",
+      "name": "Token Flow Bus",
+      "shape": "capsule",
+      "position": [
+        -1.35,
+        0.78,
+        -0.55
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.055,
+        2.7
+      ],
+      "material": "copper",
+      "role": "Visible input-to-residual conduit showing the assembly order from token ids through embeddings into the stack.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "base_frame",
+        "input_plate",
+        "embedding_table",
+        "residual_pipe"
+      ]
+    },
+    {
+      "id": "residual_pipe",
+      "name": "Residual Stream Spine (d=6144)",
+      "shape": "cylinder",
+      "position": [
+        0,
+        3.25,
+        0
+      ],
+      "size": [
+        0.13,
+        6.2
+      ],
+      "material": "copper",
+      "role": "Central pre-norm residual carrier that every cutaway stage reads from and writes back to.",
+      "compute_profile": "gpu-memory-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "base_frame",
+        "embedding_table",
+        "token_flow_bus",
+        "stage_01_left",
+        "stage_01_right",
+        "stage_02_left",
+        "stage_02_right",
+        "stage_03_left",
+        "stage_03_right",
+        "stage_04_left",
+        "stage_04_right",
+        "stage_05_left",
+        "stage_05_right",
+        "stage_06_left",
+        "stage_06_right",
+        "stage_07_left",
+        "stage_07_right",
+        "stage_08_left",
+        "stage_08_right",
+        "prediction_head"
+      ]
+    },
+    {
+      "id": "layer_count_comb",
+      "name": "96-Layer Count Comb Spine",
+      "shape": "box",
+      "position": [
+        -0.72,
+        3.25,
+        0.86
+      ],
+      "size": [
+        0.06,
+        5.75,
+        0.16
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Vertical ruler that carries eight separate 12-layer macro teeth for counting the full 96-layer depth.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "residual_pipe",
+        "macro_tooth_01",
+        "macro_tooth_02",
+        "macro_tooth_03",
+        "macro_tooth_04",
+        "macro_tooth_05",
+        "macro_tooth_06",
+        "macro_tooth_07",
+        "macro_tooth_08"
+      ]
+    },
+    {
+      "id": "macro_tooth_01",
+      "name": "Macro Tooth 1: Layers 1-12",
+      "shape": "box",
+      "position": [
+        -0.9,
+        0.95,
+        0.86
+      ],
+      "size": [
+        0.34,
+        0.08,
+        0.22
+      ],
+      "material": "brass",
+      "role": "Count mark for the first eleven lightning layers plus softmax layer 12.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_count_comb",
+        "softmax_tick_01"
+      ]
+    },
+    {
+      "id": "macro_tooth_02",
+      "name": "Macro Tooth 2: Layers 13-24",
+      "shape": "box",
+      "position": [
+        -0.9,
+        1.55,
+        0.86
+      ],
+      "size": [
+        0.34,
+        0.08,
+        0.22
+      ],
+      "material": "brass",
+      "role": "Count mark for the second 12-layer hybrid macrocycle ending at softmax layer 24.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_count_comb",
+        "softmax_tick_02"
+      ]
+    },
+    {
+      "id": "macro_tooth_03",
+      "name": "Macro Tooth 3: Layers 25-36",
+      "shape": "box",
+      "position": [
+        -0.9,
+        2.15,
+        0.86
+      ],
+      "size": [
+        0.34,
+        0.08,
+        0.22
+      ],
+      "material": "brass",
+      "role": "Count mark for the third 12-layer macrocycle ending at softmax layer 36.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_count_comb",
+        "softmax_tick_03"
+      ]
+    },
+    {
+      "id": "macro_tooth_04",
+      "name": "Macro Tooth 4: Layers 37-48",
+      "shape": "box",
+      "position": [
+        -0.9,
+        2.75,
+        0.86
+      ],
+      "size": [
+        0.34,
+        0.08,
+        0.22
+      ],
+      "material": "brass",
+      "role": "Count mark for the fourth macrocycle and midpoint of the projected 96-layer stack.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_count_comb",
+        "softmax_tick_04"
+      ]
+    },
+    {
+      "id": "macro_tooth_05",
+      "name": "Macro Tooth 5: Layers 49-60",
+      "shape": "box",
+      "position": [
+        -0.9,
+        3.35,
+        0.86
+      ],
+      "size": [
+        0.34,
+        0.08,
+        0.22
+      ],
+      "material": "brass",
+      "role": "Count mark for the fifth macrocycle showing the sparse softmax cadence continues after midpoint.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_count_comb",
+        "softmax_tick_05"
+      ]
+    },
+    {
+      "id": "macro_tooth_06",
+      "name": "Macro Tooth 6: Layers 61-72",
+      "shape": "box",
+      "position": [
+        -0.9,
+        3.95,
+        0.86
+      ],
+      "size": [
+        0.34,
+        0.08,
+        0.22
+      ],
+      "material": "brass",
+      "role": "Count mark for the sixth 12-layer macrocycle ending at softmax layer 72.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_count_comb",
+        "softmax_tick_06"
+      ]
+    },
+    {
+      "id": "macro_tooth_07",
+      "name": "Macro Tooth 7: Layers 73-84",
+      "shape": "box",
+      "position": [
+        -0.9,
+        4.55,
+        0.86
+      ],
+      "size": [
+        0.34,
+        0.08,
+        0.22
+      ],
+      "material": "brass",
+      "role": "Count mark for the seventh macrocycle ending at softmax layer 84.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_count_comb",
+        "softmax_tick_07"
+      ]
+    },
+    {
+      "id": "macro_tooth_08",
+      "name": "Macro Tooth 8: Layers 85-96",
+      "shape": "box",
+      "position": [
+        -0.9,
+        5.15,
+        0.86
+      ],
+      "size": [
+        0.34,
+        0.08,
+        0.22
+      ],
+      "material": "brass",
+      "role": "Count mark for the final 12-layer macrocycle ending at layer 96.",
+      "compute_profile": "negligible",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "layer_count_comb",
+        "softmax_tick_08"
+      ]
+    },
+    {
+      "id": "softmax_tick_01",
+      "name": "Softmax Checkpoint 12",
+      "shape": "sphere",
+      "position": [
+        -0.55,
+        0.95,
+        0.86
+      ],
+      "size": [
+        0.095
+      ],
+      "material": "glass display",
+      "role": "Blue bead marking the first sliding-window softmax layer at layer 12.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "macro_tooth_01",
+        "stage_01_right"
+      ]
+    },
+    {
+      "id": "softmax_tick_02",
+      "name": "Softmax Checkpoint 24",
+      "shape": "sphere",
+      "position": [
+        -0.55,
+        1.55,
+        0.86
+      ],
+      "size": [
+        0.095
+      ],
+      "material": "glass display",
+      "role": "Blue bead marking the second sliding-window softmax layer at layer 24.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "macro_tooth_02",
+        "stage_02_right"
+      ]
+    },
+    {
+      "id": "softmax_tick_03",
+      "name": "Softmax Checkpoint 36",
+      "shape": "sphere",
+      "position": [
+        -0.55,
+        2.15,
+        0.86
+      ],
+      "size": [
+        0.095
+      ],
+      "material": "glass display",
+      "role": "Blue bead marking the third sliding-window softmax layer at layer 36.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "macro_tooth_03",
+        "stage_03_right"
+      ]
+    },
+    {
+      "id": "softmax_tick_04",
+      "name": "Softmax Checkpoint 48",
+      "shape": "sphere",
+      "position": [
+        -0.55,
+        2.75,
+        0.86
+      ],
+      "size": [
+        0.095
+      ],
+      "material": "glass display",
+      "role": "Blue bead marking the fourth sliding-window softmax layer at layer 48.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "macro_tooth_04",
+        "stage_04_right"
+      ]
+    },
+    {
+      "id": "softmax_tick_05",
+      "name": "Softmax Checkpoint 60",
+      "shape": "sphere",
+      "position": [
+        -0.55,
+        3.35,
+        0.86
+      ],
+      "size": [
+        0.095
+      ],
+      "material": "glass display",
+      "role": "Blue bead marking the fifth sliding-window softmax layer at layer 60.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "macro_tooth_05",
+        "stage_05_right"
+      ]
+    },
+    {
+      "id": "softmax_tick_06",
+      "name": "Softmax Checkpoint 72",
+      "shape": "sphere",
+      "position": [
+        -0.55,
+        3.95,
+        0.86
+      ],
+      "size": [
+        0.095
+      ],
+      "material": "glass display",
+      "role": "Blue bead marking the sixth sliding-window softmax layer at layer 72.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "macro_tooth_06",
+        "stage_06_right"
+      ]
+    },
+    {
+      "id": "softmax_tick_07",
+      "name": "Softmax Checkpoint 84",
+      "shape": "sphere",
+      "position": [
+        -0.55,
+        4.55,
+        0.86
+      ],
+      "size": [
+        0.095
+      ],
+      "material": "glass display",
+      "role": "Blue bead marking the seventh sliding-window softmax layer at layer 84.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "macro_tooth_07",
+        "stage_07_right"
+      ]
+    },
+    {
+      "id": "softmax_tick_08",
+      "name": "Softmax Checkpoint 96",
+      "shape": "sphere",
+      "position": [
+        -0.55,
+        5.15,
+        0.86
+      ],
+      "size": [
+        0.095
+      ],
+      "material": "glass display",
+      "role": "Blue bead marking the final sliding-window softmax layer at layer 96.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "macro_tooth_08",
+        "stage_08_right"
+      ]
+    },
+    {
+      "id": "stage_01_left",
+      "name": "Stage 1 Left Cutaway Tray",
+      "shape": "box",
+      "position": [
+        -0.68,
+        0.95,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Left half of the first 12-layer tray; the center gap exposes the residual spine instead of hiding it.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_01_right",
+        "lightning_pre_norm"
+      ]
+    },
+    {
+      "id": "stage_01_right",
+      "name": "Stage 1 Right Cutaway Tray",
+      "shape": "box",
+      "position": [
+        0.68,
+        0.95,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Right half of stage 1 showing the macrocycle return path after softmax layer 12.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_01_left",
+        "softmax_tick_01"
+      ]
+    },
+    {
+      "id": "stage_02_left",
+      "name": "Stage 2 Left Cutaway Tray",
+      "shape": "box",
+      "position": [
+        -0.68,
+        1.55,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Left half of the second 12-layer tray, leaving the residual pipe visible through the tower.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_02_right"
+      ]
+    },
+    {
+      "id": "stage_02_right",
+      "name": "Stage 2 Right Cutaway Tray",
+      "shape": "box",
+      "position": [
+        0.68,
+        1.55,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Right half of stage 2 aligned to the softmax checkpoint at layer 24.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_02_left",
+        "softmax_tick_02"
+      ]
+    },
+    {
+      "id": "stage_03_left",
+      "name": "Stage 3 Left Cutaway Tray",
+      "shape": "box",
+      "position": [
+        -0.68,
+        2.15,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Left half of the third 12-layer tray, exposing the repeated residual read/write opening.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_03_right"
+      ]
+    },
+    {
+      "id": "stage_03_right",
+      "name": "Stage 3 Right Cutaway Tray",
+      "shape": "box",
+      "position": [
+        0.68,
+        2.15,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Right half of stage 3 aligned to the softmax checkpoint at layer 36.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_03_left",
+        "softmax_tick_03"
+      ]
+    },
+    {
+      "id": "stage_04_left",
+      "name": "Stage 4 Left Cutaway Tray",
+      "shape": "box",
+      "position": [
+        -0.68,
+        2.75,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Left half of the midpoint tray where layers 37-47 remain lightning-majority.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_04_right"
+      ]
+    },
+    {
+      "id": "stage_04_right",
+      "name": "Stage 4 Right Cutaway Tray",
+      "shape": "box",
+      "position": [
+        0.68,
+        2.75,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Right half of stage 4 aligned to the softmax checkpoint at layer 48.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_04_left",
+        "softmax_tick_04"
+      ]
+    },
+    {
+      "id": "stage_05_left",
+      "name": "Stage 5 Left Cutaway Tray",
+      "shape": "box",
+      "position": [
+        -0.68,
+        3.35,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Left half of stage 5 showing that later layers keep the same exposed hybrid cadence.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_05_right"
+      ]
+    },
+    {
+      "id": "stage_05_right",
+      "name": "Stage 5 Right Cutaway Tray",
+      "shape": "box",
+      "position": [
+        0.68,
+        3.35,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Right half of stage 5 aligned to the softmax checkpoint at layer 60.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_05_left",
+        "softmax_tick_05"
+      ]
+    },
+    {
+      "id": "stage_06_left",
+      "name": "Stage 6 Left Cutaway Tray",
+      "shape": "box",
+      "position": [
+        -0.68,
+        3.95,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Left half of stage 6, preserving an open slot around the residual spine.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_06_right"
+      ]
+    },
+    {
+      "id": "stage_06_right",
+      "name": "Stage 6 Right Cutaway Tray",
+      "shape": "box",
+      "position": [
+        0.68,
+        3.95,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Right half of stage 6 aligned to the softmax checkpoint at layer 72.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_06_left",
+        "softmax_tick_06"
+      ]
+    },
+    {
+      "id": "stage_07_left",
+      "name": "Stage 7 Left Cutaway Tray",
+      "shape": "box",
+      "position": [
+        -0.68,
+        4.55,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Left half of stage 7, keeping softmax as a periodic checkpoint rather than a full-stack mechanism.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_07_right"
+      ]
+    },
+    {
+      "id": "stage_07_right",
+      "name": "Stage 7 Right Cutaway Tray",
+      "shape": "box",
+      "position": [
+        0.68,
+        4.55,
+        0
+      ],
+      "size": [
+        1.05,
+        0.24,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Right half of stage 7 aligned to the softmax checkpoint at layer 84.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_07_left",
+        "softmax_tick_07"
+      ]
+    },
+    {
+      "id": "stage_08_left",
+      "name": "Stage 8 Left Cutaway Tray",
+      "shape": "box",
+      "position": [
+        -0.68,
+        5.15,
+        0
+      ],
+      "size": [
+        1.05,
+        0.28,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Left half of the final tray before the tied LM head.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_08_right",
+        "prediction_head"
+      ]
+    },
+    {
+      "id": "stage_08_right",
+      "name": "Stage 8 Right Cutaway Tray",
+      "shape": "box",
+      "position": [
+        0.68,
+        5.15,
+        0
+      ],
+      "size": [
+        1.05,
+        0.28,
+        1.18
+      ],
+      "material": "aluminum",
+      "role": "Right half of the final tray aligned to softmax layer 96 and the output head.",
+      "compute_profile": "mixed",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "stage_08_left",
+        "softmax_tick_08",
+        "prediction_head"
+      ]
+    },
+    {
+      "id": "attention_branch_rail",
+      "name": "Exploded Lightning Branch Rail",
+      "shape": "box",
+      "position": [
+        -2.15,
+        2.55,
+        0.92
+      ],
+      "size": [
+        0.08,
+        3.9,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Open support rail holding the lightning sublayer pieces outside the stack so no internal part is hidden.",
+      "compute_profile": "negligible",
+      "parallelism": "none",
+      "connections": [
+        "base_frame",
+        "lightning_pre_norm",
+        "lightning_qkv_gate_proj",
+        "gated_lightning_scan_kernel",
+        "lightning_state_bank",
+        "lightning_o_proj"
+      ]
+    },
+    {
+      "id": "lightning_pre_norm",
+      "name": "Lightning Pre-RMSNorm",
+      "shape": "box",
+      "position": [
+        -2.15,
+        1.25,
+        0.92
+      ],
+      "size": [
+        0.72,
+        0.18,
+        0.42
+      ],
+      "material": "white composite",
+      "role": "Normalizes the residual stream before the gated linear-attention sublayer.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "attention_branch_rail",
+        "stage_01_left",
+        "lightning_qkv_gate_proj"
+      ]
+    },
+    {
+      "id": "lightning_qkv_gate_proj",
+      "name": "Lightning QKV + Decay-Gate Projection",
+      "shape": "box",
+      "position": [
+        -2.15,
+        1.8,
+        0.92
+      ],
+      "size": [
+        0.86,
+        0.24,
+        0.5
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Projects Q, K, V and the per-token learnable decay gate that controls state retention.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "algorithm": "Q,K,V = projections(x); delta_t = sigmoid(x @ W_decay)",
+      "connections": [
+        "lightning_pre_norm",
+        "gated_lightning_scan_kernel"
+      ]
+    },
+    {
+      "id": "gated_lightning_scan_kernel",
+      "name": "Gated Lightning Scan Kernel",
+      "shape": "cylinder",
+      "position": [
+        -2.15,
+        2.45,
+        0.92
+      ],
+      "size": [
+        0.34,
+        0.32
+      ],
+      "material": "copper",
+      "role": "Updates the recurrent state with a Mamba-style decay, giving constant-context memory with selective forgetting.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "flops_per_token": "≈ 4·d_k·d_v per token per layer",
+      "memory_footprint": "≈ 1–2 MB recurrent state per sequence per layer",
+      "parallelism": "sequential",
+      "algorithm": "S = (1-delta_t)*S + delta_t*outer(K_t,V_t); out_t = Q_t @ S",
+      "connections": [
+        "lightning_qkv_gate_proj",
+        "lightning_state_bank",
+        "lightning_o_proj"
+      ]
+    },
+    {
+      "id": "lightning_state_bank",
+      "name": "Fixed-Size Lightning State Bank",
+      "shape": "torus",
+      "position": [
+        -2.15,
+        3.05,
+        0.92
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.38,
+        0.08
+      ],
+      "material": "glass display",
+      "role": "Ring-shaped state store showing that lightning memory is fixed-size and independent of the 4M-token input length.",
+      "compute_profile": "gpu-memory-bound",
+      "memory_footprint": "constant in T; roughly MB-scale per layer per sequence",
+      "parallelism": "data-parallel",
+      "connections": [
+        "gated_lightning_scan_kernel"
+      ]
+    },
+    {
+      "id": "lightning_o_proj",
+      "name": "Lightning Output Projection",
+      "shape": "box",
+      "position": [
+        -2.15,
+        3.65,
+        0.92
+      ],
+      "size": [
+        0.76,
+        0.22,
+        0.46
+      ],
+      "material": "brass",
+      "role": "Projects the gated-lightning result back to the d=6144 residual width.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "gated_lightning_scan_kernel",
+        "residual_pipe"
+      ]
+    },
+    {
+      "id": "softmax_branch_rail",
+      "name": "Exploded Sliding-Softmax Branch Rail",
+      "shape": "box",
+      "position": [
+        -2.15,
+        3.25,
+        -0.92
+      ],
+      "size": [
+        0.08,
+        4.2,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Open support rail for the sparse softmax pieces, placed behind the stack but visible from side and top views.",
+      "compute_profile": "negligible",
+      "parallelism": "none",
+      "connections": [
+        "base_frame",
+        "softmax_qkv_proj",
+        "rope_rotary_unit",
+        "sliding_window_mask_4096",
+        "softmax_kv_cache_stack",
+        "flash_attention_output"
+      ]
+    },
+    {
+      "id": "softmax_qkv_proj",
+      "name": "Softmax QKV Projection (GQA 64Q/8KV)",
+      "shape": "box",
+      "position": [
+        -2.15,
+        2,
+        -0.92
+      ],
+      "size": [
+        0.82,
+        0.22,
+        0.48
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Generates grouped-query Q, K, and V tensors only for the eight periodic sliding-softmax layers.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "algorithm": "Q,K,V = projections(x) with 64 Q heads and 8 KV heads",
+      "connections": [
+        "softmax_branch_rail",
+        "rope_rotary_unit"
+      ]
+    },
+    {
+      "id": "rope_rotary_unit",
+      "name": "RoPE Position Unit",
+      "shape": "cylinder",
+      "position": [
+        -2.15,
+        2.55,
+        -0.92
+      ],
+      "size": [
+        0.24,
+        0.28
+      ],
+      "material": "steel",
+      "role": "Applies rotary position embedding before the 4096-token causal window is evaluated.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "softmax_qkv_proj",
+        "sliding_window_mask_4096"
+      ]
+    },
+    {
+      "id": "sliding_window_mask_4096",
+      "name": "4096-Token Sliding Window Mask",
+      "shape": "box",
+      "position": [
+        -2.15,
+        3.1,
+        -0.92
+      ],
+      "size": [
+        0.9,
+        0.12,
+        0.52
+      ],
+      "material": "rubber",
+      "role": "Bounds softmax attention to the previous 4096 tokens, replacing full-context KV growth.",
+      "compute_profile": "gpu-memory-bound",
+      "parallelism": "sequence-parallel",
+      "connections": [
+        "rope_rotary_unit",
+        "softmax_kv_cache_stack"
+      ]
+    },
+    {
+      "id": "softmax_kv_cache_stack",
+      "name": "Softmax KV Cache Stack",
+      "shape": "capsule",
+      "position": [
+        -2.15,
+        3.82,
+        -0.92
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0.24,
+        0.9
+      ],
+      "material": "glass display",
+      "role": "Holds the eight-layer by 4096-token GQA KV cache, which stays bounded even at 4M input length.",
+      "compute_profile": "memory-capacity-bound",
+      "memory_footprint": "≈ 4 KB/token/layer × 4096 × 8 ≈ 130 MiB per sequence",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "sliding_window_mask_4096",
+        "flash_attention_output"
+      ]
+    },
+    {
+      "id": "flash_attention_output",
+      "name": "Sliding FlashAttention Output",
+      "shape": "box",
+      "position": [
+        -2.15,
+        4.55,
+        -0.92
+      ],
+      "size": [
+        0.82,
+        0.2,
+        0.48
+      ],
+      "material": "brushed steel",
+      "role": "Computes the sparse softmax attention result and returns it to the residual stream.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "algorithm": "out = flash_attn(Q,K,V, causal_sliding_window=4096)",
+      "connections": [
+        "softmax_kv_cache_stack",
+        "residual_pipe"
+      ]
+    },
+    {
+      "id": "moe_module_rail",
+      "name": "MoE Module Rail",
+      "shape": "box",
+      "position": [
+        2.55,
+        2.8,
+        0
+      ],
+      "size": [
+        0.1,
+        4.5,
+        0.1
+      ],
+      "material": "brushed steel",
+      "role": "Right-side open rail carrying the router, experts, and all-to-all buses as an exposed assembly.",
+      "compute_profile": "negligible",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "base_frame",
+        "moe_router",
+        "moe_dispatch_bus",
+        "expert_cartridge_01",
+        "expert_cartridge_02",
+        "expert_cartridge_03",
+        "expert_cartridge_04",
+        "expert_cartridge_05",
+        "expert_cartridge_06",
+        "expert_cartridge_07",
+        "expert_cartridge_08",
+        "expert_cartridge_09",
+        "expert_cartridge_10",
+        "expert_cartridge_11",
+        "expert_cartridge_12",
+        "expert_cartridge_13",
+        "expert_cartridge_14",
+        "expert_cartridge_15",
+        "expert_cartridge_16",
+        "expert_index_slab_64",
+        "moe_shared_expert",
+        "moe_combine_bus",
+        "fp4_weight_shelf"
+      ]
+    },
+    {
+      "id": "moe_router",
+      "name": "Top-3 Softmax Router",
+      "shape": "cylinder",
+      "position": [
+        2.55,
+        4.9,
+        0
+      ],
+      "size": [
+        0.42,
+        0.18
+      ],
+      "material": "glass display",
+      "role": "Chooses the top three routed experts from a projected bank of 64, with one shared expert always available.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "residual_pipe",
+        "moe_dispatch_bus"
+      ]
+    },
+    {
+      "id": "moe_dispatch_bus",
+      "name": "Expert Dispatch Bus",
+      "shape": "capsule",
+      "position": [
+        2.55,
+        4.25,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        1.95
+      ],
+      "material": "copper",
+      "role": "NCCL all-to-all dispatch path that sends token batches to the selected expert shards.",
+      "compute_profile": "communication-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_router",
+        "expert_cartridge_01",
+        "expert_cartridge_02",
+        "expert_cartridge_03",
+        "expert_cartridge_04",
+        "expert_cartridge_05",
+        "expert_cartridge_06",
+        "expert_cartridge_07",
+        "expert_cartridge_08",
+        "expert_cartridge_09",
+        "expert_cartridge_10",
+        "expert_cartridge_11",
+        "expert_cartridge_12",
+        "expert_cartridge_13",
+        "expert_cartridge_14",
+        "expert_cartridge_15",
+        "expert_cartridge_16"
+      ]
+    },
+    {
+      "id": "expert_cartridge_01",
+      "name": "Routed Expert Cartridge 1 of 64",
+      "shape": "box",
+      "position": [
+        1.95,
+        3.62,
+        0.9
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Visible cartridge for one SwiGLU routed expert with d_ff≈9216 in the 64-expert bank.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_02",
+      "name": "Routed Expert Cartridge 2 of 64",
+      "shape": "box",
+      "position": [
+        2.35,
+        3.62,
+        0.9
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Visible cartridge for a second independently routed expert shard.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_03",
+      "name": "Routed Expert Cartridge 3 of 64",
+      "shape": "box",
+      "position": [
+        2.75,
+        3.62,
+        0.9
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Visible cartridge that can be one of the top-3 experts selected by the router.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_04",
+      "name": "Routed Expert Cartridge 4 of 64",
+      "shape": "box",
+      "position": [
+        3.15,
+        3.62,
+        0.9
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Visible cartridge proving the MoE is a bank of separate FFN shards, not a dense block.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_05",
+      "name": "Routed Expert Cartridge 5 of 64",
+      "shape": "box",
+      "position": [
+        1.95,
+        3.62,
+        0.3
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second-row routed expert cartridge showing expert parallel placement across devices.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_06",
+      "name": "Routed Expert Cartridge 6 of 64",
+      "shape": "box",
+      "position": [
+        2.35,
+        3.62,
+        0.3
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second-row routed expert cartridge for a separate shard in the all-to-all path.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_07",
+      "name": "Routed Expert Cartridge 7 of 64",
+      "shape": "box",
+      "position": [
+        2.75,
+        3.62,
+        0.3
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second-row routed expert cartridge that receives a capacity-limited token batch.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_08",
+      "name": "Routed Expert Cartridge 8 of 64",
+      "shape": "box",
+      "position": [
+        3.15,
+        3.62,
+        0.3
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second-row routed expert cartridge completing the front half of the exposed 16-expert detail.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_09",
+      "name": "Routed Expert Cartridge 9 of 64",
+      "shape": "box",
+      "position": [
+        1.95,
+        3.62,
+        -0.3
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear-row expert cartridge showing the bank continues behind the visible front row.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_10",
+      "name": "Routed Expert Cartridge 10 of 64",
+      "shape": "box",
+      "position": [
+        2.35,
+        3.62,
+        -0.3
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear-row expert cartridge for another independently routed SwiGLU shard.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_11",
+      "name": "Routed Expert Cartridge 11 of 64",
+      "shape": "box",
+      "position": [
+        2.75,
+        3.62,
+        -0.3
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear-row expert cartridge that makes all-to-all dispatch visually countable.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_12",
+      "name": "Routed Expert Cartridge 12 of 64",
+      "shape": "box",
+      "position": [
+        3.15,
+        3.62,
+        -0.3
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear-row expert cartridge showing the sparse expert pool beyond the top-3 active set.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_13",
+      "name": "Routed Expert Cartridge 13 of 64",
+      "shape": "box",
+      "position": [
+        1.95,
+        3.62,
+        -0.9
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Back-row expert cartridge anchoring the 4×4 exposed detail view of the 64-expert bank.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_14",
+      "name": "Routed Expert Cartridge 14 of 64",
+      "shape": "box",
+      "position": [
+        2.35,
+        3.62,
+        -0.9
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Back-row expert cartridge documenting another routed FFN shard.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_15",
+      "name": "Routed Expert Cartridge 15 of 64",
+      "shape": "box",
+      "position": [
+        2.75,
+        3.62,
+        -0.9
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Back-row expert cartridge for a capacity-factor-limited token route.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_cartridge_16",
+      "name": "Routed Expert Cartridge 16 of 64",
+      "shape": "box",
+      "position": [
+        3.15,
+        3.62,
+        -0.9
+      ],
+      "size": [
+        0.28,
+        0.42,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Back-row expert cartridge completing the visible 16-cartridge detail of the 64-routed-expert pool.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_dispatch_bus",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "expert_index_slab_64",
+      "name": "64-Expert Index Slab",
+      "shape": "box",
+      "position": [
+        3.58,
+        3.15,
+        0
+      ],
+      "size": [
+        0.1,
+        1.05,
+        1.95
+      ],
+      "material": "glass display",
+      "role": "Transparent index plane declaring that the 16 exposed cartridges are a detail view of a 64-routed-expert bank.",
+      "compute_profile": "negligible",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_module_rail",
+        "expert_cartridge_04",
+        "expert_cartridge_16"
+      ]
+    },
+    {
+      "id": "moe_shared_expert",
+      "name": "Shared Expert",
+      "shape": "cylinder",
+      "position": [
+        3.55,
+        4.35,
+        0
+      ],
+      "size": [
+        0.28,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Always-on expert that handles common computation and over-capacity routed tokens.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "moe_router",
+        "moe_combine_bus"
+      ]
+    },
+    {
+      "id": "moe_combine_bus",
+      "name": "Expert Combine Bus",
+      "shape": "capsule",
+      "position": [
+        2.55,
+        2.75,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        2
+      ],
+      "material": "copper",
+      "role": "All-to-all combine path that gathers top-3 expert outputs before writing back to the residual stream.",
+      "compute_profile": "communication-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "expert_cartridge_01",
+        "expert_cartridge_02",
+        "expert_cartridge_03",
+        "expert_cartridge_04",
+        "expert_cartridge_05",
+        "expert_cartridge_06",
+        "expert_cartridge_07",
+        "expert_cartridge_08",
+        "expert_cartridge_09",
+        "expert_cartridge_10",
+        "expert_cartridge_11",
+        "expert_cartridge_12",
+        "expert_cartridge_13",
+        "expert_cartridge_14",
+        "expert_cartridge_15",
+        "expert_cartridge_16",
+        "moe_shared_expert",
+        "residual_return_bus"
+      ]
+    },
+    {
+      "id": "residual_return_bus",
+      "name": "MoE Residual Return Bus",
+      "shape": "capsule",
+      "position": [
+        1.28,
+        2.75,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.06,
+        2.55
+      ],
+      "material": "copper",
+      "role": "Visible return conduit carrying combined expert activations back from the MoE rail to the residual pipe.",
+      "compute_profile": "communication-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_combine_bus",
+        "residual_pipe"
+      ]
+    },
+    {
+      "id": "fp4_weight_shelf",
+      "name": "Projected FP4 Expert Weight Shelf",
+      "shape": "box",
+      "position": [
+        2.55,
+        2.15,
+        0
+      ],
+      "size": [
+        1.85,
+        0.12,
+        0.8
+      ],
+      "material": "brass",
+      "role": "Documents the projected FP4 or FP8 expert-weight quantization-aware training shelf for routed weights.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "expert-parallel",
+      "connections": [
+        "moe_module_rail",
+        "expert_cartridge_01",
+        "expert_cartridge_16"
+      ]
+    },
+    {
+      "id": "prediction_head",
+      "name": "Tied LM Head",
+      "shape": "box",
+      "position": [
+        0,
+        5.95,
+        0
+      ],
+      "size": [
+        2.2,
+        0.32,
+        0.95
+      ],
+      "material": "white composite",
+      "role": "Projects the final residual state back to the projected 200K-token vocabulary using tied embedding weights.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "tensor-parallel",
+      "connections": [
+        "stage_08_left",
+        "stage_08_right",
+        "lm_loss_probe",
+        "trainer_feedback_bus"
+      ]
+    },
+    {
+      "id": "lm_loss_probe",
+      "name": "Next-Token Loss Probe",
+      "shape": "sphere",
+      "position": [
+        -1.25,
+        6.55,
+        0
+      ],
+      "size": [
+        0.24
+      ],
+      "material": "glass display",
+      "role": "Pre-training loss probe for next-token prediction before RL post-training.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "data-parallel",
+      "connections": [
+        "prediction_head"
+      ]
+    },
+    {
+      "id": "trainer_backplane",
+      "name": "MARS Trainer Backplane",
+      "shape": "box",
+      "position": [
+        1.75,
+        6.55,
+        0
+      ],
+      "size": [
+        2.25,
+        0.1,
+        1.1
+      ],
+      "material": "brushed steel",
+      "role": "Open top rail that makes the post-training loop separate from, but connected to, the base model.",
+      "compute_profile": "communication-bound",
+      "parallelism": "data-parallel",
+      "connections": [
+        "base_frame",
+        "mars_policy_swarm",
+        "reward_model_bank",
+        "rollout_buffer_200k",
+        "optimizer_adamw_muon"
+      ]
+    },
+    {
+      "id": "mars_policy_swarm",
+      "name": "MARS Policy Swarm",
+      "shape": "torus",
+      "position": [
+        1.15,
+        6.9,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.55,
+        0.09
+      ],
+      "material": "copper",
+      "role": "Projected multi-agent policy ring where copied policies debate or cooperate during long reasoning rollouts.",
+      "compute_profile": "communication-bound",
+      "parallelism": "data-parallel",
+      "algorithm": "agents = [policy.copy() for _ in range(N)]; rollouts, debate_log = self_play(agents, prompts)",
+      "connections": [
+        "trainer_backplane",
+        "reward_model_bank",
+        "rollout_buffer_200k"
+      ]
+    },
+    {
+      "id": "reward_model_bank",
+      "name": "Reward Model Bank",
+      "shape": "box",
+      "position": [
+        2.35,
+        6.95,
+        0.55
+      ],
+      "size": [
+        0.92,
+        0.36,
+        0.42
+      ],
+      "material": "glass display",
+      "role": "Scores math, code, agentic tool-use, SWE, and debate-agreement outcomes for the projected MARS trainer.",
+      "compute_profile": "gpu-compute-bound",
+      "parallelism": "data-parallel",
+      "connections": [
+        "trainer_backplane",
+        "mars_policy_swarm",
+        "optimizer_adamw_muon"
+      ]
+    },
+    {
+      "id": "rollout_buffer_200k",
+      "name": "200K-Token Rollout Buffer",
+      "shape": "capsule",
+      "position": [
+        2.35,
+        6.95,
+        -0.55
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.18,
+        0.95
+      ],
+      "material": "aluminum",
+      "role": "Stores projected long-output trajectories for RL updates over 200K-token reasoning traces.",
+      "compute_profile": "storage-bound",
+      "parallelism": "data-parallel",
+      "connections": [
+        "trainer_backplane",
+        "mars_policy_swarm",
+        "optimizer_adamw_muon"
+      ]
+    },
+    {
+      "id": "optimizer_adamw_muon",
+      "name": "AdamW or Muon Optimizer Module",
+      "shape": "box",
+      "position": [
+        3.25,
+        6.6,
+        0
+      ],
+      "size": [
+        0.8,
+        0.5,
+        0.62
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Applies the projected RL and pre-training optimizer updates back into model weights.",
+      "compute_profile": "gpu-bandwidth-bound",
+      "parallelism": "data-parallel",
+      "connections": [
+        "reward_model_bank",
+        "rollout_buffer_200k",
+        "trainer_feedback_bus"
+      ]
+    },
+    {
+      "id": "trainer_feedback_bus",
+      "name": "Trainer Feedback Bus",
+      "shape": "capsule",
+      "position": [
+        1.55,
+        5.95,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.06,
+        2.2
+      ],
+      "material": "copper",
+      "role": "Returns optimizer updates from the projected MARS loop to the model weights and residual stack.",
+      "compute_profile": "communication-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "optimizer_adamw_muon",
+        "prediction_head",
+        "residual_pipe"
+      ]
+    },
+    {
+      "id": "parallelism_backplane",
+      "name": "TP × EP × PP × DP Backplane",
+      "shape": "box",
+      "position": [
+        4.1,
+        2.2,
+        -1.15
+      ],
+      "size": [
+        0.22,
+        3.3,
+        0.95
+      ],
+      "material": "glass display",
+      "role": "Documents tensor, expert, pipeline, and data parallelism plus state-passing for chunked-scan lightning prefill.",
+      "compute_profile": "communication-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "parallelism_datum_bus",
+        "moe_module_rail",
+        "context_curriculum_pipe"
+      ]
+    },
+    {
+      "id": "parallelism_datum_bus",
+      "name": "Parallelism Datum Bus",
+      "shape": "capsule",
+      "position": [
+        3,
+        0.35,
+        -1.15
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.06,
+        2.2
+      ],
+      "material": "brushed steel",
+      "role": "Ground-level rail tying the rear parallelism panel physically back to the base frame and MoE assembly.",
+      "compute_profile": "communication-bound",
+      "parallelism": "pipeline-parallel",
+      "connections": [
+        "base_frame",
+        "parallelism_backplane",
+        "moe_module_rail"
+      ]
+    },
+    {
+      "id": "context_curriculum_pipe",
+      "name": "4M-Context Curriculum Pipe",
+      "shape": "capsule",
+      "position": [
+        4.1,
+        0.65,
+        -1.15
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.16,
+        1.25
+      ],
+      "material": "black composite",
+      "role": "Represents projected pre-training and RL curriculum stages that extend input context to 4M tokens.",
+      "compute_profile": "storage-bound",
+      "parallelism": "data-parallel",
+      "connections": [
+        "parallelism_backplane",
+        "parallelism_datum_bus",
+        "input_plate"
+      ]
+    }
   ]
 }

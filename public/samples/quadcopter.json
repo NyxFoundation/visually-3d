@@ -1,6 +1,6 @@
 {
   "machine_name": "FPV Racing Quadcopter",
-  "assembly_instructions": "1) Bolt the four carbon arms (arm_fl/fr/rl/rr) onto the bottom_plate at 45 degrees. 2) Stand the four corner standoffs on the bottom_plate and cap them with the top_plate, sandwiching the arms. 3) Mount the 4-in-1 esc_board on the bottom_plate, then stack fc_board and vtx_board above it on 30.5 mm standoffs. 4) Fasten each motor_base to its arm tip and press on the motor_bell rotor. 5) Bolt the three pitched blades onto each motor_bell to form the tri-blade props. 6) Clip the camera_body into the front camera_cage and thread the camera_lens; route signal to fc_board. 7) Fit the antenna_mount at the rear and screw in the antenna_whip from the vtx_board. 8) Strap the LiPo battery onto the top_plate with the battery_strap and connect it to the esc_board.",
+  "assembly_instructions": "1) Lay the 0.95 m scaled lower carbon sandwich plate at y=0.155 and bolt the four 5 mm scaled X arms to it using the eight arm clamp screws. 2) Add the four aluminum frame standoffs at the plate corners, then fasten the split left and right top rails so the center stack remains open. 3) Install the four 30.5 mm-pattern stack standoffs on the bottom plate, place the 4-in-1 ESC board first, add the flight controller board above it, then add the VTX board on the upper spacers. 4) Solder or plug the four motor phase wire bundles from the ESC board to each arm and motor stator. 5) Bolt each 2207 stator to its arm tip with four screws, drop the rotor bell over the stator, then install the prop hub, three pitched blades, and prop nut on each motor. 6) Assemble the FPV camera between the two camera side cheeks, tilt it about 30 degrees upward, and connect its signal lead to the flight controller. 7) Mount the rear TPU antenna block, route the VTX coax from the VTX board, and seat the angled 5.8 GHz antenna whip clear of the prop discs. 8) In flight configuration, lower the exploded LiPo pack and strap onto the split top rails, connect the XT60 lead to the ESC input, and tighten the strap across the pack.",
   "metadata": {
     "domain": "aerial-robotics",
     "thumbnail_camera": [
@@ -10,27 +10,28 @@
     ],
     "info": "A 5-inch-class freestyle/racing FPV quadcopter on a carbon-fiber true-X frame, scaled approximately 14x from real dimensions for legibility.",
     "facts": [
-      "Wheelbase ~220 mm (5-inch class), measured motor-to-motor across the diagonal.",
-      "Motors are 2207-size (22 mm stator dia, 7 mm height), ~2400 KV brushless outrunners.",
-      "Propellers are 5x4.3x3 tri-blade, 127 mm diameter, two CW and two CCW.",
-      "Battery is 6S LiPo (22.2 V nominal, 25.2 V full), 1300 mAh, ~95C discharge.",
-      "All-up weight is roughly 600 g ready-to-fly.",
-      "Flight-controller stack uses the 30.5 x 30.5 mm mounting pattern on M3 standoffs.",
-      "Video transmitter runs 5.8 GHz analog, switchable up to 800 mW.",
-      "Static thrust-to-weight ratio is approximately 8:1.",
-      "Carbon plates are ~2 mm thick; arms are ~5 mm thick for impact resistance.",
-      "Top speed is roughly 140 km/h in level flight."
+      "Wheelbase ~220 mm real, shown scaled to 2.20 m motor-to-motor across the diagonal.",
+      "5 inch propellers are 127 mm diameter real, shown as 1.27 m swept discs.",
+      "2207 brushless motors have 22 mm stator diameter and 7 mm stator height in real hardware.",
+      "The flight stack uses a 30.5 x 30.5 mm real M3 mounting pattern, shown as a 0.305 m square scaled pattern.",
+      "Carbon arms are about 5 mm thick real, shown as 0.06 m thick members for visibility.",
+      "Main carbon plates are about 2 mm thick real, shown as 0.04 to 0.05 m thick scaled plates.",
+      "Typical 6S 1300 mAh LiPo packs are about 75 x 35 x 35 mm real and 22.2 V nominal.",
+      "The FPV camera is canted about 30 degrees upward for high-speed forward flight.",
+      "Analog VTX antennas operate at 5.8 GHz and are placed aft to clear carbon and prop wash.",
+      "Ready-to-fly all-up mass is commonly 550 to 650 g for this 5-inch class."
     ],
     "sources": [
       "iFlight Nazgul5 V3 5-inch quadcopter specifications",
       "T-Motor F40 PRO II / 2207 brushless motor datasheet",
-      "Joshua Bardwell, 'FPV Drone Build Guide', 2023"
+      "Betaflight 4.x setup documentation for 30.5 mm flight-controller stacks",
+      "Joshua Bardwell, FPV Drone Build Guide, 2023"
     ]
   },
   "parts": [
     {
       "id": "bottom_plate",
-      "name": "Bottom Carbon Plate",
+      "name": "Lower Carbon Sandwich Plate",
       "shape": "box",
       "position": [
         0,
@@ -38,12 +39,12 @@
         0
       ],
       "size": [
-        0.95,
-        0.05,
-        0.95
+        0.92,
+        0.045,
+        0.72
       ],
       "material": "carbon fiber",
-      "role": "Primary 2 mm carbon plate that the arms bolt to and that carries the electronics stack.",
+      "role": "Thin lower carbon plate that clamps the four arms and provides the root of the electronics stack.",
       "connections": [
         "arm_fl",
         "arm_fr",
@@ -53,38 +54,69 @@
         "standoff_fr",
         "standoff_rl",
         "standoff_rr",
+        "stack_standoff_fl",
+        "stack_standoff_fr",
+        "stack_standoff_rl",
+        "stack_standoff_rr",
         "esc_board",
-        "camera_cage",
-        "antenna_mount"
+        "camera_side_left",
+        "camera_side_right",
+        "antenna_mount",
+        "arm_screw_fl_in",
+        "arm_screw_fr_in",
+        "arm_screw_rl_in",
+        "arm_screw_rr_in"
       ]
     },
     {
-      "id": "top_plate",
-      "name": "Top Carbon Plate",
+      "id": "top_rail_left",
+      "name": "Left Split Top Rail",
       "shape": "box",
       "position": [
         0,
-        0.4,
-        0
+        0.405,
+        0.28
       ],
       "size": [
-        0.8,
-        0.05,
-        0.8
+        0.86,
+        0.045,
+        0.11
       ],
       "material": "carbon fiber",
-      "role": "Upper 2 mm carbon plate that clamps the arms in the true-X sandwich and supports the battery.",
+      "role": "Left upper carbon rail clamps the frame while leaving the flight stack visible from above.",
       "connections": [
         "standoff_fl",
-        "standoff_fr",
         "standoff_rl",
+        "battery",
+        "battery_strap"
+      ]
+    },
+    {
+      "id": "top_rail_right",
+      "name": "Right Split Top Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.405,
+        -0.28
+      ],
+      "size": [
+        0.86,
+        0.045,
+        0.11
+      ],
+      "material": "carbon fiber",
+      "role": "Right upper carbon rail clamps the frame while keeping the central boards exposed for the X-ray view.",
+      "connections": [
+        "standoff_fr",
         "standoff_rr",
-        "battery"
+        "battery",
+        "battery_strap"
       ]
     },
     {
       "id": "arm_fl",
-      "name": "Arm (Front-Left)",
+      "name": "Front-Left Carbon Arm",
       "shape": "box",
       "position": [
         0.55,
@@ -97,20 +129,23 @@
         0
       ],
       "size": [
-        1.75,
+        1.74,
         0.06,
         0.16
       ],
       "material": "carbon fiber",
-      "role": "5 mm carbon arm carrying the front-left motor out to the X-frame tip.",
+      "role": "Front-left 5 mm carbon arm carries the motor thrust load from the frame center to the tip.",
       "connections": [
         "bottom_plate",
-        "motor_base_fl"
+        "motor_stator_fl",
+        "arm_screw_fl_in",
+        "arm_screw_fl_out",
+        "phase_wires_fl"
       ]
     },
     {
       "id": "arm_fr",
-      "name": "Arm (Front-Right)",
+      "name": "Front-Right Carbon Arm",
       "shape": "box",
       "position": [
         0.55,
@@ -123,20 +158,23 @@
         0
       ],
       "size": [
-        1.75,
+        1.74,
         0.06,
         0.16
       ],
       "material": "carbon fiber",
-      "role": "5 mm carbon arm carrying the front-right motor out to the X-frame tip.",
+      "role": "Front-right 5 mm carbon arm carries the motor thrust load from the frame center to the tip.",
       "connections": [
         "bottom_plate",
-        "motor_base_fr"
+        "motor_stator_fr",
+        "arm_screw_fr_in",
+        "arm_screw_fr_out",
+        "phase_wires_fr"
       ]
     },
     {
       "id": "arm_rl",
-      "name": "Arm (Rear-Left)",
+      "name": "Rear-Left Carbon Arm",
       "shape": "box",
       "position": [
         -0.55,
@@ -149,20 +187,23 @@
         0
       ],
       "size": [
-        1.75,
+        1.74,
         0.06,
         0.16
       ],
       "material": "carbon fiber",
-      "role": "5 mm carbon arm carrying the rear-left motor out to the X-frame tip.",
+      "role": "Rear-left 5 mm carbon arm carries the motor thrust load from the frame center to the tip.",
       "connections": [
         "bottom_plate",
-        "motor_base_rl"
+        "motor_stator_rl",
+        "arm_screw_rl_in",
+        "arm_screw_rl_out",
+        "phase_wires_rl"
       ]
     },
     {
       "id": "arm_rr",
-      "name": "Arm (Rear-Right)",
+      "name": "Rear-Right Carbon Arm",
       "shape": "box",
       "position": [
         -0.55,
@@ -175,20 +216,23 @@
         0
       ],
       "size": [
-        1.75,
+        1.74,
         0.06,
         0.16
       ],
       "material": "carbon fiber",
-      "role": "5 mm carbon arm carrying the rear-right motor out to the X-frame tip.",
+      "role": "Rear-right 5 mm carbon arm carries the motor thrust load from the frame center to the tip.",
       "connections": [
         "bottom_plate",
-        "motor_base_rr"
+        "motor_stator_rr",
+        "arm_screw_rr_in",
+        "arm_screw_rr_out",
+        "phase_wires_rr"
       ]
     },
     {
       "id": "standoff_fl",
-      "name": "Standoff (Front-Left)",
+      "name": "Frame Standoff Front-Left",
       "shape": "cylinder",
       "position": [
         0.34,
@@ -200,15 +244,15 @@
         0.26
       ],
       "material": "dark anodized aluminum",
-      "role": "Aluminum spacer setting the gap between the bottom and top carbon plates.",
+      "role": "Aluminum post setting the front-left gap between lower plate and top rail.",
       "connections": [
         "bottom_plate",
-        "top_plate"
+        "top_rail_left"
       ]
     },
     {
       "id": "standoff_fr",
-      "name": "Standoff (Front-Right)",
+      "name": "Frame Standoff Front-Right",
       "shape": "cylinder",
       "position": [
         0.34,
@@ -220,15 +264,15 @@
         0.26
       ],
       "material": "dark anodized aluminum",
-      "role": "Aluminum spacer setting the gap between the bottom and top carbon plates.",
+      "role": "Aluminum post setting the front-right gap between lower plate and top rail.",
       "connections": [
         "bottom_plate",
-        "top_plate"
+        "top_rail_right"
       ]
     },
     {
       "id": "standoff_rl",
-      "name": "Standoff (Rear-Left)",
+      "name": "Frame Standoff Rear-Left",
       "shape": "cylinder",
       "position": [
         -0.34,
@@ -240,15 +284,15 @@
         0.26
       ],
       "material": "dark anodized aluminum",
-      "role": "Aluminum spacer setting the gap between the bottom and top carbon plates.",
+      "role": "Aluminum post setting the rear-left gap between lower plate and top rail.",
       "connections": [
         "bottom_plate",
-        "top_plate"
+        "top_rail_left"
       ]
     },
     {
       "id": "standoff_rr",
-      "name": "Standoff (Rear-Right)",
+      "name": "Frame Standoff Rear-Right",
       "shape": "cylinder",
       "position": [
         -0.34,
@@ -260,482 +304,98 @@
         0.26
       ],
       "material": "dark anodized aluminum",
-      "role": "Aluminum spacer setting the gap between the bottom and top carbon plates.",
+      "role": "Aluminum post setting the rear-right gap between lower plate and top rail.",
       "connections": [
         "bottom_plate",
-        "top_plate"
+        "top_rail_right"
       ]
     },
     {
-      "id": "motor_base_fl",
-      "name": "Motor Stator (Front-Left)",
+      "id": "stack_standoff_fl",
+      "name": "Stack Standoff Front-Left",
       "shape": "cylinder",
       "position": [
-        1.1,
-        0.3,
-        1.1
+        0.152,
+        0.305,
+        0.152
       ],
       "size": [
-        0.16,
-        0.16
-      ],
-      "material": "brushed steel",
-      "role": "Fixed 2207 stator can wound with copper that drives the front-left rotor.",
-      "connections": [
-        "arm_fl",
-        "motor_bell_fl",
-        "esc_board"
-      ]
-    },
-    {
-      "id": "motor_bell_fl",
-      "name": "Motor Bell (Front-Left)",
-      "shape": "cylinder",
-      "position": [
-        1.1,
-        0.44,
-        1.1
-      ],
-      "size": [
-        0.2,
-        0.12
+        0.018,
+        0.28
       ],
       "material": "dark anodized aluminum",
-      "role": "Spinning rotor bell holding the magnets; the propeller bolts to its top.",
+      "role": "M3 stack spacer at the front-left 30.5 mm-pattern board mounting point.",
       "connections": [
-        "motor_base_fl",
-        "prop_fl_b1",
-        "prop_fl_b2",
-        "prop_fl_b3"
+        "bottom_plate",
+        "esc_board",
+        "fc_board",
+        "vtx_board"
       ]
     },
     {
-      "id": "prop_fl_b1",
-      "name": "Prop Blade FL-1",
-      "shape": "box",
-      "position": [
-        1.55,
-        0.535,
-        1.1
-      ],
-      "rotation": [
-        0.32,
-        0,
-        0
-      ],
-      "size": [
-        0.78,
-        0.025,
-        0.15
-      ],
-      "material": "black composite",
-      "role": "One of three pitched blades of the front-left CCW propeller generating lift.",
-      "connections": [
-        "motor_bell_fl"
-      ]
-    },
-    {
-      "id": "prop_fl_b2",
-      "name": "Prop Blade FL-2",
-      "shape": "box",
-      "position": [
-        0.875,
-        0.535,
-        0.71
-      ],
-      "rotation": [
-        0.32,
-        2.0944,
-        0
-      ],
-      "size": [
-        0.78,
-        0.025,
-        0.15
-      ],
-      "material": "black composite",
-      "role": "One of three pitched blades of the front-left CCW propeller generating lift.",
-      "connections": [
-        "motor_bell_fl"
-      ]
-    },
-    {
-      "id": "prop_fl_b3",
-      "name": "Prop Blade FL-3",
-      "shape": "box",
-      "position": [
-        0.875,
-        0.535,
-        1.49
-      ],
-      "rotation": [
-        0.32,
-        4.1888,
-        0
-      ],
-      "size": [
-        0.78,
-        0.025,
-        0.15
-      ],
-      "material": "black composite",
-      "role": "One of three pitched blades of the front-left CCW propeller generating lift.",
-      "connections": [
-        "motor_bell_fl"
-      ]
-    },
-    {
-      "id": "motor_base_fr",
-      "name": "Motor Stator (Front-Right)",
+      "id": "stack_standoff_fr",
+      "name": "Stack Standoff Front-Right",
       "shape": "cylinder",
       "position": [
-        1.1,
-        0.3,
-        -1.1
+        0.152,
+        0.305,
+        -0.152
       ],
       "size": [
-        0.16,
-        0.16
-      ],
-      "material": "brushed steel",
-      "role": "Fixed 2207 stator can wound with copper that drives the front-right rotor.",
-      "connections": [
-        "arm_fr",
-        "motor_bell_fr",
-        "esc_board"
-      ]
-    },
-    {
-      "id": "motor_bell_fr",
-      "name": "Motor Bell (Front-Right)",
-      "shape": "cylinder",
-      "position": [
-        1.1,
-        0.44,
-        -1.1
-      ],
-      "size": [
-        0.2,
-        0.12
+        0.018,
+        0.28
       ],
       "material": "dark anodized aluminum",
-      "role": "Spinning rotor bell holding the magnets; the propeller bolts to its top.",
+      "role": "M3 stack spacer at the front-right 30.5 mm-pattern board mounting point.",
       "connections": [
-        "motor_base_fr",
-        "prop_fr_b1",
-        "prop_fr_b2",
-        "prop_fr_b3"
+        "bottom_plate",
+        "esc_board",
+        "fc_board",
+        "vtx_board"
       ]
     },
     {
-      "id": "prop_fr_b1",
-      "name": "Prop Blade FR-1",
-      "shape": "box",
-      "position": [
-        1.55,
-        0.535,
-        -1.1
-      ],
-      "rotation": [
-        -0.32,
-        0,
-        0
-      ],
-      "size": [
-        0.78,
-        0.025,
-        0.15
-      ],
-      "material": "black composite",
-      "role": "One of three pitched blades of the front-right CW propeller generating lift.",
-      "connections": [
-        "motor_bell_fr"
-      ]
-    },
-    {
-      "id": "prop_fr_b2",
-      "name": "Prop Blade FR-2",
-      "shape": "box",
-      "position": [
-        0.875,
-        0.535,
-        -1.49
-      ],
-      "rotation": [
-        -0.32,
-        2.0944,
-        0
-      ],
-      "size": [
-        0.78,
-        0.025,
-        0.15
-      ],
-      "material": "black composite",
-      "role": "One of three pitched blades of the front-right CW propeller generating lift.",
-      "connections": [
-        "motor_bell_fr"
-      ]
-    },
-    {
-      "id": "prop_fr_b3",
-      "name": "Prop Blade FR-3",
-      "shape": "box",
-      "position": [
-        0.875,
-        0.535,
-        -0.71
-      ],
-      "rotation": [
-        -0.32,
-        4.1888,
-        0
-      ],
-      "size": [
-        0.78,
-        0.025,
-        0.15
-      ],
-      "material": "black composite",
-      "role": "One of three pitched blades of the front-right CW propeller generating lift.",
-      "connections": [
-        "motor_bell_fr"
-      ]
-    },
-    {
-      "id": "motor_base_rl",
-      "name": "Motor Stator (Rear-Left)",
+      "id": "stack_standoff_rl",
+      "name": "Stack Standoff Rear-Left",
       "shape": "cylinder",
       "position": [
-        -1.1,
-        0.3,
-        1.1
+        -0.152,
+        0.305,
+        0.152
       ],
       "size": [
-        0.16,
-        0.16
-      ],
-      "material": "brushed steel",
-      "role": "Fixed 2207 stator can wound with copper that drives the rear-left rotor.",
-      "connections": [
-        "arm_rl",
-        "motor_bell_rl",
-        "esc_board"
-      ]
-    },
-    {
-      "id": "motor_bell_rl",
-      "name": "Motor Bell (Rear-Left)",
-      "shape": "cylinder",
-      "position": [
-        -1.1,
-        0.44,
-        1.1
-      ],
-      "size": [
-        0.2,
-        0.12
+        0.018,
+        0.28
       ],
       "material": "dark anodized aluminum",
-      "role": "Spinning rotor bell holding the magnets; the propeller bolts to its top.",
+      "role": "M3 stack spacer at the rear-left 30.5 mm-pattern board mounting point.",
       "connections": [
-        "motor_base_rl",
-        "prop_rl_b1",
-        "prop_rl_b2",
-        "prop_rl_b3"
+        "bottom_plate",
+        "esc_board",
+        "fc_board",
+        "vtx_board"
       ]
     },
     {
-      "id": "prop_rl_b1",
-      "name": "Prop Blade RL-1",
-      "shape": "box",
-      "position": [
-        -0.65,
-        0.535,
-        1.1
-      ],
-      "rotation": [
-        -0.32,
-        0,
-        0
-      ],
-      "size": [
-        0.78,
-        0.025,
-        0.15
-      ],
-      "material": "black composite",
-      "role": "One of three pitched blades of the rear-left CW propeller generating lift.",
-      "connections": [
-        "motor_bell_rl"
-      ]
-    },
-    {
-      "id": "prop_rl_b2",
-      "name": "Prop Blade RL-2",
-      "shape": "box",
-      "position": [
-        -1.325,
-        0.535,
-        0.71
-      ],
-      "rotation": [
-        -0.32,
-        2.0944,
-        0
-      ],
-      "size": [
-        0.78,
-        0.025,
-        0.15
-      ],
-      "material": "black composite",
-      "role": "One of three pitched blades of the rear-left CW propeller generating lift.",
-      "connections": [
-        "motor_bell_rl"
-      ]
-    },
-    {
-      "id": "prop_rl_b3",
-      "name": "Prop Blade RL-3",
-      "shape": "box",
-      "position": [
-        -1.325,
-        0.535,
-        1.49
-      ],
-      "rotation": [
-        -0.32,
-        4.1888,
-        0
-      ],
-      "size": [
-        0.78,
-        0.025,
-        0.15
-      ],
-      "material": "black composite",
-      "role": "One of three pitched blades of the rear-left CW propeller generating lift.",
-      "connections": [
-        "motor_bell_rl"
-      ]
-    },
-    {
-      "id": "motor_base_rr",
-      "name": "Motor Stator (Rear-Right)",
+      "id": "stack_standoff_rr",
+      "name": "Stack Standoff Rear-Right",
       "shape": "cylinder",
       "position": [
-        -1.1,
-        0.3,
-        -1.1
+        -0.152,
+        0.305,
+        -0.152
       ],
       "size": [
-        0.16,
-        0.16
-      ],
-      "material": "brushed steel",
-      "role": "Fixed 2207 stator can wound with copper that drives the rear-right rotor.",
-      "connections": [
-        "arm_rr",
-        "motor_bell_rr",
-        "esc_board"
-      ]
-    },
-    {
-      "id": "motor_bell_rr",
-      "name": "Motor Bell (Rear-Right)",
-      "shape": "cylinder",
-      "position": [
-        -1.1,
-        0.44,
-        -1.1
-      ],
-      "size": [
-        0.2,
-        0.12
+        0.018,
+        0.28
       ],
       "material": "dark anodized aluminum",
-      "role": "Spinning rotor bell holding the magnets; the propeller bolts to its top.",
+      "role": "M3 stack spacer at the rear-right 30.5 mm-pattern board mounting point.",
       "connections": [
-        "motor_base_rr",
-        "prop_rr_b1",
-        "prop_rr_b2",
-        "prop_rr_b3"
-      ]
-    },
-    {
-      "id": "prop_rr_b1",
-      "name": "Prop Blade RR-1",
-      "shape": "box",
-      "position": [
-        -0.65,
-        0.535,
-        -1.1
-      ],
-      "rotation": [
-        0.32,
-        0,
-        0
-      ],
-      "size": [
-        0.78,
-        0.025,
-        0.15
-      ],
-      "material": "black composite",
-      "role": "One of three pitched blades of the rear-right CCW propeller generating lift.",
-      "connections": [
-        "motor_bell_rr"
-      ]
-    },
-    {
-      "id": "prop_rr_b2",
-      "name": "Prop Blade RR-2",
-      "shape": "box",
-      "position": [
-        -1.325,
-        0.535,
-        -1.49
-      ],
-      "rotation": [
-        0.32,
-        2.0944,
-        0
-      ],
-      "size": [
-        0.78,
-        0.025,
-        0.15
-      ],
-      "material": "black composite",
-      "role": "One of three pitched blades of the rear-right CCW propeller generating lift.",
-      "connections": [
-        "motor_bell_rr"
-      ]
-    },
-    {
-      "id": "prop_rr_b3",
-      "name": "Prop Blade RR-3",
-      "shape": "box",
-      "position": [
-        -1.325,
-        0.535,
-        -0.71
-      ],
-      "rotation": [
-        0.32,
-        4.1888,
-        0
-      ],
-      "size": [
-        0.78,
-        0.025,
-        0.15
-      ],
-      "material": "black composite",
-      "role": "One of three pitched blades of the rear-right CCW propeller generating lift.",
-      "connections": [
-        "motor_bell_rr"
+        "bottom_plate",
+        "esc_board",
+        "fc_board",
+        "vtx_board"
       ]
     },
     {
@@ -748,20 +408,24 @@
         0
       ],
       "size": [
-        0.42,
-        0.04,
-        0.42
+        0.43,
+        0.035,
+        0.43
       ],
       "material": "dark anodized aluminum",
-      "role": "Bottom board of the stack; switches battery current to all four motors. Shown separated from the boards above for legibility.",
+      "role": "Lowest electronics board switches battery current into three motor phases for each corner.",
       "connections": [
         "bottom_plate",
+        "stack_standoff_fl",
+        "stack_standoff_fr",
+        "stack_standoff_rl",
+        "stack_standoff_rr",
         "fc_board",
-        "motor_base_fl",
-        "motor_base_fr",
-        "motor_base_rl",
-        "motor_base_rr",
-        "battery"
+        "phase_wires_fl",
+        "phase_wires_fr",
+        "phase_wires_rl",
+        "phase_wires_rr",
+        "xt60_connector"
       ]
     },
     {
@@ -770,20 +434,24 @@
       "shape": "box",
       "position": [
         0,
-        0.29,
+        0.305,
         0
       ],
       "size": [
         0.4,
-        0.04,
+        0.035,
         0.4
       ],
       "material": "dark anodized aluminum",
-      "role": "Middle board of the stack; runs the gyro and flight-control firmware. Shown separated to expose the stack interior.",
+      "role": "Middle board reads the gyro and commands the ESC so the quadcopter stabilizes and responds to the radio.",
       "connections": [
         "esc_board",
         "vtx_board",
-        "camera_body"
+        "stack_standoff_fl",
+        "stack_standoff_fr",
+        "stack_standoff_rl",
+        "stack_standoff_rr",
+        "camera_signal_lead"
       ]
     },
     {
@@ -792,39 +460,176 @@
       "shape": "box",
       "position": [
         0,
-        0.36,
+        0.39,
         0
       ],
       "size": [
-        0.38,
-        0.04,
-        0.38
+        0.36,
+        0.035,
+        0.36
       ],
       "material": "dark anodized aluminum",
-      "role": "Top board of the stack; encodes the camera feed onto 5.8 GHz. Shown separated to expose the stack interior.",
+      "role": "Upper board modulates the camera feed onto a 5.8 GHz radio signal for the pilot.",
       "connections": [
         "fc_board",
-        "antenna_whip"
+        "stack_standoff_fl",
+        "stack_standoff_fr",
+        "stack_standoff_rl",
+        "stack_standoff_rr",
+        "vtx_coax"
       ]
     },
     {
-      "id": "camera_cage",
-      "name": "Camera Cage",
+      "id": "esc_label",
+      "name": "ESC Direction Mark",
       "shape": "box",
       "position": [
-        0.46,
-        0.32,
+        0.18,
+        0.243,
         0
       ],
       "size": [
-        0.12,
-        0.4,
-        0.52
+        0.08,
+        0.006,
+        0.22
+      ],
+      "material": "brushed steel",
+      "role": "Bright mark on the ESC board showing the forward orientation and making the lowest board readable.",
+      "connections": [
+        "esc_board"
+      ]
+    },
+    {
+      "id": "fc_gyro_chip",
+      "name": "Flight Controller Gyro Chip",
+      "shape": "box",
+      "position": [
+        0.02,
+        0.329,
+        0.03
+      ],
+      "size": [
+        0.11,
+        0.025,
+        0.11
+      ],
+      "material": "brushed steel",
+      "role": "Central MEMS gyro package whose position identifies the flight-controller board function.",
+      "connections": [
+        "fc_board"
+      ]
+    },
+    {
+      "id": "vtx_heat_sink",
+      "name": "VTX Heat Sink",
+      "shape": "box",
+      "position": [
+        -0.04,
+        0.417,
+        0
+      ],
+      "size": [
+        0.22,
+        0.04,
+        0.18
+      ],
+      "material": "brushed steel",
+      "role": "Small metal heat spreader on the VTX board that represents the RF power stage.",
+      "connections": [
+        "vtx_board"
+      ]
+    },
+    {
+      "id": "camera_side_left",
+      "name": "Left Camera Side Plate",
+      "shape": "box",
+      "position": [
+        0.47,
+        0.32,
+        0.19
+      ],
+      "size": [
+        0.11,
+        0.34,
+        0.045
       ],
       "material": "black composite",
-      "role": "TPU bracket at the front of the frame that holds and protects the FPV camera.",
+      "role": "Left TPU cheek protects the FPV camera without hiding its body from the ISO view.",
       "connections": [
         "bottom_plate",
+        "camera_body",
+        "camera_pivot_left"
+      ]
+    },
+    {
+      "id": "camera_side_right",
+      "name": "Right Camera Side Plate",
+      "shape": "box",
+      "position": [
+        0.47,
+        0.32,
+        -0.19
+      ],
+      "size": [
+        0.11,
+        0.34,
+        0.045
+      ],
+      "material": "black composite",
+      "role": "Right TPU cheek protects the FPV camera without forming an opaque cage block.",
+      "connections": [
+        "bottom_plate",
+        "camera_body",
+        "camera_pivot_right"
+      ]
+    },
+    {
+      "id": "camera_pivot_left",
+      "name": "Left Camera Pivot Screw",
+      "shape": "cylinder",
+      "position": [
+        0.51,
+        0.335,
+        0.22
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.025,
+        0.07
+      ],
+      "material": "brushed steel",
+      "role": "Side screw that fixes the camera tilt angle in the left cheek plate.",
+      "connections": [
+        "camera_side_left",
+        "camera_body"
+      ]
+    },
+    {
+      "id": "camera_pivot_right",
+      "name": "Right Camera Pivot Screw",
+      "shape": "cylinder",
+      "position": [
+        0.51,
+        0.335,
+        -0.22
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.025,
+        0.07
+      ],
+      "material": "brushed steel",
+      "role": "Side screw that fixes the camera tilt angle in the right cheek plate.",
+      "connections": [
+        "camera_side_right",
         "camera_body"
       ]
     },
@@ -834,7 +639,7 @@
       "shape": "box",
       "position": [
         0.58,
-        0.33,
+        0.335,
         0
       ],
       "rotation": [
@@ -843,25 +648,28 @@
         -0.52
       ],
       "size": [
-        0.3,
-        0.3,
-        0.3
+        0.26,
+        0.24,
+        0.26
       ],
       "material": "black composite",
-      "role": "Analog CMOS micro camera canted ~30 degrees up to set the forward-flight viewing angle.",
+      "role": "Analog CMOS micro camera body tilted upward so the pilot sees level horizon during fast forward flight.",
       "connections": [
-        "camera_cage",
+        "camera_side_left",
+        "camera_side_right",
         "camera_lens",
-        "fc_board"
+        "camera_signal_lead",
+        "camera_pivot_left",
+        "camera_pivot_right"
       ]
     },
     {
       "id": "camera_lens",
-      "name": "Camera Lens",
+      "name": "Wide-Angle Camera Lens",
       "shape": "cylinder",
       "position": [
-        0.74,
-        0.4,
+        0.745,
+        0.42,
         0
       ],
       "rotation": [
@@ -870,42 +678,93 @@
         1.05
       ],
       "size": [
-        0.09,
-        0.12
+        0.085,
+        0.16
       ],
       "material": "glass display",
-      "role": "Wide-angle M12 lens projecting the pilot's first-person view onto the sensor.",
+      "role": "M12 wide-angle lens protrudes from the tilted camera and defines the forward viewing direction.",
       "connections": [
         "camera_body"
       ]
     },
     {
+      "id": "camera_signal_lead",
+      "name": "Camera Signal Lead",
+      "shape": "capsule",
+      "position": [
+        0.32,
+        0.36,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.018,
+        0.48
+      ],
+      "material": "rubber",
+      "role": "Flexible signal cable carrying camera video and power back to the flight controller.",
+      "connections": [
+        "camera_body",
+        "fc_board"
+      ]
+    },
+    {
       "id": "antenna_mount",
-      "name": "Antenna Mount",
+      "name": "Rear Antenna TPU Mount",
       "shape": "box",
       "position": [
-        -0.46,
-        0.3,
+        -0.49,
+        0.31,
         0
       ],
       "size": [
-        0.1,
         0.12,
-        0.1
+        0.16,
+        0.18
       ],
       "material": "black composite",
-      "role": "Rear bracket that anchors the video-transmitter antenna clear of the props.",
+      "role": "Rear printed mount grips the antenna base and keeps it out of the propeller discs.",
       "connections": [
         "bottom_plate",
+        "vtx_coax",
         "antenna_whip"
       ]
     },
     {
-      "id": "antenna_whip",
-      "name": "VTX Antenna",
+      "id": "vtx_coax",
+      "name": "VTX Coax Lead",
       "shape": "capsule",
       "position": [
-        -0.62,
+        -0.29,
+        0.43,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.016,
+        0.52
+      ],
+      "material": "rubber",
+      "role": "Short coaxial cable carries RF output from the VTX board to the rear antenna mount.",
+      "connections": [
+        "vtx_board",
+        "antenna_mount"
+      ]
+    },
+    {
+      "id": "antenna_whip",
+      "name": "5.8 GHz Antenna Whip",
+      "shape": "capsule",
+      "position": [
+        -0.66,
         0.66,
         0
       ],
@@ -916,22 +775,68 @@
       ],
       "size": [
         0.035,
-        0.62
+        0.64
       ],
       "material": "white composite",
-      "role": "5.8 GHz circular-polarized antenna radiating the analog video downlink to the pilot's goggles.",
+      "role": "Angled circular-polarized antenna radiates the analog video downlink behind the airframe.",
       "connections": [
         "antenna_mount",
-        "vtx_board"
+        "vtx_coax"
+      ]
+    },
+    {
+      "id": "xt60_connector",
+      "name": "XT60 Power Connector",
+      "shape": "box",
+      "position": [
+        -0.28,
+        0.235,
+        -0.26
+      ],
+      "size": [
+        0.16,
+        0.09,
+        0.12
+      ],
+      "material": "brass",
+      "role": "Yellow XT60 connector marks the removable high-current battery connection to the ESC board.",
+      "connections": [
+        "esc_board",
+        "battery_lead"
+      ]
+    },
+    {
+      "id": "battery_lead",
+      "name": "Exploded Battery Lead",
+      "shape": "capsule",
+      "position": [
+        -0.29,
+        0.78,
+        -0.2
+      ],
+      "rotation": [
+        0.35,
+        0,
+        0.2
+      ],
+      "size": [
+        0.025,
+        0.92
+      ],
+      "material": "rubber",
+      "role": "Power lead shown lifted with the exploded LiPo so the XT60 connection path remains visible.",
+      "connections": [
+        "xt60_connector",
+        "battery"
       ]
     },
     {
       "id": "battery",
-      "name": "LiPo Battery",
+      "name": "Exploded 6S LiPo Battery",
       "shape": "box",
       "position": [
         -0.05,
-        0.57,
+        0.9,
         0
       ],
       "size": [
@@ -940,31 +845,1098 @@
         0.42
       ],
       "material": "black composite",
-      "role": "6S 1300 mAh high-discharge LiPo pack supplying ~22 V to the ESC via an XT60 lead.",
+      "role": "6S 1300 mAh pack shown exploded upward from its flight position to expose the boards below.",
       "connections": [
-        "top_plate",
+        "top_rail_left",
+        "top_rail_right",
         "battery_strap",
-        "esc_board"
+        "battery_lead"
       ]
     },
     {
       "id": "battery_strap",
-      "name": "Battery Strap",
+      "name": "Exploded Hook-and-Loop Strap",
       "shape": "box",
       "position": [
         -0.05,
-        0.72,
+        1.065,
         0
       ],
       "size": [
         0.34,
         0.05,
-        0.46
+        0.52
       ],
       "material": "rubber",
-      "role": "Grippy hook-and-loop strap clamping the battery onto the top plate against flight loads.",
+      "role": "Strap shown above the exploded LiPo to indicate it wraps across the pack and ties into both top rails.",
       "connections": [
-        "battery"
+        "battery",
+        "top_rail_left",
+        "top_rail_right"
+      ]
+    },
+    {
+      "id": "motor_stator_fl",
+      "name": "Front-Left Motor Stator",
+      "shape": "cylinder",
+      "position": [
+        1.1,
+        0.3,
+        1.1
+      ],
+      "size": [
+        0.15,
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Fixed wound stator bolted to the front-left arm and electrically driven by the ESC.",
+      "connections": [
+        "arm_fl",
+        "motor_bell_fl",
+        "phase_wires_fl",
+        "motor_screw_fl_a",
+        "motor_screw_fl_b"
+      ]
+    },
+    {
+      "id": "motor_bell_fl",
+      "name": "Front-Left Motor Bell",
+      "shape": "cylinder",
+      "position": [
+        1.1,
+        0.435,
+        1.1
+      ],
+      "size": [
+        0.19,
+        0.12
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rotating outrunner bell carries magnets and spins the front-left propeller.",
+      "connections": [
+        "motor_stator_fl",
+        "prop_hub_fl"
+      ]
+    },
+    {
+      "id": "prop_hub_fl",
+      "name": "Front-Left Prop Hub",
+      "shape": "cylinder",
+      "position": [
+        1.1,
+        0.515,
+        1.1
+      ],
+      "size": [
+        0.13,
+        0.045
+      ],
+      "material": "black composite",
+      "role": "Central molded hub joins the three front-left propeller blades to the motor shaft.",
+      "connections": [
+        "motor_bell_fl",
+        "prop_fl_b1",
+        "prop_fl_b2",
+        "prop_fl_b3",
+        "prop_nut_fl"
+      ]
+    },
+    {
+      "id": "prop_nut_fl",
+      "name": "Front-Left Prop Nut",
+      "shape": "cylinder",
+      "position": [
+        1.1,
+        0.57,
+        1.1
+      ],
+      "size": [
+        0.07,
+        0.06
+      ],
+      "material": "brushed steel",
+      "role": "Threaded nut clamps the front-left prop hub to the motor shaft.",
+      "connections": [
+        "prop_hub_fl"
+      ]
+    },
+    {
+      "id": "prop_fl_b1",
+      "name": "Front-Left Prop Blade 1",
+      "shape": "complex",
+      "position": [
+        1.43,
+        0.54,
+        1.1
+      ],
+      "rotation": [
+        0.28,
+        0,
+        0
+      ],
+      "size": [
+        0.66,
+        0.03,
+        0.13
+      ],
+      "material": "black composite",
+      "role": "Pitched blade of the CCW front-left propeller that contributes one third of the rotor disc area.",
+      "connections": [
+        "prop_hub_fl"
+      ]
+    },
+    {
+      "id": "prop_fl_b2",
+      "name": "Front-Left Prop Blade 2",
+      "shape": "complex",
+      "position": [
+        0.935,
+        0.54,
+        0.814
+      ],
+      "rotation": [
+        0.28,
+        2.0944,
+        0
+      ],
+      "size": [
+        0.66,
+        0.03,
+        0.13
+      ],
+      "material": "black composite",
+      "role": "Second pitched blade of the front-left tri-blade propeller.",
+      "connections": [
+        "prop_hub_fl"
+      ]
+    },
+    {
+      "id": "prop_fl_b3",
+      "name": "Front-Left Prop Blade 3",
+      "shape": "complex",
+      "position": [
+        0.935,
+        0.54,
+        1.386
+      ],
+      "rotation": [
+        0.28,
+        4.1888,
+        0
+      ],
+      "size": [
+        0.66,
+        0.03,
+        0.13
+      ],
+      "material": "black composite",
+      "role": "Third pitched blade of the front-left tri-blade propeller.",
+      "connections": [
+        "prop_hub_fl"
+      ]
+    },
+    {
+      "id": "motor_screw_fl_a",
+      "name": "Front-Left Motor Screw A",
+      "shape": "cylinder",
+      "position": [
+        1.04,
+        0.245,
+        1.04
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Motor mounting screw passing through the arm into the front-left stator base.",
+      "connections": [
+        "arm_fl",
+        "motor_stator_fl"
+      ]
+    },
+    {
+      "id": "motor_screw_fl_b",
+      "name": "Front-Left Motor Screw B",
+      "shape": "cylinder",
+      "position": [
+        1.16,
+        0.245,
+        1.16
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Second visible screw fixing the front-left motor to the arm tip.",
+      "connections": [
+        "arm_fl",
+        "motor_stator_fl"
+      ]
+    },
+    {
+      "id": "phase_wires_fl",
+      "name": "Front-Left Motor Phase Wires",
+      "shape": "capsule",
+      "position": [
+        0.55,
+        0.245,
+        0.55
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.7854
+      ],
+      "size": [
+        0.02,
+        1.45
+      ],
+      "material": "copper",
+      "role": "Bundled three-phase motor wires run along the front-left arm from ESC to stator.",
+      "connections": [
+        "esc_board",
+        "arm_fl",
+        "motor_stator_fl"
+      ]
+    },
+    {
+      "id": "motor_stator_fr",
+      "name": "Front-Right Motor Stator",
+      "shape": "cylinder",
+      "position": [
+        1.1,
+        0.3,
+        -1.1
+      ],
+      "size": [
+        0.15,
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Fixed wound stator bolted to the front-right arm and electrically driven by the ESC.",
+      "connections": [
+        "arm_fr",
+        "motor_bell_fr",
+        "phase_wires_fr",
+        "motor_screw_fr_a",
+        "motor_screw_fr_b"
+      ]
+    },
+    {
+      "id": "motor_bell_fr",
+      "name": "Front-Right Motor Bell",
+      "shape": "cylinder",
+      "position": [
+        1.1,
+        0.435,
+        -1.1
+      ],
+      "size": [
+        0.19,
+        0.12
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rotating outrunner bell carries magnets and spins the front-right propeller.",
+      "connections": [
+        "motor_stator_fr",
+        "prop_hub_fr"
+      ]
+    },
+    {
+      "id": "prop_hub_fr",
+      "name": "Front-Right Prop Hub",
+      "shape": "cylinder",
+      "position": [
+        1.1,
+        0.515,
+        -1.1
+      ],
+      "size": [
+        0.13,
+        0.045
+      ],
+      "material": "black composite",
+      "role": "Central molded hub joins the three front-right propeller blades to the motor shaft.",
+      "connections": [
+        "motor_bell_fr",
+        "prop_fr_b1",
+        "prop_fr_b2",
+        "prop_fr_b3",
+        "prop_nut_fr"
+      ]
+    },
+    {
+      "id": "prop_nut_fr",
+      "name": "Front-Right Prop Nut",
+      "shape": "cylinder",
+      "position": [
+        1.1,
+        0.57,
+        -1.1
+      ],
+      "size": [
+        0.07,
+        0.06
+      ],
+      "material": "brushed steel",
+      "role": "Threaded nut clamps the front-right prop hub to the motor shaft.",
+      "connections": [
+        "prop_hub_fr"
+      ]
+    },
+    {
+      "id": "prop_fr_b1",
+      "name": "Front-Right Prop Blade 1",
+      "shape": "complex",
+      "position": [
+        1.43,
+        0.54,
+        -1.1
+      ],
+      "rotation": [
+        -0.28,
+        0,
+        0
+      ],
+      "size": [
+        0.66,
+        0.03,
+        0.13
+      ],
+      "material": "black composite",
+      "role": "Pitched blade of the CW front-right propeller that contributes one third of the rotor disc area.",
+      "connections": [
+        "prop_hub_fr"
+      ]
+    },
+    {
+      "id": "prop_fr_b2",
+      "name": "Front-Right Prop Blade 2",
+      "shape": "complex",
+      "position": [
+        0.935,
+        0.54,
+        -1.386
+      ],
+      "rotation": [
+        -0.28,
+        2.0944,
+        0
+      ],
+      "size": [
+        0.66,
+        0.03,
+        0.13
+      ],
+      "material": "black composite",
+      "role": "Second pitched blade of the front-right tri-blade propeller.",
+      "connections": [
+        "prop_hub_fr"
+      ]
+    },
+    {
+      "id": "prop_fr_b3",
+      "name": "Front-Right Prop Blade 3",
+      "shape": "complex",
+      "position": [
+        0.935,
+        0.54,
+        -0.814
+      ],
+      "rotation": [
+        -0.28,
+        4.1888,
+        0
+      ],
+      "size": [
+        0.66,
+        0.03,
+        0.13
+      ],
+      "material": "black composite",
+      "role": "Third pitched blade of the front-right tri-blade propeller.",
+      "connections": [
+        "prop_hub_fr"
+      ]
+    },
+    {
+      "id": "motor_screw_fr_a",
+      "name": "Front-Right Motor Screw A",
+      "shape": "cylinder",
+      "position": [
+        1.04,
+        0.245,
+        -1.04
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Motor mounting screw passing through the arm into the front-right stator base.",
+      "connections": [
+        "arm_fr",
+        "motor_stator_fr"
+      ]
+    },
+    {
+      "id": "motor_screw_fr_b",
+      "name": "Front-Right Motor Screw B",
+      "shape": "cylinder",
+      "position": [
+        1.16,
+        0.245,
+        -1.16
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Second visible screw fixing the front-right motor to the arm tip.",
+      "connections": [
+        "arm_fr",
+        "motor_stator_fr"
+      ]
+    },
+    {
+      "id": "phase_wires_fr",
+      "name": "Front-Right Motor Phase Wires",
+      "shape": "capsule",
+      "position": [
+        0.55,
+        0.245,
+        -0.55
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.7854
+      ],
+      "size": [
+        0.02,
+        1.45
+      ],
+      "material": "copper",
+      "role": "Bundled three-phase motor wires run along the front-right arm from ESC to stator.",
+      "connections": [
+        "esc_board",
+        "arm_fr",
+        "motor_stator_fr"
+      ]
+    },
+    {
+      "id": "motor_stator_rl",
+      "name": "Rear-Left Motor Stator",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.3,
+        1.1
+      ],
+      "size": [
+        0.15,
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Fixed wound stator bolted to the rear-left arm and electrically driven by the ESC.",
+      "connections": [
+        "arm_rl",
+        "motor_bell_rl",
+        "phase_wires_rl",
+        "motor_screw_rl_a",
+        "motor_screw_rl_b"
+      ]
+    },
+    {
+      "id": "motor_bell_rl",
+      "name": "Rear-Left Motor Bell",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.435,
+        1.1
+      ],
+      "size": [
+        0.19,
+        0.12
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rotating outrunner bell carries magnets and spins the rear-left propeller.",
+      "connections": [
+        "motor_stator_rl",
+        "prop_hub_rl"
+      ]
+    },
+    {
+      "id": "prop_hub_rl",
+      "name": "Rear-Left Prop Hub",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.515,
+        1.1
+      ],
+      "size": [
+        0.13,
+        0.045
+      ],
+      "material": "black composite",
+      "role": "Central molded hub joins the three rear-left propeller blades to the motor shaft.",
+      "connections": [
+        "motor_bell_rl",
+        "prop_rl_b1",
+        "prop_rl_b2",
+        "prop_rl_b3",
+        "prop_nut_rl"
+      ]
+    },
+    {
+      "id": "prop_nut_rl",
+      "name": "Rear-Left Prop Nut",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.57,
+        1.1
+      ],
+      "size": [
+        0.07,
+        0.06
+      ],
+      "material": "brushed steel",
+      "role": "Threaded nut clamps the rear-left prop hub to the motor shaft.",
+      "connections": [
+        "prop_hub_rl"
+      ]
+    },
+    {
+      "id": "prop_rl_b1",
+      "name": "Rear-Left Prop Blade 1",
+      "shape": "complex",
+      "position": [
+        -0.77,
+        0.54,
+        1.1
+      ],
+      "rotation": [
+        -0.28,
+        0,
+        0
+      ],
+      "size": [
+        0.66,
+        0.03,
+        0.13
+      ],
+      "material": "black composite",
+      "role": "Pitched blade of the CW rear-left propeller that contributes one third of the rotor disc area.",
+      "connections": [
+        "prop_hub_rl"
+      ]
+    },
+    {
+      "id": "prop_rl_b2",
+      "name": "Rear-Left Prop Blade 2",
+      "shape": "complex",
+      "position": [
+        -1.265,
+        0.54,
+        0.814
+      ],
+      "rotation": [
+        -0.28,
+        2.0944,
+        0
+      ],
+      "size": [
+        0.66,
+        0.03,
+        0.13
+      ],
+      "material": "black composite",
+      "role": "Second pitched blade of the rear-left tri-blade propeller.",
+      "connections": [
+        "prop_hub_rl"
+      ]
+    },
+    {
+      "id": "prop_rl_b3",
+      "name": "Rear-Left Prop Blade 3",
+      "shape": "complex",
+      "position": [
+        -1.265,
+        0.54,
+        1.386
+      ],
+      "rotation": [
+        -0.28,
+        4.1888,
+        0
+      ],
+      "size": [
+        0.66,
+        0.03,
+        0.13
+      ],
+      "material": "black composite",
+      "role": "Third pitched blade of the rear-left tri-blade propeller.",
+      "connections": [
+        "prop_hub_rl"
+      ]
+    },
+    {
+      "id": "motor_screw_rl_a",
+      "name": "Rear-Left Motor Screw A",
+      "shape": "cylinder",
+      "position": [
+        -1.04,
+        0.245,
+        1.04
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Motor mounting screw passing through the arm into the rear-left stator base.",
+      "connections": [
+        "arm_rl",
+        "motor_stator_rl"
+      ]
+    },
+    {
+      "id": "motor_screw_rl_b",
+      "name": "Rear-Left Motor Screw B",
+      "shape": "cylinder",
+      "position": [
+        -1.16,
+        0.245,
+        1.16
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Second visible screw fixing the rear-left motor to the arm tip.",
+      "connections": [
+        "arm_rl",
+        "motor_stator_rl"
+      ]
+    },
+    {
+      "id": "phase_wires_rl",
+      "name": "Rear-Left Motor Phase Wires",
+      "shape": "capsule",
+      "position": [
+        -0.55,
+        0.245,
+        0.55
+      ],
+      "rotation": [
+        0,
+        0,
+        0.7854
+      ],
+      "size": [
+        0.02,
+        1.45
+      ],
+      "material": "copper",
+      "role": "Bundled three-phase motor wires run along the rear-left arm from ESC to stator.",
+      "connections": [
+        "esc_board",
+        "arm_rl",
+        "motor_stator_rl"
+      ]
+    },
+    {
+      "id": "motor_stator_rr",
+      "name": "Rear-Right Motor Stator",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.3,
+        -1.1
+      ],
+      "size": [
+        0.15,
+        0.14
+      ],
+      "material": "brushed steel",
+      "role": "Fixed wound stator bolted to the rear-right arm and electrically driven by the ESC.",
+      "connections": [
+        "arm_rr",
+        "motor_bell_rr",
+        "phase_wires_rr",
+        "motor_screw_rr_a",
+        "motor_screw_rr_b"
+      ]
+    },
+    {
+      "id": "motor_bell_rr",
+      "name": "Rear-Right Motor Bell",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.435,
+        -1.1
+      ],
+      "size": [
+        0.19,
+        0.12
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rotating outrunner bell carries magnets and spins the rear-right propeller.",
+      "connections": [
+        "motor_stator_rr",
+        "prop_hub_rr"
+      ]
+    },
+    {
+      "id": "prop_hub_rr",
+      "name": "Rear-Right Prop Hub",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.515,
+        -1.1
+      ],
+      "size": [
+        0.13,
+        0.045
+      ],
+      "material": "black composite",
+      "role": "Central molded hub joins the three rear-right propeller blades to the motor shaft.",
+      "connections": [
+        "motor_bell_rr",
+        "prop_rr_b1",
+        "prop_rr_b2",
+        "prop_rr_b3",
+        "prop_nut_rr"
+      ]
+    },
+    {
+      "id": "prop_nut_rr",
+      "name": "Rear-Right Prop Nut",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.57,
+        -1.1
+      ],
+      "size": [
+        0.07,
+        0.06
+      ],
+      "material": "brushed steel",
+      "role": "Threaded nut clamps the rear-right prop hub to the motor shaft.",
+      "connections": [
+        "prop_hub_rr"
+      ]
+    },
+    {
+      "id": "prop_rr_b1",
+      "name": "Rear-Right Prop Blade 1",
+      "shape": "complex",
+      "position": [
+        -0.77,
+        0.54,
+        -1.1
+      ],
+      "rotation": [
+        0.28,
+        0,
+        0
+      ],
+      "size": [
+        0.66,
+        0.03,
+        0.13
+      ],
+      "material": "black composite",
+      "role": "Pitched blade of the CCW rear-right propeller that contributes one third of the rotor disc area.",
+      "connections": [
+        "prop_hub_rr"
+      ]
+    },
+    {
+      "id": "prop_rr_b2",
+      "name": "Rear-Right Prop Blade 2",
+      "shape": "complex",
+      "position": [
+        -1.265,
+        0.54,
+        -1.386
+      ],
+      "rotation": [
+        0.28,
+        2.0944,
+        0
+      ],
+      "size": [
+        0.66,
+        0.03,
+        0.13
+      ],
+      "material": "black composite",
+      "role": "Second pitched blade of the rear-right tri-blade propeller.",
+      "connections": [
+        "prop_hub_rr"
+      ]
+    },
+    {
+      "id": "prop_rr_b3",
+      "name": "Rear-Right Prop Blade 3",
+      "shape": "complex",
+      "position": [
+        -1.265,
+        0.54,
+        -0.814
+      ],
+      "rotation": [
+        0.28,
+        4.1888,
+        0
+      ],
+      "size": [
+        0.66,
+        0.03,
+        0.13
+      ],
+      "material": "black composite",
+      "role": "Third pitched blade of the rear-right tri-blade propeller.",
+      "connections": [
+        "prop_hub_rr"
+      ]
+    },
+    {
+      "id": "motor_screw_rr_a",
+      "name": "Rear-Right Motor Screw A",
+      "shape": "cylinder",
+      "position": [
+        -1.04,
+        0.245,
+        -1.04
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Motor mounting screw passing through the arm into the rear-right stator base.",
+      "connections": [
+        "arm_rr",
+        "motor_stator_rr"
+      ]
+    },
+    {
+      "id": "motor_screw_rr_b",
+      "name": "Rear-Right Motor Screw B",
+      "shape": "cylinder",
+      "position": [
+        -1.16,
+        0.245,
+        -1.16
+      ],
+      "size": [
+        0.018,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Second visible screw fixing the rear-right motor to the arm tip.",
+      "connections": [
+        "arm_rr",
+        "motor_stator_rr"
+      ]
+    },
+    {
+      "id": "phase_wires_rr",
+      "name": "Rear-Right Motor Phase Wires",
+      "shape": "capsule",
+      "position": [
+        -0.55,
+        0.245,
+        -0.55
+      ],
+      "rotation": [
+        0,
+        0,
+        0.7854
+      ],
+      "size": [
+        0.02,
+        1.45
+      ],
+      "material": "copper",
+      "role": "Bundled three-phase motor wires run along the rear-right arm from ESC to stator.",
+      "connections": [
+        "esc_board",
+        "arm_rr",
+        "motor_stator_rr"
+      ]
+    },
+    {
+      "id": "arm_screw_fl_in",
+      "name": "Front-Left Inner Arm Clamp Screw",
+      "shape": "cylinder",
+      "position": [
+        0.25,
+        0.215,
+        0.25
+      ],
+      "size": [
+        0.018,
+        0.09
+      ],
+      "material": "brushed steel",
+      "role": "Inner screw clamps the front-left arm into the carbon sandwich plate.",
+      "connections": [
+        "bottom_plate",
+        "arm_fl"
+      ]
+    },
+    {
+      "id": "arm_screw_fl_out",
+      "name": "Front-Left Outer Arm Clamp Screw",
+      "shape": "cylinder",
+      "position": [
+        0.47,
+        0.215,
+        0.47
+      ],
+      "size": [
+        0.018,
+        0.09
+      ],
+      "material": "brushed steel",
+      "role": "Outer screw clamps the front-left arm before it leaves the central frame.",
+      "connections": [
+        "bottom_plate",
+        "arm_fl"
+      ]
+    },
+    {
+      "id": "arm_screw_fr_in",
+      "name": "Front-Right Inner Arm Clamp Screw",
+      "shape": "cylinder",
+      "position": [
+        0.25,
+        0.215,
+        -0.25
+      ],
+      "size": [
+        0.018,
+        0.09
+      ],
+      "material": "brushed steel",
+      "role": "Inner screw clamps the front-right arm into the carbon sandwich plate.",
+      "connections": [
+        "bottom_plate",
+        "arm_fr"
+      ]
+    },
+    {
+      "id": "arm_screw_fr_out",
+      "name": "Front-Right Outer Arm Clamp Screw",
+      "shape": "cylinder",
+      "position": [
+        0.47,
+        0.215,
+        -0.47
+      ],
+      "size": [
+        0.018,
+        0.09
+      ],
+      "material": "brushed steel",
+      "role": "Outer screw clamps the front-right arm before it leaves the central frame.",
+      "connections": [
+        "bottom_plate",
+        "arm_fr"
+      ]
+    },
+    {
+      "id": "arm_screw_rl_in",
+      "name": "Rear-Left Inner Arm Clamp Screw",
+      "shape": "cylinder",
+      "position": [
+        -0.25,
+        0.215,
+        0.25
+      ],
+      "size": [
+        0.018,
+        0.09
+      ],
+      "material": "brushed steel",
+      "role": "Inner screw clamps the rear-left arm into the carbon sandwich plate.",
+      "connections": [
+        "bottom_plate",
+        "arm_rl"
+      ]
+    },
+    {
+      "id": "arm_screw_rl_out",
+      "name": "Rear-Left Outer Arm Clamp Screw",
+      "shape": "cylinder",
+      "position": [
+        -0.47,
+        0.215,
+        0.47
+      ],
+      "size": [
+        0.018,
+        0.09
+      ],
+      "material": "brushed steel",
+      "role": "Outer screw clamps the rear-left arm before it leaves the central frame.",
+      "connections": [
+        "bottom_plate",
+        "arm_rl"
+      ]
+    },
+    {
+      "id": "arm_screw_rr_in",
+      "name": "Rear-Right Inner Arm Clamp Screw",
+      "shape": "cylinder",
+      "position": [
+        -0.25,
+        0.215,
+        -0.25
+      ],
+      "size": [
+        0.018,
+        0.09
+      ],
+      "material": "brushed steel",
+      "role": "Inner screw clamps the rear-right arm into the carbon sandwich plate.",
+      "connections": [
+        "bottom_plate",
+        "arm_rr"
+      ]
+    },
+    {
+      "id": "arm_screw_rr_out",
+      "name": "Rear-Right Outer Arm Clamp Screw",
+      "shape": "cylinder",
+      "position": [
+        -0.47,
+        0.215,
+        -0.47
+      ],
+      "size": [
+        0.018,
+        0.09
+      ],
+      "material": "brushed steel",
+      "role": "Outer screw clamps the rear-right arm before it leaves the central frame.",
+      "connections": [
+        "bottom_plate",
+        "arm_rr"
       ]
     }
   ]

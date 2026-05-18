@@ -1,10 +1,25 @@
 {
   "machine_name": "Pennsylvania Railroad S2 Steam-Turbine Locomotive",
-  "assembly_instructions": "One-off experimental direct-drive steam-turbine locomotive from 1944 (PRR #6200). 6-8-6 wheel arrangement: three-axle leading truck under the smokebox, four coupled driving axles under the boiler (68-inch wheels), three-axle trailing truck under the Belpaire firebox. A long cylindrical boiler links the cylindrical smokebox at the front to the firebox at the rear; a Worthington feedwater heater rides on top of the boiler, a steam dome sits amidships, and the iconic quadruple exhaust stack crowns the smokebox. Two large 'elephant-ear' smoke deflectors flank the smokebox. The direct-drive turbine housing and reduction gearbox sit under the cab, driving wheel #4 directly and the rest via the coupling side rods. A 16-wheel 180-P-85 tender (two 4-axle trucks) trails behind. Scale 0.5× real — ≈18.7 m long.",
+  "assembly_instructions": [
+    "1. Lay the two running rails at y=0, add evenly spaced cross ties, and use the rail heads as the datum for all wheel contact points.",
+    "2. Assemble the long welded locomotive main frame above the rails, then bolt on the front pilot beam, sloped pilot, front coupler, and rear drawbar pocket.",
+    "3. Build the three-axle leading truck under the smokebox, the four driving axles under the boiler barrel, and the three-axle trailing truck under the firebox; fit every port and starboard wheel to its named axle.",
+    "4. Add crank discs and crank pins to each driving wheel, then fit the port and starboard side rods across all four driving axles so torque from the geared axle is visibly distributed.",
+    "5. Mount the smokebox, boiler barrel, and split Belpaire firebox assembly: lower wrapper first, then shoulder sheets, crown sheet, throat sheet, and exposed backhead.",
+    "6. Fit the cab floor, cutaway cab shell, and cab roof behind the firebox while leaving the turbine train below the cab open to view.",
+    "7. Install the Westinghouse ahead turbine, smaller reverse turbine, reduction gearbox, driveshaft, oil cooler, and steam delivery pipe; connect the gearbox to the fourth driving axle housing.",
+    "8. Add boiler-top and side appliances: steam dome, Worthington feedwater heater, feedwater pump and pipe, paired air pumps, four separate exhaust stacks, bell, headlight, handrails, running boards, and smoke deflectors with stays and edge stiffeners.",
+    "9. Build the tender as a separate underframe with two four-axle trucks, all sixteen tender wheels, thin floor plate, open water cistern, internal baffles, coal bunker walls, slope sheet, exposed coal load, filler hatch, water outlet pipe, rear deck, ladder, tool box, and rear coupler.",
+    "10. Connect locomotive and tender with the drawbar and verify that every truck wheel rests on the rails, the tender contents remain visible from the ISO view, and the turbine-to-geared-axle power path remains unobstructed."
+  ],
   "metadata": {
     "reference": "https://en.wikipedia.org/wiki/Pennsylvania_Railroad_class_S2",
     "domain": "railway-history",
-    "thumbnail_camera": [12.0, 6.0, 12.0],
+    "thumbnail_camera": [
+      12,
+      6,
+      12
+    ],
     "info": {
       "japanese_name": "ペンシルバニア鉄道 S2形 蒸気タービン機関車 (1944)",
       "english_name": "Pennsylvania Railroad class S2 steam-turbine locomotive",
@@ -16,65 +31,3889 @@
       "contract_value": "≈US$600,000 (1944) one-off prototype",
       "status": "Retired / scrapped; Wikipedia docs CC BY-SA 4.0",
       "facts": [
-        { "label": "Wheel arrangement",     "value": "6-8-6 — the only locomotive ever built with this layout" },
-        { "label": "Length (with tender)",  "value": "122 ft 7¼ in (37.37 m)" },
-        { "label": "Height",                "value": "16 ft (4.88 m)" },
-        { "label": "Total weight",          "value": "1,032,100 lb (≈468 t)" },
-        { "label": "Driving wheels",        "value": "8 × 68 in (1.73 m) diameter" },
-        { "label": "Leading / trailing wheels", "value": "6 × 36 in (0.91 m) / 6 × 42 in (1.07 m)" },
-        { "label": "Boiler pressure",       "value": "310 psi (2.1 MPa)" },
-        { "label": "Power",                 "value": "6,900 hp peak, ≈6,000 hp rated (turbine direct-drive)" },
-        { "label": "Tender",                "value": "180-P-85 16-wheel (2 × 4-axle trucks); 19,500 gal water, 37.5 t coal" },
-        { "label": "Signature details",     "value": "Quadruple stack, Worthington feedwater heater, 'elephant-ear' smoke deflectors" }
+        {
+          "label": "Scale used in scene",
+          "value": "0.5× real dimensions; modeled length with tender about 18.7 m from pilot to tender rear."
+        },
+        {
+          "label": "Wheel arrangement",
+          "value": "6-8-6: three leading axles, four coupled driving axles, three trailing axles."
+        },
+        {
+          "label": "Prototype length",
+          "value": "122 ft 7¼ in (37.37 m) over locomotive and tender."
+        },
+        {
+          "label": "Prototype height",
+          "value": "16 ft (4.88 m), represented as about 2.44 m at 0.5× scale."
+        },
+        {
+          "label": "Driving wheels",
+          "value": "8 × 68 in (1.73 m) drivers; scene radius about 0.43 m at 0.5× scale."
+        },
+        {
+          "label": "Leading and trailing wheels",
+          "value": "36 in leading wheels and 42 in trailing wheels, modeled at about 0.23 m and 0.27 m radii at scale."
+        },
+        {
+          "label": "Boiler pressure",
+          "value": "310 psi (2.1 MPa), shown by the single large boiler barrel feeding turbine pipework."
+        },
+        {
+          "label": "Turbine output",
+          "value": "About 6,900 hp peak and 6,000 hp rated through a Westinghouse direct-drive turbine and reduction gearing."
+        },
+        {
+          "label": "Tender capacity",
+          "value": "180-P-85 tender: 19,500 US gal water and 37.5 short tons coal on two 4-axle trucks."
+        },
+        {
+          "label": "Signature details",
+          "value": "Four exhaust stacks, Worthington feedwater heater, elephant-ear smoke deflectors, Belpaire firebox shoulders, and visible turbine gearbox."
+        }
       ],
       "sources": [
-        { "title": "Wikipedia — PRR class S2", "url": "https://en.wikipedia.org/wiki/Pennsylvania_Railroad_class_S2" },
-        { "title": "PRR Technical & Historical Society", "url": "https://prrths.com/" }
+        {
+          "title": "Wikipedia — Pennsylvania Railroad class S2",
+          "url": "https://en.wikipedia.org/wiki/Pennsylvania_Railroad_class_S2"
+        },
+        {
+          "title": "PRR Technical & Historical Society",
+          "url": "https://prrths.com/"
+        },
+        {
+          "title": "SteamLocomotive.com — Pennsylvania Railroad S2 6-8-6 turbine",
+          "url": "https://www.steamlocomotive.com/locobase.php?country=USA&wheel=6-8-6"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "pilot",                   "name": "Pilot / Cowcatcher",                "shape": "box",      "position": [11.70, 0.50, 0],                            "size": [0.40, 0.60, 1.50], "material": "welded steel", "role": "Wedge-shaped front pilot at the very front of the engine.", "connections": ["smokebox"] },
-    { "id": "smokebox",                "name": "Smokebox",                          "shape": "cylinder", "position": [10.75, 1.50, 0], "rotation": [0, 0, 1.5708], "size": [0.65, 1.50],       "material": "forged steel",  "role": "Short cylindrical chamber at the front of the boiler. Collects exhaust gas and channels it up the stack.", "connections": ["boiler", "quadruple_stack", "smoke_deflector_port", "smoke_deflector_stbd", "headlight", "bell", "leading_truck_frame"] },
-    { "id": "boiler",                  "name": "Modified Belpaire Boiler",          "shape": "cylinder", "position": [7.00, 1.50, 0],  "rotation": [0, 0, 1.5708], "size": [0.65, 6.00],       "material": "brushed steel", "role": "Main pressure vessel — 102 in (2.59 m) diameter, 310 psi. Generates the steam that feeds the turbine.", "connections": ["smokebox", "firebox", "steam_dome", "feedwater_heater", "running_board"] },
-    { "id": "firebox",                 "name": "Belpaire Firebox",                  "shape": "box",      "position": [3.00, 1.40, 0],                             "size": [2.00, 1.20, 1.60], "material": "forged steel",  "role": "Belpaire firebox at the rear of the boiler. 120 sq ft grate area.", "connections": ["boiler", "cab", "trailing_truck_frame"] },
-    { "id": "cab",                     "name": "Cab",                               "shape": "box",      "position": [1.00, 1.50, 0],                             "size": [2.00, 1.40, 1.50], "material": "welded steel",  "role": "Crew compartment over the trailing truck. Houses the single-lever fluid-pressure control.", "connections": ["firebox", "turbine_housing"] },
-
-    { "id": "headlight",               "name": "Headlight",                         "shape": "cylinder", "position": [11.55, 1.95, 0], "rotation": [0, 0, 1.5708], "size": [0.11, 0.14],       "material": "brushed steel", "role": "Front-facing headlight centered on the smokebox door.", "connections": ["smokebox"] },
-    { "id": "bell",                    "name": "Locomotive Bell",                   "shape": "sphere",   "position": [10.40, 2.25, 0],                            "size": [0.12],             "material": "brass",         "role": "Brass warning bell mounted on top of the smokebox.", "connections": ["smokebox"] },
-    { "id": "quadruple_stack",         "name": "Quadruple Exhaust Stack",           "shape": "cylinder", "position": [10.50, 2.35, 0],                            "size": [0.22, 0.60],       "material": "forged steel",  "role": "Signature four-tube exhaust stack — gave the turbine exhaust enough draft pull despite the long boiler.", "connections": ["smokebox"] },
-    { "id": "steam_dome",              "name": "Steam Dome",                        "shape": "sphere",   "position": [7.50, 2.15, 0],                             "size": [0.30],             "material": "brass",         "role": "Brass-capped dome on top of the boiler — collects dry steam from the steam space before it reaches the turbine.", "connections": ["boiler"] },
-    { "id": "feedwater_heater",        "name": "Worthington Feedwater Heater",      "shape": "cylinder", "position": [8.50, 2.18, 0],  "rotation": [0, 0, 1.5708], "size": [0.17, 2.50],       "material": "brushed steel", "role": "Worthington Corporation feedwater heater — pre-heats boiler feedwater using exhaust steam for efficiency.", "connections": ["boiler"] },
-
-    { "id": "smoke_deflector_port",    "name": "Smoke Deflector ('elephant ear', Port)", "shape": "box", "position": [10.20, 2.10, 0.80],                         "size": [1.20, 1.50, 0.04], "material": "welded steel",  "role": "Large vertical deflector plate along the port side of the smokebox. Added Dec 1946 at Altoona.", "connections": ["smokebox"] },
-    { "id": "smoke_deflector_stbd",    "name": "Smoke Deflector ('elephant ear', Stbd)", "shape": "box", "position": [10.20, 2.10, -0.80],                        "size": [1.20, 1.50, 0.04], "material": "welded steel",  "role": "Starboard-side smoke deflector.", "connections": ["smokebox"] },
-
-    { "id": "running_board",           "name": "Running Board (Port)",              "shape": "box",      "position": [5.00, 1.10, 0.85],                          "size": [12.00, 0.10, 0.04], "material": "welded steel", "role": "Long port-side running board for maintenance access along the boiler.", "connections": ["boiler", "air_pump"] },
-    { "id": "air_pump",                "name": "Twin Air Pump",                      "shape": "cylinder", "position": [5.50, 1.10, 1.00], "rotation": [0, 0, 1.5708], "size": [0.14, 0.60],    "material": "brushed steel", "role": "One of the twin air pumps beneath the running boards — supplies compressed air for the train brakes.", "connections": ["running_board"] },
-
-    { "id": "turbine_housing",         "name": "Direct-Drive Steam Turbine",        "shape": "cylinder", "position": [1.00, 0.60, 0],  "rotation": [0, 0, 1.5708], "size": [0.24, 1.40],       "material": "brushed steel", "role": "Westinghouse ahead-turbine (with smaller reverse-turbine pair) under the cab. Feeds the reduction gearbox.", "connections": ["cab", "transmission_gearbox"] },
-    { "id": "transmission_gearbox",    "name": "Reduction Transmission",            "shape": "box",      "position": [2.10, 0.45, 0],                             "size": [0.50, 0.30, 0.80], "material": "forged steel",  "role": "Reduction gearbox between the turbine shaft and the driven axle.", "connections": ["turbine_housing", "driving_wheel_4"] },
-
-    { "id": "leading_truck_frame",     "name": "Leading Truck Frame (3-axle)",      "shape": "box",      "position": [10.75, 0.35, 0],                            "size": [1.50, 0.30, 1.60], "material": "welded steel",  "role": "Three-axle (six-wheel) leading truck frame under the smokebox.", "connections": ["smokebox", "leading_wheel_front", "leading_wheel_rear"] },
-    { "id": "leading_wheel_front",     "name": "Leading Wheel (front axle, port)",  "shape": "cylinder", "position": [11.20, 0.23, 0.75], "rotation": [1.5708, 0, 0], "size": [0.23, 0.20],    "material": "forged steel",  "role": "Port-side wheel on the front leading axle (two more axles visible as part of the truck frame).", "connections": ["leading_truck_frame"] },
-    { "id": "leading_wheel_rear",      "name": "Leading Wheel (rear axle, port)",   "shape": "cylinder", "position": [10.30, 0.23, 0.75], "rotation": [1.5708, 0, 0], "size": [0.23, 0.20],    "material": "forged steel",  "role": "Port-side wheel on the rearmost leading axle.", "connections": ["leading_truck_frame"] },
-
-    { "id": "driving_wheel_1",         "name": "Driving Wheel #1 (68 in)",          "shape": "cylinder", "position": [5.00, 0.43, 0.78], "rotation": [1.5708, 0, 0], "size": [0.43, 0.24],    "material": "forged steel",  "role": "Rearmost driving wheel (port side) — 68-inch diameter, linked to the others via side rods.", "connections": ["side_rod"] },
-    { "id": "driving_wheel_2",         "name": "Driving Wheel #2",                  "shape": "cylinder", "position": [6.30, 0.43, 0.78], "rotation": [1.5708, 0, 0], "size": [0.43, 0.24],    "material": "forged steel",  "role": "Second driving wheel.", "connections": ["side_rod"] },
-    { "id": "driving_wheel_3",         "name": "Driving Wheel #3",                  "shape": "cylinder", "position": [7.60, 0.43, 0.78], "rotation": [1.5708, 0, 0], "size": [0.43, 0.24],    "material": "forged steel",  "role": "Third driving wheel.", "connections": ["side_rod"] },
-    { "id": "driving_wheel_4",         "name": "Driving Wheel #4 (geared axle)",    "shape": "cylinder", "position": [8.90, 0.43, 0.78], "rotation": [1.5708, 0, 0], "size": [0.43, 0.24],    "material": "forged steel",  "role": "Frontmost driving wheel — sits on the directly-geared axle fed by the reduction transmission.", "connections": ["side_rod", "transmission_gearbox"] },
-    { "id": "side_rod",                "name": "Connecting Side Rod (Port)",        "shape": "box",      "position": [6.95, 0.43, 0.94],                          "size": [4.20, 0.14, 0.04], "material": "brushed steel", "role": "Coupling rod that ties all four driving axles together on the port side — so torque from the geared axle distributes across all eight driving wheels.", "connections": ["driving_wheel_1", "driving_wheel_2", "driving_wheel_3", "driving_wheel_4"] },
-
-    { "id": "trailing_truck_frame",    "name": "Trailing Truck Frame (3-axle)",     "shape": "box",      "position": [2.75, 0.42, 0],                             "size": [1.30, 0.30, 1.50], "material": "welded steel",  "role": "Three-axle (six-wheel) trailing truck under the firebox.", "connections": ["firebox", "trailing_wheel_front", "trailing_wheel_rear"] },
-    { "id": "trailing_wheel_front",    "name": "Trailing Wheel (front axle, port)", "shape": "cylinder", "position": [3.30, 0.27, 0.76], "rotation": [1.5708, 0, 0], "size": [0.27, 0.22],    "material": "forged steel",  "role": "Port-side wheel on the frontmost trailing axle.", "connections": ["trailing_truck_frame"] },
-    { "id": "trailing_wheel_rear",     "name": "Trailing Wheel (rear axle, port)",  "shape": "cylinder", "position": [2.20, 0.27, 0.76], "rotation": [1.5708, 0, 0], "size": [0.27, 0.22],    "material": "forged steel",  "role": "Port-side wheel on the rearmost trailing axle.", "connections": ["trailing_truck_frame"] },
-
-    { "id": "tender_body",             "name": "180-P-85 Tender Body",              "shape": "box",      "position": [-3.25, 1.50, 0],                            "size": [6.50, 2.20, 2.80], "material": "welded steel",  "role": "16-wheel tender carrying 19,500 gal of water and 37.5 short tons of coal.", "connections": ["tender_truck_front_frame", "tender_truck_rear_frame"] },
-    { "id": "tender_truck_front_frame","name": "Tender Truck (Front, 4-axle)",      "shape": "box",      "position": [-1.50, 0.30, 0],                            "size": [2.00, 0.30, 1.50], "material": "welded steel",  "role": "Forward tender truck — four axles, eight wheels.", "connections": ["tender_body", "tender_wheel_fa", "tender_wheel_fb"] },
-    { "id": "tender_truck_rear_frame", "name": "Tender Truck (Rear, 4-axle)",       "shape": "box",      "position": [-5.25, 0.30, 0],                            "size": [2.00, 0.30, 1.50], "material": "welded steel",  "role": "Rear tender truck — four axles, eight wheels.", "connections": ["tender_body", "tender_wheel_ra", "tender_wheel_rb"] },
-    { "id": "tender_wheel_fa",         "name": "Tender Wheel (Fwd Truck, axle A)",  "shape": "cylinder", "position": [-0.90, 0.23, 0.75], "rotation": [1.5708, 0, 0], "size": [0.23, 0.20],   "material": "forged steel",  "role": "Representative port wheel on the forward tender truck (front axle).", "connections": ["tender_truck_front_frame"] },
-    { "id": "tender_wheel_fb",         "name": "Tender Wheel (Fwd Truck, axle B)",  "shape": "cylinder", "position": [-2.10, 0.23, 0.75], "rotation": [1.5708, 0, 0], "size": [0.23, 0.20],   "material": "forged steel",  "role": "Representative port wheel on the forward tender truck (rear axle).", "connections": ["tender_truck_front_frame"] },
-    { "id": "tender_wheel_ra",         "name": "Tender Wheel (Rear Truck, axle A)", "shape": "cylinder", "position": [-4.60, 0.23, 0.75], "rotation": [1.5708, 0, 0], "size": [0.23, 0.20],   "material": "forged steel",  "role": "Representative port wheel on the rear tender truck (front axle).", "connections": ["tender_truck_rear_frame"] },
-    { "id": "tender_wheel_rb",         "name": "Tender Wheel (Rear Truck, axle B)", "shape": "cylinder", "position": [-5.80, 0.23, 0.75], "rotation": [1.5708, 0, 0], "size": [0.23, 0.20],   "material": "forged steel",  "role": "Representative port wheel on the rear tender truck (rear axle).", "connections": ["tender_truck_rear_frame"] }
+    {
+      "id": "left_rail",
+      "name": "Port Rail",
+      "shape": "box",
+      "position": [
+        2.7,
+        0.03,
+        0.82
+      ],
+      "size": [
+        18.8,
+        0.06,
+        0.06
+      ],
+      "material": "forged steel",
+      "role": "Port running rail gives the wheel contact datum and shows every wheel standing on the ground line.",
+      "connections": [
+        "main_frame"
+      ]
+    },
+    {
+      "id": "right_rail",
+      "name": "Starboard Rail",
+      "shape": "box",
+      "position": [
+        2.7,
+        0.03,
+        -0.82
+      ],
+      "size": [
+        18.8,
+        0.06,
+        0.06
+      ],
+      "material": "forged steel",
+      "role": "Starboard running rail mirrors the port rail so both wheel rows are buildable and visibly supported.",
+      "connections": [
+        "main_frame"
+      ]
+    },
+    {
+      "id": "tie_01",
+      "name": "Track Cross Tie 01",
+      "shape": "box",
+      "position": [
+        -6.1,
+        0.01,
+        0
+      ],
+      "size": [
+        0.18,
+        0.04,
+        1.95
+      ],
+      "material": "welded steel",
+      "role": "Cross tie fixes rail gauge under the tender rear truck.",
+      "connections": [
+        "left_rail",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tie_02",
+      "name": "Track Cross Tie 02",
+      "shape": "box",
+      "position": [
+        -4.4,
+        0.01,
+        0
+      ],
+      "size": [
+        0.18,
+        0.04,
+        1.95
+      ],
+      "material": "welded steel",
+      "role": "Cross tie keeps the tender truck wheels visibly supported at the correct gauge.",
+      "connections": [
+        "left_rail",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tie_03",
+      "name": "Track Cross Tie 03",
+      "shape": "box",
+      "position": [
+        -2.7,
+        0.01,
+        0
+      ],
+      "size": [
+        0.18,
+        0.04,
+        1.95
+      ],
+      "material": "welded steel",
+      "role": "Cross tie defines the rail datum beneath the tender front truck.",
+      "connections": [
+        "left_rail",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tie_04",
+      "name": "Track Cross Tie 04",
+      "shape": "box",
+      "position": [
+        -1,
+        0.01,
+        0
+      ],
+      "size": [
+        0.18,
+        0.04,
+        1.95
+      ],
+      "material": "welded steel",
+      "role": "Cross tie supports the drawbar gap between tender and locomotive.",
+      "connections": [
+        "left_rail",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tie_05",
+      "name": "Track Cross Tie 05",
+      "shape": "box",
+      "position": [
+        0.7,
+        0.01,
+        0
+      ],
+      "size": [
+        0.18,
+        0.04,
+        1.95
+      ],
+      "material": "welded steel",
+      "role": "Cross tie shows the track continuing below the cab and trailing truck.",
+      "connections": [
+        "left_rail",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tie_06",
+      "name": "Track Cross Tie 06",
+      "shape": "box",
+      "position": [
+        2.4,
+        0.01,
+        0
+      ],
+      "size": [
+        0.18,
+        0.04,
+        1.95
+      ],
+      "material": "welded steel",
+      "role": "Cross tie supports the trailing truck wheel contact points.",
+      "connections": [
+        "left_rail",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tie_07",
+      "name": "Track Cross Tie 07",
+      "shape": "box",
+      "position": [
+        4.1,
+        0.01,
+        0
+      ],
+      "size": [
+        0.18,
+        0.04,
+        1.95
+      ],
+      "material": "welded steel",
+      "role": "Cross tie marks the transition from trailing truck to driving wheelbase.",
+      "connections": [
+        "left_rail",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tie_08",
+      "name": "Track Cross Tie 08",
+      "shape": "box",
+      "position": [
+        5.8,
+        0.01,
+        0
+      ],
+      "size": [
+        0.18,
+        0.04,
+        1.95
+      ],
+      "material": "welded steel",
+      "role": "Cross tie supports the rear driving axles.",
+      "connections": [
+        "left_rail",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tie_09",
+      "name": "Track Cross Tie 09",
+      "shape": "box",
+      "position": [
+        7.5,
+        0.01,
+        0
+      ],
+      "size": [
+        0.18,
+        0.04,
+        1.95
+      ],
+      "material": "welded steel",
+      "role": "Cross tie supports the middle driving axles.",
+      "connections": [
+        "left_rail",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tie_10",
+      "name": "Track Cross Tie 10",
+      "shape": "box",
+      "position": [
+        9.2,
+        0.01,
+        0
+      ],
+      "size": [
+        0.18,
+        0.04,
+        1.95
+      ],
+      "material": "welded steel",
+      "role": "Cross tie supports the geared driving axle and leading truck transition.",
+      "connections": [
+        "left_rail",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tie_11",
+      "name": "Track Cross Tie 11",
+      "shape": "box",
+      "position": [
+        10.9,
+        0.01,
+        0
+      ],
+      "size": [
+        0.18,
+        0.04,
+        1.95
+      ],
+      "material": "welded steel",
+      "role": "Cross tie supports the three-axle leading truck.",
+      "connections": [
+        "left_rail",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tie_12",
+      "name": "Track Cross Tie 12",
+      "shape": "box",
+      "position": [
+        12.1,
+        0.01,
+        0
+      ],
+      "size": [
+        0.18,
+        0.04,
+        1.95
+      ],
+      "material": "welded steel",
+      "role": "Cross tie shows the track extending under the pilot and front coupler.",
+      "connections": [
+        "left_rail",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "main_frame",
+      "name": "Locomotive Main Frame",
+      "shape": "box",
+      "position": [
+        6.25,
+        0.72,
+        0
+      ],
+      "size": [
+        11.4,
+        0.18,
+        1.36
+      ],
+      "material": "welded steel",
+      "role": "Long welded locomotive bed frame carries the boiler, trucks, driving axles, turbine, and drawbar loads.",
+      "connections": [
+        "left_rail",
+        "right_rail",
+        "smokebox",
+        "boiler",
+        "firebox_lower_wrapper",
+        "cab",
+        "leading_truck_frame",
+        "trailing_truck_frame",
+        "drawbar"
+      ]
+    },
+    {
+      "id": "pilot_beam",
+      "name": "Front Pilot Beam",
+      "shape": "box",
+      "position": [
+        11.78,
+        0.55,
+        0
+      ],
+      "size": [
+        0.24,
+        0.34,
+        1.62
+      ],
+      "material": "welded steel",
+      "role": "Heavy transverse beam at the nose supports the pilot and front coupler.",
+      "connections": [
+        "main_frame",
+        "pilot",
+        "front_coupler"
+      ]
+    },
+    {
+      "id": "pilot",
+      "name": "Sloped Pilot / Cowcatcher",
+      "shape": "complex",
+      "position": [
+        12.05,
+        0.31,
+        0
+      ],
+      "size": [
+        0.55,
+        0.38,
+        1.5
+      ],
+      "material": "welded steel",
+      "role": "Low wedge-shaped pilot clears track obstructions ahead of the leading truck.",
+      "connections": [
+        "pilot_beam"
+      ]
+    },
+    {
+      "id": "front_coupler",
+      "name": "Front Knuckle Coupler",
+      "shape": "box",
+      "position": [
+        12.25,
+        0.55,
+        0
+      ],
+      "size": [
+        0.24,
+        0.18,
+        0.28
+      ],
+      "material": "forged steel",
+      "role": "Front coupler is the external pulling interface on the pilot beam.",
+      "connections": [
+        "pilot_beam"
+      ]
+    },
+    {
+      "id": "smokebox",
+      "name": "Cylindrical Smokebox",
+      "shape": "cylinder",
+      "position": [
+        10.75,
+        1.48,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.64,
+        1.48
+      ],
+      "material": "forged steel",
+      "role": "Short front chamber collects combustion gas and turbine exhaust draft before discharge through the four stacks.",
+      "connections": [
+        "main_frame",
+        "boiler",
+        "smokebox_door",
+        "stack_a",
+        "stack_b",
+        "stack_c",
+        "stack_d",
+        "smoke_deflector_port",
+        "smoke_deflector_stbd"
+      ]
+    },
+    {
+      "id": "smokebox_door",
+      "name": "Round Smokebox Door",
+      "shape": "cylinder",
+      "position": [
+        11.52,
+        1.48,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.55,
+        0.08
+      ],
+      "material": "brushed steel",
+      "role": "Circular front door gives maintenance access to the smokebox tube sheet.",
+      "connections": [
+        "smokebox",
+        "headlight",
+        "front_number_plate"
+      ]
+    },
+    {
+      "id": "front_number_plate",
+      "name": "PRR 6200 Number Plate",
+      "shape": "box",
+      "position": [
+        11.58,
+        1.72,
+        0
+      ],
+      "size": [
+        0.04,
+        0.12,
+        0.34
+      ],
+      "material": "brass",
+      "role": "Small brass number plate identifies the one-off PRR 6200 prototype on the smokebox door.",
+      "connections": [
+        "smokebox_door"
+      ]
+    },
+    {
+      "id": "headlight",
+      "name": "Centered Headlight",
+      "shape": "cylinder",
+      "position": [
+        11.66,
+        1.98,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.12,
+        0.15
+      ],
+      "material": "brushed steel",
+      "role": "Front-facing headlight is centered above the smokebox door for passenger-service visibility.",
+      "connections": [
+        "smokebox_door"
+      ]
+    },
+    {
+      "id": "boiler",
+      "name": "Long Boiler Barrel",
+      "shape": "cylinder",
+      "position": [
+        7.05,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.65,
+        6.05
+      ],
+      "material": "brushed steel",
+      "role": "Main 310 psi pressure vessel generates steam and visually defines the S2's very long nose.",
+      "connections": [
+        "main_frame",
+        "smokebox",
+        "firebox_lower_wrapper",
+        "steam_dome",
+        "feedwater_heater",
+        "steam_pipe_to_turbine",
+        "running_board_port",
+        "running_board_stbd"
+      ]
+    },
+    {
+      "id": "firebox_lower_wrapper",
+      "name": "Belpaire Firebox Lower Wrapper",
+      "shape": "box",
+      "position": [
+        3.05,
+        1.29,
+        0
+      ],
+      "size": [
+        1.68,
+        0.92,
+        1.36
+      ],
+      "material": "forged steel",
+      "role": "Lower Belpaire firebox wrapper carries the grate space over the trailing truck without hiding the under-cab turbine.",
+      "connections": [
+        "main_frame",
+        "boiler",
+        "firebox_port_shoulder",
+        "firebox_stbd_shoulder",
+        "firebox_crown_sheet",
+        "firebox_throat_sheet",
+        "firebox_backhead",
+        "cab",
+        "trailing_truck_frame"
+      ]
+    },
+    {
+      "id": "firebox_port_shoulder",
+      "name": "Port Belpaire Shoulder Sheet",
+      "shape": "box",
+      "position": [
+        3.05,
+        1.83,
+        0.55
+      ],
+      "size": [
+        1.58,
+        0.34,
+        0.22
+      ],
+      "material": "forged steel",
+      "role": "Port raised shoulder forms the square Belpaire upper corner instead of a plain rectangular firebox slab.",
+      "connections": [
+        "firebox_lower_wrapper",
+        "firebox_crown_sheet"
+      ]
+    },
+    {
+      "id": "firebox_stbd_shoulder",
+      "name": "Starboard Belpaire Shoulder Sheet",
+      "shape": "box",
+      "position": [
+        3.05,
+        1.83,
+        -0.55
+      ],
+      "size": [
+        1.58,
+        0.34,
+        0.22
+      ],
+      "material": "forged steel",
+      "role": "Starboard raised shoulder mirrors the port Belpaire sheet and makes the squared firebox top readable.",
+      "connections": [
+        "firebox_lower_wrapper",
+        "firebox_crown_sheet"
+      ]
+    },
+    {
+      "id": "firebox_crown_sheet",
+      "name": "Flat Belpaire Crown Sheet",
+      "shape": "box",
+      "position": [
+        3.05,
+        2.09,
+        0
+      ],
+      "size": [
+        1.58,
+        0.14,
+        1.12
+      ],
+      "material": "forged steel",
+      "role": "Flat crown sheet caps the firebox and distinguishes the Belpaire wrapper from a round-top boiler.",
+      "connections": [
+        "firebox_lower_wrapper",
+        "firebox_port_shoulder",
+        "firebox_stbd_shoulder"
+      ]
+    },
+    {
+      "id": "firebox_throat_sheet",
+      "name": "Belpaire Throat Sheet",
+      "shape": "box",
+      "position": [
+        3.9,
+        1.55,
+        0
+      ],
+      "size": [
+        0.08,
+        0.98,
+        1.12
+      ],
+      "material": "brushed steel",
+      "role": "Front throat sheet shows the transition from the round boiler barrel into the squared firebox wrapper.",
+      "connections": [
+        "firebox_lower_wrapper",
+        "boiler"
+      ]
+    },
+    {
+      "id": "firebox_backhead",
+      "name": "Exposed Firebox Backhead",
+      "shape": "box",
+      "position": [
+        2.16,
+        1.48,
+        0
+      ],
+      "size": [
+        0.06,
+        1.04,
+        1.2
+      ],
+      "material": "brushed steel",
+      "role": "Rear firebox plate is exposed at the cab front to show where controls and firing gear meet the boiler.",
+      "connections": [
+        "firebox_lower_wrapper",
+        "cab"
+      ]
+    },
+    {
+      "id": "cab",
+      "name": "Crew Cab with Cutaway Side",
+      "shape": "box",
+      "position": [
+        1.28,
+        1.52,
+        -0.18
+      ],
+      "size": [
+        1.55,
+        1.42,
+        1.12
+      ],
+      "material": "welded steel",
+      "role": "Crew cab is narrowed on the port side so the turbine and gearbox below remain visible in the ISO view.",
+      "connections": [
+        "main_frame",
+        "firebox_lower_wrapper",
+        "cab_roof",
+        "cab_floor"
+      ]
+    },
+    {
+      "id": "cab_roof",
+      "name": "Cab Roof",
+      "shape": "box",
+      "position": [
+        1.28,
+        2.32,
+        -0.18
+      ],
+      "size": [
+        1.8,
+        0.16,
+        1.34
+      ],
+      "material": "welded steel",
+      "role": "Thin cab roof caps the crew compartment without hiding the under-cab machinery.",
+      "connections": [
+        "cab"
+      ]
+    },
+    {
+      "id": "cab_floor",
+      "name": "Cab Floor Plate",
+      "shape": "box",
+      "position": [
+        1.28,
+        0.88,
+        0
+      ],
+      "size": [
+        1.64,
+        0.08,
+        1.28
+      ],
+      "material": "welded steel",
+      "role": "Thin floor plate supports the crew area and leaves the turbine train legible below it.",
+      "connections": [
+        "cab",
+        "main_frame"
+      ]
+    },
+    {
+      "id": "bell",
+      "name": "Brass Locomotive Bell",
+      "shape": "sphere",
+      "position": [
+        10.36,
+        2.24,
+        0
+      ],
+      "size": [
+        0.12
+      ],
+      "material": "brass",
+      "role": "Bell on top of the smokebox provides the audible warning device.",
+      "connections": [
+        "smokebox"
+      ]
+    },
+    {
+      "id": "stack_a",
+      "name": "Quadruple Exhaust Stack A",
+      "shape": "cylinder",
+      "position": [
+        10.42,
+        2.35,
+        0.27
+      ],
+      "size": [
+        0.09,
+        0.46
+      ],
+      "material": "forged steel",
+      "role": "One of four separate exhaust tubes that create the S2's distinctive quadruple stack silhouette.",
+      "connections": [
+        "smokebox"
+      ]
+    },
+    {
+      "id": "stack_b",
+      "name": "Quadruple Exhaust Stack B",
+      "shape": "cylinder",
+      "position": [
+        10.42,
+        2.35,
+        0.09
+      ],
+      "size": [
+        0.09,
+        0.46
+      ],
+      "material": "forged steel",
+      "role": "Second exhaust tube, separated so the four-stack arrangement is visible rather than a single cylinder.",
+      "connections": [
+        "smokebox"
+      ]
+    },
+    {
+      "id": "stack_c",
+      "name": "Quadruple Exhaust Stack C",
+      "shape": "cylinder",
+      "position": [
+        10.42,
+        2.35,
+        -0.09
+      ],
+      "size": [
+        0.09,
+        0.46
+      ],
+      "material": "forged steel",
+      "role": "Third exhaust tube channels smokebox draft upward from the turbine locomotive's long boiler.",
+      "connections": [
+        "smokebox"
+      ]
+    },
+    {
+      "id": "stack_d",
+      "name": "Quadruple Exhaust Stack D",
+      "shape": "cylinder",
+      "position": [
+        10.42,
+        2.35,
+        -0.27
+      ],
+      "size": [
+        0.09,
+        0.46
+      ],
+      "material": "forged steel",
+      "role": "Fourth exhaust tube completes the signature PRR S2 exhaust cluster.",
+      "connections": [
+        "smokebox"
+      ]
+    },
+    {
+      "id": "steam_dome",
+      "name": "Steam Dome",
+      "shape": "sphere",
+      "position": [
+        7.35,
+        2.17,
+        0
+      ],
+      "size": [
+        0.3
+      ],
+      "material": "brass",
+      "role": "Dome collects dry steam above the boiler waterline before steam is routed to appliances and turbine piping.",
+      "connections": [
+        "boiler"
+      ]
+    },
+    {
+      "id": "feedwater_heater",
+      "name": "Worthington Feedwater Heater",
+      "shape": "cylinder",
+      "position": [
+        8.55,
+        2.16,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.16,
+        2.45
+      ],
+      "material": "brushed steel",
+      "role": "Long Worthington heater preheats feedwater with exhaust steam before it enters the boiler.",
+      "connections": [
+        "boiler",
+        "feedwater_pump_port",
+        "feedwater_pipe"
+      ]
+    },
+    {
+      "id": "feedwater_pump_port",
+      "name": "Port Feedwater Pump",
+      "shape": "cylinder",
+      "position": [
+        8.95,
+        1.08,
+        0.92
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.12,
+        0.55
+      ],
+      "material": "brushed steel",
+      "role": "Pump below the running board moves heated feedwater from the tender supply into the boiler.",
+      "connections": [
+        "feedwater_heater",
+        "running_board_port"
+      ]
+    },
+    {
+      "id": "feedwater_pipe",
+      "name": "Feedwater Return Pipe",
+      "shape": "capsule",
+      "position": [
+        7.72,
+        1.96,
+        0.48
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.04,
+        1.65
+      ],
+      "material": "copper",
+      "role": "Visible pipe links the heater outlet back into the boiler shell.",
+      "connections": [
+        "feedwater_heater",
+        "boiler"
+      ]
+    },
+    {
+      "id": "smoke_deflector_port",
+      "name": "Port Elephant-Ear Smoke Deflector",
+      "shape": "box",
+      "position": [
+        10.3,
+        1.86,
+        0.86
+      ],
+      "size": [
+        1.35,
+        1.28,
+        0.04
+      ],
+      "material": "welded steel",
+      "role": "Large vertical port plate lifts smoke over the long boiler and makes the post-1946 S2 silhouette recognizable.",
+      "connections": [
+        "smokebox",
+        "deflector_port_bracket_front",
+        "deflector_port_bracket_rear",
+        "deflector_port_top_stiffener",
+        "deflector_port_bottom_stiffener",
+        "deflector_port_diagonal_stay"
+      ]
+    },
+    {
+      "id": "smoke_deflector_stbd",
+      "name": "Starboard Elephant-Ear Smoke Deflector",
+      "shape": "box",
+      "position": [
+        10.3,
+        1.86,
+        -0.86
+      ],
+      "size": [
+        1.35,
+        1.28,
+        0.04
+      ],
+      "material": "welded steel",
+      "role": "Matching starboard deflector balances the smokebox and shows the paired Altoona modification.",
+      "connections": [
+        "smokebox",
+        "deflector_stbd_bracket_front",
+        "deflector_stbd_bracket_rear",
+        "deflector_stbd_top_stiffener",
+        "deflector_stbd_bottom_stiffener",
+        "deflector_stbd_diagonal_stay"
+      ]
+    },
+    {
+      "id": "deflector_port_bracket_front",
+      "name": "Port Deflector Front Stay",
+      "shape": "box",
+      "position": [
+        10.9,
+        1.35,
+        0.73
+      ],
+      "size": [
+        0.08,
+        0.82,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "Front stay braces the port smoke deflector to the smokebox shell.",
+      "connections": [
+        "smoke_deflector_port",
+        "smokebox"
+      ]
+    },
+    {
+      "id": "deflector_port_bracket_rear",
+      "name": "Port Deflector Rear Stay",
+      "shape": "box",
+      "position": [
+        9.75,
+        1.35,
+        0.73
+      ],
+      "size": [
+        0.08,
+        0.82,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "Rear stay prevents the port deflector plate from vibrating at speed.",
+      "connections": [
+        "smoke_deflector_port",
+        "smokebox"
+      ]
+    },
+    {
+      "id": "deflector_stbd_bracket_front",
+      "name": "Starboard Deflector Front Stay",
+      "shape": "box",
+      "position": [
+        10.9,
+        1.35,
+        -0.73
+      ],
+      "size": [
+        0.08,
+        0.82,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "Front stay braces the starboard smoke deflector to the smokebox shell.",
+      "connections": [
+        "smoke_deflector_stbd",
+        "smokebox"
+      ]
+    },
+    {
+      "id": "deflector_stbd_bracket_rear",
+      "name": "Starboard Deflector Rear Stay",
+      "shape": "box",
+      "position": [
+        9.75,
+        1.35,
+        -0.73
+      ],
+      "size": [
+        0.08,
+        0.82,
+        0.06
+      ],
+      "material": "welded steel",
+      "role": "Rear stay prevents the starboard deflector plate from vibrating at speed.",
+      "connections": [
+        "smoke_deflector_stbd",
+        "smokebox"
+      ]
+    },
+    {
+      "id": "deflector_port_top_stiffener",
+      "name": "Port Deflector Top Edge Stiffener",
+      "shape": "box",
+      "position": [
+        10.3,
+        2.51,
+        0.89
+      ],
+      "size": [
+        1.32,
+        0.06,
+        0.08
+      ],
+      "material": "welded steel",
+      "role": "Top stiffener makes the port elephant-ear plate read as a braced sheet rather than a floating flat rectangle.",
+      "connections": [
+        "smoke_deflector_port"
+      ]
+    },
+    {
+      "id": "deflector_port_bottom_stiffener",
+      "name": "Port Deflector Bottom Edge Stiffener",
+      "shape": "box",
+      "position": [
+        10.3,
+        1.21,
+        0.89
+      ],
+      "size": [
+        1.32,
+        0.06,
+        0.08
+      ],
+      "material": "welded steel",
+      "role": "Bottom stiffener ties the lower edge of the port deflector into the stay brackets.",
+      "connections": [
+        "smoke_deflector_port",
+        "deflector_port_bracket_front",
+        "deflector_port_bracket_rear"
+      ]
+    },
+    {
+      "id": "deflector_port_diagonal_stay",
+      "name": "Port Deflector Diagonal Stay",
+      "shape": "box",
+      "position": [
+        10.32,
+        1.86,
+        0.71
+      ],
+      "rotation": [
+        0,
+        0,
+        0.55
+      ],
+      "size": [
+        1.42,
+        0.05,
+        0.05
+      ],
+      "material": "welded steel",
+      "role": "Diagonal stay triangulates the port deflector mount so the plate has a believable support path.",
+      "connections": [
+        "smoke_deflector_port",
+        "smokebox"
+      ]
+    },
+    {
+      "id": "deflector_stbd_top_stiffener",
+      "name": "Starboard Deflector Top Edge Stiffener",
+      "shape": "box",
+      "position": [
+        10.3,
+        2.51,
+        -0.89
+      ],
+      "size": [
+        1.32,
+        0.06,
+        0.08
+      ],
+      "material": "welded steel",
+      "role": "Top stiffener makes the starboard elephant-ear plate read as a braced sheet.",
+      "connections": [
+        "smoke_deflector_stbd"
+      ]
+    },
+    {
+      "id": "deflector_stbd_bottom_stiffener",
+      "name": "Starboard Deflector Bottom Edge Stiffener",
+      "shape": "box",
+      "position": [
+        10.3,
+        1.21,
+        -0.89
+      ],
+      "size": [
+        1.32,
+        0.06,
+        0.08
+      ],
+      "material": "welded steel",
+      "role": "Bottom stiffener ties the starboard deflector into its stay brackets.",
+      "connections": [
+        "smoke_deflector_stbd",
+        "deflector_stbd_bracket_front",
+        "deflector_stbd_bracket_rear"
+      ]
+    },
+    {
+      "id": "deflector_stbd_diagonal_stay",
+      "name": "Starboard Deflector Diagonal Stay",
+      "shape": "box",
+      "position": [
+        10.32,
+        1.86,
+        -0.71
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.55
+      ],
+      "size": [
+        1.42,
+        0.05,
+        0.05
+      ],
+      "material": "welded steel",
+      "role": "Diagonal stay triangulates the starboard deflector mount so the plate is not visually unsupported.",
+      "connections": [
+        "smoke_deflector_stbd",
+        "smokebox"
+      ]
+    },
+    {
+      "id": "running_board_port",
+      "name": "Port Running Board",
+      "shape": "box",
+      "position": [
+        6.6,
+        1.08,
+        0.86
+      ],
+      "size": [
+        9.7,
+        0.08,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Port walkway gives maintenance access along the boiler and supports exposed pumps.",
+      "connections": [
+        "boiler",
+        "main_frame",
+        "feedwater_pump_port",
+        "air_pump_port"
+      ]
+    },
+    {
+      "id": "running_board_stbd",
+      "name": "Starboard Running Board",
+      "shape": "box",
+      "position": [
+        6.6,
+        1.08,
+        -0.86
+      ],
+      "size": [
+        9.7,
+        0.08,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Starboard walkway mirrors the port board and establishes the full boiler width.",
+      "connections": [
+        "boiler",
+        "main_frame",
+        "air_pump_stbd"
+      ]
+    },
+    {
+      "id": "air_pump_port",
+      "name": "Port Twin Air Pump",
+      "shape": "cylinder",
+      "position": [
+        5.65,
+        1.02,
+        1.02
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.13,
+        0.62
+      ],
+      "material": "brushed steel",
+      "role": "Port air pump supplies compressed air for train brakes from below the running board.",
+      "connections": [
+        "running_board_port"
+      ]
+    },
+    {
+      "id": "air_pump_stbd",
+      "name": "Starboard Twin Air Pump",
+      "shape": "cylinder",
+      "position": [
+        5.65,
+        1.02,
+        -1.02
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.13,
+        0.62
+      ],
+      "material": "brushed steel",
+      "role": "Starboard air pump completes the paired brake-air equipment installation.",
+      "connections": [
+        "running_board_stbd"
+      ]
+    },
+    {
+      "id": "turbine_ahead",
+      "name": "Westinghouse Ahead Turbine",
+      "shape": "cylinder",
+      "position": [
+        1.08,
+        0.52,
+        0.42
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.22,
+        1.1
+      ],
+      "material": "brushed steel",
+      "role": "Main ahead steam turbine sits exposed under the cab and delivers forward running power to the gearbox.",
+      "connections": [
+        "main_frame",
+        "cab_floor",
+        "transmission_gearbox",
+        "steam_pipe_to_turbine"
+      ]
+    },
+    {
+      "id": "reverse_turbine",
+      "name": "Smaller Reverse Turbine",
+      "shape": "cylinder",
+      "position": [
+        1.08,
+        0.5,
+        -0.35
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.14,
+        0.68
+      ],
+      "material": "brushed steel",
+      "role": "Smaller reverse turbine provides backing movement without separate reciprocating cylinders.",
+      "connections": [
+        "main_frame",
+        "transmission_gearbox"
+      ]
+    },
+    {
+      "id": "steam_pipe_to_turbine",
+      "name": "Steam Delivery Pipe to Turbine",
+      "shape": "capsule",
+      "position": [
+        2.9,
+        1.05,
+        0.52
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.06,
+        3.45
+      ],
+      "material": "brushed steel",
+      "role": "Large external pipe carries boiler steam rearward to the turbine housing so the power path is visible.",
+      "connections": [
+        "boiler",
+        "turbine_ahead"
+      ]
+    },
+    {
+      "id": "transmission_gearbox",
+      "name": "Reduction Transmission Gearbox",
+      "shape": "box",
+      "position": [
+        2.18,
+        0.46,
+        0.42
+      ],
+      "size": [
+        0.5,
+        0.34,
+        0.54
+      ],
+      "material": "forged steel",
+      "role": "Gearbox reduces turbine speed and sends torque to the fourth driving axle.",
+      "connections": [
+        "main_frame",
+        "turbine_ahead",
+        "reverse_turbine",
+        "driveshaft_to_geared_axle",
+        "driver_4_port"
+      ]
+    },
+    {
+      "id": "driveshaft_to_geared_axle",
+      "name": "Drive Shaft to Geared Axle",
+      "shape": "capsule",
+      "position": [
+        5.35,
+        0.48,
+        0.35
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.05,
+        6.25
+      ],
+      "material": "forged steel",
+      "role": "Long shaft visually links the gearbox to driving axle #4, explaining the direct-drive turbine layout.",
+      "connections": [
+        "transmission_gearbox",
+        "geared_axle_marker"
+      ]
+    },
+    {
+      "id": "geared_axle_marker",
+      "name": "Geared Axle Housing on Driver #4",
+      "shape": "box",
+      "position": [
+        8.9,
+        0.52,
+        0.35
+      ],
+      "size": [
+        0.36,
+        0.24,
+        0.34
+      ],
+      "material": "forged steel",
+      "role": "Compact axle housing marks the driver that directly receives reduction-gear torque.",
+      "connections": [
+        "driveshaft_to_geared_axle",
+        "driver_4_port",
+        "driver_4_stbd"
+      ]
+    },
+    {
+      "id": "oil_cooler",
+      "name": "Turbine Oil Cooler",
+      "shape": "box",
+      "position": [
+        0.38,
+        0.66,
+        0.42
+      ],
+      "size": [
+        0.44,
+        0.22,
+        0.5
+      ],
+      "material": "brushed steel",
+      "role": "Auxiliary cooler represents the lubrication system needed by the turbine and gearbox bearings.",
+      "connections": [
+        "turbine_ahead",
+        "main_frame"
+      ]
+    },
+    {
+      "id": "leading_truck_frame",
+      "name": "Leading Truck Equalized Frame",
+      "shape": "box",
+      "position": [
+        10.75,
+        0.34,
+        0
+      ],
+      "size": [
+        1.55,
+        0.22,
+        1.45
+      ],
+      "material": "welded steel",
+      "role": "Three-axle leading truck frame carries the smokebox end while allowing curves.",
+      "connections": [
+        "main_frame",
+        "lead_axle_1",
+        "lead_axle_2",
+        "lead_axle_3"
+      ]
+    },
+    {
+      "id": "lead_axle_1",
+      "name": "Leading Axle 1",
+      "shape": "cylinder",
+      "position": [
+        11.25,
+        0.24,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.05,
+        1.42
+      ],
+      "material": "forged steel",
+      "role": "Front leading axle spans port and starboard 36-inch wheels.",
+      "connections": [
+        "leading_truck_frame",
+        "lead_wheel_1_port",
+        "lead_wheel_1_stbd"
+      ]
+    },
+    {
+      "id": "lead_axle_2",
+      "name": "Leading Axle 2",
+      "shape": "cylinder",
+      "position": [
+        10.75,
+        0.24,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.05,
+        1.42
+      ],
+      "material": "forged steel",
+      "role": "Middle leading axle completes the six-wheel pilot truck layout.",
+      "connections": [
+        "leading_truck_frame",
+        "lead_wheel_2_port",
+        "lead_wheel_2_stbd"
+      ]
+    },
+    {
+      "id": "lead_axle_3",
+      "name": "Leading Axle 3",
+      "shape": "cylinder",
+      "position": [
+        10.25,
+        0.24,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.05,
+        1.42
+      ],
+      "material": "forged steel",
+      "role": "Rear leading axle supports the rear of the pilot truck below the smokebox.",
+      "connections": [
+        "leading_truck_frame",
+        "lead_wheel_3_port",
+        "lead_wheel_3_stbd"
+      ]
+    },
+    {
+      "id": "lead_wheel_1_port",
+      "name": "Leading Wheel 1 Port",
+      "shape": "cylinder",
+      "position": [
+        11.25,
+        0.23,
+        0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port wheel on the front leading axle, scaled from the 36-inch prototype wheel.",
+      "connections": [
+        "lead_axle_1",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "lead_wheel_1_stbd",
+      "name": "Leading Wheel 1 Starboard",
+      "shape": "cylinder",
+      "position": [
+        11.25,
+        0.23,
+        -0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard wheel on the front leading axle, completing the axle pair.",
+      "connections": [
+        "lead_axle_1",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "lead_wheel_2_port",
+      "name": "Leading Wheel 2 Port",
+      "shape": "cylinder",
+      "position": [
+        10.75,
+        0.23,
+        0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port wheel on the middle leading axle.",
+      "connections": [
+        "lead_axle_2",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "lead_wheel_2_stbd",
+      "name": "Leading Wheel 2 Starboard",
+      "shape": "cylinder",
+      "position": [
+        10.75,
+        0.23,
+        -0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard wheel on the middle leading axle.",
+      "connections": [
+        "lead_axle_2",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "lead_wheel_3_port",
+      "name": "Leading Wheel 3 Port",
+      "shape": "cylinder",
+      "position": [
+        10.25,
+        0.23,
+        0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port wheel on the rear leading axle under the smokebox.",
+      "connections": [
+        "lead_axle_3",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "lead_wheel_3_stbd",
+      "name": "Leading Wheel 3 Starboard",
+      "shape": "cylinder",
+      "position": [
+        10.25,
+        0.23,
+        -0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard wheel on the rear leading axle under the smokebox.",
+      "connections": [
+        "lead_axle_3",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "driver_axle_1",
+      "name": "Driving Axle 1",
+      "shape": "cylinder",
+      "position": [
+        5,
+        0.43,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.06,
+        1.48
+      ],
+      "material": "forged steel",
+      "role": "Rear driving axle carries the first pair of 68-inch coupled wheels.",
+      "connections": [
+        "main_frame",
+        "driver_1_port",
+        "driver_1_stbd"
+      ]
+    },
+    {
+      "id": "driver_axle_2",
+      "name": "Driving Axle 2",
+      "shape": "cylinder",
+      "position": [
+        6.3,
+        0.43,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.06,
+        1.48
+      ],
+      "material": "forged steel",
+      "role": "Second driving axle carries the next pair of coupled drivers.",
+      "connections": [
+        "main_frame",
+        "driver_2_port",
+        "driver_2_stbd"
+      ]
+    },
+    {
+      "id": "driver_axle_3",
+      "name": "Driving Axle 3",
+      "shape": "cylinder",
+      "position": [
+        7.6,
+        0.43,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.06,
+        1.48
+      ],
+      "material": "forged steel",
+      "role": "Third driving axle keeps the four-coupled axle set evenly spaced beneath the boiler.",
+      "connections": [
+        "main_frame",
+        "driver_3_port",
+        "driver_3_stbd"
+      ]
+    },
+    {
+      "id": "driver_axle_4",
+      "name": "Driving Axle 4 Geared",
+      "shape": "cylinder",
+      "position": [
+        8.9,
+        0.43,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.06,
+        1.48
+      ],
+      "material": "forged steel",
+      "role": "Front driving axle is the directly geared axle that receives turbine torque.",
+      "connections": [
+        "main_frame",
+        "driver_4_port",
+        "driver_4_stbd",
+        "geared_axle_marker"
+      ]
+    },
+    {
+      "id": "driver_1_port",
+      "name": "Driving Wheel 1 Port",
+      "shape": "cylinder",
+      "position": [
+        5,
+        0.43,
+        0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.43,
+        0.22
+      ],
+      "material": "forged steel",
+      "role": "Port 68-inch driver on axle 1, connected by side rods to distribute torque.",
+      "connections": [
+        "driver_axle_1",
+        "side_rod_port",
+        "left_rail",
+        "driver_1_port_crank_disc"
+      ]
+    },
+    {
+      "id": "driver_1_stbd",
+      "name": "Driving Wheel 1 Starboard",
+      "shape": "cylinder",
+      "position": [
+        5,
+        0.43,
+        -0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.43,
+        0.22
+      ],
+      "material": "forged steel",
+      "role": "Starboard 68-inch driver on axle 1.",
+      "connections": [
+        "driver_axle_1",
+        "side_rod_stbd",
+        "right_rail",
+        "driver_1_stbd_crank_disc"
+      ]
+    },
+    {
+      "id": "driver_2_port",
+      "name": "Driving Wheel 2 Port",
+      "shape": "cylinder",
+      "position": [
+        6.3,
+        0.43,
+        0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.43,
+        0.22
+      ],
+      "material": "forged steel",
+      "role": "Port 68-inch driver on axle 2.",
+      "connections": [
+        "driver_axle_2",
+        "side_rod_port",
+        "left_rail",
+        "driver_2_port_crank_disc"
+      ]
+    },
+    {
+      "id": "driver_2_stbd",
+      "name": "Driving Wheel 2 Starboard",
+      "shape": "cylinder",
+      "position": [
+        6.3,
+        0.43,
+        -0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.43,
+        0.22
+      ],
+      "material": "forged steel",
+      "role": "Starboard 68-inch driver on axle 2.",
+      "connections": [
+        "driver_axle_2",
+        "side_rod_stbd",
+        "right_rail",
+        "driver_2_stbd_crank_disc"
+      ]
+    },
+    {
+      "id": "driver_3_port",
+      "name": "Driving Wheel 3 Port",
+      "shape": "cylinder",
+      "position": [
+        7.6,
+        0.43,
+        0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.43,
+        0.22
+      ],
+      "material": "forged steel",
+      "role": "Port 68-inch driver on axle 3.",
+      "connections": [
+        "driver_axle_3",
+        "side_rod_port",
+        "left_rail",
+        "driver_3_port_crank_disc"
+      ]
+    },
+    {
+      "id": "driver_3_stbd",
+      "name": "Driving Wheel 3 Starboard",
+      "shape": "cylinder",
+      "position": [
+        7.6,
+        0.43,
+        -0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.43,
+        0.22
+      ],
+      "material": "forged steel",
+      "role": "Starboard 68-inch driver on axle 3.",
+      "connections": [
+        "driver_axle_3",
+        "side_rod_stbd",
+        "right_rail",
+        "driver_3_stbd_crank_disc"
+      ]
+    },
+    {
+      "id": "driver_4_port",
+      "name": "Driving Wheel 4 Port Geared",
+      "shape": "cylinder",
+      "position": [
+        8.9,
+        0.43,
+        0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.43,
+        0.22
+      ],
+      "material": "forged steel",
+      "role": "Port 68-inch driver on the directly geared axle receiving turbine power.",
+      "connections": [
+        "driver_axle_4",
+        "side_rod_port",
+        "left_rail",
+        "transmission_gearbox",
+        "driver_4_port_crank_disc"
+      ]
+    },
+    {
+      "id": "driver_4_stbd",
+      "name": "Driving Wheel 4 Starboard Geared",
+      "shape": "cylinder",
+      "position": [
+        8.9,
+        0.43,
+        -0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.43,
+        0.22
+      ],
+      "material": "forged steel",
+      "role": "Starboard 68-inch driver on the geared axle.",
+      "connections": [
+        "driver_axle_4",
+        "side_rod_stbd",
+        "right_rail",
+        "geared_axle_marker",
+        "driver_4_stbd_crank_disc"
+      ]
+    },
+    {
+      "id": "driver_1_port_crank_disc",
+      "name": "Driver 1 Port Crank Disc",
+      "shape": "cylinder",
+      "position": [
+        5,
+        0.56,
+        1.03
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        0.04
+      ],
+      "material": "brushed steel",
+      "role": "Port crank disc gives the side rod a visible attachment point on driver 1.",
+      "connections": [
+        "driver_1_port",
+        "driver_1_port_crank_pin"
+      ]
+    },
+    {
+      "id": "driver_1_port_crank_pin",
+      "name": "Driver 1 Port Crank Pin",
+      "shape": "cylinder",
+      "position": [
+        5,
+        0.56,
+        1.08
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.08
+      ],
+      "material": "forged steel",
+      "role": "Port crank pin fastens the coupling rod to driver 1.",
+      "connections": [
+        "driver_1_port_crank_disc",
+        "side_rod_port"
+      ]
+    },
+    {
+      "id": "driver_2_port_crank_disc",
+      "name": "Driver 2 Port Crank Disc",
+      "shape": "cylinder",
+      "position": [
+        6.3,
+        0.56,
+        1.03
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        0.04
+      ],
+      "material": "brushed steel",
+      "role": "Port crank disc gives the side rod a visible attachment point on driver 2.",
+      "connections": [
+        "driver_2_port",
+        "driver_2_port_crank_pin"
+      ]
+    },
+    {
+      "id": "driver_2_port_crank_pin",
+      "name": "Driver 2 Port Crank Pin",
+      "shape": "cylinder",
+      "position": [
+        6.3,
+        0.56,
+        1.08
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.08
+      ],
+      "material": "forged steel",
+      "role": "Port crank pin fastens the coupling rod to driver 2.",
+      "connections": [
+        "driver_2_port_crank_disc",
+        "side_rod_port"
+      ]
+    },
+    {
+      "id": "driver_3_port_crank_disc",
+      "name": "Driver 3 Port Crank Disc",
+      "shape": "cylinder",
+      "position": [
+        7.6,
+        0.56,
+        1.03
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        0.04
+      ],
+      "material": "brushed steel",
+      "role": "Port crank disc gives the side rod a visible attachment point on driver 3.",
+      "connections": [
+        "driver_3_port",
+        "driver_3_port_crank_pin"
+      ]
+    },
+    {
+      "id": "driver_3_port_crank_pin",
+      "name": "Driver 3 Port Crank Pin",
+      "shape": "cylinder",
+      "position": [
+        7.6,
+        0.56,
+        1.08
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.08
+      ],
+      "material": "forged steel",
+      "role": "Port crank pin fastens the coupling rod to driver 3.",
+      "connections": [
+        "driver_3_port_crank_disc",
+        "side_rod_port"
+      ]
+    },
+    {
+      "id": "driver_4_port_crank_disc",
+      "name": "Driver 4 Port Crank Disc",
+      "shape": "cylinder",
+      "position": [
+        8.9,
+        0.56,
+        1.03
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        0.04
+      ],
+      "material": "brushed steel",
+      "role": "Port crank disc marks the geared driver where turbine torque enters the side-rod set.",
+      "connections": [
+        "driver_4_port",
+        "driver_4_port_crank_pin"
+      ]
+    },
+    {
+      "id": "driver_4_port_crank_pin",
+      "name": "Driver 4 Port Crank Pin",
+      "shape": "cylinder",
+      "position": [
+        8.9,
+        0.56,
+        1.08
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.08
+      ],
+      "material": "forged steel",
+      "role": "Port crank pin fastens the coupling rod to the geared driver.",
+      "connections": [
+        "driver_4_port_crank_disc",
+        "side_rod_port"
+      ]
+    },
+    {
+      "id": "driver_1_stbd_crank_disc",
+      "name": "Driver 1 Starboard Crank Disc",
+      "shape": "cylinder",
+      "position": [
+        5,
+        0.3,
+        -1.03
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        0.04
+      ],
+      "material": "brushed steel",
+      "role": "Starboard crank disc is quartered opposite the port side for driver 1.",
+      "connections": [
+        "driver_1_stbd",
+        "driver_1_stbd_crank_pin"
+      ]
+    },
+    {
+      "id": "driver_1_stbd_crank_pin",
+      "name": "Driver 1 Starboard Crank Pin",
+      "shape": "cylinder",
+      "position": [
+        5,
+        0.3,
+        -1.08
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.08
+      ],
+      "material": "forged steel",
+      "role": "Starboard crank pin fastens the coupling rod to driver 1.",
+      "connections": [
+        "driver_1_stbd_crank_disc",
+        "side_rod_stbd"
+      ]
+    },
+    {
+      "id": "driver_2_stbd_crank_disc",
+      "name": "Driver 2 Starboard Crank Disc",
+      "shape": "cylinder",
+      "position": [
+        6.3,
+        0.3,
+        -1.03
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        0.04
+      ],
+      "material": "brushed steel",
+      "role": "Starboard crank disc is quartered opposite the port side for driver 2.",
+      "connections": [
+        "driver_2_stbd",
+        "driver_2_stbd_crank_pin"
+      ]
+    },
+    {
+      "id": "driver_2_stbd_crank_pin",
+      "name": "Driver 2 Starboard Crank Pin",
+      "shape": "cylinder",
+      "position": [
+        6.3,
+        0.3,
+        -1.08
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.08
+      ],
+      "material": "forged steel",
+      "role": "Starboard crank pin fastens the coupling rod to driver 2.",
+      "connections": [
+        "driver_2_stbd_crank_disc",
+        "side_rod_stbd"
+      ]
+    },
+    {
+      "id": "driver_3_stbd_crank_disc",
+      "name": "Driver 3 Starboard Crank Disc",
+      "shape": "cylinder",
+      "position": [
+        7.6,
+        0.3,
+        -1.03
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        0.04
+      ],
+      "material": "brushed steel",
+      "role": "Starboard crank disc is quartered opposite the port side for driver 3.",
+      "connections": [
+        "driver_3_stbd",
+        "driver_3_stbd_crank_pin"
+      ]
+    },
+    {
+      "id": "driver_3_stbd_crank_pin",
+      "name": "Driver 3 Starboard Crank Pin",
+      "shape": "cylinder",
+      "position": [
+        7.6,
+        0.3,
+        -1.08
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.08
+      ],
+      "material": "forged steel",
+      "role": "Starboard crank pin fastens the coupling rod to driver 3.",
+      "connections": [
+        "driver_3_stbd_crank_disc",
+        "side_rod_stbd"
+      ]
+    },
+    {
+      "id": "driver_4_stbd_crank_disc",
+      "name": "Driver 4 Starboard Crank Disc",
+      "shape": "cylinder",
+      "position": [
+        8.9,
+        0.3,
+        -1.03
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        0.04
+      ],
+      "material": "brushed steel",
+      "role": "Starboard crank disc marks the geared driver on the far side.",
+      "connections": [
+        "driver_4_stbd",
+        "driver_4_stbd_crank_pin"
+      ]
+    },
+    {
+      "id": "driver_4_stbd_crank_pin",
+      "name": "Driver 4 Starboard Crank Pin",
+      "shape": "cylinder",
+      "position": [
+        8.9,
+        0.3,
+        -1.08
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.08
+      ],
+      "material": "forged steel",
+      "role": "Starboard crank pin fastens the coupling rod to the geared driver.",
+      "connections": [
+        "driver_4_stbd_crank_disc",
+        "side_rod_stbd"
+      ]
+    },
+    {
+      "id": "side_rod_port",
+      "name": "Port Coupling Side Rod",
+      "shape": "box",
+      "position": [
+        6.95,
+        0.56,
+        1.08
+      ],
+      "size": [
+        4.15,
+        0.09,
+        0.05
+      ],
+      "material": "brushed steel",
+      "role": "Port coupling rod ties all four driving axles so torque from axle 4 reaches every driver.",
+      "connections": [
+        "driver_1_port",
+        "driver_2_port",
+        "driver_3_port",
+        "driver_4_port",
+        "driver_1_port_crank_pin",
+        "driver_2_port_crank_pin",
+        "driver_3_port_crank_pin",
+        "driver_4_port_crank_pin"
+      ]
+    },
+    {
+      "id": "side_rod_stbd",
+      "name": "Starboard Coupling Side Rod",
+      "shape": "box",
+      "position": [
+        6.95,
+        0.3,
+        -1.08
+      ],
+      "size": [
+        4.15,
+        0.09,
+        0.05
+      ],
+      "material": "brushed steel",
+      "role": "Starboard coupling rod mirrors the port rod and completes the eight-driver power train.",
+      "connections": [
+        "driver_1_stbd",
+        "driver_2_stbd",
+        "driver_3_stbd",
+        "driver_4_stbd",
+        "driver_1_stbd_crank_pin",
+        "driver_2_stbd_crank_pin",
+        "driver_3_stbd_crank_pin",
+        "driver_4_stbd_crank_pin"
+      ]
+    },
+    {
+      "id": "trailing_truck_frame",
+      "name": "Trailing Truck Equalized Frame",
+      "shape": "box",
+      "position": [
+        2.72,
+        0.36,
+        0
+      ],
+      "size": [
+        1.45,
+        0.22,
+        1.42
+      ],
+      "material": "welded steel",
+      "role": "Three-axle trailing truck supports the large Belpaire firebox and cab end.",
+      "connections": [
+        "main_frame",
+        "trail_axle_1",
+        "trail_axle_2",
+        "trail_axle_3"
+      ]
+    },
+    {
+      "id": "trail_axle_1",
+      "name": "Trailing Axle 1",
+      "shape": "cylinder",
+      "position": [
+        3.22,
+        0.27,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.05,
+        1.42
+      ],
+      "material": "forged steel",
+      "role": "Front trailing axle spans the larger 42-inch support wheels.",
+      "connections": [
+        "trailing_truck_frame",
+        "trail_wheel_1_port",
+        "trail_wheel_1_stbd"
+      ]
+    },
+    {
+      "id": "trail_axle_2",
+      "name": "Trailing Axle 2",
+      "shape": "cylinder",
+      "position": [
+        2.72,
+        0.27,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.05,
+        1.42
+      ],
+      "material": "forged steel",
+      "role": "Middle trailing axle shares the firebox weight.",
+      "connections": [
+        "trailing_truck_frame",
+        "trail_wheel_2_port",
+        "trail_wheel_2_stbd"
+      ]
+    },
+    {
+      "id": "trail_axle_3",
+      "name": "Trailing Axle 3",
+      "shape": "cylinder",
+      "position": [
+        2.22,
+        0.27,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.05,
+        1.42
+      ],
+      "material": "forged steel",
+      "role": "Rear trailing axle completes the six-wheel trailing truck.",
+      "connections": [
+        "trailing_truck_frame",
+        "trail_wheel_3_port",
+        "trail_wheel_3_stbd"
+      ]
+    },
+    {
+      "id": "trail_wheel_1_port",
+      "name": "Trailing Wheel 1 Port",
+      "shape": "cylinder",
+      "position": [
+        3.22,
+        0.27,
+        0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.27,
+        0.18
+      ],
+      "material": "forged steel",
+      "role": "Port 42-inch wheel on the front trailing axle.",
+      "connections": [
+        "trail_axle_1",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "trail_wheel_1_stbd",
+      "name": "Trailing Wheel 1 Starboard",
+      "shape": "cylinder",
+      "position": [
+        3.22,
+        0.27,
+        -0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.27,
+        0.18
+      ],
+      "material": "forged steel",
+      "role": "Starboard 42-inch wheel on the front trailing axle.",
+      "connections": [
+        "trail_axle_1",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "trail_wheel_2_port",
+      "name": "Trailing Wheel 2 Port",
+      "shape": "cylinder",
+      "position": [
+        2.72,
+        0.27,
+        0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.27,
+        0.18
+      ],
+      "material": "forged steel",
+      "role": "Port 42-inch wheel on the middle trailing axle.",
+      "connections": [
+        "trail_axle_2",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "trail_wheel_2_stbd",
+      "name": "Trailing Wheel 2 Starboard",
+      "shape": "cylinder",
+      "position": [
+        2.72,
+        0.27,
+        -0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.27,
+        0.18
+      ],
+      "material": "forged steel",
+      "role": "Starboard 42-inch wheel on the middle trailing axle.",
+      "connections": [
+        "trail_axle_2",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "trail_wheel_3_port",
+      "name": "Trailing Wheel 3 Port",
+      "shape": "cylinder",
+      "position": [
+        2.22,
+        0.27,
+        0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.27,
+        0.18
+      ],
+      "material": "forged steel",
+      "role": "Port 42-inch wheel on the rear trailing axle.",
+      "connections": [
+        "trail_axle_3",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "trail_wheel_3_stbd",
+      "name": "Trailing Wheel 3 Starboard",
+      "shape": "cylinder",
+      "position": [
+        2.22,
+        0.27,
+        -0.78
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.27,
+        0.18
+      ],
+      "material": "forged steel",
+      "role": "Starboard 42-inch wheel on the rear trailing axle.",
+      "connections": [
+        "trail_axle_3",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "drawbar",
+      "name": "Engine-to-Tender Drawbar",
+      "shape": "box",
+      "position": [
+        -0.16,
+        0.58,
+        0
+      ],
+      "size": [
+        1.05,
+        0.1,
+        0.18
+      ],
+      "material": "forged steel",
+      "role": "Rigid drawbar transfers pulling and buffing loads between locomotive frame and tender frame.",
+      "connections": [
+        "main_frame",
+        "tender_frame"
+      ]
+    },
+    {
+      "id": "tender_frame",
+      "name": "Tender Underframe",
+      "shape": "box",
+      "position": [
+        -3.72,
+        0.65,
+        0
+      ],
+      "size": [
+        6.5,
+        0.18,
+        1.55
+      ],
+      "material": "welded steel",
+      "role": "Separate tender frame carries the cistern, coal bunker, trucks, and drawbar load instead of being a solid body block.",
+      "connections": [
+        "drawbar",
+        "tender_floor",
+        "tender_front_truck_frame",
+        "tender_rear_truck_frame",
+        "tender_rear_coupler"
+      ]
+    },
+    {
+      "id": "tender_floor",
+      "name": "Tender Thin Floor Plate",
+      "shape": "box",
+      "position": [
+        -3.72,
+        0.86,
+        0
+      ],
+      "size": [
+        6.45,
+        0.08,
+        1.45
+      ],
+      "material": "welded steel",
+      "role": "Thin floor plate exposes the tender trucks and supports the water tank and coal bunker walls.",
+      "connections": [
+        "tender_frame",
+        "water_cistern_floor",
+        "coal_bunker_floor",
+        "tender_rear_deck"
+      ]
+    },
+    {
+      "id": "water_cistern_floor",
+      "name": "Open Tender Water Cistern Floor",
+      "shape": "box",
+      "position": [
+        -4.15,
+        1.05,
+        0
+      ],
+      "size": [
+        4.55,
+        0.1,
+        1.3
+      ],
+      "material": "welded steel",
+      "role": "Flat cistern bottom shows the tender's water storage envelope without hiding its wheel trucks.",
+      "connections": [
+        "tender_floor",
+        "water_cistern_stbd_wall",
+        "water_cistern_rear_wall",
+        "water_filler_hatch",
+        "water_cistern_port_cutaway_lip",
+        "water_cistern_baffle_1",
+        "water_cistern_baffle_2",
+        "water_outlet_pipe"
+      ]
+    },
+    {
+      "id": "water_cistern_stbd_wall",
+      "name": "Tender Water Cistern Starboard Wall",
+      "shape": "box",
+      "position": [
+        -4.15,
+        1.55,
+        -0.68
+      ],
+      "size": [
+        4.55,
+        1,
+        0.08
+      ],
+      "material": "welded steel",
+      "role": "Starboard tank wall leaves the port side open as a cutaway so the cistern volume is legible.",
+      "connections": [
+        "water_cistern_floor",
+        "water_cistern_rear_wall"
+      ]
+    },
+    {
+      "id": "water_cistern_rear_wall",
+      "name": "Tender Water Cistern Rear Wall",
+      "shape": "box",
+      "position": [
+        -6.45,
+        1.55,
+        0
+      ],
+      "size": [
+        0.1,
+        1,
+        1.3
+      ],
+      "material": "welded steel",
+      "role": "Rear tank wall closes the water cistern and defines the end of the tender body.",
+      "connections": [
+        "water_cistern_floor",
+        "water_cistern_stbd_wall",
+        "rear_ladder"
+      ]
+    },
+    {
+      "id": "water_cistern_port_cutaway_lip",
+      "name": "Tender Water Cistern Port Cutaway Lip",
+      "shape": "box",
+      "position": [
+        -4.15,
+        1.08,
+        0.68
+      ],
+      "size": [
+        4.55,
+        0.14,
+        0.08
+      ],
+      "material": "welded steel",
+      "role": "Low port lip marks the removed cutaway side of the water tank without hiding the water panel.",
+      "connections": [
+        "water_cistern_floor"
+      ]
+    },
+    {
+      "id": "water_cistern_baffle_1",
+      "name": "Tender Water Cistern Baffle 1",
+      "shape": "box",
+      "position": [
+        -3.25,
+        1.43,
+        -0.18
+      ],
+      "size": [
+        0.08,
+        0.62,
+        0.86
+      ],
+      "material": "welded steel",
+      "role": "Internal baffle subdivides the water volume and proves the tender is a tank, not a solid block.",
+      "connections": [
+        "water_cistern_floor",
+        "water_cistern_stbd_wall"
+      ]
+    },
+    {
+      "id": "water_cistern_baffle_2",
+      "name": "Tender Water Cistern Baffle 2",
+      "shape": "box",
+      "position": [
+        -5.05,
+        1.43,
+        -0.18
+      ],
+      "size": [
+        0.08,
+        0.62,
+        0.86
+      ],
+      "material": "welded steel",
+      "role": "Second internal baffle makes the open cistern construction and slosh control visible.",
+      "connections": [
+        "water_cistern_floor",
+        "water_cistern_stbd_wall"
+      ]
+    },
+    {
+      "id": "water_level_panel",
+      "name": "Visible Water Volume Panel",
+      "shape": "box",
+      "position": [
+        -4.15,
+        1.22,
+        0.3
+      ],
+      "size": [
+        4.2,
+        0.24,
+        0.5
+      ],
+      "material": "glass display",
+      "role": "Translucent low panel marks the water volume inside the open cistern cutaway.",
+      "connections": [
+        "water_cistern_floor"
+      ]
+    },
+    {
+      "id": "water_filler_hatch",
+      "name": "Round Tender Water Filler",
+      "shape": "cylinder",
+      "position": [
+        -5.55,
+        2.13,
+        0
+      ],
+      "size": [
+        0.22,
+        0.12
+      ],
+      "material": "brushed steel",
+      "role": "Top filler hatch identifies the tender section as a water cistern.",
+      "connections": [
+        "water_cistern_floor"
+      ]
+    },
+    {
+      "id": "water_outlet_pipe",
+      "name": "Tender Water Outlet Pipe",
+      "shape": "capsule",
+      "position": [
+        -2.02,
+        0.98,
+        0.52
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.045,
+        1.2
+      ],
+      "material": "brushed steel",
+      "role": "Outlet pipe shows how water leaves the tender cistern for feedwater pumps on the locomotive.",
+      "connections": [
+        "water_cistern_floor",
+        "feedwater_pump_port"
+      ]
+    },
+    {
+      "id": "coal_bunker_floor",
+      "name": "Coal Bunker Floor",
+      "shape": "box",
+      "position": [
+        -1.52,
+        1.05,
+        0
+      ],
+      "size": [
+        1.65,
+        0.1,
+        1.3
+      ],
+      "material": "welded steel",
+      "role": "Forward tender floor supports the coal bunker immediately behind the cab.",
+      "connections": [
+        "tender_floor",
+        "coal_bunker_front_wall",
+        "coal_bunker_stbd_wall",
+        "coal_bunker_slope_sheet",
+        "coal_pile"
+      ]
+    },
+    {
+      "id": "coal_bunker_front_wall",
+      "name": "Coal Bunker Front Wall",
+      "shape": "box",
+      "position": [
+        -0.68,
+        1.55,
+        0
+      ],
+      "size": [
+        0.1,
+        1,
+        1.3
+      ],
+      "material": "welded steel",
+      "role": "Front coal wall contains fuel while leaving the top open for visual identification.",
+      "connections": [
+        "coal_bunker_floor"
+      ]
+    },
+    {
+      "id": "coal_bunker_stbd_wall",
+      "name": "Coal Bunker Starboard Wall",
+      "shape": "box",
+      "position": [
+        -1.52,
+        1.55,
+        -0.68
+      ],
+      "size": [
+        1.65,
+        1,
+        0.08
+      ],
+      "material": "welded steel",
+      "role": "Starboard coal wall leaves the port side open so the coal pile is visible in ISO view.",
+      "connections": [
+        "coal_bunker_floor"
+      ]
+    },
+    {
+      "id": "coal_bunker_slope_sheet",
+      "name": "Coal Bunker Sloped Delivery Sheet",
+      "shape": "box",
+      "position": [
+        -1.04,
+        1.22,
+        0.18
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.35
+      ],
+      "size": [
+        1,
+        0.08,
+        1
+      ],
+      "material": "welded steel",
+      "role": "Sloped sheet guides coal toward the cab opening and makes the bunker function buildable.",
+      "connections": [
+        "coal_bunker_floor",
+        "coal_bunker_front_wall"
+      ]
+    },
+    {
+      "id": "coal_pile",
+      "name": "Exposed Coal Load",
+      "shape": "complex",
+      "position": [
+        -1.52,
+        1.55,
+        0.1
+      ],
+      "size": [
+        1.35,
+        0.55,
+        1.05
+      ],
+      "material": "black composite",
+      "role": "Mounded coal load represents the 37.5 short tons of fuel carried in the 180-P-85 tender.",
+      "connections": [
+        "coal_bunker_floor",
+        "coal_bunker_front_wall"
+      ]
+    },
+    {
+      "id": "tender_rear_deck",
+      "name": "Tender Rear Service Deck",
+      "shape": "box",
+      "position": [
+        -6.35,
+        1.08,
+        0.48
+      ],
+      "size": [
+        0.56,
+        0.08,
+        0.46
+      ],
+      "material": "welded steel",
+      "role": "Rear deck gives the ladder and toolbox a real platform at the back of the tender.",
+      "connections": [
+        "tender_floor",
+        "water_cistern_rear_wall",
+        "tender_tool_box"
+      ]
+    },
+    {
+      "id": "rear_ladder",
+      "name": "Tender Rear Ladder",
+      "shape": "box",
+      "position": [
+        -6.55,
+        1.45,
+        0.73
+      ],
+      "size": [
+        0.08,
+        1.05,
+        0.08
+      ],
+      "material": "welded steel",
+      "role": "Rear ladder gives crew access to the filler and coal space on the tender deck.",
+      "connections": [
+        "water_cistern_rear_wall"
+      ]
+    },
+    {
+      "id": "tender_tool_box",
+      "name": "Tender Rear Tool Box",
+      "shape": "box",
+      "position": [
+        -6.15,
+        1.03,
+        0.48
+      ],
+      "size": [
+        0.55,
+        0.24,
+        0.32
+      ],
+      "material": "welded steel",
+      "role": "Small rear toolbox adds scale and service detail without covering the truck assembly.",
+      "connections": [
+        "tender_floor",
+        "tender_rear_deck"
+      ]
+    },
+    {
+      "id": "tender_rear_coupler",
+      "name": "Tender Rear Knuckle Coupler",
+      "shape": "box",
+      "position": [
+        -7.05,
+        0.58,
+        0
+      ],
+      "size": [
+        0.28,
+        0.18,
+        0.3
+      ],
+      "material": "forged steel",
+      "role": "Rear coupler completes the trainline interface at the back of the tender.",
+      "connections": [
+        "tender_frame"
+      ]
+    },
+    {
+      "id": "tender_front_truck_frame",
+      "name": "Tender Front 4-Axle Truck Frame",
+      "shape": "box",
+      "position": [
+        -1.75,
+        0.32,
+        0
+      ],
+      "size": [
+        2.2,
+        0.22,
+        1.42
+      ],
+      "material": "welded steel",
+      "role": "Forward tender truck frame carries four axles and eight wheels.",
+      "connections": [
+        "tender_frame",
+        "tender_f_axle_1",
+        "tender_f_axle_2",
+        "tender_f_axle_3",
+        "tender_f_axle_4"
+      ]
+    },
+    {
+      "id": "tender_rear_truck_frame",
+      "name": "Tender Rear 4-Axle Truck Frame",
+      "shape": "box",
+      "position": [
+        -5.35,
+        0.32,
+        0
+      ],
+      "size": [
+        2.2,
+        0.22,
+        1.42
+      ],
+      "material": "welded steel",
+      "role": "Rear tender truck frame carries four axles and eight wheels.",
+      "connections": [
+        "tender_frame",
+        "tender_r_axle_1",
+        "tender_r_axle_2",
+        "tender_r_axle_3",
+        "tender_r_axle_4"
+      ]
+    },
+    {
+      "id": "tender_f_axle_1",
+      "name": "Tender Front Truck Axle 1",
+      "shape": "cylinder",
+      "position": [
+        -0.95,
+        0.23,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        1.4
+      ],
+      "material": "forged steel",
+      "role": "First axle in the tender's forward 4-axle truck.",
+      "connections": [
+        "tender_front_truck_frame",
+        "tender_f1_port",
+        "tender_f1_stbd"
+      ]
+    },
+    {
+      "id": "tender_f_axle_2",
+      "name": "Tender Front Truck Axle 2",
+      "shape": "cylinder",
+      "position": [
+        -1.48,
+        0.23,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        1.4
+      ],
+      "material": "forged steel",
+      "role": "Second axle in the tender's forward truck.",
+      "connections": [
+        "tender_front_truck_frame",
+        "tender_f2_port",
+        "tender_f2_stbd"
+      ]
+    },
+    {
+      "id": "tender_f_axle_3",
+      "name": "Tender Front Truck Axle 3",
+      "shape": "cylinder",
+      "position": [
+        -2.02,
+        0.23,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        1.4
+      ],
+      "material": "forged steel",
+      "role": "Third axle in the tender's forward truck.",
+      "connections": [
+        "tender_front_truck_frame",
+        "tender_f3_port",
+        "tender_f3_stbd"
+      ]
+    },
+    {
+      "id": "tender_f_axle_4",
+      "name": "Tender Front Truck Axle 4",
+      "shape": "cylinder",
+      "position": [
+        -2.55,
+        0.23,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        1.4
+      ],
+      "material": "forged steel",
+      "role": "Fourth axle in the tender's forward truck.",
+      "connections": [
+        "tender_front_truck_frame",
+        "tender_f4_port",
+        "tender_f4_stbd"
+      ]
+    },
+    {
+      "id": "tender_r_axle_1",
+      "name": "Tender Rear Truck Axle 1",
+      "shape": "cylinder",
+      "position": [
+        -4.55,
+        0.23,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        1.4
+      ],
+      "material": "forged steel",
+      "role": "First axle in the tender's rear 4-axle truck.",
+      "connections": [
+        "tender_rear_truck_frame",
+        "tender_r1_port",
+        "tender_r1_stbd"
+      ]
+    },
+    {
+      "id": "tender_r_axle_2",
+      "name": "Tender Rear Truck Axle 2",
+      "shape": "cylinder",
+      "position": [
+        -5.08,
+        0.23,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        1.4
+      ],
+      "material": "forged steel",
+      "role": "Second axle in the tender's rear truck.",
+      "connections": [
+        "tender_rear_truck_frame",
+        "tender_r2_port",
+        "tender_r2_stbd"
+      ]
+    },
+    {
+      "id": "tender_r_axle_3",
+      "name": "Tender Rear Truck Axle 3",
+      "shape": "cylinder",
+      "position": [
+        -5.62,
+        0.23,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        1.4
+      ],
+      "material": "forged steel",
+      "role": "Third axle in the tender's rear truck.",
+      "connections": [
+        "tender_rear_truck_frame",
+        "tender_r3_port",
+        "tender_r3_stbd"
+      ]
+    },
+    {
+      "id": "tender_r_axle_4",
+      "name": "Tender Rear Truck Axle 4",
+      "shape": "cylinder",
+      "position": [
+        -6.15,
+        0.23,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        1.4
+      ],
+      "material": "forged steel",
+      "role": "Fourth axle in the tender's rear truck.",
+      "connections": [
+        "tender_rear_truck_frame",
+        "tender_r4_port",
+        "tender_r4_stbd"
+      ]
+    },
+    {
+      "id": "tender_f1_port",
+      "name": "Tender Front Truck Wheel 1 Port",
+      "shape": "cylinder",
+      "position": [
+        -0.95,
+        0.23,
+        0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port wheel on forward tender truck axle 1.",
+      "connections": [
+        "tender_f_axle_1",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "tender_f1_stbd",
+      "name": "Tender Front Truck Wheel 1 Starboard",
+      "shape": "cylinder",
+      "position": [
+        -0.95,
+        0.23,
+        -0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard wheel on forward tender truck axle 1.",
+      "connections": [
+        "tender_f_axle_1",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tender_f2_port",
+      "name": "Tender Front Truck Wheel 2 Port",
+      "shape": "cylinder",
+      "position": [
+        -1.48,
+        0.23,
+        0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port wheel on forward tender truck axle 2.",
+      "connections": [
+        "tender_f_axle_2",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "tender_f2_stbd",
+      "name": "Tender Front Truck Wheel 2 Starboard",
+      "shape": "cylinder",
+      "position": [
+        -1.48,
+        0.23,
+        -0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard wheel on forward tender truck axle 2.",
+      "connections": [
+        "tender_f_axle_2",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tender_f3_port",
+      "name": "Tender Front Truck Wheel 3 Port",
+      "shape": "cylinder",
+      "position": [
+        -2.02,
+        0.23,
+        0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port wheel on forward tender truck axle 3.",
+      "connections": [
+        "tender_f_axle_3",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "tender_f3_stbd",
+      "name": "Tender Front Truck Wheel 3 Starboard",
+      "shape": "cylinder",
+      "position": [
+        -2.02,
+        0.23,
+        -0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard wheel on forward tender truck axle 3.",
+      "connections": [
+        "tender_f_axle_3",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tender_f4_port",
+      "name": "Tender Front Truck Wheel 4 Port",
+      "shape": "cylinder",
+      "position": [
+        -2.55,
+        0.23,
+        0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port wheel on forward tender truck axle 4.",
+      "connections": [
+        "tender_f_axle_4",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "tender_f4_stbd",
+      "name": "Tender Front Truck Wheel 4 Starboard",
+      "shape": "cylinder",
+      "position": [
+        -2.55,
+        0.23,
+        -0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard wheel on forward tender truck axle 4.",
+      "connections": [
+        "tender_f_axle_4",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tender_r1_port",
+      "name": "Tender Rear Truck Wheel 1 Port",
+      "shape": "cylinder",
+      "position": [
+        -4.55,
+        0.23,
+        0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port wheel on rear tender truck axle 1.",
+      "connections": [
+        "tender_r_axle_1",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "tender_r1_stbd",
+      "name": "Tender Rear Truck Wheel 1 Starboard",
+      "shape": "cylinder",
+      "position": [
+        -4.55,
+        0.23,
+        -0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard wheel on rear tender truck axle 1.",
+      "connections": [
+        "tender_r_axle_1",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tender_r2_port",
+      "name": "Tender Rear Truck Wheel 2 Port",
+      "shape": "cylinder",
+      "position": [
+        -5.08,
+        0.23,
+        0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port wheel on rear tender truck axle 2.",
+      "connections": [
+        "tender_r_axle_2",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "tender_r2_stbd",
+      "name": "Tender Rear Truck Wheel 2 Starboard",
+      "shape": "cylinder",
+      "position": [
+        -5.08,
+        0.23,
+        -0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard wheel on rear tender truck axle 2.",
+      "connections": [
+        "tender_r_axle_2",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tender_r3_port",
+      "name": "Tender Rear Truck Wheel 3 Port",
+      "shape": "cylinder",
+      "position": [
+        -5.62,
+        0.23,
+        0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port wheel on rear tender truck axle 3.",
+      "connections": [
+        "tender_r_axle_3",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "tender_r3_stbd",
+      "name": "Tender Rear Truck Wheel 3 Starboard",
+      "shape": "cylinder",
+      "position": [
+        -5.62,
+        0.23,
+        -0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard wheel on rear tender truck axle 3.",
+      "connections": [
+        "tender_r_axle_3",
+        "right_rail"
+      ]
+    },
+    {
+      "id": "tender_r4_port",
+      "name": "Tender Rear Truck Wheel 4 Port",
+      "shape": "cylinder",
+      "position": [
+        -6.15,
+        0.23,
+        0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port wheel on rear tender truck axle 4.",
+      "connections": [
+        "tender_r_axle_4",
+        "left_rail"
+      ]
+    },
+    {
+      "id": "tender_r4_stbd",
+      "name": "Tender Rear Truck Wheel 4 Starboard",
+      "shape": "cylinder",
+      "position": [
+        -6.15,
+        0.23,
+        -0.76
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.23,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard wheel on rear tender truck axle 4.",
+      "connections": [
+        "tender_r_axle_4",
+        "right_rail"
+      ]
+    }
   ]
 }

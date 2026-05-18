@@ -1,10 +1,25 @@
 {
   "machine_name": "Original Prusa i3 MK3S+",
-  "assembly_instructions": "Real-scale ('bed-slinger') Prusa i3 MK3S+. The Y-axis base is a 500 mm long rectangular frame built from four 2020 aluminium extrusions (two rails + front/rear cross-bars); two 8 mm M8 smooth rods run along the rails and carry the Y-carriage. The magnetic MK52 heatbed sits on the carriage under a removable PEI-coated spring-steel print sheet. At the rear, a single laser-cut aluminium sheet forms the vertical frame and cantilevers the X-Z gantry: two 10 mm smooth Z-rods and two T8 lead screws, driven by two NEMA17 Z motors at the top of the frame, carry a 2020 X-axis extrusion. The X-carriage rides on the extrusion with the MK3S+ direct-drive extruder hanging forward — NEMA17 E motor on its face, Bondtech feeder, E3D V6 heatblock, 0.4 mm brass nozzle, SuperPINDA probe. The Einsy RAMBo case is bolted to the right side of the frame with the LCD and rotary encoder on its face; the 1 kg filament spool sits on a holder atop the frame. 250 × 210 × 210 mm build volume.",
+  "assembly_instructions": [
+    "1. Place four rubber feet on the floor, then bolt the left and right 2020 Y-axis extrusions to the front and rear 2020 cross-bars to make a 0.50 m by 0.44 m rectangular base.",
+    "2. Fasten the split rear aluminium frame to the rear cross-bar: install the left upright, right upright, bottom bridge, top bridge, and angled sheet legs so the central window remains open.",
+    "3. Install the two 8 mm Y smooth rods on the base rails, add the front Y idler and rear Y motor pulley, then loop the GT2 Y belt along the centreline.",
+    "4. Fit the three Y linear bearing blocks to the rods, bolt the Y-carriage plate to them, add nine heatbed spacers, then mount the MK52 heatbed and PEI spring-steel print sheet.",
+    "5. Clamp the two 10 mm Z smooth rods and two T8 lead screws into the rear frame, add top Z motors and couplers, and connect each lead screw to the X-axis gantry.",
+    "6. Build the X-axis gantry from the 2020 X extrusion, X motor pulley, left idler pulley, X belt, and three X bearing blocks, then attach the X-carriage.",
+    "7. Assemble the direct-drive extruder on the X-carriage: mount the printed body, E motor, Bondtech gears, heatsink, fan, heatblock, brass nozzle, SuperPINDA probe, and filament sensor.",
+    "8. Bolt the Einsy RAMBo electronics case to the right rear frame, route the X/Z and bed wiring looms, and mount the LCD with rotary encoder on the front cross-bar.",
+    "9. Fit the top spool holder brackets and axle, place the 1 kg filament spool on the axle, and feed 1.75 mm filament through the guide into the extruder inlet.",
+    "10. Square the base, tension the X and Y belts, verify all feet sit at y = 0, then mesh-level the 250 x 210 mm print surface."
+  ],
   "metadata": {
     "reference": "https://help.prusa3d.com/category/original-prusa-i3-mk3s_221",
     "domain": "additive-manufacturing",
-    "thumbnail_camera": [0.9, 0.7, 0.9],
+    "thumbnail_camera": [
+      0.9,
+      0.7,
+      0.9
+    ],
     "info": {
       "japanese_name": "Original Prusa i3 MK3S+",
       "english_name": "Original Prusa i3 MK3S+ FDM 3D Printer",
@@ -16,61 +31,1829 @@
       "contract_value": "≈US$1,000 kit / US$1,200 assembled (at launch)",
       "status": "In production through MK4/MK4S successor; MK3S+ still sold / upgradable",
       "facts": [
-        { "label": "Overall size",    "value": "≈500 × 550 × 400 mm" },
-        { "label": "Build volume",    "value": "250 × 210 × 210 mm" },
-        { "label": "Filament",        "value": "1.75 mm, direct-drive Bondtech dual-gear extruder" },
-        { "label": "Hotend",          "value": "E3D V6-compatible, 0.4 mm brass nozzle (swap-in)" },
-        { "label": "Heat bed",        "value": "MK52 magnetic base + removable PEI-coated spring-steel sheet" },
-        { "label": "Axes",            "value": "X: 2020 extrusion · Y: 2× M8 smooth rods · Z: 2× lead screws + 2× smooth rods" },
-        { "label": "Electronics",     "value": "Einsy RAMBo, TMC2130 stealthChop drivers, IR filament sensor, SuperPINDA" },
-        { "label": "License",         "value": "GPL-3.0 firmware · CC BY-SA 4.0 hardware" }
+        {
+          "label": "Overall size",
+          "value": "≈500 × 550 × 400 mm"
+        },
+        {
+          "label": "Build volume",
+          "value": "250 × 210 × 210 mm"
+        },
+        {
+          "label": "Filament",
+          "value": "1.75 mm, direct-drive Bondtech dual-gear extruder"
+        },
+        {
+          "label": "Hotend",
+          "value": "E3D V6-compatible, 0.4 mm brass nozzle (swap-in)"
+        },
+        {
+          "label": "Heat bed",
+          "value": "MK52 magnetic base + removable PEI-coated spring-steel sheet"
+        },
+        {
+          "label": "Axes",
+          "value": "X: 2020 extrusion · Y: 2× M8 smooth rods · Z: 2× lead screws + 2× smooth rods"
+        },
+        {
+          "label": "Electronics",
+          "value": "Einsy RAMBo, TMC2130 stealthChop drivers, IR filament sensor, SuperPINDA"
+        },
+        {
+          "label": "License",
+          "value": "GPL-3.0 firmware · CC BY-SA 4.0 hardware"
+        }
       ],
       "sources": [
-        { "title": "Prusa Research — i3 MK3S+ knowledge base",  "url": "https://help.prusa3d.com/category/original-prusa-i3-mk3s_221" },
-        { "title": "Prusa-Firmware GitHub",                      "url": "https://github.com/prusa3d/Prusa-Firmware" },
-        { "title": "Wikipedia — Prusa i3",                        "url": "https://en.wikipedia.org/wiki/Prusa_i3" }
+        {
+          "title": "Prusa Research — i3 MK3S+ knowledge base",
+          "url": "https://help.prusa3d.com/category/original-prusa-i3-mk3s_221"
+        },
+        {
+          "title": "Prusa-Firmware GitHub",
+          "url": "https://github.com/prusa3d/Prusa-Firmware"
+        },
+        {
+          "title": "Wikipedia — Prusa i3",
+          "url": "https://en.wikipedia.org/wiki/Prusa_i3"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "base_extr_left",  "name": "Y-Axis Rail (Left, 2020)",    "shape": "box",      "position": [-0.20, 0.07, 0],           "size": [0.04, 0.04, 0.50], "material": "dark anodized aluminum", "role": "Left 2020 aluminium extrusion forming one side of the Y-axis base.", "connections": ["base_cross_front", "base_cross_rear", "y_rod_left", "motor_y"] },
-    { "id": "base_extr_right", "name": "Y-Axis Rail (Right, 2020)",   "shape": "box",      "position": [ 0.20, 0.07, 0],           "size": [0.04, 0.04, 0.50], "material": "dark anodized aluminum", "role": "Right 2020 aluminium extrusion forming the other side of the Y-axis base.", "connections": ["base_cross_front", "base_cross_rear", "y_rod_right"] },
-    { "id": "base_cross_front","name": "Y-Axis Front Cross-Bar",      "shape": "box",      "position": [0, 0.07,  0.23],           "size": [0.44, 0.04, 0.04], "material": "dark anodized aluminum", "role": "Front cross-member tying the two Y-axis rails together and rooting the frame feet.", "connections": ["base_extr_left", "base_extr_right"] },
-    { "id": "base_cross_rear", "name": "Y-Axis Rear Cross-Bar",       "shape": "box",      "position": [0, 0.07, -0.23],           "size": [0.44, 0.04, 0.04], "material": "dark anodized aluminum", "role": "Rear cross-member. Also anchors the base of the vertical frame and the Y motor.", "connections": ["base_extr_left", "base_extr_right", "frame", "motor_y"] },
-
-    { "id": "y_rod_left",      "name": "Y-Axis Smooth Rod (Left, 8 mm)",  "shape": "cylinder", "position": [-0.14, 0.10, 0], "rotation": [1.5708, 0, 0], "size": [0.004, 0.46], "material": "brushed steel", "role": "Hardened 8 mm linear rod — one of two that guide the Y-carriage.", "connections": ["base_extr_left", "y_carriage"] },
-    { "id": "y_rod_right",     "name": "Y-Axis Smooth Rod (Right, 8 mm)", "shape": "cylinder", "position": [ 0.14, 0.10, 0], "rotation": [1.5708, 0, 0], "size": [0.004, 0.46], "material": "brushed steel", "role": "Hardened 8 mm linear rod — the second Y-axis guide.", "connections": ["base_extr_right", "y_carriage"] },
-
-    { "id": "y_carriage",      "name": "Y-Carriage",                   "shape": "box",      "position": [0, 0.115, 0.06],          "size": [0.26, 0.010, 0.24], "material": "dark anodized aluminum", "role": "Aluminium plate that rides on the M8 rods. Carries the heatbed assembly and links to the Y belt.", "connections": ["y_rod_left", "y_rod_right", "heatbed_mk52", "motor_y"] },
-    { "id": "heatbed_mk52",    "name": "MK52 Magnetic Heat Bed",        "shape": "box",      "position": [0, 0.128, 0.06],          "size": [0.25, 0.012, 0.21], "material": "dark anodized aluminum", "role": "Heated aluminium PCB + magnetic top layer that grabs the removable spring-steel print sheet.", "connections": ["y_carriage", "print_sheet"] },
-    { "id": "print_sheet",     "name": "PEI Spring-Steel Print Sheet",  "shape": "box",      "position": [0, 0.137, 0.06],          "size": [0.25, 0.002, 0.21], "material": "brushed steel",          "role": "Removable, flexible spring-steel sheet coated with PEI. Prints pop off by flexing the sheet.", "connections": ["heatbed_mk52"] },
-
-    { "id": "frame",           "name": "Aluminium Frame",               "shape": "box",      "position": [0, 0.32, -0.25],          "size": [0.40, 0.48, 0.006], "material": "brushed steel",          "role": "Laser-cut single-sheet aluminium frame standing vertically at the rear of the Y base. Cantilevers the X/Z axes.", "connections": ["base_cross_rear", "z_rod_left", "z_rod_right", "z_screw_left", "z_screw_right", "motor_zl", "motor_zr", "einsy_case", "spool_holder"] },
-
-    { "id": "z_rod_left",      "name": "Z-Axis Smooth Rod (Left, 10 mm)","shape": "cylinder", "position": [-0.15, 0.30, -0.24],    "size": [0.005, 0.34], "material": "brushed steel",         "role": "Left 10 mm Z-axis smooth rod — guides the X-extrusion up and down.", "connections": ["frame", "x_extrusion"] },
-    { "id": "z_rod_right",     "name": "Z-Axis Smooth Rod (Right, 10 mm)","shape": "cylinder", "position": [ 0.15, 0.30, -0.24],    "size": [0.005, 0.34], "material": "brushed steel",         "role": "Right Z-axis smooth rod.", "connections": ["frame", "x_extrusion"] },
-    { "id": "z_screw_left",    "name": "Z-Axis Lead Screw (Left, T8)",  "shape": "cylinder", "position": [-0.08, 0.30, -0.255],    "size": [0.004, 0.34], "material": "brushed steel",         "role": "T8 trapezoidal lead screw — drives the left side of the X-extrusion vertically.", "connections": ["motor_zl", "x_extrusion"] },
-    { "id": "z_screw_right",   "name": "Z-Axis Lead Screw (Right, T8)", "shape": "cylinder", "position": [ 0.08, 0.30, -0.255],    "size": [0.004, 0.34], "material": "brushed steel",         "role": "Right T8 lead screw.", "connections": ["motor_zr", "x_extrusion"] },
-    { "id": "motor_zl",        "name": "NEMA17 Z Motor (Left)",         "shape": "cylinder", "position": [-0.08, 0.50, -0.25],     "size": [0.021, 0.042],"material": "brushed steel",         "role": "Left Z-axis NEMA17 stepper at the top of the frame.", "connections": ["frame", "z_screw_left"] },
-    { "id": "motor_zr",        "name": "NEMA17 Z Motor (Right)",        "shape": "cylinder", "position": [ 0.08, 0.50, -0.25],     "size": [0.021, 0.042],"material": "brushed steel",         "role": "Right Z-axis NEMA17 stepper.", "connections": ["frame", "z_screw_right"] },
-
-    { "id": "x_extrusion",     "name": "X-Axis Extrusion (2020)",       "shape": "box",      "position": [0, 0.32, -0.20],          "size": [0.40, 0.04, 0.04], "material": "dark anodized aluminum", "role": "Horizontal 2020 extrusion that rides up/down on the Z rods and carries the X-carriage.", "connections": ["z_rod_left", "z_rod_right", "z_screw_left", "z_screw_right", "x_carriage", "motor_x"] },
-    { "id": "x_carriage",      "name": "X-Carriage",                    "shape": "box",      "position": [0, 0.33, -0.13],          "size": [0.08, 0.06, 0.07], "material": "black composite",        "role": "Printed PETG carriage — slides along the X extrusion and bolts to the extruder.", "connections": ["x_extrusion", "extruder"] },
-    { "id": "motor_x",         "name": "NEMA17 X Motor",                "shape": "cylinder", "position": [ 0.22, 0.32, -0.20],      "rotation": [0, 0, 1.5708], "size": [0.021, 0.042], "material": "brushed steel",     "role": "NEMA17 X motor at the right end of the X extrusion — drives the X-carriage via a GT2 belt.", "connections": ["x_extrusion"] },
-
-    { "id": "extruder",        "name": "MK3S+ Direct-Drive Extruder",   "shape": "box",      "position": [0, 0.29, -0.095],         "size": [0.08, 0.12, 0.11], "material": "black composite",        "role": "Bondtech dual-gear direct-drive extruder body. Houses filament path, drive gears, and hotend mount.", "connections": ["x_carriage", "motor_e", "hotend_heatblock", "pinda_probe", "filament_sensor"] },
-    { "id": "motor_e",         "name": "NEMA17 E Motor",                "shape": "cylinder", "position": [0.045, 0.305, -0.04],     "rotation": [1.5708, 0, 0], "size": [0.021, 0.038], "material": "brushed steel",     "role": "NEMA17 stepper on the extruder face — drives the Bondtech feeder gears directly.", "connections": ["extruder"] },
-    { "id": "filament_sensor", "name": "IR Filament Sensor",            "shape": "box",      "position": [-0.02, 0.32, -0.06],      "size": [0.02, 0.02, 0.025], "material": "black composite",       "role": "IR optical sensor inside the extruder — detects filament presence and feed failure.", "connections": ["extruder"] },
-    { "id": "hotend_heatblock","name": "E3D V6 Hotend Heatblock",        "shape": "box",      "position": [0, 0.205, -0.095],        "size": [0.028, 0.020, 0.022], "material": "brushed steel",       "role": "Brass/aluminium heater block with a 40 W cartridge and a thermistor.", "connections": ["extruder", "nozzle"] },
-    { "id": "nozzle",          "name": "Hotend Nozzle (0.4 mm brass)",   "shape": "cylinder", "position": [0, 0.184, -0.095],        "size": [0.005, 0.020], "material": "brass",                 "role": "0.4 mm brass nozzle. Swappable for other diameters and hardened variants.", "connections": ["hotend_heatblock"] },
-    { "id": "pinda_probe",     "name": "SuperPINDA Probe",              "shape": "cylinder", "position": [0.03, 0.23, -0.09],       "size": [0.008, 0.04], "material": "dark anodized aluminum","role": "Temperature-compensated inductive probe next to the hotend — drives automatic mesh bed levelling.", "connections": ["extruder"] },
-
-    { "id": "motor_y",         "name": "NEMA17 Y Motor",                "shape": "cylinder", "position": [0, 0.09, -0.265],         "rotation": [1.5708, 0, 0], "size": [0.021, 0.042], "material": "brushed steel",    "role": "NEMA17 Y motor at the rear of the base — drives the Y-carriage belt.", "connections": ["base_cross_rear", "y_carriage"] },
-
-    { "id": "einsy_case",      "name": "Einsy RAMBo Case",              "shape": "box",      "position": [0.22, 0.23, -0.20],       "size": [0.05, 0.15, 0.14], "material": "black composite",        "role": "Controller enclosure bolted to the right side of the frame. Holds the Einsy board with TMC2130 drivers.", "connections": ["frame", "lcd_display"] },
-    { "id": "lcd_display",     "name": "LCD + Encoder",                 "shape": "box",      "position": [0.265, 0.22, -0.14],      "size": [0.02, 0.05, 0.10], "material": "glass display",          "role": "Monochrome LCD with rotary/click encoder on the front face of the Einsy case.", "connections": ["einsy_case"] },
-
-    { "id": "spool_holder",    "name": "Spool Holder Bracket",          "shape": "box",      "position": [0, 0.58, -0.21],          "size": [0.10, 0.04, 0.12], "material": "dark anodized aluminum", "role": "Bracket on top of the frame — pivots the filament-spool axle.", "connections": ["frame", "spool"] },
-    { "id": "spool",           "name": "Filament Spool (1 kg)",         "shape": "cylinder", "position": [0, 0.60, -0.10],          "rotation": [0, 0, 1.5708], "size": [0.10, 0.06], "material": "white composite",       "role": "Standard 1 kg filament spool. Feeds down and forward into the extruder.", "connections": ["spool_holder", "extruder"] }
+    {
+      "id": "base_extr_left",
+      "name": "Y-Axis Rail Left 2020 Extrusion",
+      "shape": "box",
+      "position": [
+        -0.2,
+        0.07,
+        0
+      ],
+      "size": [
+        0.04,
+        0.04,
+        0.5
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Left 2020 aluminium extrusion forms the left side beam of the rectangular Y base.",
+      "connections": [
+        "base_cross_front",
+        "base_cross_rear",
+        "left_front_foot",
+        "left_rear_foot",
+        "y_rod_left"
+      ]
+    },
+    {
+      "id": "base_extr_right",
+      "name": "Y-Axis Rail Right 2020 Extrusion",
+      "shape": "box",
+      "position": [
+        0.2,
+        0.07,
+        0
+      ],
+      "size": [
+        0.04,
+        0.04,
+        0.5
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Right 2020 aluminium extrusion forms the right side beam of the rectangular Y base.",
+      "connections": [
+        "base_cross_front",
+        "base_cross_rear",
+        "right_front_foot",
+        "right_rear_foot",
+        "y_rod_right"
+      ]
+    },
+    {
+      "id": "base_cross_front",
+      "name": "Front 2020 Cross-Bar",
+      "shape": "box",
+      "position": [
+        0,
+        0.07,
+        0.23
+      ],
+      "size": [
+        0.44,
+        0.04,
+        0.04
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Front cross-member ties the two Y rails together and carries the LCD bracket and Y idler.",
+      "connections": [
+        "base_extr_left",
+        "base_extr_right",
+        "lcd_bracket",
+        "y_idler_pulley"
+      ]
+    },
+    {
+      "id": "base_cross_rear",
+      "name": "Rear 2020 Cross-Bar",
+      "shape": "box",
+      "position": [
+        0,
+        0.07,
+        -0.23
+      ],
+      "size": [
+        0.44,
+        0.04,
+        0.04
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear cross-member ties the Y rails together and anchors the rear sheet frame and Y motor.",
+      "connections": [
+        "base_extr_left",
+        "base_extr_right",
+        "frame_left_upright",
+        "frame_right_upright",
+        "motor_y"
+      ]
+    },
+    {
+      "id": "left_front_foot",
+      "name": "Left Front Rubber Foot",
+      "shape": "cylinder",
+      "position": [
+        -0.2,
+        0.015,
+        0.23
+      ],
+      "size": [
+        0.025,
+        0.03
+      ],
+      "material": "rubber",
+      "role": "Rubber levelling foot supports the front-left corner with its base on the ground plane.",
+      "connections": [
+        "base_extr_left",
+        "base_cross_front"
+      ]
+    },
+    {
+      "id": "right_front_foot",
+      "name": "Right Front Rubber Foot",
+      "shape": "cylinder",
+      "position": [
+        0.2,
+        0.015,
+        0.23
+      ],
+      "size": [
+        0.025,
+        0.03
+      ],
+      "material": "rubber",
+      "role": "Rubber levelling foot supports the front-right corner with its base on the ground plane.",
+      "connections": [
+        "base_extr_right",
+        "base_cross_front"
+      ]
+    },
+    {
+      "id": "left_rear_foot",
+      "name": "Left Rear Rubber Foot",
+      "shape": "cylinder",
+      "position": [
+        -0.2,
+        0.015,
+        -0.23
+      ],
+      "size": [
+        0.025,
+        0.03
+      ],
+      "material": "rubber",
+      "role": "Rubber levelling foot supports the rear-left corner under the frame load.",
+      "connections": [
+        "base_extr_left",
+        "base_cross_rear"
+      ]
+    },
+    {
+      "id": "right_rear_foot",
+      "name": "Right Rear Rubber Foot",
+      "shape": "cylinder",
+      "position": [
+        0.2,
+        0.015,
+        -0.23
+      ],
+      "size": [
+        0.025,
+        0.03
+      ],
+      "material": "rubber",
+      "role": "Rubber levelling foot supports the rear-right corner under the electronics side.",
+      "connections": [
+        "base_extr_right",
+        "base_cross_rear"
+      ]
+    },
+    {
+      "id": "frame_left_upright",
+      "name": "Laser-Cut Frame Left Upright",
+      "shape": "box",
+      "position": [
+        -0.18,
+        0.315,
+        -0.255
+      ],
+      "size": [
+        0.045,
+        0.49,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Left side of the single-sheet aluminium rear frame, modelled separately so the central gantry window is open.",
+      "connections": [
+        "base_cross_rear",
+        "frame_top_bridge",
+        "frame_bottom_bridge",
+        "z_rod_left",
+        "z_screw_left"
+      ]
+    },
+    {
+      "id": "frame_right_upright",
+      "name": "Laser-Cut Frame Right Upright",
+      "shape": "box",
+      "position": [
+        0.18,
+        0.315,
+        -0.255
+      ],
+      "size": [
+        0.045,
+        0.49,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Right side of the single-sheet aluminium rear frame, exposing the Z rods and lead screws instead of hiding them.",
+      "connections": [
+        "base_cross_rear",
+        "frame_top_bridge",
+        "frame_bottom_bridge",
+        "z_rod_right",
+        "z_screw_right",
+        "einsy_case"
+      ]
+    },
+    {
+      "id": "frame_bottom_bridge",
+      "name": "Rear Frame Bottom Bridge",
+      "shape": "box",
+      "position": [
+        0,
+        0.105,
+        -0.255
+      ],
+      "size": [
+        0.38,
+        0.055,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Lower sheet bridge bolts the rear frame to the Y base while leaving the build area visible.",
+      "connections": [
+        "frame_left_upright",
+        "frame_right_upright",
+        "base_cross_rear"
+      ]
+    },
+    {
+      "id": "frame_top_bridge",
+      "name": "Rear Frame Top Bridge",
+      "shape": "box",
+      "position": [
+        0,
+        0.555,
+        -0.255
+      ],
+      "size": [
+        0.38,
+        0.055,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Top sheet bridge carries the Z motor mounts and the spool holder without closing the central window.",
+      "connections": [
+        "frame_left_upright",
+        "frame_right_upright",
+        "motor_z_left",
+        "motor_z_right",
+        "spool_holder_left",
+        "spool_holder_right"
+      ]
+    },
+    {
+      "id": "frame_left_angled_leg",
+      "name": "Left Angled Frame Leg",
+      "shape": "box",
+      "position": [
+        -0.125,
+        0.16,
+        -0.252
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.45
+      ],
+      "size": [
+        0.035,
+        0.18,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Angled lower sheet web gives the rear frame the recognizable Prusa A-frame silhouette.",
+      "connections": [
+        "frame_left_upright",
+        "frame_bottom_bridge"
+      ]
+    },
+    {
+      "id": "frame_right_angled_leg",
+      "name": "Right Angled Frame Leg",
+      "shape": "box",
+      "position": [
+        0.125,
+        0.16,
+        -0.252
+      ],
+      "rotation": [
+        0,
+        0,
+        0.45
+      ],
+      "size": [
+        0.035,
+        0.18,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Mirrored lower sheet web gives the rear frame stiffness without hiding the carriage.",
+      "connections": [
+        "frame_right_upright",
+        "frame_bottom_bridge"
+      ]
+    },
+    {
+      "id": "y_rod_left",
+      "name": "Y-Axis Smooth Rod Left 8 mm",
+      "shape": "cylinder",
+      "position": [
+        -0.14,
+        0.105,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.004,
+        0.46
+      ],
+      "material": "brushed steel",
+      "role": "Hardened 8 mm linear rod guides the left side of the moving bed carriage along Y.",
+      "connections": [
+        "base_extr_left",
+        "y_bearing_left_front",
+        "y_bearing_left_rear"
+      ]
+    },
+    {
+      "id": "y_rod_right",
+      "name": "Y-Axis Smooth Rod Right 8 mm",
+      "shape": "cylinder",
+      "position": [
+        0.14,
+        0.105,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.004,
+        0.46
+      ],
+      "material": "brushed steel",
+      "role": "Second 8 mm linear rod keeps the Y carriage square and level through the 210 mm bed travel.",
+      "connections": [
+        "base_extr_right",
+        "y_bearing_right_center"
+      ]
+    },
+    {
+      "id": "y_bearing_left_front",
+      "name": "Y Bearing Left Front",
+      "shape": "box",
+      "position": [
+        -0.14,
+        0.125,
+        0.12
+      ],
+      "size": [
+        0.045,
+        0.025,
+        0.055
+      ],
+      "material": "black composite",
+      "role": "Linear bearing block clamps the front-left side of the Y carriage to the left smooth rod.",
+      "connections": [
+        "y_rod_left",
+        "y_carriage"
+      ]
+    },
+    {
+      "id": "y_bearing_left_rear",
+      "name": "Y Bearing Left Rear",
+      "shape": "box",
+      "position": [
+        -0.14,
+        0.125,
+        -0.08
+      ],
+      "size": [
+        0.045,
+        0.025,
+        0.055
+      ],
+      "material": "black composite",
+      "role": "Linear bearing block supports the rear-left side of the Y carriage on the left rod.",
+      "connections": [
+        "y_rod_left",
+        "y_carriage"
+      ]
+    },
+    {
+      "id": "y_bearing_right_center",
+      "name": "Y Bearing Right Center",
+      "shape": "box",
+      "position": [
+        0.14,
+        0.125,
+        0.02
+      ],
+      "size": [
+        0.045,
+        0.025,
+        0.07
+      ],
+      "material": "black composite",
+      "role": "Single right-side bearing block completes the MK3S+ three-bearing Y carriage support.",
+      "connections": [
+        "y_rod_right",
+        "y_carriage"
+      ]
+    },
+    {
+      "id": "y_carriage",
+      "name": "Y-Carriage Aluminium Plate",
+      "shape": "box",
+      "position": [
+        0,
+        0.143,
+        0.04
+      ],
+      "size": [
+        0.28,
+        0.01,
+        0.25
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Thin aluminium Y plate rides on three bearings and carries the heated bed and belt clamp.",
+      "connections": [
+        "y_bearing_left_front",
+        "y_bearing_left_rear",
+        "y_bearing_right_center",
+        "heatbed_mk52",
+        "y_belt_upper"
+      ]
+    },
+    {
+      "id": "heatbed_mk52",
+      "name": "MK52 Magnetic Heatbed",
+      "shape": "box",
+      "position": [
+        0,
+        0.162,
+        0.04
+      ],
+      "size": [
+        0.255,
+        0.012,
+        0.215
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Heated magnetic PCB provides the 250 x 210 mm print area and mounts above spacer standoffs.",
+      "connections": [
+        "y_carriage",
+        "bed_spacer_front_left",
+        "bed_spacer_front_right",
+        "bed_spacer_rear_left",
+        "bed_spacer_rear_right",
+        "print_sheet"
+      ]
+    },
+    {
+      "id": "print_sheet",
+      "name": "PEI Spring-Steel Print Sheet",
+      "shape": "box",
+      "position": [
+        0,
+        0.171,
+        0.04
+      ],
+      "size": [
+        0.25,
+        0.002,
+        0.21
+      ],
+      "material": "brushed steel",
+      "role": "Removable PEI-coated spring-steel sheet is the visible print surface that flexes to release parts.",
+      "connections": [
+        "heatbed_mk52",
+        "sheet_front_tab",
+        "sheet_rear_tab"
+      ]
+    },
+    {
+      "id": "sheet_front_tab",
+      "name": "Front Print Sheet Pull Tab",
+      "shape": "box",
+      "position": [
+        0,
+        0.174,
+        0.154
+      ],
+      "size": [
+        0.07,
+        0.003,
+        0.014
+      ],
+      "material": "brushed steel",
+      "role": "Small front lip marks the removable spring-steel sheet and gives the operator a grip point.",
+      "connections": [
+        "print_sheet"
+      ]
+    },
+    {
+      "id": "sheet_rear_tab",
+      "name": "Rear Print Sheet Alignment Tab",
+      "shape": "box",
+      "position": [
+        0,
+        0.174,
+        -0.074
+      ],
+      "size": [
+        0.06,
+        0.003,
+        0.012
+      ],
+      "material": "brushed steel",
+      "role": "Rear tab shows the sheet registration edge against the MK52 magnetic bed.",
+      "connections": [
+        "print_sheet"
+      ]
+    },
+    {
+      "id": "bed_spacer_front_left",
+      "name": "Heatbed Spacer Front Left",
+      "shape": "cylinder",
+      "position": [
+        -0.105,
+        0.152,
+        0.125
+      ],
+      "size": [
+        0.006,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Metal standoff sets the heatbed height above the Y carriage at the front-left screw.",
+      "connections": [
+        "y_carriage",
+        "heatbed_mk52"
+      ]
+    },
+    {
+      "id": "bed_spacer_front_right",
+      "name": "Heatbed Spacer Front Right",
+      "shape": "cylinder",
+      "position": [
+        0.105,
+        0.152,
+        0.125
+      ],
+      "size": [
+        0.006,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Metal standoff sets the heatbed height above the Y carriage at the front-right screw.",
+      "connections": [
+        "y_carriage",
+        "heatbed_mk52"
+      ]
+    },
+    {
+      "id": "bed_spacer_rear_left",
+      "name": "Heatbed Spacer Rear Left",
+      "shape": "cylinder",
+      "position": [
+        -0.105,
+        0.152,
+        -0.045
+      ],
+      "size": [
+        0.006,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Rear-left standoff keeps the heated bed parallel to the carriage plate.",
+      "connections": [
+        "y_carriage",
+        "heatbed_mk52"
+      ]
+    },
+    {
+      "id": "bed_spacer_rear_right",
+      "name": "Heatbed Spacer Rear Right",
+      "shape": "cylinder",
+      "position": [
+        0.105,
+        0.152,
+        -0.045
+      ],
+      "size": [
+        0.006,
+        0.02
+      ],
+      "material": "brushed steel",
+      "role": "Rear-right standoff keeps the heated bed parallel to the carriage plate.",
+      "connections": [
+        "y_carriage",
+        "heatbed_mk52"
+      ]
+    },
+    {
+      "id": "motor_y",
+      "name": "NEMA17 Y Motor",
+      "shape": "box",
+      "position": [
+        0,
+        0.105,
+        -0.275
+      ],
+      "size": [
+        0.045,
+        0.045,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Rear NEMA17 stepper drives the Y belt that moves the bed forward and backward.",
+      "connections": [
+        "base_cross_rear",
+        "y_motor_pulley"
+      ]
+    },
+    {
+      "id": "y_motor_pulley",
+      "name": "Y Motor GT2 Pulley",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.105,
+        -0.245
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.014,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Small toothed pulley on the Y motor shaft redirects the GT2 belt at the rear.",
+      "connections": [
+        "motor_y",
+        "y_belt_upper",
+        "y_belt_lower"
+      ]
+    },
+    {
+      "id": "y_idler_pulley",
+      "name": "Front Y Idler Pulley",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.105,
+        0.245
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.014,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Front idler pulley returns the Y belt and visibly closes the bed-slinger belt loop.",
+      "connections": [
+        "base_cross_front",
+        "y_belt_upper",
+        "y_belt_lower"
+      ]
+    },
+    {
+      "id": "y_belt_upper",
+      "name": "Y Belt Upper Run",
+      "shape": "box",
+      "position": [
+        0,
+        0.128,
+        0
+      ],
+      "size": [
+        0.012,
+        0.006,
+        0.46
+      ],
+      "material": "rubber",
+      "role": "Upper GT2 belt run clamps to the Y carriage and transmits motor motion to the bed.",
+      "connections": [
+        "y_motor_pulley",
+        "y_idler_pulley",
+        "y_carriage"
+      ]
+    },
+    {
+      "id": "y_belt_lower",
+      "name": "Y Belt Lower Return",
+      "shape": "box",
+      "position": [
+        0,
+        0.088,
+        0
+      ],
+      "size": [
+        0.01,
+        0.005,
+        0.46
+      ],
+      "material": "rubber",
+      "role": "Lower GT2 belt return completes the closed loop below the carriage plate.",
+      "connections": [
+        "y_motor_pulley",
+        "y_idler_pulley"
+      ]
+    },
+    {
+      "id": "z_rod_left",
+      "name": "Z-Axis Smooth Rod Left 10 mm",
+      "shape": "cylinder",
+      "position": [
+        -0.15,
+        0.325,
+        -0.238
+      ],
+      "size": [
+        0.005,
+        0.39
+      ],
+      "material": "brushed steel",
+      "role": "Left 10 mm vertical smooth rod guides the X gantry without carrying drive torque.",
+      "connections": [
+        "frame_left_upright",
+        "z_top_clamp_left",
+        "z_bottom_clamp_left",
+        "x_bearing_left"
+      ]
+    },
+    {
+      "id": "z_rod_right",
+      "name": "Z-Axis Smooth Rod Right 10 mm",
+      "shape": "cylinder",
+      "position": [
+        0.15,
+        0.325,
+        -0.238
+      ],
+      "size": [
+        0.005,
+        0.39
+      ],
+      "material": "brushed steel",
+      "role": "Right 10 mm vertical smooth rod keeps the X gantry parallel to the bed.",
+      "connections": [
+        "frame_right_upright",
+        "z_top_clamp_right",
+        "z_bottom_clamp_right",
+        "x_bearing_right"
+      ]
+    },
+    {
+      "id": "z_screw_left",
+      "name": "Z-Axis Lead Screw Left T8",
+      "shape": "cylinder",
+      "position": [
+        -0.085,
+        0.325,
+        -0.245
+      ],
+      "size": [
+        0.004,
+        0.38
+      ],
+      "material": "brushed steel",
+      "role": "Left T8 lead screw raises and lowers the left end of the X-axis extrusion.",
+      "connections": [
+        "motor_z_left",
+        "z_coupler_left",
+        "x_extrusion"
+      ]
+    },
+    {
+      "id": "z_screw_right",
+      "name": "Z-Axis Lead Screw Right T8",
+      "shape": "cylinder",
+      "position": [
+        0.085,
+        0.325,
+        -0.245
+      ],
+      "size": [
+        0.004,
+        0.38
+      ],
+      "material": "brushed steel",
+      "role": "Right T8 lead screw raises and lowers the right end of the X-axis extrusion.",
+      "connections": [
+        "motor_z_right",
+        "z_coupler_right",
+        "x_extrusion"
+      ]
+    },
+    {
+      "id": "z_bottom_clamp_left",
+      "name": "Left Z Rod Bottom Clamp",
+      "shape": "box",
+      "position": [
+        -0.15,
+        0.135,
+        -0.238
+      ],
+      "size": [
+        0.035,
+        0.025,
+        0.025
+      ],
+      "material": "black composite",
+      "role": "Printed lower clamp locates the bottom of the left Z smooth rod on the rear frame.",
+      "connections": [
+        "frame_left_upright",
+        "z_rod_left"
+      ]
+    },
+    {
+      "id": "z_bottom_clamp_right",
+      "name": "Right Z Rod Bottom Clamp",
+      "shape": "box",
+      "position": [
+        0.15,
+        0.135,
+        -0.238
+      ],
+      "size": [
+        0.035,
+        0.025,
+        0.025
+      ],
+      "material": "black composite",
+      "role": "Printed lower clamp locates the bottom of the right Z smooth rod on the rear frame.",
+      "connections": [
+        "frame_right_upright",
+        "z_rod_right"
+      ]
+    },
+    {
+      "id": "z_top_clamp_left",
+      "name": "Left Z Rod Top Clamp",
+      "shape": "box",
+      "position": [
+        -0.15,
+        0.515,
+        -0.238
+      ],
+      "size": [
+        0.035,
+        0.025,
+        0.025
+      ],
+      "material": "black composite",
+      "role": "Printed top clamp captures the left Z smooth rod near the top bridge.",
+      "connections": [
+        "frame_top_bridge",
+        "z_rod_left"
+      ]
+    },
+    {
+      "id": "z_top_clamp_right",
+      "name": "Right Z Rod Top Clamp",
+      "shape": "box",
+      "position": [
+        0.15,
+        0.515,
+        -0.238
+      ],
+      "size": [
+        0.035,
+        0.025,
+        0.025
+      ],
+      "material": "black composite",
+      "role": "Printed top clamp captures the right Z smooth rod near the top bridge.",
+      "connections": [
+        "frame_top_bridge",
+        "z_rod_right"
+      ]
+    },
+    {
+      "id": "motor_z_left",
+      "name": "Left Z NEMA17 Motor",
+      "shape": "box",
+      "position": [
+        -0.085,
+        0.565,
+        -0.245
+      ],
+      "size": [
+        0.045,
+        0.045,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Left Z-axis stepper sits at the top of the frame and turns the left lead screw.",
+      "connections": [
+        "frame_top_bridge",
+        "z_coupler_left"
+      ]
+    },
+    {
+      "id": "motor_z_right",
+      "name": "Right Z NEMA17 Motor",
+      "shape": "box",
+      "position": [
+        0.085,
+        0.565,
+        -0.245
+      ],
+      "size": [
+        0.045,
+        0.045,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Right Z-axis stepper sits at the top of the frame and turns the right lead screw.",
+      "connections": [
+        "frame_top_bridge",
+        "z_coupler_right"
+      ]
+    },
+    {
+      "id": "z_coupler_left",
+      "name": "Left Z Flexible Coupler",
+      "shape": "cylinder",
+      "position": [
+        -0.085,
+        0.532,
+        -0.245
+      ],
+      "size": [
+        0.01,
+        0.035
+      ],
+      "material": "brushed steel",
+      "role": "Flexible coupler joins the left motor shaft to the T8 lead screw.",
+      "connections": [
+        "motor_z_left",
+        "z_screw_left"
+      ]
+    },
+    {
+      "id": "z_coupler_right",
+      "name": "Right Z Flexible Coupler",
+      "shape": "cylinder",
+      "position": [
+        0.085,
+        0.532,
+        -0.245
+      ],
+      "size": [
+        0.01,
+        0.035
+      ],
+      "material": "brushed steel",
+      "role": "Flexible coupler joins the right motor shaft to the T8 lead screw.",
+      "connections": [
+        "motor_z_right",
+        "z_screw_right"
+      ]
+    },
+    {
+      "id": "x_extrusion",
+      "name": "X-Axis 2020 Extrusion",
+      "shape": "box",
+      "position": [
+        0,
+        0.335,
+        -0.195
+      ],
+      "size": [
+        0.405,
+        0.04,
+        0.04
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Horizontal 2020 extrusion spans the Z rods and carries the moving X carriage.",
+      "connections": [
+        "z_screw_left",
+        "z_screw_right",
+        "x_bearing_left",
+        "x_bearing_center",
+        "x_bearing_right",
+        "x_carriage",
+        "motor_x",
+        "x_idler_pulley"
+      ]
+    },
+    {
+      "id": "x_bearing_left",
+      "name": "Left X-Axis Bearing Block",
+      "shape": "box",
+      "position": [
+        -0.115,
+        0.35,
+        -0.165
+      ],
+      "size": [
+        0.055,
+        0.028,
+        0.035
+      ],
+      "material": "black composite",
+      "role": "Bearing block grips the X extrusion and transfers the left Z rod guidance into the gantry.",
+      "connections": [
+        "x_extrusion",
+        "z_rod_left"
+      ]
+    },
+    {
+      "id": "x_bearing_center",
+      "name": "Center X-Axis Bearing Block",
+      "shape": "box",
+      "position": [
+        0,
+        0.35,
+        -0.165
+      ],
+      "size": [
+        0.055,
+        0.028,
+        0.035
+      ],
+      "material": "black composite",
+      "role": "Central bearing support keeps the X carriage aligned on the horizontal extrusion.",
+      "connections": [
+        "x_extrusion",
+        "x_carriage"
+      ]
+    },
+    {
+      "id": "x_bearing_right",
+      "name": "Right X-Axis Bearing Block",
+      "shape": "box",
+      "position": [
+        0.115,
+        0.35,
+        -0.165
+      ],
+      "size": [
+        0.055,
+        0.028,
+        0.035
+      ],
+      "material": "black composite",
+      "role": "Bearing block grips the X extrusion and transfers the right Z rod guidance into the gantry.",
+      "connections": [
+        "x_extrusion",
+        "z_rod_right"
+      ]
+    },
+    {
+      "id": "motor_x",
+      "name": "Right X NEMA17 Motor",
+      "shape": "box",
+      "position": [
+        0.235,
+        0.335,
+        -0.195
+      ],
+      "size": [
+        0.045,
+        0.045,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Right-end X stepper drives the belt that moves the extruder across the build plate.",
+      "connections": [
+        "x_extrusion",
+        "x_motor_pulley"
+      ]
+    },
+    {
+      "id": "x_motor_pulley",
+      "name": "X Motor GT2 Pulley",
+      "shape": "cylinder",
+      "position": [
+        0.205,
+        0.335,
+        -0.195
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.012,
+        0.016
+      ],
+      "material": "brushed steel",
+      "role": "Toothed pulley on the X motor shaft pulls the X belt loop.",
+      "connections": [
+        "motor_x",
+        "x_belt_front",
+        "x_belt_rear"
+      ]
+    },
+    {
+      "id": "x_idler_pulley",
+      "name": "Left X Idler Pulley",
+      "shape": "cylinder",
+      "position": [
+        -0.205,
+        0.335,
+        -0.195
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.012,
+        0.016
+      ],
+      "material": "brushed steel",
+      "role": "Left idler pulley returns the X belt at the opposite end of the extrusion.",
+      "connections": [
+        "x_extrusion",
+        "x_belt_front",
+        "x_belt_rear"
+      ]
+    },
+    {
+      "id": "x_belt_front",
+      "name": "X Belt Front Run",
+      "shape": "box",
+      "position": [
+        0,
+        0.354,
+        -0.16
+      ],
+      "size": [
+        0.395,
+        0.006,
+        0.01
+      ],
+      "material": "rubber",
+      "role": "Front run of the GT2 belt is clamped to the X carriage and moves the extruder laterally.",
+      "connections": [
+        "x_motor_pulley",
+        "x_idler_pulley",
+        "x_carriage"
+      ]
+    },
+    {
+      "id": "x_belt_rear",
+      "name": "X Belt Rear Return",
+      "shape": "box",
+      "position": [
+        0,
+        0.316,
+        -0.205
+      ],
+      "size": [
+        0.395,
+        0.005,
+        0.01
+      ],
+      "material": "rubber",
+      "role": "Rear return run completes the closed X belt loop behind the carriage.",
+      "connections": [
+        "x_motor_pulley",
+        "x_idler_pulley"
+      ]
+    },
+    {
+      "id": "x_carriage",
+      "name": "X-Carriage Printed Plate",
+      "shape": "box",
+      "position": [
+        -0.02,
+        0.325,
+        -0.12
+      ],
+      "size": [
+        0.095,
+        0.07,
+        0.035
+      ],
+      "material": "black composite",
+      "role": "Printed PETG carriage bolts to the X belt and supports the complete direct-drive extruder.",
+      "connections": [
+        "x_extrusion",
+        "x_belt_front",
+        "extruder_body"
+      ]
+    },
+    {
+      "id": "extruder_body",
+      "name": "MK3S+ Direct-Drive Extruder Body",
+      "shape": "complex",
+      "position": [
+        -0.02,
+        0.29,
+        -0.085
+      ],
+      "size": [
+        0.09,
+        0.11,
+        0.075
+      ],
+      "material": "black composite",
+      "role": "Printed extruder body houses the filament path, Bondtech drive gears, idler door, and hotend clamp.",
+      "connections": [
+        "x_carriage",
+        "motor_e",
+        "bondtech_gear_left",
+        "bondtech_gear_right",
+        "v6_heatsink",
+        "filament_sensor",
+        "pinda_probe"
+      ]
+    },
+    {
+      "id": "motor_e",
+      "name": "Extruder NEMA17 Motor",
+      "shape": "box",
+      "position": [
+        0.045,
+        0.305,
+        -0.08
+      ],
+      "size": [
+        0.045,
+        0.045,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Direct-drive E motor sits on the extruder face and turns the Bondtech reduction gears.",
+      "connections": [
+        "extruder_body",
+        "bondtech_gear_left"
+      ]
+    },
+    {
+      "id": "bondtech_gear_left",
+      "name": "Bondtech Drive Gear Left",
+      "shape": "cylinder",
+      "position": [
+        -0.012,
+        0.3,
+        -0.045
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.01,
+        0.01
+      ],
+      "material": "brushed steel",
+      "role": "Knurled drive gear grips one side of the 1.75 mm filament path.",
+      "connections": [
+        "extruder_body",
+        "motor_e",
+        "filament_strand"
+      ]
+    },
+    {
+      "id": "bondtech_gear_right",
+      "name": "Bondtech Idler Gear Right",
+      "shape": "cylinder",
+      "position": [
+        0.012,
+        0.3,
+        -0.045
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.01,
+        0.01
+      ],
+      "material": "brushed steel",
+      "role": "Counter gear pinches filament against the driven gear for reliable direct extrusion.",
+      "connections": [
+        "extruder_body",
+        "filament_strand"
+      ]
+    },
+    {
+      "id": "filament_sensor",
+      "name": "IR Filament Sensor",
+      "shape": "box",
+      "position": [
+        -0.045,
+        0.36,
+        -0.07
+      ],
+      "size": [
+        0.026,
+        0.018,
+        0.025
+      ],
+      "material": "black composite",
+      "role": "IR optical sensor above the drive path detects filament presence before it reaches the gears.",
+      "connections": [
+        "extruder_body",
+        "filament_strand"
+      ]
+    },
+    {
+      "id": "v6_heatsink",
+      "name": "E3D V6 Heatsink",
+      "shape": "cylinder",
+      "position": [
+        -0.02,
+        0.245,
+        -0.085
+      ],
+      "size": [
+        0.016,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Finned metal heatsink keeps the upper hotend cool above the heatbreak.",
+      "connections": [
+        "extruder_body",
+        "hotend_heatblock",
+        "hotend_fan"
+      ]
+    },
+    {
+      "id": "hotend_fan",
+      "name": "Hotend Cooling Fan",
+      "shape": "box",
+      "position": [
+        -0.065,
+        0.262,
+        -0.062
+      ],
+      "size": [
+        0.04,
+        0.04,
+        0.012
+      ],
+      "material": "black composite",
+      "role": "Square 40 mm fan blows through the V6 heatsink to prevent heat creep.",
+      "connections": [
+        "extruder_body",
+        "v6_heatsink"
+      ]
+    },
+    {
+      "id": "hotend_heatblock",
+      "name": "E3D V6 Heater Block",
+      "shape": "box",
+      "position": [
+        -0.02,
+        0.21,
+        -0.085
+      ],
+      "size": [
+        0.03,
+        0.02,
+        0.024
+      ],
+      "material": "brushed steel",
+      "role": "Heater block contains the cartridge heater and thermistor and transfers heat to the nozzle.",
+      "connections": [
+        "v6_heatsink",
+        "nozzle"
+      ]
+    },
+    {
+      "id": "nozzle",
+      "name": "0.4 mm Brass Nozzle",
+      "shape": "cone",
+      "position": [
+        -0.02,
+        0.188,
+        -0.085
+      ],
+      "size": [
+        0.008,
+        0.02
+      ],
+      "material": "brass",
+      "role": "Tapered brass nozzle forms the final molten plastic outlet just above the print sheet.",
+      "connections": [
+        "hotend_heatblock"
+      ]
+    },
+    {
+      "id": "pinda_probe",
+      "name": "SuperPINDA Probe",
+      "shape": "cylinder",
+      "position": [
+        0.03,
+        0.23,
+        -0.07
+      ],
+      "size": [
+        0.0075,
+        0.05
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Inductive probe sits beside the nozzle and measures the steel sheet for mesh bed levelling.",
+      "connections": [
+        "extruder_body"
+      ]
+    },
+    {
+      "id": "einsy_case",
+      "name": "Einsy RAMBo Electronics Case",
+      "shape": "box",
+      "position": [
+        0.245,
+        0.255,
+        -0.232
+      ],
+      "size": [
+        0.055,
+        0.17,
+        0.115
+      ],
+      "material": "black composite",
+      "role": "Controller enclosure bolts to the right rear frame and contains the Einsy RAMBo board and TMC2130 drivers.",
+      "connections": [
+        "frame_right_upright",
+        "einsy_lid",
+        "x_z_wiring_loom",
+        "bed_wiring_loom"
+      ]
+    },
+    {
+      "id": "einsy_lid",
+      "name": "Einsy Case Ventilated Lid",
+      "shape": "box",
+      "position": [
+        0.276,
+        0.255,
+        -0.232
+      ],
+      "size": [
+        0.01,
+        0.14,
+        0.09
+      ],
+      "material": "black composite",
+      "role": "Removable side lid shows the electronics case opening without making the controller a featureless block.",
+      "connections": [
+        "einsy_case"
+      ]
+    },
+    {
+      "id": "x_z_wiring_loom",
+      "name": "X/Z Motor Wiring Loom",
+      "shape": "capsule",
+      "position": [
+        0.205,
+        0.385,
+        -0.215
+      ],
+      "rotation": [
+        0,
+        0,
+        0.55
+      ],
+      "size": [
+        0.006,
+        0.23
+      ],
+      "material": "rubber",
+      "role": "Bundled cable run from the electronics case to the X carriage and Z motors.",
+      "connections": [
+        "einsy_case",
+        "motor_x",
+        "extruder_body"
+      ]
+    },
+    {
+      "id": "bed_wiring_loom",
+      "name": "Heatbed Wiring Loom",
+      "shape": "capsule",
+      "position": [
+        0.115,
+        0.135,
+        -0.1
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.35
+      ],
+      "size": [
+        0.006,
+        0.21
+      ],
+      "material": "rubber",
+      "role": "Flexible heated-bed cable bundle routes from the moving bed to the controller case.",
+      "connections": [
+        "einsy_case",
+        "heatbed_mk52"
+      ]
+    },
+    {
+      "id": "lcd_bracket",
+      "name": "Front LCD Bracket",
+      "shape": "box",
+      "position": [
+        0,
+        0.115,
+        0.285
+      ],
+      "size": [
+        0.17,
+        0.07,
+        0.025
+      ],
+      "material": "black composite",
+      "role": "Printed front bracket mounts the control display to the front cross-bar, matching the real MK3S+ layout.",
+      "connections": [
+        "base_cross_front",
+        "lcd_display",
+        "rotary_encoder"
+      ]
+    },
+    {
+      "id": "lcd_display",
+      "name": "Monochrome LCD Display",
+      "shape": "box",
+      "position": [
+        -0.02,
+        0.125,
+        0.303
+      ],
+      "size": [
+        0.095,
+        0.04,
+        0.008
+      ],
+      "material": "glass display",
+      "role": "Front monochrome LCD presents printer menus and status to the operator.",
+      "connections": [
+        "lcd_bracket"
+      ]
+    },
+    {
+      "id": "rotary_encoder",
+      "name": "Rotary Click Encoder",
+      "shape": "cylinder",
+      "position": [
+        0.07,
+        0.125,
+        0.309
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.014,
+        0.014
+      ],
+      "material": "brushed steel",
+      "role": "Round push encoder beside the LCD provides the single-knob user interface.",
+      "connections": [
+        "lcd_bracket"
+      ]
+    },
+    {
+      "id": "spool_holder_left",
+      "name": "Left Spool Holder Bracket",
+      "shape": "box",
+      "position": [
+        -0.075,
+        0.615,
+        -0.225
+      ],
+      "size": [
+        0.03,
+        0.07,
+        0.09
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Left top bracket supports one end of the filament spool axle above the frame.",
+      "connections": [
+        "frame_top_bridge",
+        "spool_axle"
+      ]
+    },
+    {
+      "id": "spool_holder_right",
+      "name": "Right Spool Holder Bracket",
+      "shape": "box",
+      "position": [
+        0.075,
+        0.615,
+        -0.225
+      ],
+      "size": [
+        0.03,
+        0.07,
+        0.09
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Right top bracket supports the other end of the filament spool axle above the frame.",
+      "connections": [
+        "frame_top_bridge",
+        "spool_axle"
+      ]
+    },
+    {
+      "id": "spool_axle",
+      "name": "Filament Spool Axle",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.625,
+        -0.155
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.01,
+        0.17
+      ],
+      "material": "brushed steel",
+      "role": "Horizontal axle passes through the spool hub and lets the 1 kg spool rotate freely.",
+      "connections": [
+        "spool_holder_left",
+        "spool_holder_right",
+        "spool_hub"
+      ]
+    },
+    {
+      "id": "spool_hub",
+      "name": "Filament Spool Hub",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.625,
+        -0.155
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.045,
+        0.065
+      ],
+      "material": "white composite",
+      "role": "Central hub represents the wound filament core around the support axle.",
+      "connections": [
+        "spool_axle",
+        "spool_flange_left",
+        "spool_flange_right",
+        "filament_strand"
+      ]
+    },
+    {
+      "id": "spool_flange_left",
+      "name": "Left Spool Flange",
+      "shape": "torus",
+      "position": [
+        -0.037,
+        0.625,
+        -0.155
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.082,
+        0.01
+      ],
+      "material": "white composite",
+      "role": "Outer flange of the 1 kg filament spool keeps the coil from sliding off the left side.",
+      "connections": [
+        "spool_hub"
+      ]
+    },
+    {
+      "id": "spool_flange_right",
+      "name": "Right Spool Flange",
+      "shape": "torus",
+      "position": [
+        0.037,
+        0.625,
+        -0.155
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.082,
+        0.01
+      ],
+      "material": "white composite",
+      "role": "Outer flange of the 1 kg filament spool keeps the coil from sliding off the right side.",
+      "connections": [
+        "spool_hub"
+      ]
+    },
+    {
+      "id": "filament_strand",
+      "name": "1.75 mm Filament Feed Strand",
+      "shape": "capsule",
+      "position": [
+        -0.02,
+        0.485,
+        -0.1
+      ],
+      "rotation": [
+        0.45,
+        0,
+        -0.1
+      ],
+      "size": [
+        0.002,
+        0.3
+      ],
+      "material": "fiberglass",
+      "role": "Visible filament strand runs from the top spool down through the sensor into the Bondtech drive path.",
+      "connections": [
+        "spool_hub",
+        "filament_sensor",
+        "bondtech_gear_left",
+        "bondtech_gear_right"
+      ]
+    }
   ]
 }

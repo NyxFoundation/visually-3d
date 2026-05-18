@@ -1,62 +1,1767 @@
 {
   "machine_name": "OreSat0 1U CubeSat",
-  "assembly_instructions": "Open-source 1U CubeSat (10×10×10 cm) from Portland State Aerospace Society. Four 6061-aluminum corner rails with machined +Y and −Y end-caps form the primary structure. Two body-mounted solar panels flush-cover the +Z and −Z side faces; the +X and −X sides carry deployable solar panels hinged on burn-wire releases at the top of each rail (shown deployed 90° outward). Inside the open cage, a PC/104 stack of four cards (battery, ADACS, on-board computer, communications) plugs into a vertical backplane PCB along the −Z interior wall. Exterior sensors: a small camera lens in the +Z face, a sun-sensor chip and a magnetometer on the top end-cap, a UHF whip antenna deployed straight up from the top end-cap, and a deployment-switch plunger on a bottom corner rail (arms the satellite when the P-POD dispenser releases it).",
+  "assembly_instructions": [
+    "Machine four 6061 aluminum corner rails to a 100 mm CubeSat height and fasten them to the -Y bottom end cap at the four 6 mm square rail corners.",
+    "Install the +X, -X, +Z, and -Z lower cross rails between adjacent corner rails to square the 100 mm frame while leaving the side walls open.",
+    "Install the four PC/104 standoffs on the bottom end cap and bolt the vertical -Z backplane PCB to the rear interior standoff line.",
+    "Slide the battery, ADACS, OBC, and UHF communications PC/104 cards down the standoffs from bottom to top and plug each brass edge connector into the backplane.",
+    "Fit the battery cells, ADACS torque rods, OBC processor, radio module, and board-to-board spacers on their named PC/104 cards before closing the upper frame.",
+    "Fasten the four split +Y top cap perimeter bars to the corner rails and bolt the small top instrument island between them so the avionics stack remains visible in this cutaway model.",
+    "Bond the -Z body-mounted solar panel to the -Z face; mount the +Z body-mounted solar panel on two exploded service spacers aligned with the +Z outline rail so the internal stack remains visible.",
+    "Attach the +X and -X hinge rods and their hinge brackets to the top side rails, then pin the two deployable solar panels so each is shown deployed 90 degrees outward.",
+    "Install the burn-wire retainers at both hinges, route the UHF radio feed to the antenna base, and seat the whip antenna vertically on the top instrument island.",
+    "Install the CMOS camera lens through the exploded +Z solar face, place the sun sensor and magnetometer on the top island, and mount the deployment switch plunger on the -X -Z lower rail corner."
+  ],
   "metadata": {
     "reference": "https://github.com/oresat/oresat-structure",
     "domain": "smallsat",
-    "thumbnail_camera": [0.40, 0.35, 0.40],
+    "thumbnail_camera": [
+      0.4,
+      0.35,
+      0.4
+    ],
     "info": {
       "japanese_name": "OreSat0 1U CubeSat",
       "english_name": "OreSat0 1U CubeSat (PSAS)",
       "summary": "Open-hardware 1U CubeSat from the Portland State Aerospace Society — a technology-demonstration precursor to the larger OreSat bus.",
-      "description": "OreSat0 is an open-source 1U (10×10×10 cm) CubeSat developed by the Portland State Aerospace Society (PSAS). It was built to flight-qualify the structural, power, and command-and-data-handling systems of the larger OreSat bus before those subsystems flew on a 2U/3U science mission. Four 6061 aluminum corner rails carry the launch loads, closed off by machined +Y and -Y end-caps. Inside, a PC/104-form-factor stack holds a battery card, an ADACS (Attitude Determination and Control) module, an on-board computer, and a UHF comms card — all plugging into a shared backplane that runs the power and CAN bus between them. Two deployable solar panels hinge outward from opposite side rails on burn-wire releases; the other two side faces carry flush body-mounted solar cells. External features: a CMOS camera lens in one side face, a sun sensor and magnetometer on the top face, a UHF whip antenna, and a deployment switch on one bottom corner that arms the satellite on release from the P-POD dispenser. Structure and electronics are released under CERN-OHL-S v2.0.",
+      "description": "OreSat0 is an open-source 1U (10×10×10 cm) CubeSat developed by the Portland State Aerospace Society (PSAS). It was built to flight-qualify the structural, power, and command-and-data-handling systems of the larger OreSat bus before those subsystems flew on a 2U/3U science mission. Four 6061 aluminum corner rails carry the launch loads, closed off by machined +Y and -Y end-cap structure. This scene splits the +Y cap into perimeter bars and a small instrument island as a deliberate cutaway so the PC/104 avionics stack remains visible. Inside, a PC/104-form-factor stack holds a battery card, an ADACS module, an on-board computer, and a UHF comms card — all plugging into a shared backplane that runs power and CAN bus between them. Two deployable solar panels hinge outward from opposite side rails on burn-wire releases; the other two side faces carry flush body-mounted solar cells, with the +Z panel exploded outward in this view. External features include a CMOS camera lens in one side face, a sun sensor and magnetometer on the top face, a UHF whip antenna, and a deployment switch on one bottom corner that arms the satellite on release from the P-POD dispenser.",
       "operator": "Portland State Aerospace Society (PSAS)",
       "contractor": "PSAS student/volunteer team, Portland State University",
       "contract_date": "Launched 2022 (ELaNa 50 / Virgin Orbit 'Straight Up')",
       "contract_value": "Student-built; materials ≈US$10k",
       "status": "Flown (deorbited). Design iterated into OreSat (2U+) flight bus.",
       "facts": [
-        { "label": "Form factor",   "value": "1U CubeSat (10 × 10 × 10 cm)" },
-        { "label": "Mass",          "value": "≈1.0 kg" },
-        { "label": "Avionics bus",  "value": "PC/104 stack with shared backplane, CAN-based" },
-        { "label": "Power",         "value": "Body-mounted solar (+Z, −Z) + two deployable side panels → Li-ion battery card" },
-        { "label": "Attitude",      "value": "ADACS module + sun sensor + magnetometer" },
-        { "label": "Comms",         "value": "UHF + deployable monopole whip antenna" },
-        { "label": "License",       "value": "CERN-OHL-S v2.0 (hardware); open software" }
+        {
+          "label": "CubeSat envelope",
+          "value": "1U class, 0.100 × 0.100 × 0.100 m structural envelope"
+        },
+        {
+          "label": "Scene scale",
+          "value": "1 scene metre equals 1 real metre; no scale reduction needed"
+        },
+        {
+          "label": "Frame rail section",
+          "value": "Four corner rails are modelled as 0.006 × 0.100 × 0.006 m members"
+        },
+        {
+          "label": "Split top cap",
+          "value": "The +Y cap is shown as four 0.006 m thick perimeter bars plus a 0.032 m square instrument island for cutaway legibility"
+        },
+        {
+          "label": "PC/104 cards",
+          "value": "Four internal cards are 0.082 × 0.004 × 0.070 m with 0.014 m vertical pitch"
+        },
+        {
+          "label": "Backplane",
+          "value": "Vertical backplane PCB is 0.082 × 0.075 × 0.004 m on the -Z interior wall"
+        },
+        {
+          "label": "Deployable solar panels",
+          "value": "Two side panels are 0.098 × 0.003 × 0.094 m and shown deployed 90 degrees"
+        },
+        {
+          "label": "Body solar panels",
+          "value": "-Z panel is flush; +Z panel is offset 0.045 m outward as an exploded service view"
+        },
+        {
+          "label": "Whip antenna",
+          "value": "UHF monopole is modelled as a 0.180 m long, 0.0015 m radius steel cylinder"
+        },
+        {
+          "label": "Mass class",
+          "value": "Approximately 1.0 kg for the OreSat0 1U demonstrator"
+        }
       ],
       "sources": [
-        { "title": "OreSat structure repository (GitHub)", "url": "https://github.com/oresat/oresat-structure" },
-        { "title": "PSAS — OreSat project page",            "url": "https://www.oresat.org/" }
+        {
+          "title": "OreSat structure repository (GitHub)",
+          "url": "https://github.com/oresat/oresat-structure"
+        },
+        {
+          "title": "PSAS — OreSat project page",
+          "url": "https://www.oresat.org/"
+        },
+        {
+          "title": "CubeSat Design Specification, 1U envelope reference",
+          "url": "https://www.cubesat.org/cds-announcement"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "rail_fr",          "name": "Corner Rail (Fwd-Right, +X+Z)", "shape": "box",      "position": [ 0.047, 0.15,  0.047], "size": [0.006, 0.10, 0.006], "material": "dark anodized aluminum", "role": "Machined 6061 corner rail — one of four carrying launch-rail loads.", "connections": ["end_cap_top", "end_cap_bot", "hinge_front"] },
-    { "id": "rail_fl",          "name": "Corner Rail (Fwd-Left, +X−Z)",  "shape": "box",      "position": [ 0.047, 0.15, -0.047], "size": [0.006, 0.10, 0.006], "material": "dark anodized aluminum", "role": "Forward-left corner rail.", "connections": ["end_cap_top", "end_cap_bot", "hinge_front"] },
-    { "id": "rail_rr",          "name": "Corner Rail (Rear-Right, −X+Z)","shape": "box",      "position": [-0.047, 0.15,  0.047], "size": [0.006, 0.10, 0.006], "material": "dark anodized aluminum", "role": "Rear-right corner rail.", "connections": ["end_cap_top", "end_cap_bot", "hinge_rear"] },
-    { "id": "rail_rl",          "name": "Corner Rail (Rear-Left, −X−Z)", "shape": "box",      "position": [-0.047, 0.15, -0.047], "size": [0.006, 0.10, 0.006], "material": "dark anodized aluminum", "role": "Rear-left corner rail. Houses the deployment switch on the −Y end.", "connections": ["end_cap_top", "end_cap_bot", "hinge_rear", "deploy_switch"] },
-
-    { "id": "end_cap_top",      "name": "End Cap (+Y, top)",              "shape": "box",      "position": [0, 0.203, 0],          "size": [0.100, 0.006, 0.100],"material": "dark anodized aluminum", "role": "Machined top end-cap. Mounts the sun sensor, magnetometer, and UHF antenna.", "connections": ["rail_fr", "rail_fl", "rail_rr", "rail_rl", "sun_sensor", "magnetometer", "uhf_antenna"] },
-    { "id": "end_cap_bot",      "name": "End Cap (−Y, bottom)",           "shape": "box",      "position": [0, 0.097, 0],          "size": [0.100, 0.006, 0.100],"material": "dark anodized aluminum", "role": "Bottom end-cap. Interfaces to the P-POD dispenser's launch-rail pusher spring.", "connections": ["rail_fr", "rail_fl", "rail_rr", "rail_rl"] },
-
-    { "id": "body_solar_port",  "name": "Body-Mounted Solar Panel (+Z)",  "shape": "box",      "position": [0, 0.15, 0.052],        "size": [0.094, 0.090, 0.003], "material": "glass display",        "role": "Body-mounted solar cells flush against the +Z face.", "connections": ["rail_fr", "rail_rr", "camera_lens"] },
-    { "id": "body_solar_stbd",  "name": "Body-Mounted Solar Panel (−Z)",  "shape": "box",      "position": [0, 0.15, -0.052],       "size": [0.094, 0.090, 0.003], "material": "glass display",        "role": "Body-mounted solar cells flush against the −Z face.", "connections": ["rail_fl", "rail_rl"] },
-
-    { "id": "deploy_panel_front","name": "Deployable Solar Panel (+X)",   "shape": "box",      "position": [0.100, 0.15, 0],        "size": [0.098, 0.003, 0.094], "material": "glass display",        "role": "Deployable solar panel hinged on the +X rail; shown flipped outward 90°.", "connections": ["hinge_front"] },
-    { "id": "deploy_panel_rear", "name": "Deployable Solar Panel (−X)",   "shape": "box",      "position": [-0.100, 0.15, 0],       "size": [0.098, 0.003, 0.094], "material": "glass display",        "role": "Deployable solar panel hinged on the −X rail.", "connections": ["hinge_rear"] },
-    { "id": "hinge_front",      "name": "Burn-Wire Hinge (+X)",           "shape": "cylinder", "position": [0.050, 0.196, 0], "rotation": [1.5708, 0, 0], "size": [0.003, 0.080], "material": "brushed steel",      "role": "Spring-loaded hinge pin on the +X rail — released by a burn-wire at deployment.", "connections": ["rail_fr", "rail_fl", "deploy_panel_front"] },
-    { "id": "hinge_rear",       "name": "Burn-Wire Hinge (−X)",           "shape": "cylinder", "position": [-0.050, 0.196, 0],"rotation": [1.5708, 0, 0], "size": [0.003, 0.080], "material": "brushed steel",      "role": "Burn-wire hinge on the −X rail.", "connections": ["rail_rr", "rail_rl", "deploy_panel_rear"] },
-
-    { "id": "backplane",        "name": "PC/104 Backplane",               "shape": "box",      "position": [0, 0.15, -0.040],       "size": [0.082, 0.080, 0.005], "material": "dark anodized aluminum","role": "Vertical backplane PCB along the interior −Z wall — carries power + CAN bus between the stacked PC/104 cards.", "connections": ["battery_card", "adacs_card", "obc_card", "comms_card"] },
-    { "id": "battery_card",     "name": "Battery Card (PC/104)",          "shape": "box",      "position": [0, 0.118, 0.005],       "size": [0.082, 0.006, 0.070], "material": "black composite",       "role": "Li-ion battery board — bottom of the stack.", "connections": ["backplane"] },
-    { "id": "adacs_card",       "name": "ADACS Card (PC/104)",            "shape": "box",      "position": [0, 0.138, 0.005],       "size": [0.082, 0.006, 0.070], "material": "dark anodized aluminum","role": "Attitude Determination and Control board — IMU + magnetometer + torque-rod drivers.", "connections": ["backplane"] },
-    { "id": "obc_card",         "name": "On-Board Computer Card",         "shape": "box",      "position": [0, 0.158, 0.005],       "size": [0.082, 0.006, 0.070], "material": "dark anodized aluminum","role": "Mission computer running the C3 flight software.", "connections": ["backplane"] },
-    { "id": "comms_card",       "name": "UHF Comms Card (PC/104)",        "shape": "box",      "position": [0, 0.178, 0.005],       "size": [0.082, 0.006, 0.070], "material": "dark anodized aluminum","role": "UHF radio board — drives the whip antenna.", "connections": ["backplane", "uhf_antenna"] },
-
-    { "id": "camera_lens",      "name": "CMOS Camera Lens",               "shape": "cylinder", "position": [0, 0.15, 0.056], "rotation": [1.5708, 0, 0], "size": [0.008, 0.006], "material": "glass display",            "role": "Small lens protruding through the +Z body-mounted panel — the tech-demo imaging camera.", "connections": ["body_solar_port"] },
-    { "id": "sun_sensor",       "name": "Sun Sensor",                     "shape": "box",      "position": [0.030, 0.208, -0.020],  "size": [0.012, 0.005, 0.012], "material": "glass display",         "role": "Photodiode-based coarse sun sensor on the top end-cap. Feeds ADACS.", "connections": ["end_cap_top", "adacs_card"] },
-    { "id": "magnetometer",     "name": "Magnetometer",                   "shape": "box",      "position": [-0.030, 0.208, 0.020],  "size": [0.010, 0.005, 0.010], "material": "black composite",       "role": "3-axis magnetometer chip on the top end-cap for coarse attitude sensing.", "connections": ["end_cap_top", "adacs_card"] },
-    { "id": "uhf_antenna",      "name": "UHF Whip Antenna",               "shape": "cylinder", "position": [0.030, 0.295, 0.030],                           "size": [0.002, 0.18], "material": "brushed steel",             "role": "Deployed monopole UHF whip — unfurls from its base on the top end-cap after orbit insertion.", "connections": ["end_cap_top", "comms_card"] },
-    { "id": "deploy_switch",    "name": "Deployment Switch",              "shape": "cylinder", "position": [-0.047, 0.092, -0.047],                        "size": [0.004, 0.008], "material": "brushed steel",            "role": "Plunger switch on one bottom corner rail — held in by the P-POD dispenser and released at deployment to arm the satellite.", "connections": ["rail_rl"] }
+    {
+      "id": "end_cap_bot",
+      "name": "Bottom End Cap (-Y)",
+      "shape": "box",
+      "position": [
+        0,
+        0.003,
+        0
+      ],
+      "size": [
+        0.1,
+        0.006,
+        0.1
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Machined 6061 aluminum bottom plate that squares the four rails and receives the P-POD pusher load.",
+      "connections": [
+        "rail_fr",
+        "rail_fl",
+        "rail_rr",
+        "rail_rl",
+        "cross_front_low",
+        "cross_rear_low",
+        "cross_port_low",
+        "cross_starboard_low",
+        "standoff_fr",
+        "standoff_fl",
+        "standoff_rr",
+        "standoff_rl"
+      ]
+    },
+    {
+      "id": "rail_fr",
+      "name": "Corner Rail (+X +Z)",
+      "shape": "box",
+      "position": [
+        0.047,
+        0.05,
+        0.047
+      ],
+      "size": [
+        0.006,
+        0.1,
+        0.006
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Forward-port corner rail that carries launch-guide contact loads along the full 100 mm CubeSat height.",
+      "connections": [
+        "end_cap_bot",
+        "top_cap_front_bar",
+        "top_cap_port_bar",
+        "cross_front_low",
+        "cross_port_low",
+        "cross_front_high",
+        "cross_port_high",
+        "hinge_front_rod",
+        "body_solar_port_exploded",
+        "top_screw_fr"
+      ]
+    },
+    {
+      "id": "rail_fl",
+      "name": "Corner Rail (+X -Z)",
+      "shape": "box",
+      "position": [
+        0.047,
+        0.05,
+        -0.047
+      ],
+      "size": [
+        0.006,
+        0.1,
+        0.006
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Forward-starboard corner rail that fixes the +X deployable panel hinge line.",
+      "connections": [
+        "end_cap_bot",
+        "top_cap_front_bar",
+        "top_cap_starboard_bar",
+        "cross_front_low",
+        "cross_starboard_low",
+        "cross_front_high",
+        "cross_starboard_high",
+        "hinge_front_rod",
+        "top_screw_fl"
+      ]
+    },
+    {
+      "id": "rail_rr",
+      "name": "Corner Rail (-X +Z)",
+      "shape": "box",
+      "position": [
+        -0.047,
+        0.05,
+        0.047
+      ],
+      "size": [
+        0.006,
+        0.1,
+        0.006
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear-port corner rail that supports the exploded +Z solar panel service bracket.",
+      "connections": [
+        "end_cap_bot",
+        "top_cap_rear_bar",
+        "top_cap_port_bar",
+        "cross_rear_low",
+        "cross_port_low",
+        "cross_rear_high",
+        "cross_port_high",
+        "hinge_rear_rod",
+        "body_solar_port_exploded",
+        "top_screw_rr"
+      ]
+    },
+    {
+      "id": "rail_rl",
+      "name": "Corner Rail (-X -Z)",
+      "shape": "box",
+      "position": [
+        -0.047,
+        0.05,
+        -0.047
+      ],
+      "size": [
+        0.006,
+        0.1,
+        0.006
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear-starboard corner rail that carries the deployment switch bracket near the lower dispenser contact corner.",
+      "connections": [
+        "end_cap_bot",
+        "top_cap_rear_bar",
+        "top_cap_starboard_bar",
+        "cross_rear_low",
+        "cross_starboard_low",
+        "cross_rear_high",
+        "cross_starboard_high",
+        "hinge_rear_rod",
+        "deploy_switch_body",
+        "top_screw_rl"
+      ]
+    },
+    {
+      "id": "top_cap_front_bar",
+      "name": "Cutaway Top Cap Bar (+X)",
+      "shape": "box",
+      "position": [
+        0.047,
+        0.097,
+        0
+      ],
+      "size": [
+        0.006,
+        0.006,
+        0.1
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Front perimeter segment of the split top cap; it closes the rail corner while leaving the card stack visible.",
+      "connections": [
+        "rail_fr",
+        "rail_fl",
+        "cross_front_high",
+        "top_instrument_island",
+        "top_screw_fr",
+        "top_screw_fl"
+      ]
+    },
+    {
+      "id": "top_cap_rear_bar",
+      "name": "Cutaway Top Cap Bar (-X)",
+      "shape": "box",
+      "position": [
+        -0.047,
+        0.097,
+        0
+      ],
+      "size": [
+        0.006,
+        0.006,
+        0.1
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear perimeter segment of the split top cap; it ties the rear rails without covering the avionics stack.",
+      "connections": [
+        "rail_rr",
+        "rail_rl",
+        "cross_rear_high",
+        "top_instrument_island",
+        "top_screw_rr",
+        "top_screw_rl"
+      ]
+    },
+    {
+      "id": "top_cap_port_bar",
+      "name": "Cutaway Top Cap Bar (+Z)",
+      "shape": "box",
+      "position": [
+        0,
+        0.097,
+        0.047
+      ],
+      "size": [
+        0.1,
+        0.006,
+        0.006
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Port perimeter segment of the top cap aligned with the exploded +Z wall opening.",
+      "connections": [
+        "rail_fr",
+        "rail_rr",
+        "cross_port_high",
+        "top_instrument_island",
+        "port_cutaway_outline"
+      ]
+    },
+    {
+      "id": "top_cap_starboard_bar",
+      "name": "Cutaway Top Cap Bar (-Z)",
+      "shape": "box",
+      "position": [
+        0,
+        0.097,
+        -0.047
+      ],
+      "size": [
+        0.1,
+        0.006,
+        0.006
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Starboard perimeter segment of the split top cap that supports the fixed -Z body solar face.",
+      "connections": [
+        "rail_fl",
+        "rail_rl",
+        "cross_starboard_high",
+        "top_instrument_island"
+      ]
+    },
+    {
+      "id": "top_instrument_island",
+      "name": "Top Instrument Island",
+      "shape": "box",
+      "position": [
+        0.014,
+        0.101,
+        0.01
+      ],
+      "size": [
+        0.032,
+        0.004,
+        0.032
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Small remaining top-cap pad that carries the antenna feedthrough and sensors without hiding the internal PC/104 stack.",
+      "connections": [
+        "top_cap_front_bar",
+        "top_cap_rear_bar",
+        "top_cap_port_bar",
+        "top_cap_starboard_bar",
+        "sun_sensor",
+        "magnetometer",
+        "antenna_base"
+      ]
+    },
+    {
+      "id": "top_screw_fr",
+      "name": "Top Rail Screw (+X +Z)",
+      "shape": "cylinder",
+      "position": [
+        0.047,
+        0.105,
+        0.047
+      ],
+      "size": [
+        0.002,
+        0.002
+      ],
+      "material": "brushed steel",
+      "role": "Visible cap screw head fastening the split top frame into the forward-port rail.",
+      "connections": [
+        "rail_fr",
+        "top_cap_front_bar"
+      ]
+    },
+    {
+      "id": "top_screw_fl",
+      "name": "Top Rail Screw (+X -Z)",
+      "shape": "cylinder",
+      "position": [
+        0.047,
+        0.105,
+        -0.047
+      ],
+      "size": [
+        0.002,
+        0.002
+      ],
+      "material": "brushed steel",
+      "role": "Visible cap screw head fastening the split top frame into the forward-starboard rail.",
+      "connections": [
+        "rail_fl",
+        "top_cap_front_bar"
+      ]
+    },
+    {
+      "id": "top_screw_rr",
+      "name": "Top Rail Screw (-X +Z)",
+      "shape": "cylinder",
+      "position": [
+        -0.047,
+        0.105,
+        0.047
+      ],
+      "size": [
+        0.002,
+        0.002
+      ],
+      "material": "brushed steel",
+      "role": "Visible cap screw head fastening the split top frame into the rear-port rail.",
+      "connections": [
+        "rail_rr",
+        "top_cap_rear_bar"
+      ]
+    },
+    {
+      "id": "top_screw_rl",
+      "name": "Top Rail Screw (-X -Z)",
+      "shape": "cylinder",
+      "position": [
+        -0.047,
+        0.105,
+        -0.047
+      ],
+      "size": [
+        0.002,
+        0.002
+      ],
+      "material": "brushed steel",
+      "role": "Visible cap screw head fastening the split top frame into the rear-starboard rail.",
+      "connections": [
+        "rail_rl",
+        "top_cap_rear_bar"
+      ]
+    },
+    {
+      "id": "cross_front_low",
+      "name": "Lower +X Cross Rail",
+      "shape": "box",
+      "position": [
+        0.047,
+        0.016,
+        0
+      ],
+      "size": [
+        0.005,
+        0.006,
+        0.088
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Lower front frame member that ties the two +X corner rails together without closing the side opening.",
+      "connections": [
+        "end_cap_bot",
+        "rail_fr",
+        "rail_fl"
+      ]
+    },
+    {
+      "id": "cross_rear_low",
+      "name": "Lower -X Cross Rail",
+      "shape": "box",
+      "position": [
+        -0.047,
+        0.016,
+        0
+      ],
+      "size": [
+        0.005,
+        0.006,
+        0.088
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Lower rear frame member that ties the two -X corner rails together.",
+      "connections": [
+        "end_cap_bot",
+        "rail_rr",
+        "rail_rl"
+      ]
+    },
+    {
+      "id": "cross_port_low",
+      "name": "Lower +Z Cross Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.016,
+        0.047
+      ],
+      "size": [
+        0.088,
+        0.006,
+        0.005
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Lower port frame member left exposed so the internal PC/104 stack can be seen from the +Z side.",
+      "connections": [
+        "end_cap_bot",
+        "rail_fr",
+        "rail_rr",
+        "port_cutaway_outline"
+      ]
+    },
+    {
+      "id": "cross_starboard_low",
+      "name": "Lower -Z Cross Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.016,
+        -0.047
+      ],
+      "size": [
+        0.088,
+        0.006,
+        0.005
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Lower starboard frame member that backs the fixed -Z body solar panel.",
+      "connections": [
+        "end_cap_bot",
+        "rail_fl",
+        "rail_rl",
+        "body_solar_starboard"
+      ]
+    },
+    {
+      "id": "cross_front_high",
+      "name": "Upper +X Cross Rail",
+      "shape": "box",
+      "position": [
+        0.047,
+        0.084,
+        0
+      ],
+      "size": [
+        0.005,
+        0.006,
+        0.088
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Upper front frame member that carries the +X hinge brackets.",
+      "connections": [
+        "top_cap_front_bar",
+        "rail_fr",
+        "rail_fl",
+        "hinge_front_left_bracket",
+        "hinge_front_right_bracket"
+      ]
+    },
+    {
+      "id": "cross_rear_high",
+      "name": "Upper -X Cross Rail",
+      "shape": "box",
+      "position": [
+        -0.047,
+        0.084,
+        0
+      ],
+      "size": [
+        0.005,
+        0.006,
+        0.088
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Upper rear frame member that carries the -X hinge brackets.",
+      "connections": [
+        "top_cap_rear_bar",
+        "rail_rr",
+        "rail_rl",
+        "hinge_rear_left_bracket",
+        "hinge_rear_right_bracket"
+      ]
+    },
+    {
+      "id": "cross_port_high",
+      "name": "Upper +Z Cross Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.084,
+        0.047
+      ],
+      "size": [
+        0.088,
+        0.006,
+        0.005
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Upper port frame member that leaves the +Z wall open for X-ray visibility of the avionics stack.",
+      "connections": [
+        "top_cap_port_bar",
+        "rail_fr",
+        "rail_rr",
+        "body_solar_port_exploded",
+        "port_cutaway_outline"
+      ]
+    },
+    {
+      "id": "cross_starboard_high",
+      "name": "Upper -Z Cross Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.084,
+        -0.047
+      ],
+      "size": [
+        0.088,
+        0.006,
+        0.005
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Upper starboard frame member that supports the fixed -Z solar panel and backplane side of the bus.",
+      "connections": [
+        "top_cap_starboard_bar",
+        "rail_fl",
+        "rail_rl",
+        "body_solar_starboard"
+      ]
+    },
+    {
+      "id": "port_cutaway_outline",
+      "name": "+Z Body Panel Cutaway Outline",
+      "shape": "box",
+      "position": [
+        0,
+        0.05,
+        0.051
+      ],
+      "size": [
+        0.086,
+        0.004,
+        0.002
+      ],
+      "material": "brushed steel",
+      "role": "Thin reference strip marking the original +Z wall plane from which the body solar panel is exploded outward.",
+      "connections": [
+        "cross_port_low",
+        "cross_port_high",
+        "top_cap_port_bar",
+        "body_solar_port_exploded"
+      ]
+    },
+    {
+      "id": "standoff_fr",
+      "name": "PC/104 Standoff (+X +Z)",
+      "shape": "cylinder",
+      "position": [
+        0.032,
+        0.05,
+        0.026
+      ],
+      "size": [
+        0.0015,
+        0.078
+      ],
+      "material": "brushed steel",
+      "role": "Threaded spacer post that clamps the four PC/104 boards at the forward-port mounting hole.",
+      "connections": [
+        "end_cap_bot",
+        "battery_card",
+        "adacs_card",
+        "obc_card",
+        "comms_card"
+      ]
+    },
+    {
+      "id": "standoff_fl",
+      "name": "PC/104 Standoff (+X -Z)",
+      "shape": "cylinder",
+      "position": [
+        0.032,
+        0.05,
+        -0.026
+      ],
+      "size": [
+        0.0015,
+        0.078
+      ],
+      "material": "brushed steel",
+      "role": "Threaded spacer post that fixes the forward-starboard edge of the avionics stack.",
+      "connections": [
+        "end_cap_bot",
+        "battery_card",
+        "adacs_card",
+        "obc_card",
+        "comms_card"
+      ]
+    },
+    {
+      "id": "standoff_rr",
+      "name": "PC/104 Standoff (-X +Z)",
+      "shape": "cylinder",
+      "position": [
+        -0.032,
+        0.05,
+        0.026
+      ],
+      "size": [
+        0.0015,
+        0.078
+      ],
+      "material": "brushed steel",
+      "role": "Threaded spacer post that holds the rear-port corners of the cards visible through the exploded +Z side.",
+      "connections": [
+        "end_cap_bot",
+        "battery_card",
+        "adacs_card",
+        "obc_card",
+        "comms_card"
+      ]
+    },
+    {
+      "id": "standoff_rl",
+      "name": "PC/104 Standoff (-X -Z)",
+      "shape": "cylinder",
+      "position": [
+        -0.032,
+        0.05,
+        -0.026
+      ],
+      "size": [
+        0.0015,
+        0.078
+      ],
+      "material": "brushed steel",
+      "role": "Threaded spacer post that clamps the rear-starboard PC/104 mounting holes next to the backplane.",
+      "connections": [
+        "end_cap_bot",
+        "battery_card",
+        "adacs_card",
+        "obc_card",
+        "comms_card"
+      ]
+    },
+    {
+      "id": "backplane",
+      "name": "Vertical PC/104 Backplane PCB",
+      "shape": "box",
+      "position": [
+        0,
+        0.052,
+        -0.037
+      ],
+      "size": [
+        0.082,
+        0.075,
+        0.004
+      ],
+      "material": "black composite",
+      "role": "Vertical PCB on the -Z interior wall that distributes power and CAN signals to each stacked avionics card.",
+      "connections": [
+        "cross_starboard_low",
+        "cross_starboard_high",
+        "battery_card",
+        "adacs_card",
+        "obc_card",
+        "comms_card"
+      ]
+    },
+    {
+      "id": "battery_card",
+      "name": "Battery PC/104 Card",
+      "shape": "box",
+      "position": [
+        0,
+        0.029,
+        0.004
+      ],
+      "size": [
+        0.082,
+        0.004,
+        0.07
+      ],
+      "material": "fiberglass",
+      "role": "Lowest PC/104 board that stores solar power in Li-ion cells and feeds the spacecraft power bus.",
+      "connections": [
+        "backplane",
+        "standoff_fr",
+        "standoff_fl",
+        "standoff_rr",
+        "standoff_rl",
+        "battery_cell_a",
+        "battery_cell_b",
+        "battery_edge_connector"
+      ]
+    },
+    {
+      "id": "battery_edge_connector",
+      "name": "Battery Card Backplane Connector",
+      "shape": "box",
+      "position": [
+        0,
+        0.031,
+        -0.032
+      ],
+      "size": [
+        0.054,
+        0.006,
+        0.004
+      ],
+      "material": "brass",
+      "role": "Gold-plated board-edge connector that plugs the battery card into the vertical backplane.",
+      "connections": [
+        "battery_card",
+        "backplane"
+      ]
+    },
+    {
+      "id": "battery_cell_a",
+      "name": "Li-ion Cell A",
+      "shape": "capsule",
+      "position": [
+        -0.018,
+        0.034,
+        0.012
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.006,
+        0.038
+      ],
+      "material": "metal",
+      "role": "Cylindrical Li-ion cell mounted on the battery board as one half of the smallsat energy store.",
+      "connections": [
+        "battery_card"
+      ]
+    },
+    {
+      "id": "battery_cell_b",
+      "name": "Li-ion Cell B",
+      "shape": "capsule",
+      "position": [
+        0.018,
+        0.034,
+        0.012
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.006,
+        0.038
+      ],
+      "material": "metal",
+      "role": "Second cylindrical Li-ion cell mounted parallel to cell A on the battery board.",
+      "connections": [
+        "battery_card"
+      ]
+    },
+    {
+      "id": "adacs_card",
+      "name": "ADACS PC/104 Card",
+      "shape": "box",
+      "position": [
+        0,
+        0.043,
+        0.004
+      ],
+      "size": [
+        0.082,
+        0.004,
+        0.07
+      ],
+      "material": "fiberglass",
+      "role": "Attitude determination and control board that reads sun and magnetic sensors and drives torque rods.",
+      "connections": [
+        "backplane",
+        "standoff_fr",
+        "standoff_fl",
+        "standoff_rr",
+        "standoff_rl",
+        "torque_rod_x",
+        "torque_rod_z",
+        "adacs_edge_connector"
+      ]
+    },
+    {
+      "id": "adacs_edge_connector",
+      "name": "ADACS Backplane Connector",
+      "shape": "box",
+      "position": [
+        0,
+        0.045,
+        -0.032
+      ],
+      "size": [
+        0.054,
+        0.006,
+        0.004
+      ],
+      "material": "brass",
+      "role": "Board-edge connector that carries sensor and magnetorquer signals between the ADACS card and backplane.",
+      "connections": [
+        "adacs_card",
+        "backplane"
+      ]
+    },
+    {
+      "id": "torque_rod_x",
+      "name": "X-Axis Torque Rod",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.048,
+        0.023
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.002,
+        0.052
+      ],
+      "material": "copper",
+      "role": "Magnetorquer coil core aligned along X to exchange angular momentum with Earth's magnetic field.",
+      "connections": [
+        "adacs_card"
+      ]
+    },
+    {
+      "id": "torque_rod_z",
+      "name": "Z-Axis Torque Rod",
+      "shape": "cylinder",
+      "position": [
+        0.026,
+        0.048,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.002,
+        0.052
+      ],
+      "material": "copper",
+      "role": "Magnetorquer coil core aligned along Z for coarse magnetic attitude control.",
+      "connections": [
+        "adacs_card"
+      ]
+    },
+    {
+      "id": "obc_card",
+      "name": "On-Board Computer PC/104 Card",
+      "shape": "box",
+      "position": [
+        0,
+        0.057,
+        0.004
+      ],
+      "size": [
+        0.082,
+        0.004,
+        0.07
+      ],
+      "material": "fiberglass",
+      "role": "Flight computer board that runs command, telemetry, and payload software for the OreSat0 bus.",
+      "connections": [
+        "backplane",
+        "standoff_fr",
+        "standoff_fl",
+        "standoff_rr",
+        "standoff_rl",
+        "obc_processor",
+        "obc_edge_connector"
+      ]
+    },
+    {
+      "id": "obc_edge_connector",
+      "name": "OBC Backplane Connector",
+      "shape": "box",
+      "position": [
+        0,
+        0.059,
+        -0.032
+      ],
+      "size": [
+        0.054,
+        0.006,
+        0.004
+      ],
+      "material": "brass",
+      "role": "Board-edge connector that links the on-board computer to the shared backplane bus.",
+      "connections": [
+        "obc_card",
+        "backplane"
+      ]
+    },
+    {
+      "id": "obc_processor",
+      "name": "OBC Processor Package",
+      "shape": "box",
+      "position": [
+        -0.012,
+        0.061,
+        0.014
+      ],
+      "size": [
+        0.018,
+        0.003,
+        0.018
+      ],
+      "material": "black composite",
+      "role": "Main integrated-circuit package on the OBC board, shown as the central computer component.",
+      "connections": [
+        "obc_card"
+      ]
+    },
+    {
+      "id": "comms_card",
+      "name": "UHF Communications PC/104 Card",
+      "shape": "box",
+      "position": [
+        0,
+        0.071,
+        0.004
+      ],
+      "size": [
+        0.082,
+        0.004,
+        0.07
+      ],
+      "material": "fiberglass",
+      "role": "Top PC/104 radio board that drives the UHF monopole antenna through the top feedthrough.",
+      "connections": [
+        "backplane",
+        "standoff_fr",
+        "standoff_fl",
+        "standoff_rr",
+        "standoff_rl",
+        "radio_module",
+        "antenna_base",
+        "comms_edge_connector"
+      ]
+    },
+    {
+      "id": "comms_edge_connector",
+      "name": "Comms Backplane Connector",
+      "shape": "box",
+      "position": [
+        0,
+        0.073,
+        -0.032
+      ],
+      "size": [
+        0.054,
+        0.006,
+        0.004
+      ],
+      "material": "brass",
+      "role": "Board-edge connector that carries UHF radio power and data to the backplane.",
+      "connections": [
+        "comms_card",
+        "backplane"
+      ]
+    },
+    {
+      "id": "radio_module",
+      "name": "UHF Radio Module",
+      "shape": "box",
+      "position": [
+        0.018,
+        0.075,
+        0.013
+      ],
+      "size": [
+        0.022,
+        0.004,
+        0.016
+      ],
+      "material": "brushed steel",
+      "role": "Shielded RF module on the communications card that produces the UHF downlink and uplink carrier.",
+      "connections": [
+        "comms_card"
+      ]
+    },
+    {
+      "id": "body_solar_starboard",
+      "name": "Body Solar Panel (-Z)",
+      "shape": "box",
+      "position": [
+        0,
+        0.05,
+        -0.052
+      ],
+      "size": [
+        0.092,
+        0.084,
+        0.003
+      ],
+      "material": "glass display",
+      "role": "Fixed -Z solar panel bonded flush to the side frame to charge the battery while preserving the CubeSat envelope.",
+      "connections": [
+        "cross_starboard_low",
+        "cross_starboard_high",
+        "starboard_cell_upper",
+        "starboard_cell_lower"
+      ]
+    },
+    {
+      "id": "starboard_cell_upper",
+      "name": "-Z Upper Solar Cell String",
+      "shape": "box",
+      "position": [
+        0,
+        0.068,
+        -0.054
+      ],
+      "size": [
+        0.078,
+        0.026,
+        0.001
+      ],
+      "material": "glass display",
+      "role": "Upper photovoltaic cell string on the fixed -Z body panel.",
+      "connections": [
+        "body_solar_starboard"
+      ]
+    },
+    {
+      "id": "starboard_cell_lower",
+      "name": "-Z Lower Solar Cell String",
+      "shape": "box",
+      "position": [
+        0,
+        0.032,
+        -0.054
+      ],
+      "size": [
+        0.078,
+        0.026,
+        0.001
+      ],
+      "material": "glass display",
+      "role": "Lower photovoltaic cell string on the fixed -Z body panel.",
+      "connections": [
+        "body_solar_starboard"
+      ]
+    },
+    {
+      "id": "body_solar_port_exploded",
+      "name": "Exploded Body Solar Panel (+Z)",
+      "shape": "box",
+      "position": [
+        0,
+        0.05,
+        0.097
+      ],
+      "size": [
+        0.092,
+        0.084,
+        0.003
+      ],
+      "material": "glass display",
+      "role": "The +Z body solar panel is offset outward as an exploded part so the internal backplane and PC/104 boards remain visible.",
+      "connections": [
+        "rail_fr",
+        "rail_rr",
+        "cross_port_high",
+        "port_cutaway_outline",
+        "port_panel_service_spacer_a",
+        "port_panel_service_spacer_b",
+        "camera_barrel",
+        "port_cell_upper",
+        "port_cell_lower"
+      ]
+    },
+    {
+      "id": "port_panel_service_spacer_a",
+      "name": "+Z Exploded Panel Spacer A",
+      "shape": "cylinder",
+      "position": [
+        0.035,
+        0.05,
+        0.072
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.0012,
+        0.044
+      ],
+      "material": "brushed steel",
+      "role": "Temporary exploded-view spacer that shows the real mounting offset direction from the +Z frame.",
+      "connections": [
+        "body_solar_port_exploded",
+        "rail_fr"
+      ]
+    },
+    {
+      "id": "port_panel_service_spacer_b",
+      "name": "+Z Exploded Panel Spacer B",
+      "shape": "cylinder",
+      "position": [
+        -0.035,
+        0.05,
+        0.072
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.0012,
+        0.044
+      ],
+      "material": "brushed steel",
+      "role": "Second exploded-view spacer that keeps the +Z body panel aligned with its original side face.",
+      "connections": [
+        "body_solar_port_exploded",
+        "rail_rr"
+      ]
+    },
+    {
+      "id": "port_cell_upper",
+      "name": "+Z Upper Solar Cell String",
+      "shape": "box",
+      "position": [
+        0,
+        0.068,
+        0.099
+      ],
+      "size": [
+        0.078,
+        0.026,
+        0.001
+      ],
+      "material": "glass display",
+      "role": "Upper photovoltaic cell string on the exploded +Z body panel.",
+      "connections": [
+        "body_solar_port_exploded"
+      ]
+    },
+    {
+      "id": "port_cell_lower",
+      "name": "+Z Lower Solar Cell String",
+      "shape": "box",
+      "position": [
+        0,
+        0.032,
+        0.099
+      ],
+      "size": [
+        0.078,
+        0.026,
+        0.001
+      ],
+      "material": "glass display",
+      "role": "Lower photovoltaic cell string on the exploded +Z body panel.",
+      "connections": [
+        "body_solar_port_exploded"
+      ]
+    },
+    {
+      "id": "camera_barrel",
+      "name": "CMOS Camera Barrel",
+      "shape": "cylinder",
+      "position": [
+        0.018,
+        0.05,
+        0.102
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.006,
+        0.008
+      ],
+      "material": "black composite",
+      "role": "Short camera barrel protruding through the +Z solar panel for the OreSat0 technology-demonstration imager.",
+      "connections": [
+        "body_solar_port_exploded",
+        "camera_lens"
+      ]
+    },
+    {
+      "id": "camera_lens",
+      "name": "CMOS Camera Lens Glass",
+      "shape": "cylinder",
+      "position": [
+        0.018,
+        0.05,
+        0.107
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.004,
+        0.002
+      ],
+      "material": "glass display",
+      "role": "Visible glass lens at the end of the camera barrel.",
+      "connections": [
+        "camera_barrel"
+      ]
+    },
+    {
+      "id": "hinge_front_rod",
+      "name": "+X Deployable Panel Hinge Rod",
+      "shape": "cylinder",
+      "position": [
+        0.054,
+        0.088,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.002,
+        0.086
+      ],
+      "material": "brushed steel",
+      "role": "Steel hinge pin spanning the +X top edge and allowing the front solar panel to rotate outward.",
+      "connections": [
+        "rail_fr",
+        "rail_fl",
+        "hinge_front_left_bracket",
+        "hinge_front_right_bracket",
+        "deploy_panel_front"
+      ]
+    },
+    {
+      "id": "hinge_front_left_bracket",
+      "name": "+X Hinge Bracket +Z",
+      "shape": "box",
+      "position": [
+        0.052,
+        0.084,
+        0.036
+      ],
+      "size": [
+        0.006,
+        0.008,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Small hinge lug bolted to the +Z end of the +X upper cross rail.",
+      "connections": [
+        "cross_front_high",
+        "hinge_front_rod"
+      ]
+    },
+    {
+      "id": "hinge_front_right_bracket",
+      "name": "+X Hinge Bracket -Z",
+      "shape": "box",
+      "position": [
+        0.052,
+        0.084,
+        -0.036
+      ],
+      "size": [
+        0.006,
+        0.008,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Small hinge lug bolted to the -Z end of the +X upper cross rail.",
+      "connections": [
+        "cross_front_high",
+        "hinge_front_rod"
+      ]
+    },
+    {
+      "id": "deploy_panel_front",
+      "name": "Deployed Solar Panel (+X)",
+      "shape": "box",
+      "position": [
+        0.104,
+        0.05,
+        0
+      ],
+      "size": [
+        0.098,
+        0.003,
+        0.094
+      ],
+      "material": "glass display",
+      "role": "Front solar wing shown deployed 90 degrees outward from the +X face to expose its photovoltaic area.",
+      "connections": [
+        "hinge_front_rod",
+        "front_panel_cell_a",
+        "front_panel_cell_b",
+        "burn_wire_front"
+      ]
+    },
+    {
+      "id": "front_panel_cell_a",
+      "name": "+X Deployed Panel Cell A",
+      "shape": "box",
+      "position": [
+        0.08,
+        0.052,
+        0
+      ],
+      "size": [
+        0.036,
+        0.001,
+        0.078
+      ],
+      "material": "glass display",
+      "role": "Inner photovoltaic cell strip on the deployed +X solar wing.",
+      "connections": [
+        "deploy_panel_front"
+      ]
+    },
+    {
+      "id": "front_panel_cell_b",
+      "name": "+X Deployed Panel Cell B",
+      "shape": "box",
+      "position": [
+        0.128,
+        0.052,
+        0
+      ],
+      "size": [
+        0.036,
+        0.001,
+        0.078
+      ],
+      "material": "glass display",
+      "role": "Outer photovoltaic cell strip on the deployed +X solar wing.",
+      "connections": [
+        "deploy_panel_front"
+      ]
+    },
+    {
+      "id": "burn_wire_front",
+      "name": "+X Burn-Wire Retainer",
+      "shape": "cylinder",
+      "position": [
+        0.056,
+        0.092,
+        0.02
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.001,
+        0.018
+      ],
+      "material": "copper",
+      "role": "Resistive burn-wire loop that releases the spring-loaded +X deployable panel after orbit insertion.",
+      "connections": [
+        "deploy_panel_front",
+        "hinge_front_rod"
+      ]
+    },
+    {
+      "id": "hinge_rear_rod",
+      "name": "-X Deployable Panel Hinge Rod",
+      "shape": "cylinder",
+      "position": [
+        -0.054,
+        0.088,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.002,
+        0.086
+      ],
+      "material": "brushed steel",
+      "role": "Steel hinge pin spanning the -X top edge for the rear deployed solar panel.",
+      "connections": [
+        "rail_rr",
+        "rail_rl",
+        "hinge_rear_left_bracket",
+        "hinge_rear_right_bracket",
+        "deploy_panel_rear"
+      ]
+    },
+    {
+      "id": "hinge_rear_left_bracket",
+      "name": "-X Hinge Bracket +Z",
+      "shape": "box",
+      "position": [
+        -0.052,
+        0.084,
+        0.036
+      ],
+      "size": [
+        0.006,
+        0.008,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Small hinge lug bolted to the +Z end of the -X upper cross rail.",
+      "connections": [
+        "cross_rear_high",
+        "hinge_rear_rod"
+      ]
+    },
+    {
+      "id": "hinge_rear_right_bracket",
+      "name": "-X Hinge Bracket -Z",
+      "shape": "box",
+      "position": [
+        -0.052,
+        0.084,
+        -0.036
+      ],
+      "size": [
+        0.006,
+        0.008,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Small hinge lug bolted to the -Z end of the -X upper cross rail.",
+      "connections": [
+        "cross_rear_high",
+        "hinge_rear_rod"
+      ]
+    },
+    {
+      "id": "deploy_panel_rear",
+      "name": "Deployed Solar Panel (-X)",
+      "shape": "box",
+      "position": [
+        -0.104,
+        0.05,
+        0
+      ],
+      "size": [
+        0.098,
+        0.003,
+        0.094
+      ],
+      "material": "glass display",
+      "role": "Rear solar wing shown deployed 90 degrees outward from the -X face.",
+      "connections": [
+        "hinge_rear_rod",
+        "rear_panel_cell_a",
+        "rear_panel_cell_b",
+        "burn_wire_rear"
+      ]
+    },
+    {
+      "id": "rear_panel_cell_a",
+      "name": "-X Deployed Panel Cell A",
+      "shape": "box",
+      "position": [
+        -0.08,
+        0.052,
+        0
+      ],
+      "size": [
+        0.036,
+        0.001,
+        0.078
+      ],
+      "material": "glass display",
+      "role": "Inner photovoltaic cell strip on the deployed -X solar wing.",
+      "connections": [
+        "deploy_panel_rear"
+      ]
+    },
+    {
+      "id": "rear_panel_cell_b",
+      "name": "-X Deployed Panel Cell B",
+      "shape": "box",
+      "position": [
+        -0.128,
+        0.052,
+        0
+      ],
+      "size": [
+        0.036,
+        0.001,
+        0.078
+      ],
+      "material": "glass display",
+      "role": "Outer photovoltaic cell strip on the deployed -X solar wing.",
+      "connections": [
+        "deploy_panel_rear"
+      ]
+    },
+    {
+      "id": "burn_wire_rear",
+      "name": "-X Burn-Wire Retainer",
+      "shape": "cylinder",
+      "position": [
+        -0.056,
+        0.092,
+        -0.02
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.001,
+        0.018
+      ],
+      "material": "copper",
+      "role": "Resistive burn-wire loop that releases the -X deployed solar panel.",
+      "connections": [
+        "deploy_panel_rear",
+        "hinge_rear_rod"
+      ]
+    },
+    {
+      "id": "antenna_base",
+      "name": "UHF Antenna Base",
+      "shape": "cylinder",
+      "position": [
+        0.024,
+        0.108,
+        0.024
+      ],
+      "size": [
+        0.005,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Feedthrough and spring base that anchors the deployed UHF monopole to the top instrument island.",
+      "connections": [
+        "top_instrument_island",
+        "comms_card",
+        "uhf_antenna"
+      ]
+    },
+    {
+      "id": "uhf_antenna",
+      "name": "UHF Whip Antenna",
+      "shape": "cylinder",
+      "position": [
+        0.024,
+        0.202,
+        0.024
+      ],
+      "size": [
+        0.0015,
+        0.18
+      ],
+      "material": "brushed steel",
+      "role": "Straight deployed monopole whip used for UHF communications after release from the dispenser.",
+      "connections": [
+        "antenna_base"
+      ]
+    },
+    {
+      "id": "sun_sensor",
+      "name": "Coarse Sun Sensor",
+      "shape": "box",
+      "position": [
+        0.024,
+        0.106,
+        -0.006
+      ],
+      "size": [
+        0.012,
+        0.004,
+        0.012
+      ],
+      "material": "glass display",
+      "role": "Photodiode sun sensor on the top island that provides coarse attitude information to the ADACS card.",
+      "connections": [
+        "top_instrument_island",
+        "adacs_card"
+      ]
+    },
+    {
+      "id": "magnetometer",
+      "name": "Top Magnetometer",
+      "shape": "box",
+      "position": [
+        -0.002,
+        0.106,
+        0.018
+      ],
+      "size": [
+        0.01,
+        0.004,
+        0.01
+      ],
+      "material": "black composite",
+      "role": "Three-axis magnetic field sensor on the top island used by the ADACS board for coarse pointing.",
+      "connections": [
+        "top_instrument_island",
+        "adacs_card"
+      ]
+    },
+    {
+      "id": "deploy_switch_body",
+      "name": "Deployment Switch Body",
+      "shape": "box",
+      "position": [
+        -0.052,
+        0.012,
+        -0.052
+      ],
+      "size": [
+        0.01,
+        0.014,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Limit-switch housing fixed to the lower rear-starboard rail corner and pressed by the dispenser wall before ejection.",
+      "connections": [
+        "rail_rl",
+        "deploy_switch_plunger"
+      ]
+    },
+    {
+      "id": "deploy_switch_plunger",
+      "name": "Deployment Switch Plunger",
+      "shape": "cylinder",
+      "position": [
+        -0.052,
+        0.006,
+        -0.058
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.002,
+        0.01
+      ],
+      "material": "brushed steel",
+      "role": "Spring plunger that pops out when the CubeSat leaves the P-POD and arms the spacecraft electronics.",
+      "connections": [
+        "deploy_switch_body"
+      ]
+    }
   ]
 }

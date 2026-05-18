@@ -1,10 +1,14 @@
 {
   "machine_name": "OpenROV 2.8 Underwater Drone",
-  "assembly_instructions": "Tethered DIY ROV built on two parallel laser-cut acrylic plates (top + bottom) held apart by four vertical aluminum standoffs at the corners. Between the plates: three transparent acrylic pressure vessels — a central electronics tube and two smaller battery tubes on either side — each sealed with machined endcaps. Three brushless thrusters drive the vehicle: two rear-facing horizontal thrusters (port + starboard) for surge/yaw and one vertical thruster in the centerline for heave; each has a printed propeller. A forward camera module and three LED lights ride on the front of the top plate. A neutrally-buoyant tether exits through a printed strain-relief on the top plate. A steel trim/ballast weight hangs below the bottom plate. The BeagleBone + cape controller is shown on top of the central tube for inspectability (physically it lives inside the e-tube).",
+  "assembly_instructions": "1. Laser-cut the upper and lower acrylic frame as eight side rail strips plus four cross rails, keeping the central bay open for the vertical thruster and the three pressure vessels. 2. Bolt the four 100 mm aluminum standoffs between matching top and bottom rail corners, then add the visible rail bolts at the front and rear crossmembers. 3. Fit the black saddle blocks and clamp straps, then install the 100 mm outside-diameter electronics tube on the centerline with front and rear aluminum endcaps, O-ring bands and endcap screws. 4. Install the two 60 mm outside-diameter battery tubes outboard of the electronics tube, fit their four aluminum endcaps, and fasten the front and rear tube clamps to the top rails. 5. Assemble each rear horizontal thruster from a printed bracket, annular duct ring, motor capsule, propeller hub and two pitched blades, then bolt the port and starboard thrusters to the rear lower cross rail with diagonal struts. 6. Assemble the vertical heave thruster from its torus duct, motor pod, hub, two blades and four support struts, then suspend it in the open middle bay between the upper and lower cross rails. 7. Mount the camera tilt-servo bracket on the front top cross rail, install the servo axle, forward CMOS camera, glass lens, three LED bezels and three LED lamps. 8. Install the tether penetrator in the rear electronics endcap, clamp the printed strain-relief boot to the rear top cross rail, then route the rubber tether upward and aft. 9. Hang the steel trim ballast below the lower frame using the two threaded rods, leaving its lower face just above the ground plane and trimming mass until the vehicle is close to neutral buoyancy. 10. For this scene's X-ray inspection, place the BeagleBone Black, OpenROV cape, IMU board and all twelve C-cell battery cylinders in exploded stacks directly above their real pressure vessels; in the physical vehicle these components slide inside the sealed tubes.",
   "metadata": {
     "reference": "https://github.com/OpenROV/openrov-hardware",
     "domain": "underwater-robotics",
-    "thumbnail_camera": [0.6, 0.4, 0.6],
+    "thumbnail_camera": [
+      0.6,
+      0.4,
+      0.6
+    ],
     "info": {
       "japanese_name": "OpenROV 2.8 水中ドローン",
       "english_name": "OpenROV 2.8 Open-Source Underwater ROV",
@@ -16,56 +20,2623 @@
       "contract_value": "≈US$900 kit; ≈US$1,500 assembled",
       "status": "Classic 2.x production ended; superseded by Trident. Open-hardware designs remain public.",
       "facts": [
-        { "label": "Footprint",       "value": "≈0.30 m × 0.20 m × 0.15 m" },
-        { "label": "Depth rating",    "value": "≈100 m" },
-        { "label": "Chassis",         "value": "Two parallel laser-cut acrylic plates + four aluminum standoffs" },
-        { "label": "Pressure vessels","value": "1 × central electronics tube + 2 × battery tubes, acrylic with machined endcaps" },
-        { "label": "Thrusters",       "value": "3 × brushless (2 rear horizontal + 1 center vertical)" },
-        { "label": "Imaging",         "value": "Forward CMOS camera on a tilt servo + 3 × LED" },
-        { "label": "Tether",          "value": "Neutrally buoyant twisted-pair, Ethernet-over-powerline" },
-        { "label": "License",         "value": "CC BY-NC-SA 4.0 (hardware + software)" }
+        {
+          "label": "Overall footprint",
+          "value": "≈0.32 m long × 0.24 m wide × 0.15 m tall excluding tether and exploded inspection parts"
+        },
+        {
+          "label": "Depth rating",
+          "value": "≈100 m nominal operating depth for the sealed acrylic pressure vessels"
+        },
+        {
+          "label": "Plate spacing",
+          "value": "≈0.10 m between 6 mm laser-cut acrylic upper and lower rail planes"
+        },
+        {
+          "label": "Electronics tube",
+          "value": "≈0.10 m outside diameter × 0.22 m long acrylic pressure vessel on the centerline"
+        },
+        {
+          "label": "Battery tubes",
+          "value": "2 × ≈0.06 m outside diameter × 0.18 m long acrylic side pressure vessels at about ±0.095 m lateral offset"
+        },
+        {
+          "label": "Battery cells",
+          "value": "12 visible C-cell cylinders in the exploded view, arranged as six cells per side pack"
+        },
+        {
+          "label": "Thrusters",
+          "value": "3 × brushless thrusters: 2 horizontal rear units plus 1 vertical center heave unit"
+        },
+        {
+          "label": "Imaging",
+          "value": "Forward CMOS camera on tilt servo with 3 LED lamps and separate front lens"
+        },
+        {
+          "label": "Tether",
+          "value": "Neutrally buoyant twisted pair carrying Ethernet-over-powerline through a rear strain-relief boot"
+        },
+        {
+          "label": "Runtime",
+          "value": "Typical internal C-cell pack runtime about 2–3 hours"
+        }
       ],
       "sources": [
-        { "title": "OpenROV hardware repository (GitHub)",      "url": "https://github.com/OpenROV/openrov-hardware" },
-        { "title": "OpenROV 2.8 product & build reference",     "url": "https://www.openrov.com/products/openrov28/" },
-        { "title": "Sofar Ocean — successor platform (Trident)","url": "https://www.sofarocean.com/products/trident" }
+        {
+          "title": "OpenROV hardware repository (GitHub)",
+          "url": "https://github.com/OpenROV/openrov-hardware"
+        },
+        {
+          "title": "OpenROV 2.8 product & build reference",
+          "url": "https://www.openrov.com/products/openrov28/"
+        },
+        {
+          "title": "OpenROV project documentation archive",
+          "url": "https://openrov.dozuki.com/"
+        },
+        {
+          "title": "Sofar Ocean — successor platform (Trident)",
+          "url": "https://www.sofarocean.com/products/trident"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "top_plate",        "name": "Top Acrylic Plate",            "shape": "box",      "position": [0, 0.20, 0],                                     "size": [0.30, 0.008, 0.20], "material": "glass display",       "role": "Laser-cut 6 mm acrylic top plate — mounts the camera, LED array, tether strain relief, and the thrusters/tubes below.", "connections": ["standoff_fl", "standoff_fr", "standoff_rl", "standoff_rr", "e_tube", "battery_tube_port", "battery_tube_stbd", "camera", "led_port", "led_center", "led_stbd", "tether_strain", "thruster_vert", "control_board"] },
-    { "id": "bottom_plate",     "name": "Bottom Acrylic Plate",         "shape": "box",      "position": [0, 0.10, 0],                                     "size": [0.30, 0.008, 0.20], "material": "glass display",       "role": "Laser-cut 6 mm acrylic bottom plate — other face of the open twin-plate chassis, holds the ballast weight.", "connections": ["standoff_fl", "standoff_fr", "standoff_rl", "standoff_rr", "ballast", "thruster_vert"] },
-
-    { "id": "standoff_fl",      "name": "Aluminum Standoff (Fwd-Left)", "shape": "cylinder", "position": [ 0.13, 0.15, 0.08],                             "size": [0.006, 0.10], "material": "brushed steel",             "role": "Front-left aluminum standoff spacing the two plates.", "connections": ["top_plate", "bottom_plate"] },
-    { "id": "standoff_fr",      "name": "Aluminum Standoff (Fwd-Right)","shape": "cylinder", "position": [ 0.13, 0.15, -0.08],                            "size": [0.006, 0.10], "material": "brushed steel",             "role": "Front-right standoff.", "connections": ["top_plate", "bottom_plate"] },
-    { "id": "standoff_rl",      "name": "Aluminum Standoff (Rear-Left)","shape": "cylinder", "position": [-0.13, 0.15, 0.08],                             "size": [0.006, 0.10], "material": "brushed steel",             "role": "Rear-left standoff.", "connections": ["top_plate", "bottom_plate"] },
-    { "id": "standoff_rr",      "name": "Aluminum Standoff (Rear-Right)","shape": "cylinder", "position": [-0.13, 0.15, -0.08],                           "size": [0.006, 0.10], "material": "brushed steel",             "role": "Rear-right standoff.", "connections": ["top_plate", "bottom_plate"] },
-
-    { "id": "e_tube",           "name": "Electronics Tube (central)",   "shape": "cylinder", "position": [0, 0.15, 0],  "rotation": [0, 0, 1.5708],       "size": [0.050, 0.22], "material": "glass display",             "role": "Central watertight acrylic tube housing the BeagleBone Black + OpenROV cape + tilt servo.", "connections": ["top_plate", "e_endcap_front", "e_endcap_rear"] },
-    { "id": "e_endcap_front",   "name": "E-Tube Endcap (Front)",         "shape": "cylinder", "position": [0.12, 0.15, 0], "rotation": [0, 0, 1.5708],      "size": [0.053, 0.02], "material": "dark anodized aluminum",   "role": "Machined front endcap sealing the electronics tube.", "connections": ["e_tube"] },
-    { "id": "e_endcap_rear",    "name": "E-Tube Endcap (Rear)",          "shape": "cylinder", "position": [-0.12, 0.15, 0],"rotation": [0, 0, 1.5708],      "size": [0.053, 0.02], "material": "dark anodized aluminum",   "role": "Machined rear endcap sealing the electronics tube.", "connections": ["e_tube"] },
-
-    { "id": "battery_tube_port","name": "Battery Tube (Port)",           "shape": "cylinder", "position": [0, 0.15, 0.07], "rotation": [0, 0, 1.5708],      "size": [0.030, 0.18], "material": "glass display",            "role": "Port-side watertight acrylic battery tube. Carries C-cells for the port power channel.", "connections": ["top_plate", "batt_endcap_port_front"] },
-    { "id": "battery_tube_stbd","name": "Battery Tube (Starboard)",      "shape": "cylinder", "position": [0, 0.15, -0.07],"rotation": [0, 0, 1.5708],      "size": [0.030, 0.18], "material": "glass display",            "role": "Starboard-side battery tube.", "connections": ["top_plate", "batt_endcap_stbd_front"] },
-    { "id": "batt_endcap_port_front","name": "Battery Endcap (Port, Front)","shape": "cylinder","position": [0.10, 0.15, 0.07], "rotation": [0, 0, 1.5708],"size": [0.033, 0.02], "material": "dark anodized aluminum",  "role": "Front endcap on the port battery tube (rear endcap identical and implicit).", "connections": ["battery_tube_port"] },
-    { "id": "batt_endcap_stbd_front","name": "Battery Endcap (Stbd, Front)","shape": "cylinder","position": [0.10, 0.15, -0.07],"rotation": [0, 0, 1.5708],"size": [0.033, 0.02], "material": "dark anodized aluminum",  "role": "Front endcap on the starboard battery tube.", "connections": ["battery_tube_stbd"] },
-
-    { "id": "thruster_port",    "name": "Thruster (Rear Port, horizontal)","shape": "cylinder","position": [-0.18, 0.15, 0.10],"rotation": [0, 0, 1.5708],  "size": [0.025, 0.06], "material": "dark anodized aluminum",    "role": "Rear horizontal brushless thruster, port side — generates surge/yaw.", "connections": ["prop_port", "e_tube"] },
-    { "id": "thruster_stbd",    "name": "Thruster (Rear Starboard, horizontal)","shape": "cylinder","position": [-0.18, 0.15, -0.10],"rotation": [0, 0, 1.5708], "size": [0.025, 0.06], "material": "dark anodized aluminum", "role": "Rear horizontal brushless thruster, starboard side.", "connections": ["prop_stbd", "e_tube"] },
-    { "id": "thruster_vert",    "name": "Thruster (Center, vertical)",   "shape": "cylinder", "position": [0.02, 0.15, 0],                                 "size": [0.025, 0.08], "material": "dark anodized aluminum",    "role": "Center vertical brushless thruster — generates heave (up/down).", "connections": ["prop_vert", "top_plate", "bottom_plate"] },
-    { "id": "prop_port",        "name": "Propeller (Port)",              "shape": "cylinder", "position": [-0.22, 0.15, 0.10],"rotation": [0, 0, 1.5708],   "size": [0.035, 0.010],"material": "white composite",           "role": "Small printed propeller on the port thruster.", "connections": ["thruster_port"] },
-    { "id": "prop_stbd",        "name": "Propeller (Starboard)",         "shape": "cylinder", "position": [-0.22, 0.15, -0.10],"rotation": [0, 0, 1.5708],  "size": [0.035, 0.010],"material": "white composite",           "role": "Propeller on the starboard thruster.", "connections": ["thruster_stbd"] },
-    { "id": "prop_vert",        "name": "Propeller (Vertical)",          "shape": "cylinder", "position": [0.02, 0.205, 0],                                "size": [0.035, 0.010],"material": "white composite",           "role": "Propeller on the vertical thruster.", "connections": ["thruster_vert"] },
-
-    { "id": "camera",           "name": "Forward CMOS Camera",           "shape": "box",      "position": [0.14, 0.205, 0],                                "size": [0.025, 0.025, 0.03], "material": "black composite",    "role": "Forward-facing CMOS camera on a tilt servo (above the top plate, front).", "connections": ["top_plate"] },
-    { "id": "led_port",         "name": "LED Light (Port)",              "shape": "cylinder", "position": [0.14, 0.210, 0.05], "rotation": [0, 0, 1.5708], "size": [0.008, 0.015],"material": "glass display",             "role": "One of three high-output LEDs alongside the camera.", "connections": ["top_plate", "camera"] },
-    { "id": "led_center",       "name": "LED Light (Center)",            "shape": "cylinder", "position": [0.14, 0.210, 0],    "rotation": [0, 0, 1.5708], "size": [0.008, 0.015],"material": "glass display",             "role": "Center LED.", "connections": ["top_plate", "camera"] },
-    { "id": "led_stbd",         "name": "LED Light (Starboard)",         "shape": "cylinder", "position": [0.14, 0.210, -0.05],"rotation": [0, 0, 1.5708], "size": [0.008, 0.015],"material": "glass display",             "role": "Starboard LED.", "connections": ["top_plate", "camera"] },
-
-    { "id": "tether_strain",    "name": "Tether Strain Relief",          "shape": "cylinder", "position": [-0.13, 0.22, 0],                                "size": [0.015, 0.03], "material": "white composite",           "role": "Printed strain-relief boot where the tether clamps to the top plate.", "connections": ["top_plate", "tether"] },
-    { "id": "tether",           "name": "Tether Cable",                  "shape": "cylinder", "position": [-0.13, 0.45, 0],                                "size": [0.006, 0.42], "material": "rubber",                    "role": "Neutrally-buoyant twisted-pair tether. Carries Ethernet-over-powerline to a topside router and laptop.", "connections": ["tether_strain"] },
-
-    { "id": "control_board",    "name": "BeagleBone + Cape (shown)",     "shape": "box",      "position": [0, 0.225, 0],                                    "size": [0.09, 0.010, 0.06], "material": "dark anodized aluminum","role": "BeagleBone Black + custom OpenROV cape running the Cockpit stack. Physically lives inside the e-tube; rendered on top for inspectability.", "connections": ["top_plate"] },
-    { "id": "ballast",          "name": "Trim Ballast Weight",           "shape": "box",      "position": [0, 0.085, 0],                                    "size": [0.06, 0.015, 0.08], "material": "forged steel",         "role": "Small steel bar under the bottom plate, trimmed to set neutral buoyancy.", "connections": ["bottom_plate"] }
+    {
+      "id": "top_rail_port_outer",
+      "name": "Top Port Outer Acrylic Rail Strip",
+      "shape": "box",
+      "position": [
+        0,
+        0.2,
+        0.123
+      ],
+      "size": [
+        0.3,
+        0.008,
+        0.014
+      ],
+      "material": "glass display",
+      "role": "Outer laser-cut top port rail strip forming the visible open side of the upper acrylic chassis.",
+      "connections": [
+        "top_cross_front",
+        "top_cross_rear",
+        "standoff_fl",
+        "standoff_rl",
+        "battery_clamp_port_front",
+        "battery_clamp_port_rear"
+      ]
+    },
+    {
+      "id": "top_rail_port_inner",
+      "name": "Top Port Inner Acrylic Rail Strip",
+      "shape": "box",
+      "position": [
+        0,
+        0.2,
+        0.093
+      ],
+      "size": [
+        0.245,
+        0.008,
+        0.01
+      ],
+      "material": "glass display",
+      "role": "Inner top port rail strip approximating the laser-cut opening beside the port battery tube.",
+      "connections": [
+        "top_cross_front",
+        "top_cross_rear",
+        "battery_clamp_port_front",
+        "battery_clamp_port_rear"
+      ]
+    },
+    {
+      "id": "top_rail_stbd_outer",
+      "name": "Top Starboard Outer Acrylic Rail Strip",
+      "shape": "box",
+      "position": [
+        0,
+        0.2,
+        -0.123
+      ],
+      "size": [
+        0.3,
+        0.008,
+        0.014
+      ],
+      "material": "glass display",
+      "role": "Outer laser-cut top starboard rail strip forming the opposite visible side of the upper chassis.",
+      "connections": [
+        "top_cross_front",
+        "top_cross_rear",
+        "standoff_fr",
+        "standoff_rr",
+        "battery_clamp_stbd_front",
+        "battery_clamp_stbd_rear"
+      ]
+    },
+    {
+      "id": "top_rail_stbd_inner",
+      "name": "Top Starboard Inner Acrylic Rail Strip",
+      "shape": "box",
+      "position": [
+        0,
+        0.2,
+        -0.093
+      ],
+      "size": [
+        0.245,
+        0.008,
+        0.01
+      ],
+      "material": "glass display",
+      "role": "Inner top starboard rail strip preserving a visible opening around the starboard battery tube.",
+      "connections": [
+        "top_cross_front",
+        "top_cross_rear",
+        "battery_clamp_stbd_front",
+        "battery_clamp_stbd_rear"
+      ]
+    },
+    {
+      "id": "top_cross_front",
+      "name": "Top Front Acrylic Cross Rail",
+      "shape": "box",
+      "position": [
+        0.13,
+        0.2,
+        0
+      ],
+      "size": [
+        0.035,
+        0.008,
+        0.255
+      ],
+      "material": "glass display",
+      "role": "Front upper cross rail tying the side strips together and carrying the camera, LEDs and vertical-thruster struts.",
+      "connections": [
+        "top_rail_port_outer",
+        "top_rail_port_inner",
+        "top_rail_stbd_outer",
+        "top_rail_stbd_inner",
+        "camera_servo_bracket",
+        "led_port",
+        "led_center",
+        "led_stbd",
+        "vert_strut_upper_front"
+      ]
+    },
+    {
+      "id": "top_cross_rear",
+      "name": "Top Rear Acrylic Cross Rail",
+      "shape": "box",
+      "position": [
+        -0.13,
+        0.2,
+        0
+      ],
+      "size": [
+        0.035,
+        0.008,
+        0.255
+      ],
+      "material": "glass display",
+      "role": "Rear upper cross rail completing the top frame and anchoring the tether strain relief.",
+      "connections": [
+        "top_rail_port_outer",
+        "top_rail_port_inner",
+        "top_rail_stbd_outer",
+        "top_rail_stbd_inner",
+        "tether_strain",
+        "vert_strut_upper_rear"
+      ]
+    },
+    {
+      "id": "bottom_rail_port_outer",
+      "name": "Bottom Port Outer Acrylic Rail Strip",
+      "shape": "box",
+      "position": [
+        0,
+        0.1,
+        0.123
+      ],
+      "size": [
+        0.3,
+        0.008,
+        0.014
+      ],
+      "material": "glass display",
+      "role": "Outer lower port rail strip supporting the side vessel while leaving the bottom bay open.",
+      "connections": [
+        "bottom_cross_front",
+        "bottom_cross_rear",
+        "standoff_fl",
+        "standoff_rl",
+        "ballast_hanger_port"
+      ]
+    },
+    {
+      "id": "bottom_rail_port_inner",
+      "name": "Bottom Port Inner Acrylic Rail Strip",
+      "shape": "box",
+      "position": [
+        0,
+        0.1,
+        0.093
+      ],
+      "size": [
+        0.245,
+        0.008,
+        0.01
+      ],
+      "material": "glass display",
+      "role": "Inner lower port rail strip showing the split laser-cut frame around the pressure vessels.",
+      "connections": [
+        "bottom_cross_front",
+        "bottom_cross_rear",
+        "e_saddle_front",
+        "e_saddle_rear"
+      ]
+    },
+    {
+      "id": "bottom_rail_stbd_outer",
+      "name": "Bottom Starboard Outer Acrylic Rail Strip",
+      "shape": "box",
+      "position": [
+        0,
+        0.1,
+        -0.123
+      ],
+      "size": [
+        0.3,
+        0.008,
+        0.014
+      ],
+      "material": "glass display",
+      "role": "Outer lower starboard rail strip completing the lower open side of the chassis.",
+      "connections": [
+        "bottom_cross_front",
+        "bottom_cross_rear",
+        "standoff_fr",
+        "standoff_rr",
+        "ballast_hanger_stbd"
+      ]
+    },
+    {
+      "id": "bottom_rail_stbd_inner",
+      "name": "Bottom Starboard Inner Acrylic Rail Strip",
+      "shape": "box",
+      "position": [
+        0,
+        0.1,
+        -0.093
+      ],
+      "size": [
+        0.245,
+        0.008,
+        0.01
+      ],
+      "material": "glass display",
+      "role": "Inner lower starboard rail strip exposing the center bay rather than covering it with a plate.",
+      "connections": [
+        "bottom_cross_front",
+        "bottom_cross_rear",
+        "e_saddle_front",
+        "e_saddle_rear"
+      ]
+    },
+    {
+      "id": "bottom_cross_front",
+      "name": "Bottom Front Acrylic Cross Rail",
+      "shape": "box",
+      "position": [
+        0.13,
+        0.1,
+        0
+      ],
+      "size": [
+        0.035,
+        0.008,
+        0.255
+      ],
+      "material": "glass display",
+      "role": "Front lower cross rail fixing the lower side strips and taking the front vertical-thruster support load.",
+      "connections": [
+        "bottom_rail_port_outer",
+        "bottom_rail_port_inner",
+        "bottom_rail_stbd_outer",
+        "bottom_rail_stbd_inner",
+        "standoff_fl",
+        "standoff_fr",
+        "vert_strut_lower_front"
+      ]
+    },
+    {
+      "id": "bottom_cross_rear",
+      "name": "Bottom Rear Acrylic Cross Rail",
+      "shape": "box",
+      "position": [
+        -0.13,
+        0.1,
+        0
+      ],
+      "size": [
+        0.035,
+        0.008,
+        0.255
+      ],
+      "material": "glass display",
+      "role": "Rear lower cross rail fixing the frame and bracing the two horizontal thruster mounts.",
+      "connections": [
+        "bottom_rail_port_outer",
+        "bottom_rail_port_inner",
+        "bottom_rail_stbd_outer",
+        "bottom_rail_stbd_inner",
+        "standoff_rl",
+        "standoff_rr",
+        "thruster_port_mount",
+        "thruster_stbd_mount",
+        "vert_strut_lower_rear"
+      ]
+    },
+    {
+      "id": "standoff_fl",
+      "name": "Aluminum Standoff Front Port",
+      "shape": "cylinder",
+      "position": [
+        0.13,
+        0.15,
+        0.123
+      ],
+      "size": [
+        0.006,
+        0.1
+      ],
+      "material": "brushed steel",
+      "role": "Front port spacer post setting the 100 mm vertical separation between upper and lower acrylic rails.",
+      "connections": [
+        "top_rail_port_outer",
+        "bottom_rail_port_outer",
+        "bottom_cross_front"
+      ]
+    },
+    {
+      "id": "standoff_fr",
+      "name": "Aluminum Standoff Front Starboard",
+      "shape": "cylinder",
+      "position": [
+        0.13,
+        0.15,
+        -0.123
+      ],
+      "size": [
+        0.006,
+        0.1
+      ],
+      "material": "brushed steel",
+      "role": "Front starboard spacer post keeping the frame planes parallel under tube-clamp loads.",
+      "connections": [
+        "top_rail_stbd_outer",
+        "bottom_rail_stbd_outer",
+        "bottom_cross_front"
+      ]
+    },
+    {
+      "id": "standoff_rl",
+      "name": "Aluminum Standoff Rear Port",
+      "shape": "cylinder",
+      "position": [
+        -0.13,
+        0.15,
+        0.123
+      ],
+      "size": [
+        0.006,
+        0.1
+      ],
+      "material": "brushed steel",
+      "role": "Rear port spacer post bolting the top and bottom rail sets into a rigid corner.",
+      "connections": [
+        "top_rail_port_outer",
+        "bottom_rail_port_outer",
+        "bottom_cross_rear"
+      ]
+    },
+    {
+      "id": "standoff_rr",
+      "name": "Aluminum Standoff Rear Starboard",
+      "shape": "cylinder",
+      "position": [
+        -0.13,
+        0.15,
+        -0.123
+      ],
+      "size": [
+        0.006,
+        0.1
+      ],
+      "material": "brushed steel",
+      "role": "Rear starboard spacer post completing the four-post chassis rectangle.",
+      "connections": [
+        "top_rail_stbd_outer",
+        "bottom_rail_stbd_outer",
+        "bottom_cross_rear"
+      ]
+    },
+    {
+      "id": "rail_bolt_front_port",
+      "name": "Front Port Rail Bolt Head",
+      "shape": "cylinder",
+      "position": [
+        0.14,
+        0.207,
+        0.123
+      ],
+      "size": [
+        0.005,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head clamping the top front cross rail to the port rail strip.",
+      "connections": [
+        "top_cross_front",
+        "top_rail_port_outer"
+      ]
+    },
+    {
+      "id": "rail_bolt_front_stbd",
+      "name": "Front Starboard Rail Bolt Head",
+      "shape": "cylinder",
+      "position": [
+        0.14,
+        0.207,
+        -0.123
+      ],
+      "size": [
+        0.005,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head clamping the top front cross rail to the starboard rail strip.",
+      "connections": [
+        "top_cross_front",
+        "top_rail_stbd_outer"
+      ]
+    },
+    {
+      "id": "rail_bolt_rear_port",
+      "name": "Rear Port Rail Bolt Head",
+      "shape": "cylinder",
+      "position": [
+        -0.14,
+        0.207,
+        0.123
+      ],
+      "size": [
+        0.005,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head clamping the top rear cross rail to the port rail strip.",
+      "connections": [
+        "top_cross_rear",
+        "top_rail_port_outer"
+      ]
+    },
+    {
+      "id": "rail_bolt_rear_stbd",
+      "name": "Rear Starboard Rail Bolt Head",
+      "shape": "cylinder",
+      "position": [
+        -0.14,
+        0.207,
+        -0.123
+      ],
+      "size": [
+        0.005,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head clamping the top rear cross rail to the starboard rail strip.",
+      "connections": [
+        "top_cross_rear",
+        "top_rail_stbd_outer"
+      ]
+    },
+    {
+      "id": "e_tube",
+      "name": "Central Acrylic Electronics Tube",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.15,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.05,
+        0.22
+      ],
+      "material": "glass display",
+      "role": "Main watertight pressure vessel for the controller electronics; exploded boards above show what fits inside.",
+      "connections": [
+        "e_endcap_front",
+        "e_endcap_rear",
+        "e_saddle_front",
+        "e_saddle_rear"
+      ]
+    },
+    {
+      "id": "e_endcap_front",
+      "name": "Electronics Tube Front Endcap",
+      "shape": "cylinder",
+      "position": [
+        0.12,
+        0.15,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.053,
+        0.02
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Machined front plug with an O-ring land that seals the electronics tube and carries camera wiring.",
+      "connections": [
+        "e_tube",
+        "e_oring_front",
+        "e_endcap_front_screw_top",
+        "e_endcap_front_screw_bottom",
+        "camera_servo_bracket"
+      ]
+    },
+    {
+      "id": "e_endcap_rear",
+      "name": "Electronics Tube Rear Endcap",
+      "shape": "cylinder",
+      "position": [
+        -0.12,
+        0.15,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.053,
+        0.02
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Machined rear plug sealing the electronics tube and receiving the tether penetrator wiring.",
+      "connections": [
+        "e_tube",
+        "e_oring_rear",
+        "e_endcap_rear_screw_top",
+        "e_endcap_rear_screw_bottom",
+        "tether_penetrator"
+      ]
+    },
+    {
+      "id": "e_oring_front",
+      "name": "Electronics Front O-Ring Band",
+      "shape": "torus",
+      "position": [
+        0.109,
+        0.15,
+        0
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.052,
+        0.0025
+      ],
+      "material": "rubber",
+      "role": "Black elastomer band marking the compression seal between the front endcap and acrylic tube.",
+      "connections": [
+        "e_tube",
+        "e_endcap_front"
+      ]
+    },
+    {
+      "id": "e_oring_rear",
+      "name": "Electronics Rear O-Ring Band",
+      "shape": "torus",
+      "position": [
+        -0.109,
+        0.15,
+        0
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.052,
+        0.0025
+      ],
+      "material": "rubber",
+      "role": "Black elastomer band marking the rear pressure seal between endcap and tube.",
+      "connections": [
+        "e_tube",
+        "e_endcap_rear"
+      ]
+    },
+    {
+      "id": "e_endcap_front_screw_top",
+      "name": "Electronics Front Top Endcap Screw",
+      "shape": "cylinder",
+      "position": [
+        0.132,
+        0.18,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.006
+      ],
+      "material": "brushed steel",
+      "role": "Visible machine screw that retains the front electronics endcap.",
+      "connections": [
+        "e_endcap_front"
+      ]
+    },
+    {
+      "id": "e_endcap_front_screw_bottom",
+      "name": "Electronics Front Bottom Endcap Screw",
+      "shape": "cylinder",
+      "position": [
+        0.132,
+        0.12,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.006
+      ],
+      "material": "brushed steel",
+      "role": "Lower machine screw completing the visible front endcap fastener pair.",
+      "connections": [
+        "e_endcap_front"
+      ]
+    },
+    {
+      "id": "e_endcap_rear_screw_top",
+      "name": "Electronics Rear Top Endcap Screw",
+      "shape": "cylinder",
+      "position": [
+        -0.132,
+        0.18,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.006
+      ],
+      "material": "brushed steel",
+      "role": "Visible machine screw that retains the rear electronics endcap.",
+      "connections": [
+        "e_endcap_rear"
+      ]
+    },
+    {
+      "id": "e_endcap_rear_screw_bottom",
+      "name": "Electronics Rear Bottom Endcap Screw",
+      "shape": "cylinder",
+      "position": [
+        -0.132,
+        0.12,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.006
+      ],
+      "material": "brushed steel",
+      "role": "Lower machine screw completing the visible rear endcap fastener pair.",
+      "connections": [
+        "e_endcap_rear"
+      ]
+    },
+    {
+      "id": "e_saddle_front",
+      "name": "Front Electronics Tube Saddle",
+      "shape": "box",
+      "position": [
+        0.075,
+        0.105,
+        0
+      ],
+      "size": [
+        0.026,
+        0.012,
+        0.08
+      ],
+      "material": "black composite",
+      "role": "Printed cradle under the front of the electronics tube that bolts to the lower inner rails.",
+      "connections": [
+        "e_tube",
+        "bottom_rail_port_inner",
+        "bottom_rail_stbd_inner",
+        "e_clamp_front"
+      ]
+    },
+    {
+      "id": "e_saddle_rear",
+      "name": "Rear Electronics Tube Saddle",
+      "shape": "box",
+      "position": [
+        -0.075,
+        0.105,
+        0
+      ],
+      "size": [
+        0.026,
+        0.012,
+        0.08
+      ],
+      "material": "black composite",
+      "role": "Printed cradle under the rear of the electronics tube that prevents fore-aft sliding.",
+      "connections": [
+        "e_tube",
+        "bottom_rail_port_inner",
+        "bottom_rail_stbd_inner",
+        "e_clamp_rear"
+      ]
+    },
+    {
+      "id": "e_clamp_front",
+      "name": "Front Electronics Tube Clamp Strap",
+      "shape": "box",
+      "position": [
+        0.075,
+        0.202,
+        0
+      ],
+      "size": [
+        0.025,
+        0.01,
+        0.105
+      ],
+      "material": "black composite",
+      "role": "Upper clamp strap over the front of the electronics tube tying it to the rail frame.",
+      "connections": [
+        "e_saddle_front",
+        "top_cross_front",
+        "e_tube"
+      ]
+    },
+    {
+      "id": "e_clamp_rear",
+      "name": "Rear Electronics Tube Clamp Strap",
+      "shape": "box",
+      "position": [
+        -0.075,
+        0.202,
+        0
+      ],
+      "size": [
+        0.025,
+        0.01,
+        0.105
+      ],
+      "material": "black composite",
+      "role": "Upper clamp strap over the rear of the electronics tube tying it to the rail frame.",
+      "connections": [
+        "e_saddle_rear",
+        "top_cross_rear",
+        "e_tube"
+      ]
+    },
+    {
+      "id": "battery_tube_port",
+      "name": "Port Acrylic Battery Tube",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.15,
+        0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.03,
+        0.18
+      ],
+      "material": "glass display",
+      "role": "Port-side watertight battery vessel offset outboard of the electronics tube; exploded C-cells above show the pack inside.",
+      "connections": [
+        "batt_endcap_port_front",
+        "batt_endcap_port_rear",
+        "battery_clamp_port_front",
+        "battery_clamp_port_rear"
+      ]
+    },
+    {
+      "id": "battery_tube_stbd",
+      "name": "Starboard Acrylic Battery Tube",
+      "shape": "cylinder",
+      "position": [
+        0,
+        0.15,
+        -0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.03,
+        0.18
+      ],
+      "material": "glass display",
+      "role": "Starboard-side watertight battery vessel balancing the port pack and keeping battery mass low.",
+      "connections": [
+        "batt_endcap_stbd_front",
+        "batt_endcap_stbd_rear",
+        "battery_clamp_stbd_front",
+        "battery_clamp_stbd_rear"
+      ]
+    },
+    {
+      "id": "batt_endcap_port_front",
+      "name": "Port Battery Front Endcap",
+      "shape": "cylinder",
+      "position": [
+        0.1,
+        0.15,
+        0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.033,
+        0.02
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Front machined cap sealing the port battery tube against water pressure.",
+      "connections": [
+        "battery_tube_port",
+        "batt_oring_port_front"
+      ]
+    },
+    {
+      "id": "batt_endcap_port_rear",
+      "name": "Port Battery Rear Endcap",
+      "shape": "cylinder",
+      "position": [
+        -0.1,
+        0.15,
+        0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.033,
+        0.02
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear machined cap completing the sealed port battery pressure vessel.",
+      "connections": [
+        "battery_tube_port",
+        "batt_oring_port_rear"
+      ]
+    },
+    {
+      "id": "batt_endcap_stbd_front",
+      "name": "Starboard Battery Front Endcap",
+      "shape": "cylinder",
+      "position": [
+        0.1,
+        0.15,
+        -0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.033,
+        0.02
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Front machined cap sealing the starboard battery tube.",
+      "connections": [
+        "battery_tube_stbd",
+        "batt_oring_stbd_front"
+      ]
+    },
+    {
+      "id": "batt_endcap_stbd_rear",
+      "name": "Starboard Battery Rear Endcap",
+      "shape": "cylinder",
+      "position": [
+        -0.1,
+        0.15,
+        -0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.033,
+        0.02
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear machined cap completing the sealed starboard battery pressure vessel.",
+      "connections": [
+        "battery_tube_stbd",
+        "batt_oring_stbd_rear"
+      ]
+    },
+    {
+      "id": "batt_oring_port_front",
+      "name": "Port Battery Front O-Ring Band",
+      "shape": "torus",
+      "position": [
+        0.089,
+        0.15,
+        0.095
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.032,
+        0.002
+      ],
+      "material": "rubber",
+      "role": "Elastomer seal band at the front of the port battery vessel.",
+      "connections": [
+        "battery_tube_port",
+        "batt_endcap_port_front"
+      ]
+    },
+    {
+      "id": "batt_oring_port_rear",
+      "name": "Port Battery Rear O-Ring Band",
+      "shape": "torus",
+      "position": [
+        -0.089,
+        0.15,
+        0.095
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.032,
+        0.002
+      ],
+      "material": "rubber",
+      "role": "Elastomer seal band at the rear of the port battery vessel.",
+      "connections": [
+        "battery_tube_port",
+        "batt_endcap_port_rear"
+      ]
+    },
+    {
+      "id": "batt_oring_stbd_front",
+      "name": "Starboard Battery Front O-Ring Band",
+      "shape": "torus",
+      "position": [
+        0.089,
+        0.15,
+        -0.095
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.032,
+        0.002
+      ],
+      "material": "rubber",
+      "role": "Elastomer seal band at the front of the starboard battery vessel.",
+      "connections": [
+        "battery_tube_stbd",
+        "batt_endcap_stbd_front"
+      ]
+    },
+    {
+      "id": "batt_oring_stbd_rear",
+      "name": "Starboard Battery Rear O-Ring Band",
+      "shape": "torus",
+      "position": [
+        -0.089,
+        0.15,
+        -0.095
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.032,
+        0.002
+      ],
+      "material": "rubber",
+      "role": "Elastomer seal band at the rear of the starboard battery vessel.",
+      "connections": [
+        "battery_tube_stbd",
+        "batt_endcap_stbd_rear"
+      ]
+    },
+    {
+      "id": "battery_clamp_port_front",
+      "name": "Port Battery Front Clamp",
+      "shape": "box",
+      "position": [
+        0.06,
+        0.2,
+        0.095
+      ],
+      "size": [
+        0.02,
+        0.014,
+        0.065
+      ],
+      "material": "black composite",
+      "role": "Printed clamp strap tying the front of the port battery tube to the two top port rail strips.",
+      "connections": [
+        "battery_tube_port",
+        "top_rail_port_outer",
+        "top_rail_port_inner"
+      ]
+    },
+    {
+      "id": "battery_clamp_port_rear",
+      "name": "Port Battery Rear Clamp",
+      "shape": "box",
+      "position": [
+        -0.06,
+        0.2,
+        0.095
+      ],
+      "size": [
+        0.02,
+        0.014,
+        0.065
+      ],
+      "material": "black composite",
+      "role": "Printed clamp strap tying the rear of the port battery tube to the top rail pair.",
+      "connections": [
+        "battery_tube_port",
+        "top_rail_port_outer",
+        "top_rail_port_inner"
+      ]
+    },
+    {
+      "id": "battery_clamp_stbd_front",
+      "name": "Starboard Battery Front Clamp",
+      "shape": "box",
+      "position": [
+        0.06,
+        0.2,
+        -0.095
+      ],
+      "size": [
+        0.02,
+        0.014,
+        0.065
+      ],
+      "material": "black composite",
+      "role": "Printed clamp strap tying the front of the starboard battery tube to the two top starboard rail strips.",
+      "connections": [
+        "battery_tube_stbd",
+        "top_rail_stbd_outer",
+        "top_rail_stbd_inner"
+      ]
+    },
+    {
+      "id": "battery_clamp_stbd_rear",
+      "name": "Starboard Battery Rear Clamp",
+      "shape": "box",
+      "position": [
+        -0.06,
+        0.2,
+        -0.095
+      ],
+      "size": [
+        0.02,
+        0.014,
+        0.065
+      ],
+      "material": "black composite",
+      "role": "Printed clamp strap tying the rear of the starboard battery tube to the top rail pair.",
+      "connections": [
+        "battery_tube_stbd",
+        "top_rail_stbd_outer",
+        "top_rail_stbd_inner"
+      ]
+    },
+    {
+      "id": "thruster_port_mount",
+      "name": "Port Horizontal Thruster Bracket",
+      "shape": "box",
+      "position": [
+        -0.15,
+        0.135,
+        0.13
+      ],
+      "size": [
+        0.035,
+        0.055,
+        0.012
+      ],
+      "material": "black composite",
+      "role": "Rear printed bracket holding the port horizontal thruster behind the acrylic frame.",
+      "connections": [
+        "bottom_cross_rear",
+        "thruster_port_duct",
+        "thruster_port_strut_upper",
+        "thruster_port_strut_lower"
+      ]
+    },
+    {
+      "id": "thruster_stbd_mount",
+      "name": "Starboard Horizontal Thruster Bracket",
+      "shape": "box",
+      "position": [
+        -0.15,
+        0.135,
+        -0.13
+      ],
+      "size": [
+        0.035,
+        0.055,
+        0.012
+      ],
+      "material": "black composite",
+      "role": "Rear printed bracket holding the starboard horizontal thruster behind the acrylic frame.",
+      "connections": [
+        "bottom_cross_rear",
+        "thruster_stbd_duct",
+        "thruster_stbd_strut_upper",
+        "thruster_stbd_strut_lower"
+      ]
+    },
+    {
+      "id": "thruster_port_strut_upper",
+      "name": "Port Thruster Upper Strut",
+      "shape": "box",
+      "position": [
+        -0.17,
+        0.17,
+        0.13
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.45
+      ],
+      "size": [
+        0.055,
+        0.006,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Diagonal printed strut carrying upper duct load from the port thruster to the rear bracket.",
+      "connections": [
+        "thruster_port_mount",
+        "thruster_port_duct"
+      ]
+    },
+    {
+      "id": "thruster_port_strut_lower",
+      "name": "Port Thruster Lower Strut",
+      "shape": "box",
+      "position": [
+        -0.17,
+        0.13,
+        0.13
+      ],
+      "rotation": [
+        0,
+        0,
+        0.45
+      ],
+      "size": [
+        0.055,
+        0.006,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Diagonal printed strut carrying lower duct load from the port thruster to the rear bracket.",
+      "connections": [
+        "thruster_port_mount",
+        "thruster_port_duct"
+      ]
+    },
+    {
+      "id": "thruster_stbd_strut_upper",
+      "name": "Starboard Thruster Upper Strut",
+      "shape": "box",
+      "position": [
+        -0.17,
+        0.17,
+        -0.13
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.45
+      ],
+      "size": [
+        0.055,
+        0.006,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Diagonal printed strut carrying upper duct load from the starboard thruster to the rear bracket.",
+      "connections": [
+        "thruster_stbd_mount",
+        "thruster_stbd_duct"
+      ]
+    },
+    {
+      "id": "thruster_stbd_strut_lower",
+      "name": "Starboard Thruster Lower Strut",
+      "shape": "box",
+      "position": [
+        -0.17,
+        0.13,
+        -0.13
+      ],
+      "rotation": [
+        0,
+        0,
+        0.45
+      ],
+      "size": [
+        0.055,
+        0.006,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Diagonal printed strut carrying lower duct load from the starboard thruster to the rear bracket.",
+      "connections": [
+        "thruster_stbd_mount",
+        "thruster_stbd_duct"
+      ]
+    },
+    {
+      "id": "thruster_port_duct",
+      "name": "Port Thruster Duct Ring",
+      "shape": "torus",
+      "position": [
+        -0.198,
+        0.15,
+        0.13
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.035,
+        0.006
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Annular shroud around the port propeller protecting blades and directing rearward thrust.",
+      "connections": [
+        "thruster_port_mount",
+        "thruster_port_motor",
+        "prop_port_hub",
+        "thruster_port_strut_upper",
+        "thruster_port_strut_lower"
+      ]
+    },
+    {
+      "id": "thruster_port_motor",
+      "name": "Port Thruster Motor Pod",
+      "shape": "capsule",
+      "position": [
+        -0.198,
+        0.15,
+        0.13
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.014,
+        0.045
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Brushless motor capsule centered in the port duct and wired back to the electronics endcap.",
+      "connections": [
+        "thruster_port_duct",
+        "e_endcap_rear"
+      ]
+    },
+    {
+      "id": "prop_port_hub",
+      "name": "Port Propeller Hub",
+      "shape": "cylinder",
+      "position": [
+        -0.232,
+        0.15,
+        0.13
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.009,
+        0.012
+      ],
+      "material": "white composite",
+      "role": "Central hub coupling the printed port propeller blades to the motor shaft.",
+      "connections": [
+        "thruster_port_motor",
+        "prop_port_blade_a",
+        "prop_port_blade_b"
+      ]
+    },
+    {
+      "id": "prop_port_blade_a",
+      "name": "Port Propeller Blade A",
+      "shape": "box",
+      "position": [
+        -0.235,
+        0.167,
+        0.13
+      ],
+      "rotation": [
+        0,
+        0,
+        0.35
+      ],
+      "size": [
+        0.01,
+        0.004,
+        0.036
+      ],
+      "material": "white composite",
+      "role": "One printed blade of the port propeller pitched to push water aft.",
+      "connections": [
+        "prop_port_hub"
+      ]
+    },
+    {
+      "id": "prop_port_blade_b",
+      "name": "Port Propeller Blade B",
+      "shape": "box",
+      "position": [
+        -0.235,
+        0.133,
+        0.13
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.35
+      ],
+      "size": [
+        0.01,
+        0.004,
+        0.036
+      ],
+      "material": "white composite",
+      "role": "Opposed printed blade balancing the port propeller hub.",
+      "connections": [
+        "prop_port_hub"
+      ]
+    },
+    {
+      "id": "thruster_stbd_duct",
+      "name": "Starboard Thruster Duct Ring",
+      "shape": "torus",
+      "position": [
+        -0.198,
+        0.15,
+        -0.13
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.035,
+        0.006
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Annular shroud around the starboard propeller protecting blades and directing thrust.",
+      "connections": [
+        "thruster_stbd_mount",
+        "thruster_stbd_motor",
+        "prop_stbd_hub",
+        "thruster_stbd_strut_upper",
+        "thruster_stbd_strut_lower"
+      ]
+    },
+    {
+      "id": "thruster_stbd_motor",
+      "name": "Starboard Thruster Motor Pod",
+      "shape": "capsule",
+      "position": [
+        -0.198,
+        0.15,
+        -0.13
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.014,
+        0.045
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Brushless motor capsule centered in the starboard duct and wired back to the electronics endcap.",
+      "connections": [
+        "thruster_stbd_duct",
+        "e_endcap_rear"
+      ]
+    },
+    {
+      "id": "prop_stbd_hub",
+      "name": "Starboard Propeller Hub",
+      "shape": "cylinder",
+      "position": [
+        -0.232,
+        0.15,
+        -0.13
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.009,
+        0.012
+      ],
+      "material": "white composite",
+      "role": "Central hub coupling the printed starboard propeller blades to the motor shaft.",
+      "connections": [
+        "thruster_stbd_motor",
+        "prop_stbd_blade_a",
+        "prop_stbd_blade_b"
+      ]
+    },
+    {
+      "id": "prop_stbd_blade_a",
+      "name": "Starboard Propeller Blade A",
+      "shape": "box",
+      "position": [
+        -0.235,
+        0.167,
+        -0.13
+      ],
+      "rotation": [
+        0,
+        0,
+        0.35
+      ],
+      "size": [
+        0.01,
+        0.004,
+        0.036
+      ],
+      "material": "white composite",
+      "role": "One printed blade of the starboard propeller pitched for matched thrust with the port unit.",
+      "connections": [
+        "prop_stbd_hub"
+      ]
+    },
+    {
+      "id": "prop_stbd_blade_b",
+      "name": "Starboard Propeller Blade B",
+      "shape": "box",
+      "position": [
+        -0.235,
+        0.133,
+        -0.13
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.35
+      ],
+      "size": [
+        0.01,
+        0.004,
+        0.036
+      ],
+      "material": "white composite",
+      "role": "Opposed printed blade balancing the starboard propeller hub.",
+      "connections": [
+        "prop_stbd_hub"
+      ]
+    },
+    {
+      "id": "thruster_vert_duct",
+      "name": "Vertical Thruster Duct Ring",
+      "shape": "torus",
+      "position": [
+        0.025,
+        0.15,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.037,
+        0.006
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Open center heave-thruster shroud placed in the clear bay between the rail frames.",
+      "connections": [
+        "vert_strut_upper_front",
+        "vert_strut_upper_rear",
+        "vert_strut_lower_front",
+        "vert_strut_lower_rear",
+        "thruster_vert_motor",
+        "prop_vert_hub"
+      ]
+    },
+    {
+      "id": "vert_strut_upper_front",
+      "name": "Vertical Thruster Upper Front Strut",
+      "shape": "box",
+      "position": [
+        0.075,
+        0.185,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.2
+      ],
+      "size": [
+        0.07,
+        0.006,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Upper front printed strut tying the heave-thruster duct to the top front cross rail.",
+      "connections": [
+        "top_cross_front",
+        "thruster_vert_duct"
+      ]
+    },
+    {
+      "id": "vert_strut_upper_rear",
+      "name": "Vertical Thruster Upper Rear Strut",
+      "shape": "box",
+      "position": [
+        -0.025,
+        0.185,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.2
+      ],
+      "size": [
+        0.07,
+        0.006,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Upper rear printed strut tying the heave-thruster duct to the top rear cross rail.",
+      "connections": [
+        "top_cross_rear",
+        "thruster_vert_duct"
+      ]
+    },
+    {
+      "id": "vert_strut_lower_front",
+      "name": "Vertical Thruster Lower Front Strut",
+      "shape": "box",
+      "position": [
+        0.075,
+        0.115,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.2
+      ],
+      "size": [
+        0.07,
+        0.006,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Lower front printed strut tying the heave-thruster duct to the bottom front cross rail.",
+      "connections": [
+        "bottom_cross_front",
+        "thruster_vert_duct"
+      ]
+    },
+    {
+      "id": "vert_strut_lower_rear",
+      "name": "Vertical Thruster Lower Rear Strut",
+      "shape": "box",
+      "position": [
+        -0.025,
+        0.115,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.2
+      ],
+      "size": [
+        0.07,
+        0.006,
+        0.006
+      ],
+      "material": "black composite",
+      "role": "Lower rear printed strut tying the heave-thruster duct to the bottom rear cross rail.",
+      "connections": [
+        "bottom_cross_rear",
+        "thruster_vert_duct"
+      ]
+    },
+    {
+      "id": "thruster_vert_motor",
+      "name": "Vertical Thruster Motor Pod",
+      "shape": "capsule",
+      "position": [
+        0.025,
+        0.15,
+        0
+      ],
+      "size": [
+        0.014,
+        0.055
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Upright brushless motor capsule driving the central heave propeller.",
+      "connections": [
+        "thruster_vert_duct",
+        "e_endcap_front"
+      ]
+    },
+    {
+      "id": "prop_vert_hub",
+      "name": "Vertical Propeller Hub",
+      "shape": "cylinder",
+      "position": [
+        0.025,
+        0.19,
+        0
+      ],
+      "size": [
+        0.009,
+        0.012
+      ],
+      "material": "white composite",
+      "role": "Hub for the vertical propeller that pushes water up or down through the center bay.",
+      "connections": [
+        "thruster_vert_motor",
+        "prop_vert_blade_a",
+        "prop_vert_blade_b"
+      ]
+    },
+    {
+      "id": "prop_vert_blade_a",
+      "name": "Vertical Propeller Blade A",
+      "shape": "box",
+      "position": [
+        0.025,
+        0.192,
+        0.019
+      ],
+      "rotation": [
+        0,
+        0.35,
+        0
+      ],
+      "size": [
+        0.041,
+        0.004,
+        0.01
+      ],
+      "material": "white composite",
+      "role": "One blade of the vertical propeller spanning across the duct opening.",
+      "connections": [
+        "prop_vert_hub"
+      ]
+    },
+    {
+      "id": "prop_vert_blade_b",
+      "name": "Vertical Propeller Blade B",
+      "shape": "box",
+      "position": [
+        0.025,
+        0.192,
+        -0.019
+      ],
+      "rotation": [
+        0,
+        -0.35,
+        0
+      ],
+      "size": [
+        0.041,
+        0.004,
+        0.01
+      ],
+      "material": "white composite",
+      "role": "Opposed blade of the vertical propeller providing balanced heave thrust.",
+      "connections": [
+        "prop_vert_hub"
+      ]
+    },
+    {
+      "id": "camera_servo_bracket",
+      "name": "Camera Tilt Servo Bracket",
+      "shape": "box",
+      "position": [
+        0.148,
+        0.22,
+        0
+      ],
+      "size": [
+        0.03,
+        0.025,
+        0.055
+      ],
+      "material": "black composite",
+      "role": "Small printed bracket and tilt-servo block aiming the forward camera from the nose.",
+      "connections": [
+        "top_cross_front",
+        "e_endcap_front",
+        "camera_servo_axle",
+        "camera"
+      ]
+    },
+    {
+      "id": "camera_servo_axle",
+      "name": "Camera Tilt Servo Axle",
+      "shape": "cylinder",
+      "position": [
+        0.158,
+        0.22,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.004,
+        0.07
+      ],
+      "material": "brushed steel",
+      "role": "Cross-shaft through the camera bracket that represents the tilt-servo pivot axis.",
+      "connections": [
+        "camera_servo_bracket",
+        "camera"
+      ]
+    },
+    {
+      "id": "camera",
+      "name": "Forward CMOS Camera Body",
+      "shape": "cylinder",
+      "position": [
+        0.17,
+        0.22,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.014,
+        0.02
+      ],
+      "material": "black composite",
+      "role": "Forward-facing CMOS camera module used by the pilot for navigation and inspection.",
+      "connections": [
+        "camera_servo_bracket",
+        "camera_lens"
+      ]
+    },
+    {
+      "id": "camera_lens",
+      "name": "Camera Glass Lens",
+      "shape": "cylinder",
+      "position": [
+        0.183,
+        0.22,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.009,
+        0.004
+      ],
+      "material": "glass display",
+      "role": "Clear front lens disk marking the direction the ROV camera is looking.",
+      "connections": [
+        "camera"
+      ]
+    },
+    {
+      "id": "led_port_bezel",
+      "name": "Port LED Black Bezel",
+      "shape": "cylinder",
+      "position": [
+        0.152,
+        0.212,
+        0.062
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.011,
+        0.008
+      ],
+      "material": "black composite",
+      "role": "Black printed bezel holding the port LED lamp at the nose.",
+      "connections": [
+        "top_cross_front",
+        "led_port"
+      ]
+    },
+    {
+      "id": "led_port",
+      "name": "Port LED Lamp",
+      "shape": "cylinder",
+      "position": [
+        0.159,
+        0.212,
+        0.062
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.008,
+        0.012
+      ],
+      "material": "glass display",
+      "role": "Port high-output LED illuminating the camera field in turbid water.",
+      "connections": [
+        "led_port_bezel",
+        "camera_servo_bracket"
+      ]
+    },
+    {
+      "id": "led_center_bezel",
+      "name": "Center LED Black Bezel",
+      "shape": "cylinder",
+      "position": [
+        0.155,
+        0.247,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.011,
+        0.008
+      ],
+      "material": "black composite",
+      "role": "Black printed bezel holding the center LED above the camera.",
+      "connections": [
+        "top_cross_front",
+        "led_center"
+      ]
+    },
+    {
+      "id": "led_center",
+      "name": "Center LED Lamp",
+      "shape": "cylinder",
+      "position": [
+        0.162,
+        0.247,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.008,
+        0.012
+      ],
+      "material": "glass display",
+      "role": "Center high-output LED mounted above the camera for direct forward lighting.",
+      "connections": [
+        "led_center_bezel",
+        "camera_servo_bracket"
+      ]
+    },
+    {
+      "id": "led_stbd_bezel",
+      "name": "Starboard LED Black Bezel",
+      "shape": "cylinder",
+      "position": [
+        0.152,
+        0.212,
+        -0.062
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.011,
+        0.008
+      ],
+      "material": "black composite",
+      "role": "Black printed bezel holding the starboard LED lamp at the nose.",
+      "connections": [
+        "top_cross_front",
+        "led_stbd"
+      ]
+    },
+    {
+      "id": "led_stbd",
+      "name": "Starboard LED Lamp",
+      "shape": "cylinder",
+      "position": [
+        0.159,
+        0.212,
+        -0.062
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.008,
+        0.012
+      ],
+      "material": "glass display",
+      "role": "Starboard high-output LED completing the three-light forward array.",
+      "connections": [
+        "led_stbd_bezel",
+        "camera_servo_bracket"
+      ]
+    },
+    {
+      "id": "tether_penetrator",
+      "name": "Rear Tether Penetrator",
+      "shape": "cylinder",
+      "position": [
+        -0.145,
+        0.17,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.011,
+        0.018
+      ],
+      "material": "rubber",
+      "role": "Sealed rubber cable gland passing tether conductors through the rear electronics endcap.",
+      "connections": [
+        "e_endcap_rear",
+        "tether_strain"
+      ]
+    },
+    {
+      "id": "tether_strain",
+      "name": "Printed Tether Strain Relief Boot",
+      "shape": "cylinder",
+      "position": [
+        -0.13,
+        0.223,
+        0
+      ],
+      "size": [
+        0.015,
+        0.03
+      ],
+      "material": "white composite",
+      "role": "Printed boot clamped to the rear top rail so tether loads do not pull on endcap wiring.",
+      "connections": [
+        "top_cross_rear",
+        "tether_penetrator",
+        "tether_bend"
+      ]
+    },
+    {
+      "id": "tether_bend",
+      "name": "Short Aft Tether Bend",
+      "shape": "capsule",
+      "position": [
+        -0.16,
+        0.255,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.55
+      ],
+      "size": [
+        0.006,
+        0.07
+      ],
+      "material": "rubber",
+      "role": "Short flexible bend showing the tether leaving the strain relief before rising to the surface.",
+      "connections": [
+        "tether_strain",
+        "tether"
+      ]
+    },
+    {
+      "id": "tether",
+      "name": "Neutrally Buoyant Tether Cable",
+      "shape": "cylinder",
+      "position": [
+        -0.175,
+        0.485,
+        0
+      ],
+      "size": [
+        0.006,
+        0.43
+      ],
+      "material": "rubber",
+      "role": "Vertical segment of the twisted-pair tether carrying Ethernet-over-powerline to the topside controller.",
+      "connections": [
+        "tether_bend"
+      ]
+    },
+    {
+      "id": "beaglebone_board_exploded",
+      "name": "BeagleBone Black Controller Board Exploded",
+      "shape": "box",
+      "position": [
+        -0.015,
+        0.275,
+        0
+      ],
+      "size": [
+        0.086,
+        0.006,
+        0.054
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Exploded inspection view of the BeagleBone controller board that physically installs inside the electronics tube.",
+      "connections": [
+        "e_tube",
+        "openrov_cape_exploded",
+        "ethernet_jack_exploded",
+        "usb_jack_exploded"
+      ]
+    },
+    {
+      "id": "openrov_cape_exploded",
+      "name": "OpenROV Cape Board Exploded",
+      "shape": "box",
+      "position": [
+        -0.015,
+        0.292,
+        0
+      ],
+      "size": [
+        0.078,
+        0.005,
+        0.048
+      ],
+      "material": "brushed steel",
+      "role": "Exploded custom cape carrying motor, light and sensor interfaces for the ROV.",
+      "connections": [
+        "beaglebone_board_exploded",
+        "imu_board_exploded"
+      ]
+    },
+    {
+      "id": "imu_board_exploded",
+      "name": "IMU Sensor Board Exploded",
+      "shape": "box",
+      "position": [
+        0.04,
+        0.309,
+        0.018
+      ],
+      "size": [
+        0.025,
+        0.004,
+        0.02
+      ],
+      "material": "black composite",
+      "role": "Exploded small sensor board representing attitude and depth electronics inside the electronics tube.",
+      "connections": [
+        "openrov_cape_exploded"
+      ]
+    },
+    {
+      "id": "ethernet_jack_exploded",
+      "name": "Ethernet Jack on Controller Board",
+      "shape": "box",
+      "position": [
+        -0.055,
+        0.284,
+        -0.018
+      ],
+      "size": [
+        0.018,
+        0.012,
+        0.014
+      ],
+      "material": "brushed steel",
+      "role": "Exploded RJ45-style connector block showing the controller's network interface location.",
+      "connections": [
+        "beaglebone_board_exploded"
+      ]
+    },
+    {
+      "id": "usb_jack_exploded",
+      "name": "USB Jack on Controller Board",
+      "shape": "box",
+      "position": [
+        0.03,
+        0.284,
+        -0.019
+      ],
+      "size": [
+        0.014,
+        0.009,
+        0.011
+      ],
+      "material": "brushed steel",
+      "role": "Exploded USB connector block adding scale and orientation to the BeagleBone board.",
+      "connections": [
+        "beaglebone_board_exploded"
+      ]
+    },
+    {
+      "id": "port_cell_1_exploded",
+      "name": "Port C-Cell 1 Exploded",
+      "shape": "cylinder",
+      "position": [
+        -0.0625,
+        0.26,
+        0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.013,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "First exploded C-cell from the port battery pack, aligned with the pressure tube it slides into.",
+      "connections": [
+        "battery_tube_port",
+        "port_cell_2_exploded"
+      ]
+    },
+    {
+      "id": "port_cell_2_exploded",
+      "name": "Port C-Cell 2 Exploded",
+      "shape": "cylinder",
+      "position": [
+        -0.0375,
+        0.26,
+        0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.013,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Second exploded C-cell showing the serial pack layout in the port tube.",
+      "connections": [
+        "port_cell_1_exploded",
+        "port_cell_3_exploded"
+      ]
+    },
+    {
+      "id": "port_cell_3_exploded",
+      "name": "Port C-Cell 3 Exploded",
+      "shape": "cylinder",
+      "position": [
+        -0.0125,
+        0.26,
+        0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.013,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Third exploded C-cell in the port pack, kept separate for build-count clarity.",
+      "connections": [
+        "port_cell_2_exploded",
+        "port_cell_4_exploded"
+      ]
+    },
+    {
+      "id": "port_cell_4_exploded",
+      "name": "Port C-Cell 4 Exploded",
+      "shape": "cylinder",
+      "position": [
+        0.0125,
+        0.26,
+        0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.013,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Fourth exploded C-cell continuing the port battery string.",
+      "connections": [
+        "port_cell_3_exploded",
+        "port_cell_5_exploded"
+      ]
+    },
+    {
+      "id": "port_cell_5_exploded",
+      "name": "Port C-Cell 5 Exploded",
+      "shape": "cylinder",
+      "position": [
+        0.0375,
+        0.26,
+        0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.013,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Fifth exploded C-cell showing the port battery pack length.",
+      "connections": [
+        "port_cell_4_exploded",
+        "port_cell_6_exploded"
+      ]
+    },
+    {
+      "id": "port_cell_6_exploded",
+      "name": "Port C-Cell 6 Exploded",
+      "shape": "cylinder",
+      "position": [
+        0.0625,
+        0.26,
+        0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.013,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Sixth exploded C-cell completing the port-side battery string.",
+      "connections": [
+        "port_cell_5_exploded",
+        "battery_tube_port"
+      ]
+    },
+    {
+      "id": "stbd_cell_1_exploded",
+      "name": "Starboard C-Cell 1 Exploded",
+      "shape": "cylinder",
+      "position": [
+        -0.0625,
+        0.26,
+        -0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.013,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "First exploded C-cell from the starboard battery pack, aligned with its pressure tube.",
+      "connections": [
+        "battery_tube_stbd",
+        "stbd_cell_2_exploded"
+      ]
+    },
+    {
+      "id": "stbd_cell_2_exploded",
+      "name": "Starboard C-Cell 2 Exploded",
+      "shape": "cylinder",
+      "position": [
+        -0.0375,
+        0.26,
+        -0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.013,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Second exploded C-cell showing the serial starboard battery layout.",
+      "connections": [
+        "stbd_cell_1_exploded",
+        "stbd_cell_3_exploded"
+      ]
+    },
+    {
+      "id": "stbd_cell_3_exploded",
+      "name": "Starboard C-Cell 3 Exploded",
+      "shape": "cylinder",
+      "position": [
+        -0.0125,
+        0.26,
+        -0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.013,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Third exploded C-cell in the starboard battery string.",
+      "connections": [
+        "stbd_cell_2_exploded",
+        "stbd_cell_4_exploded"
+      ]
+    },
+    {
+      "id": "stbd_cell_4_exploded",
+      "name": "Starboard C-Cell 4 Exploded",
+      "shape": "cylinder",
+      "position": [
+        0.0125,
+        0.26,
+        -0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.013,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Fourth exploded C-cell continuing the starboard battery string.",
+      "connections": [
+        "stbd_cell_3_exploded",
+        "stbd_cell_5_exploded"
+      ]
+    },
+    {
+      "id": "stbd_cell_5_exploded",
+      "name": "Starboard C-Cell 5 Exploded",
+      "shape": "cylinder",
+      "position": [
+        0.0375,
+        0.26,
+        -0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.013,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Fifth exploded C-cell showing the starboard battery pack length.",
+      "connections": [
+        "stbd_cell_4_exploded",
+        "stbd_cell_6_exploded"
+      ]
+    },
+    {
+      "id": "stbd_cell_6_exploded",
+      "name": "Starboard C-Cell 6 Exploded",
+      "shape": "cylinder",
+      "position": [
+        0.0625,
+        0.26,
+        -0.095
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.013,
+        0.045
+      ],
+      "material": "brushed steel",
+      "role": "Sixth exploded C-cell completing the starboard-side battery string.",
+      "connections": [
+        "stbd_cell_5_exploded",
+        "battery_tube_stbd"
+      ]
+    },
+    {
+      "id": "ballast_hanger_port",
+      "name": "Port Ballast Hanger Rod",
+      "shape": "cylinder",
+      "position": [
+        -0.005,
+        0.065,
+        0.045
+      ],
+      "size": [
+        0.004,
+        0.07
+      ],
+      "material": "brushed steel",
+      "role": "Threaded rod suspending the trim ballast below the bottom port rail.",
+      "connections": [
+        "bottom_rail_port_outer",
+        "ballast"
+      ]
+    },
+    {
+      "id": "ballast_hanger_stbd",
+      "name": "Starboard Ballast Hanger Rod",
+      "shape": "cylinder",
+      "position": [
+        -0.005,
+        0.065,
+        -0.045
+      ],
+      "size": [
+        0.004,
+        0.07
+      ],
+      "material": "brushed steel",
+      "role": "Threaded rod suspending the trim ballast below the bottom starboard rail.",
+      "connections": [
+        "bottom_rail_stbd_outer",
+        "ballast"
+      ]
+    },
+    {
+      "id": "ballast",
+      "name": "Steel Trim Ballast Weight",
+      "shape": "box",
+      "position": [
+        -0.005,
+        0.025,
+        0
+      ],
+      "size": [
+        0.07,
+        0.018,
+        0.09
+      ],
+      "material": "forged steel",
+      "role": "Removable low-mounted steel bar used to set neutral buoyancy and roll stability.",
+      "connections": [
+        "ballast_hanger_port",
+        "ballast_hanger_stbd"
+      ]
+    }
   ]
 }

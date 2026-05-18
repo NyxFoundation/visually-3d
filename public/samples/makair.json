@@ -1,68 +1,2349 @@
 {
   "machine_name": "MakAir Open-Source Emergency Ventilator",
-  "assembly_instructions": "Makers-For-Life COVID-19 emergency ventilator in a ≈20×20×20 cm cube. The visualization is shown open-topped with the side walls removed so the pneumatic and electronic subsystems are inspectable. Base plate carries a front panel (with touchscreen, two alarm LEDs, a silence button, and a power button) and a rear connector panel. Pneumatic flow: air enters through an intake HEPA filter on the rear, feeds a brushless blower driven by its own motor on top, mixes with supplemental oxygen in the O2 mixer (fed from the rear O2 supply port), passes a flow and a pressure sensor and a proportional pressure valve, then out through the patient HEPA filter to the patient tube port on the front. Exhaled air returns through a separate exhaust HEPA filter and out a rear exhaust port. Electronics ride on a thin STM32 controller board in the rear of the case with a motor driver and power supply.",
+  "assembly_instructions": "1. Bolt the 200 mm x 200 mm x 8 mm aluminum base plate to four 16 mm diameter rubber feet, then install the four 190 mm corner posts. 2. Fasten the rear connector panel and the four top rim rails to the posts; leave the top and both side covers removed as a service cutaway. 3. Install the rail screws, blower bracket screws, board screws, and power-supply screws so the frame, pneumatic modules, and electronics have visible mechanical attachment points. 4. Mount the intake HEPA filter, blower bracket, centrifugal blower, O2 mixer, proportional valve, flow sensor, patient HEPA filter, exhalation HEPA filter, and their pleated media faces to the base plate in the visible left-to-right pneumatic order. 5. Connect the rear intake grille to the intake HEPA filter, the intake filter to the blower inlet, the blower outlet to the mixer, the mixer to the proportional valve, the valve to the flow sensor and patient HEPA filter, and the patient filter to the 22 mm inspiratory front port. 6. Connect the rear O2 supply port to the mixer through the 6 mm oxygen tube. 7. Connect the front exhalation-return port through the return hose to the exhaust HEPA filter, then connect that filter to the rear exhaust port. 8. Install the STM32 controller board, motor driver board, power supply, terminal block, cooling fan, and wiring harnesses on rear standoffs. 9. Assemble the operator front panel as an exploded service door on four standoffs: fit the touchscreen, two alarm LEDs, alarm-silence button, power button, inspiratory port, exhalation port, labels, and panel screws, then connect the ribbon cable to the controller. 10. Verify from the open top and removed side walls that the complete air path, oxygen path, return path, electronics stack, and standoffs are visible before fitting any optional covers.",
   "metadata": {
     "reference": "https://github.com/makers-for-life/makair",
     "domain": "medical-devices",
-    "thumbnail_camera": [0.45, 0.35, 0.45],
+    "thumbnail_camera": [
+      0.45,
+      0.35,
+      0.45
+    ],
     "info": {
       "japanese_name": "MakAir オープンソース人工呼吸器",
       "english_name": "MakAir Open-Source Emergency Ventilator",
       "summary": "Emergency-grade, open-hardware ventilator designed by the Makers-For-Life collective during the COVID-19 pandemic. Targeted at hospital shortages in low-resource settings.",
-      "description": "MakAir is an open-source emergency ventilator designed in spring 2020 by Makers For Life, a volunteer collective of French engineers, medical professionals, and makers responding to the COVID-19 ventilator shortage. It is a compact blower-based ventilator — a brushless blower draws ambient air through a HEPA filter, mixes it with optional supplemental oxygen in a passive mixer, meters it past a proportional pressure valve with in-line flow and pressure sensors, and delivers it through a disposable patient HEPA filter to the patient circuit. A separate exhaust-return filter handles expired gas. A touchscreen + two alarm LEDs on the front panel drive the UI; the STM32-based controller, motor driver, and power supply ride on the rear of the base. The enclosure is a ≈20×20×20 cm cube; CAD, firmware, and bill of materials are released under open licenses so hospitals can manufacture locally.",
-      "operator": "Field-deployed by Makers-For-Life partners and hospital maker-programs in 2020–21",
+      "description": "MakAir is an open-source emergency ventilator designed in spring 2020 by Makers For Life, a volunteer collective of French engineers, medical professionals, and makers responding to the COVID-19 ventilator shortage. It is a compact blower-based ventilator: a brushless blower draws ambient air through a HEPA filter, mixes it with optional supplemental oxygen in a passive mixer, meters it past a proportional pressure valve with in-line flow and pressure sensors, and delivers it through a disposable patient HEPA filter to the inspiratory patient port. A separate front exhalation-return port routes expired gas through an exhaust HEPA filter to the rear exhaust outlet. A touchscreen plus two alarm LEDs on the front panel drive the UI; the STM32-based controller, motor driver, and power supply ride on the rear of the base. The enclosure is about a 20 x 20 x 20 cm cube; CAD, firmware, and bill of materials are released under open licenses so hospitals can manufacture locally.",
+      "operator": "Field-deployed by Makers-For-Life partners and hospital maker-programs in 2020-21",
       "contractor": "Makers For Life (volunteer French engineering/medical collective)",
       "contract_date": "Initial release spring 2020; safety-iterated through 2021",
-      "contract_value": "Target ≈€500 in parts vs. €20k+ for commercial ICU ventilators",
+      "contract_value": "Target about EUR 500 in parts versus EUR 20k+ for commercial ICU ventilators",
       "status": "Open-source design; reference device certified for emergency use in several jurisdictions during COVID-19",
       "facts": [
-        { "label": "Form factor",   "value": "≈20 × 20 × 20 cm enclosure" },
-        { "label": "Architecture",  "value": "Brushless blower + passive O₂ mixer + proportional pressure-valve metering" },
-        { "label": "Control",       "value": "STM32 controller, touchscreen UI, two alarm LEDs" },
-        { "label": "Sensors",       "value": "In-line flow sensor + pressure sensor on the patient line" },
-        { "label": "Filters",       "value": "HEPA on blower intake + patient circuit + exhaust return" },
-        { "label": "Oxygen",        "value": "Optional supplemental O₂ via the rear supply port + mixer" },
-        { "label": "License",       "value": "Open-source hardware + firmware (Makers-For-Life GitHub)" }
+        {
+          "label": "Form factor",
+          "value": "Approximate 0.200 m x 0.200 m x 0.200 m cube enclosure; scene dimensions use metres."
+        },
+        {
+          "label": "Base plate",
+          "value": "0.200 m x 0.200 m x 0.008 m aluminum plate with four 0.016 m diameter rubber feet."
+        },
+        {
+          "label": "Patient circuit ports",
+          "value": "Two nominal 22 mm front patient fittings are represented by 0.011 m radius inspiratory and exhalation ports."
+        },
+        {
+          "label": "Architecture",
+          "value": "Brushless centrifugal blower, passive O2 mixer, proportional pressure valve, flow sensor, pressure tap, and separate exhaust return filter."
+        },
+        {
+          "label": "Control electronics",
+          "value": "STM32 controller board, motor driver, power supply, terminal block, cooling fan, touchscreen, and ribbon cable are separately modelled."
+        },
+        {
+          "label": "Filters",
+          "value": "Three HEPA elements are modelled with visible pleated media: room-air intake, patient inspiratory outlet, and exhalation exhaust return."
+        },
+        {
+          "label": "Oxygen input",
+          "value": "Rear O2 port feeds a 0.006 m class tube into the passive mixer."
+        },
+        {
+          "label": "Open hardware cost target",
+          "value": "MakAir publications described a target bill of materials of about EUR 500."
+        },
+        {
+          "label": "Service cutaway",
+          "value": "Side walls and top cover are removed and the front panel is exploded 0.065 m forward for inspection."
+        },
+        {
+          "label": "Frame members",
+          "value": "Four 0.190 m posts and four top rails define the removable 0.20 m cube enclosure without opaque side panels."
+        }
       ],
       "sources": [
-        { "title": "Makers For Life — MakAir on GitHub", "url": "https://github.com/makers-for-life/makair" },
-        { "title": "Makers For Life — project site",     "url": "https://makers-for-life.org/" }
+        {
+          "title": "Makers For Life - MakAir on GitHub",
+          "url": "https://github.com/makers-for-life/makair"
+        },
+        {
+          "title": "Makers For Life - project site",
+          "url": "https://makers-for-life.org/"
+        },
+        {
+          "title": "MakAir documentation repository",
+          "url": "https://github.com/makers-for-life/makair/tree/master/docs"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "base",               "name": "Base Plate",                      "shape": "box",      "position": [0, 0.005, 0],           "size": [0.20, 0.010, 0.20],  "material": "dark anodized aluminum", "role": "Enclosure floor. Every internal module and panel bolts to it.", "connections": ["front_face", "rear_panel", "blower", "o2_mixer", "proportional_valve", "patient_hepa_filter", "exhaust_hepa_filter", "air_intake_filter", "stm32_board", "power_supply"] },
-
-    { "id": "front_face",         "name": "Front Panel (touchscreen)",       "shape": "box",      "position": [0, 0.105, 0.095],       "size": [0.20, 0.200, 0.012], "material": "dark anodized aluminum", "role": "Operator-facing front panel. Carries the touchscreen, alarm LEDs, and front buttons.", "connections": ["base", "touchscreen", "alarm_led_red", "alarm_led_yellow", "silence_button", "power_button", "patient_tube_port"] },
-    { "id": "touchscreen",        "name": "Touchscreen Display",             "shape": "box",      "position": [0, 0.115, 0.107],       "size": [0.13, 0.110, 0.006], "material": "glass display",          "role": "Capacitive touchscreen — pressure/flow waveforms, alarm limits, modes.", "connections": ["front_face"] },
-    { "id": "alarm_led_red",      "name": "Alarm LED (High Priority)",       "shape": "cylinder", "position": [-0.075, 0.185, 0.108],  "rotation": [1.5708, 0, 0], "size": [0.006, 0.005], "material": "glass display",            "role": "Red high-priority alarm light on the top-left of the front panel.", "connections": ["front_face"] },
-    { "id": "alarm_led_yellow",   "name": "Alarm LED (Medium Priority)",     "shape": "cylinder", "position": [ 0.075, 0.185, 0.108],  "rotation": [1.5708, 0, 0], "size": [0.006, 0.005], "material": "glass display",            "role": "Yellow medium-priority alarm light on the top-right.", "connections": ["front_face"] },
-    { "id": "silence_button",     "name": "Alarm-Silence Button",            "shape": "cylinder", "position": [-0.075, 0.030, 0.108],  "rotation": [1.5708, 0, 0], "size": [0.009, 0.008], "material": "white composite",          "role": "Front-panel button that silences an active alarm.", "connections": ["front_face"] },
-    { "id": "power_button",       "name": "Power Button",                    "shape": "cylinder", "position": [ 0.075, 0.030, 0.108],  "rotation": [1.5708, 0, 0], "size": [0.009, 0.008], "material": "white composite",          "role": "On / stand-by button.", "connections": ["front_face"] },
-
-    { "id": "rear_panel",         "name": "Rear Connector Panel",            "shape": "box",      "position": [0, 0.105, -0.095],      "size": [0.20, 0.200, 0.012], "material": "dark anodized aluminum", "role": "Rear panel carrying the O₂ supply port, AC power inlet, and exhaust port.", "connections": ["base", "o2_supply_port", "power_inlet", "exhaust_port", "air_intake_filter"] },
-
-    { "id": "air_intake_filter",  "name": "Air-Intake HEPA Filter",          "shape": "box",      "position": [-0.080, 0.050, -0.075], "size": [0.050, 0.050, 0.050],"material": "white composite",         "role": "HEPA filter on the blower-intake line — scrubs room air before it enters the blower.", "connections": ["base", "rear_panel", "blower", "tube_intake_to_blower"] },
-    { "id": "blower",             "name": "Brushless Blower",                "shape": "cylinder", "position": [-0.05, 0.055, 0],       "size": [0.040, 0.060],       "material": "dark anodized aluminum", "role": "Centrifugal brushless blower — the prime mover that pressurizes the breath waveform.", "connections": ["base", "blower_motor", "air_intake_filter", "tube_blower_to_mixer", "motor_driver"] },
-    { "id": "blower_motor",       "name": "Blower Motor",                    "shape": "cylinder", "position": [-0.05, 0.105, 0],       "size": [0.018, 0.040],       "material": "brushed steel",          "role": "Brushless DC motor on top of the blower impeller.", "connections": ["blower"] },
-    { "id": "o2_mixer",           "name": "O₂ Mixer",                        "shape": "box",      "position": [0.00, 0.040, 0.02],     "size": [0.055, 0.050, 0.055],"material": "white composite",         "role": "Passive mixing chamber — combines blower air with supplemental oxygen before the patient circuit.", "connections": ["base", "tube_blower_to_mixer", "o2_supply_port", "proportional_valve"] },
-    { "id": "proportional_valve", "name": "Proportional Pressure Valve",     "shape": "box",      "position": [0.00, 0.040, -0.04],    "size": [0.050, 0.045, 0.040],"material": "forged steel",           "role": "Servo-driven proportional valve that meters the breath waveform into the patient line.", "connections": ["o2_mixer", "patient_hepa_filter", "flow_sensor", "pressure_sensor"] },
-    { "id": "flow_sensor",        "name": "Inspiratory Flow Sensor",         "shape": "box",      "position": [0.04, 0.075, 0.00],     "size": [0.020, 0.020, 0.030],"material": "dark anodized aluminum", "role": "In-line flow sensor — feeds the control loop and tidal-volume calculation.", "connections": ["proportional_valve"] },
-    { "id": "pressure_sensor",    "name": "Patient-Line Pressure Sensor",    "shape": "box",      "position": [0.02, 0.075, -0.03],    "size": [0.020, 0.020, 0.030],"material": "dark anodized aluminum", "role": "Patient-line pressure sensor — feeds the servo loop and sounds over-pressure alarms.", "connections": ["proportional_valve"] },
-    { "id": "patient_hepa_filter","name": "Patient HEPA Filter",             "shape": "box",      "position": [0.065, 0.050, 0.055],   "size": [0.050, 0.050, 0.050],"material": "white composite",         "role": "Disposable HEPA filter on the patient inspiratory line — swapped between patients.", "connections": ["base", "proportional_valve", "patient_tube_port"] },
-    { "id": "exhaust_hepa_filter","name": "Exhaust HEPA Filter",             "shape": "box",      "position": [-0.065, 0.050, -0.025], "size": [0.045, 0.050, 0.045],"material": "white composite",         "role": "HEPA filter on the exhaust-return line — scrubs expired gas before it vents out the device.", "connections": ["base", "exhaust_port"] },
-
-    { "id": "tube_intake_to_blower","name": "Tube — Intake → Blower",         "shape": "cylinder", "position": [-0.065, 0.050, -0.035], "rotation": [1.5708, 0, 0], "size": [0.006, 0.070], "material": "rubber",                  "role": "Flexible silicone tube from the intake HEPA to the blower inlet.", "connections": ["air_intake_filter", "blower"] },
-    { "id": "tube_blower_to_mixer","name": "Tube — Blower → Mixer",            "shape": "cylinder", "position": [-0.025, 0.055, 0.010],  "rotation": [0, 0, 1.5708], "size": [0.005, 0.050], "material": "rubber",                  "role": "Tube from the blower output to the O₂ mixer inlet.", "connections": ["blower", "o2_mixer"] },
-    { "id": "tube_valve_to_filter","name": "Tube — Valve → Patient Filter",    "shape": "cylinder", "position": [0.035, 0.045, 0.010],   "rotation": [0, 0, 1.5708], "size": [0.005, 0.045], "material": "rubber",                  "role": "Tube from the proportional-valve output to the patient HEPA filter.", "connections": ["proportional_valve", "patient_hepa_filter"] },
-
-    { "id": "stm32_board",        "name": "STM32 Controller Board",          "shape": "box",      "position": [0, 0.140, -0.055],      "size": [0.150, 0.010, 0.080],"material": "dark anodized aluminum", "role": "STM32-based flight controller — runs the pressure/flow servo loop, alarm logic, and UI driver.", "connections": ["base", "motor_driver", "touchscreen"] },
-    { "id": "motor_driver",       "name": "Motor Driver Board",              "shape": "box",      "position": [-0.05, 0.120, -0.055],  "size": [0.060, 0.020, 0.040],"material": "dark anodized aluminum", "role": "Three-phase driver for the brushless blower motor.", "connections": ["stm32_board", "blower"] },
-    { "id": "power_supply",       "name": "Power Supply",                    "shape": "box",      "position": [0.05, 0.140, -0.075],   "size": [0.100, 0.040, 0.050],"material": "dark anodized aluminum", "role": "Internal AC→DC power supply.", "connections": ["base", "power_inlet", "stm32_board"] },
-
-    { "id": "power_inlet",        "name": "AC Power Inlet",                  "shape": "box",      "position": [ 0.075, 0.045, -0.101], "size": [0.030, 0.030, 0.015],"material": "black composite",         "role": "IEC C14 mains inlet on the rear panel.", "connections": ["rear_panel", "power_supply"] },
-    { "id": "o2_supply_port",     "name": "O₂ Supply Port",                  "shape": "cylinder", "position": [-0.085, 0.050, -0.101], "rotation": [1.5708, 0, 0], "size": [0.008, 0.018], "material": "dark anodized aluminum",   "role": "DIN O₂ inlet on the rear panel. Supplemental O₂ from a cylinder enters here.", "connections": ["rear_panel", "o2_mixer"] },
-    { "id": "exhaust_port",       "name": "Exhaust Port",                    "shape": "cylinder", "position": [-0.025, 0.090, -0.101], "rotation": [1.5708, 0, 0], "size": [0.010, 0.015], "material": "dark anodized aluminum",   "role": "Filtered exhaust port on the rear panel.", "connections": ["rear_panel", "exhaust_hepa_filter"] },
-    { "id": "patient_tube_port",  "name": "Patient Tube Port",               "shape": "cylinder", "position": [ 0.065, 0.150, 0.102],  "rotation": [1.5708, 0, 0], "size": [0.015, 0.020], "material": "dark anodized aluminum",   "role": "22 mm standard patient-circuit tube port on the top-right of the front panel.", "connections": ["front_face", "patient_hepa_filter"] }
+    {
+      "id": "base",
+      "name": "Base Plate",
+      "shape": "box",
+      "position": [
+        0,
+        0.004,
+        0
+      ],
+      "size": [
+        0.2,
+        0.008,
+        0.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Thin structural floor that roots the assembly and carries every pneumatic and electronic module.",
+      "connections": [
+        "foot_front_left",
+        "foot_front_right",
+        "foot_rear_left",
+        "foot_rear_right",
+        "post_front_left",
+        "post_front_right",
+        "post_rear_left",
+        "post_rear_right",
+        "rear_panel",
+        "blower_mount",
+        "air_intake_filter",
+        "blower_body",
+        "o2_mixer_body",
+        "proportional_valve_body",
+        "patient_hepa_filter",
+        "exhaust_hepa_filter",
+        "stm32_board",
+        "power_supply"
+      ]
+    },
+    {
+      "id": "foot_front_left",
+      "name": "Front Left Rubber Foot",
+      "shape": "cylinder",
+      "position": [
+        -0.082,
+        0.004,
+        0.082
+      ],
+      "size": [
+        0.008,
+        0.008
+      ],
+      "material": "rubber",
+      "role": "Vibration-isolating foot under the front-left corner of the ventilator.",
+      "connections": [
+        "base"
+      ]
+    },
+    {
+      "id": "foot_front_right",
+      "name": "Front Right Rubber Foot",
+      "shape": "cylinder",
+      "position": [
+        0.082,
+        0.004,
+        0.082
+      ],
+      "size": [
+        0.008,
+        0.008
+      ],
+      "material": "rubber",
+      "role": "Vibration-isolating foot under the front-right corner of the ventilator.",
+      "connections": [
+        "base"
+      ]
+    },
+    {
+      "id": "foot_rear_left",
+      "name": "Rear Left Rubber Foot",
+      "shape": "cylinder",
+      "position": [
+        -0.082,
+        0.004,
+        -0.082
+      ],
+      "size": [
+        0.008,
+        0.008
+      ],
+      "material": "rubber",
+      "role": "Vibration-isolating foot under the rear-left corner of the ventilator.",
+      "connections": [
+        "base"
+      ]
+    },
+    {
+      "id": "foot_rear_right",
+      "name": "Rear Right Rubber Foot",
+      "shape": "cylinder",
+      "position": [
+        0.082,
+        0.004,
+        -0.082
+      ],
+      "size": [
+        0.008,
+        0.008
+      ],
+      "material": "rubber",
+      "role": "Vibration-isolating foot under the rear-right corner of the ventilator.",
+      "connections": [
+        "base"
+      ]
+    },
+    {
+      "id": "post_front_left",
+      "name": "Front Left Corner Post",
+      "shape": "box",
+      "position": [
+        -0.094,
+        0.101,
+        0.094
+      ],
+      "size": [
+        0.01,
+        0.19,
+        0.01
+      ],
+      "material": "welded steel",
+      "role": "Vertical frame post that supports the exploded front standoff and top rail without closing the side wall.",
+      "connections": [
+        "base",
+        "top_front_rail",
+        "top_left_rail",
+        "front_panel_standoff_fl"
+      ]
+    },
+    {
+      "id": "post_front_right",
+      "name": "Front Right Corner Post",
+      "shape": "box",
+      "position": [
+        0.094,
+        0.101,
+        0.094
+      ],
+      "size": [
+        0.01,
+        0.19,
+        0.01
+      ],
+      "material": "welded steel",
+      "role": "Vertical frame post that supports the front rail and the operator panel standoff.",
+      "connections": [
+        "base",
+        "top_front_rail",
+        "top_right_rail",
+        "front_panel_standoff_fr"
+      ]
+    },
+    {
+      "id": "post_rear_left",
+      "name": "Rear Left Corner Post",
+      "shape": "box",
+      "position": [
+        -0.094,
+        0.101,
+        -0.094
+      ],
+      "size": [
+        0.01,
+        0.19,
+        0.01
+      ],
+      "material": "welded steel",
+      "role": "Rear frame post that ties the rear connector panel into the base and top rail.",
+      "connections": [
+        "base",
+        "rear_panel",
+        "top_rear_rail",
+        "top_left_rail"
+      ]
+    },
+    {
+      "id": "post_rear_right",
+      "name": "Rear Right Corner Post",
+      "shape": "box",
+      "position": [
+        0.094,
+        0.101,
+        -0.094
+      ],
+      "size": [
+        0.01,
+        0.19,
+        0.01
+      ],
+      "material": "welded steel",
+      "role": "Rear frame post that ties the power-connector side of the rear panel into the base.",
+      "connections": [
+        "base",
+        "rear_panel",
+        "top_rear_rail",
+        "top_right_rail"
+      ]
+    },
+    {
+      "id": "top_front_rail",
+      "name": "Open Top Front Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.193,
+        0.094
+      ],
+      "size": [
+        0.19,
+        0.012,
+        0.01
+      ],
+      "material": "welded steel",
+      "role": "Top-front frame rail left in place while the cover is removed for inspection.",
+      "connections": [
+        "post_front_left",
+        "post_front_right",
+        "rail_screw_front_left",
+        "rail_screw_front_right"
+      ]
+    },
+    {
+      "id": "top_rear_rail",
+      "name": "Open Top Rear Rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.193,
+        -0.094
+      ],
+      "size": [
+        0.19,
+        0.012,
+        0.01
+      ],
+      "material": "welded steel",
+      "role": "Top-rear rail that braces the rear connector panel while keeping the top open.",
+      "connections": [
+        "post_rear_left",
+        "post_rear_right",
+        "rail_screw_rear_left",
+        "rail_screw_rear_right"
+      ]
+    },
+    {
+      "id": "top_left_rail",
+      "name": "Open Top Left Rail",
+      "shape": "box",
+      "position": [
+        -0.094,
+        0.193,
+        0
+      ],
+      "size": [
+        0.01,
+        0.012,
+        0.19
+      ],
+      "material": "welded steel",
+      "role": "Left-side top rail showing the removed side cover outline without hiding the bay.",
+      "connections": [
+        "post_front_left",
+        "post_rear_left"
+      ]
+    },
+    {
+      "id": "top_right_rail",
+      "name": "Open Top Right Rail",
+      "shape": "box",
+      "position": [
+        0.094,
+        0.193,
+        0
+      ],
+      "size": [
+        0.01,
+        0.012,
+        0.19
+      ],
+      "material": "welded steel",
+      "role": "Right-side top rail showing the removed side cover outline without hiding the bay.",
+      "connections": [
+        "post_front_right",
+        "post_rear_right"
+      ]
+    },
+    {
+      "id": "rail_screw_front_left",
+      "name": "Front Left Top Rail Screw",
+      "shape": "cylinder",
+      "position": [
+        -0.078,
+        0.201,
+        0.094
+      ],
+      "size": [
+        0.003,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Visible cap screw fastening the front rail to the left corner post.",
+      "connections": [
+        "top_front_rail",
+        "post_front_left"
+      ]
+    },
+    {
+      "id": "rail_screw_front_right",
+      "name": "Front Right Top Rail Screw",
+      "shape": "cylinder",
+      "position": [
+        0.078,
+        0.201,
+        0.094
+      ],
+      "size": [
+        0.003,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Visible cap screw fastening the front rail to the right corner post.",
+      "connections": [
+        "top_front_rail",
+        "post_front_right"
+      ]
+    },
+    {
+      "id": "rail_screw_rear_left",
+      "name": "Rear Left Top Rail Screw",
+      "shape": "cylinder",
+      "position": [
+        -0.078,
+        0.201,
+        -0.094
+      ],
+      "size": [
+        0.003,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Visible cap screw fastening the rear rail to the left rear post.",
+      "connections": [
+        "top_rear_rail",
+        "post_rear_left"
+      ]
+    },
+    {
+      "id": "rail_screw_rear_right",
+      "name": "Rear Right Top Rail Screw",
+      "shape": "cylinder",
+      "position": [
+        0.078,
+        0.201,
+        -0.094
+      ],
+      "size": [
+        0.003,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Visible cap screw fastening the rear rail to the right rear post.",
+      "connections": [
+        "top_rear_rail",
+        "post_rear_right"
+      ]
+    },
+    {
+      "id": "rear_panel",
+      "name": "Rear Connector Panel",
+      "shape": "box",
+      "position": [
+        0,
+        0.101,
+        -0.101
+      ],
+      "size": [
+        0.2,
+        0.19,
+        0.008
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Back service panel carrying external oxygen, power, exhaust, USB, and intake connections.",
+      "connections": [
+        "base",
+        "post_rear_left",
+        "post_rear_right",
+        "o2_supply_port",
+        "power_inlet",
+        "exhaust_port",
+        "service_usb_port",
+        "rear_intake_grille"
+      ]
+    },
+    {
+      "id": "front_operator_panel",
+      "name": "Exploded Front Operator Panel",
+      "shape": "box",
+      "position": [
+        0,
+        0.104,
+        0.165
+      ],
+      "size": [
+        0.18,
+        0.17,
+        0.008
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Operator panel shown 65 mm forward as an exploded service door so it does not conceal the internal pneumatic path.",
+      "connections": [
+        "front_panel_standoff_fl",
+        "front_panel_standoff_fr",
+        "front_panel_standoff_bl",
+        "front_panel_standoff_br",
+        "touchscreen",
+        "alarm_led_red",
+        "alarm_led_yellow",
+        "silence_button",
+        "power_button",
+        "patient_tube_port",
+        "exhalation_return_port",
+        "ui_ribbon_cable",
+        "panel_screw_ul",
+        "panel_screw_ur",
+        "panel_screw_ll",
+        "panel_screw_lr"
+      ]
+    },
+    {
+      "id": "front_panel_standoff_fl",
+      "name": "Front Panel Upper Left Standoff",
+      "shape": "cylinder",
+      "position": [
+        -0.075,
+        0.162,
+        0.132
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.003,
+        0.07
+      ],
+      "material": "brushed steel",
+      "role": "Spacer rod that locates the exploded operator panel in front of the chassis.",
+      "connections": [
+        "post_front_left",
+        "front_operator_panel"
+      ]
+    },
+    {
+      "id": "front_panel_standoff_fr",
+      "name": "Front Panel Upper Right Standoff",
+      "shape": "cylinder",
+      "position": [
+        0.075,
+        0.162,
+        0.132
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.003,
+        0.07
+      ],
+      "material": "brushed steel",
+      "role": "Spacer rod that locates the upper-right corner of the exploded operator panel.",
+      "connections": [
+        "post_front_right",
+        "front_operator_panel"
+      ]
+    },
+    {
+      "id": "front_panel_standoff_bl",
+      "name": "Front Panel Lower Left Standoff",
+      "shape": "cylinder",
+      "position": [
+        -0.075,
+        0.046,
+        0.132
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.003,
+        0.07
+      ],
+      "material": "brushed steel",
+      "role": "Spacer rod that supports the lower-left of the exploded operator panel.",
+      "connections": [
+        "base",
+        "front_operator_panel"
+      ]
+    },
+    {
+      "id": "front_panel_standoff_br",
+      "name": "Front Panel Lower Right Standoff",
+      "shape": "cylinder",
+      "position": [
+        0.075,
+        0.046,
+        0.132
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.003,
+        0.07
+      ],
+      "material": "brushed steel",
+      "role": "Spacer rod that supports the lower-right of the exploded operator panel.",
+      "connections": [
+        "base",
+        "front_operator_panel"
+      ]
+    },
+    {
+      "id": "panel_screw_ul",
+      "name": "Upper Left Front Panel Screw",
+      "shape": "cylinder",
+      "position": [
+        -0.079,
+        0.173,
+        0.177
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.003,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head showing how the upper-left panel corner attaches to its standoff.",
+      "connections": [
+        "front_operator_panel",
+        "front_panel_standoff_fl"
+      ]
+    },
+    {
+      "id": "panel_screw_ur",
+      "name": "Upper Right Front Panel Screw",
+      "shape": "cylinder",
+      "position": [
+        0.079,
+        0.173,
+        0.177
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.003,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head showing how the upper-right panel corner attaches to its standoff.",
+      "connections": [
+        "front_operator_panel",
+        "front_panel_standoff_fr"
+      ]
+    },
+    {
+      "id": "panel_screw_ll",
+      "name": "Lower Left Front Panel Screw",
+      "shape": "cylinder",
+      "position": [
+        -0.079,
+        0.035,
+        0.177
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.003,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head showing how the lower-left panel corner attaches to its standoff.",
+      "connections": [
+        "front_operator_panel",
+        "front_panel_standoff_bl"
+      ]
+    },
+    {
+      "id": "panel_screw_lr",
+      "name": "Lower Right Front Panel Screw",
+      "shape": "cylinder",
+      "position": [
+        0.079,
+        0.035,
+        0.177
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.003,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head showing how the lower-right panel corner attaches to its standoff.",
+      "connections": [
+        "front_operator_panel",
+        "front_panel_standoff_br"
+      ]
+    },
+    {
+      "id": "touchscreen",
+      "name": "Touchscreen Display",
+      "shape": "box",
+      "position": [
+        0,
+        0.118,
+        0.171
+      ],
+      "size": [
+        0.12,
+        0.09,
+        0.006
+      ],
+      "material": "glass display",
+      "role": "Capacitive touchscreen that shows pressure and flow waveforms, modes, alarm limits, and settings.",
+      "connections": [
+        "front_operator_panel",
+        "ui_ribbon_cable"
+      ]
+    },
+    {
+      "id": "alarm_led_red",
+      "name": "High-Priority Alarm LED",
+      "shape": "cylinder",
+      "position": [
+        -0.066,
+        0.172,
+        0.176
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.006,
+        0.005
+      ],
+      "material": "glass display",
+      "role": "Red front-panel indicator used for high-priority ventilator alarms.",
+      "connections": [
+        "front_operator_panel"
+      ]
+    },
+    {
+      "id": "alarm_led_yellow",
+      "name": "Medium-Priority Alarm LED",
+      "shape": "cylinder",
+      "position": [
+        0.066,
+        0.172,
+        0.176
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.006,
+        0.005
+      ],
+      "material": "glass display",
+      "role": "Yellow front-panel indicator used for medium-priority warning states.",
+      "connections": [
+        "front_operator_panel"
+      ]
+    },
+    {
+      "id": "silence_button",
+      "name": "Alarm-Silence Button",
+      "shape": "cylinder",
+      "position": [
+        -0.06,
+        0.044,
+        0.176
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.009,
+        0.007
+      ],
+      "material": "white composite",
+      "role": "Momentary button used by the operator to silence an active audible alarm.",
+      "connections": [
+        "front_operator_panel"
+      ]
+    },
+    {
+      "id": "power_button",
+      "name": "Power Button",
+      "shape": "cylinder",
+      "position": [
+        0.06,
+        0.044,
+        0.176
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.009,
+        0.007
+      ],
+      "material": "white composite",
+      "role": "Front-panel on and standby control for the ventilator electronics.",
+      "connections": [
+        "front_operator_panel"
+      ]
+    },
+    {
+      "id": "patient_tube_port",
+      "name": "22 mm Inspiratory Patient Tube Port",
+      "shape": "cylinder",
+      "position": [
+        0.048,
+        0.124,
+        0.181
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.011,
+        0.026
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Standard inspiratory patient-circuit outlet where the blower-fed limb connects.",
+      "connections": [
+        "front_operator_panel",
+        "tube_patient_filter_to_port",
+        "insp_port_label"
+      ]
+    },
+    {
+      "id": "exhalation_return_port",
+      "name": "22 mm Exhalation Return Port",
+      "shape": "cylinder",
+      "position": [
+        0.082,
+        0.092,
+        0.181
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.011,
+        0.026
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Separate front return fitting that accepts the expiratory limb before gas passes through the exhaust HEPA filter.",
+      "connections": [
+        "front_operator_panel",
+        "tube_exhale_port_to_filter",
+        "exh_port_label"
+      ]
+    },
+    {
+      "id": "insp_port_label",
+      "name": "Inspiratory Port Label Plaque",
+      "shape": "box",
+      "position": [
+        0.048,
+        0.148,
+        0.178
+      ],
+      "size": [
+        0.026,
+        0.006,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Small physical label plaque that identifies the upper patient port as inspiratory flow out.",
+      "connections": [
+        "front_operator_panel",
+        "patient_tube_port"
+      ]
+    },
+    {
+      "id": "exh_port_label",
+      "name": "Exhalation Port Label Plaque",
+      "shape": "box",
+      "position": [
+        0.082,
+        0.071,
+        0.178
+      ],
+      "size": [
+        0.026,
+        0.006,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Small physical label plaque that identifies the lower patient port as exhalation return.",
+      "connections": [
+        "front_operator_panel",
+        "exhalation_return_port"
+      ]
+    },
+    {
+      "id": "rear_intake_grille",
+      "name": "Rear Air-Intake Grille",
+      "shape": "box",
+      "position": [
+        -0.072,
+        0.075,
+        -0.107
+      ],
+      "size": [
+        0.05,
+        0.045,
+        0.004
+      ],
+      "material": "black composite",
+      "role": "External louver opening that admits room air before the intake HEPA filter.",
+      "connections": [
+        "rear_panel",
+        "air_intake_filter"
+      ]
+    },
+    {
+      "id": "intake_grille_slat_1",
+      "name": "Intake Grille Slat 1",
+      "shape": "box",
+      "position": [
+        -0.072,
+        0.061,
+        -0.111
+      ],
+      "size": [
+        0.044,
+        0.004,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Horizontal grille bar that makes the rear air inlet recognizable.",
+      "connections": [
+        "rear_intake_grille"
+      ]
+    },
+    {
+      "id": "intake_grille_slat_2",
+      "name": "Intake Grille Slat 2",
+      "shape": "box",
+      "position": [
+        -0.072,
+        0.075,
+        -0.111
+      ],
+      "size": [
+        0.044,
+        0.004,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Middle grille bar across the rear air inlet.",
+      "connections": [
+        "rear_intake_grille"
+      ]
+    },
+    {
+      "id": "intake_grille_slat_3",
+      "name": "Intake Grille Slat 3",
+      "shape": "box",
+      "position": [
+        -0.072,
+        0.089,
+        -0.111
+      ],
+      "size": [
+        0.044,
+        0.004,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Upper grille bar across the rear air inlet.",
+      "connections": [
+        "rear_intake_grille"
+      ]
+    },
+    {
+      "id": "air_intake_filter",
+      "name": "Air-Intake HEPA Filter",
+      "shape": "box",
+      "position": [
+        -0.072,
+        0.046,
+        -0.064
+      ],
+      "size": [
+        0.052,
+        0.052,
+        0.035
+      ],
+      "material": "white composite",
+      "role": "Replaceable HEPA cartridge that filters room air before it reaches the blower.",
+      "connections": [
+        "base",
+        "rear_intake_grille",
+        "tube_intake_to_blower",
+        "intake_filter_face"
+      ]
+    },
+    {
+      "id": "intake_filter_face",
+      "name": "Intake Filter Blue Media Face",
+      "shape": "box",
+      "position": [
+        -0.072,
+        0.046,
+        -0.045
+      ],
+      "size": [
+        0.046,
+        0.044,
+        0.003
+      ],
+      "material": "fiberglass",
+      "role": "Visible blue filter media face that distinguishes the HEPA cartridge from a plain box.",
+      "connections": [
+        "air_intake_filter",
+        "intake_pleat_1",
+        "intake_pleat_2",
+        "intake_pleat_3",
+        "intake_pleat_4"
+      ]
+    },
+    {
+      "id": "intake_pleat_1",
+      "name": "Intake HEPA Pleat 1",
+      "shape": "box",
+      "position": [
+        -0.088,
+        0.046,
+        -0.042
+      ],
+      "size": [
+        0.003,
+        0.04,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Raised pleat rib on the intake HEPA media showing folded filter construction.",
+      "connections": [
+        "intake_filter_face"
+      ]
+    },
+    {
+      "id": "intake_pleat_2",
+      "name": "Intake HEPA Pleat 2",
+      "shape": "box",
+      "position": [
+        -0.077,
+        0.046,
+        -0.042
+      ],
+      "size": [
+        0.003,
+        0.04,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Raised pleat rib on the intake filter face used to convey replaceable HEPA media.",
+      "connections": [
+        "intake_filter_face"
+      ]
+    },
+    {
+      "id": "intake_pleat_3",
+      "name": "Intake HEPA Pleat 3",
+      "shape": "box",
+      "position": [
+        -0.066,
+        0.046,
+        -0.042
+      ],
+      "size": [
+        0.003,
+        0.04,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Raised pleat rib on the intake filter face that breaks up the cartridge block.",
+      "connections": [
+        "intake_filter_face"
+      ]
+    },
+    {
+      "id": "intake_pleat_4",
+      "name": "Intake HEPA Pleat 4",
+      "shape": "box",
+      "position": [
+        -0.055,
+        0.046,
+        -0.042
+      ],
+      "size": [
+        0.003,
+        0.04,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Raised pleat rib on the intake filter face marking the air-cleaning element.",
+      "connections": [
+        "intake_filter_face"
+      ]
+    },
+    {
+      "id": "blower_mount",
+      "name": "Blower Mounting Bracket",
+      "shape": "box",
+      "position": [
+        -0.046,
+        0.018,
+        -0.004
+      ],
+      "size": [
+        0.072,
+        0.018,
+        0.068
+      ],
+      "material": "brushed steel",
+      "role": "Raised metal saddle that bolts the blower to the base plate and leaves tube clearance underneath.",
+      "connections": [
+        "base",
+        "blower_body",
+        "blower_mount_screw_1",
+        "blower_mount_screw_2"
+      ]
+    },
+    {
+      "id": "blower_mount_screw_1",
+      "name": "Blower Bracket Front Screw",
+      "shape": "cylinder",
+      "position": [
+        -0.072,
+        0.03,
+        0.022
+      ],
+      "size": [
+        0.003,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Front screw head clamping the blower bracket to the base plate.",
+      "connections": [
+        "blower_mount",
+        "base"
+      ]
+    },
+    {
+      "id": "blower_mount_screw_2",
+      "name": "Blower Bracket Rear Screw",
+      "shape": "cylinder",
+      "position": [
+        -0.02,
+        0.03,
+        -0.03
+      ],
+      "size": [
+        0.003,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Rear screw head clamping the blower bracket to the base plate.",
+      "connections": [
+        "blower_mount",
+        "base"
+      ]
+    },
+    {
+      "id": "blower_body",
+      "name": "Centrifugal Blower Scroll",
+      "shape": "cylinder",
+      "position": [
+        -0.048,
+        0.064,
+        -0.004
+      ],
+      "size": [
+        0.034,
+        0.048
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Circular centrifugal blower housing that pressurizes the inspiratory gas stream.",
+      "connections": [
+        "base",
+        "blower_mount",
+        "blower_motor",
+        "tube_intake_to_blower",
+        "blower_outlet_snout",
+        "motor_driver_board"
+      ]
+    },
+    {
+      "id": "blower_motor",
+      "name": "Brushless Blower Motor",
+      "shape": "cylinder",
+      "position": [
+        -0.048,
+        0.103,
+        -0.004
+      ],
+      "size": [
+        0.018,
+        0.03
+      ],
+      "material": "brushed steel",
+      "role": "Brushless DC motor mounted above the blower impeller and driven by the motor driver board.",
+      "connections": [
+        "blower_body",
+        "motor_wire_harness"
+      ]
+    },
+    {
+      "id": "blower_outlet_snout",
+      "name": "Tangential Blower Outlet",
+      "shape": "box",
+      "position": [
+        -0.015,
+        0.062,
+        0.017
+      ],
+      "size": [
+        0.04,
+        0.02,
+        0.024
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Tangential rectangular outlet that makes the blower read as a centrifugal scroll rather than a simple can.",
+      "connections": [
+        "blower_body",
+        "tube_blower_to_mixer"
+      ]
+    },
+    {
+      "id": "tube_intake_to_blower",
+      "name": "Tube - Intake Filter to Blower",
+      "shape": "cylinder",
+      "position": [
+        -0.06,
+        0.052,
+        -0.034
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.006,
+        0.058
+      ],
+      "material": "rubber",
+      "role": "Short silicone tube carrying filtered room air from the HEPA cartridge into the blower inlet.",
+      "connections": [
+        "air_intake_filter",
+        "blower_body"
+      ]
+    },
+    {
+      "id": "o2_supply_port",
+      "name": "Rear O2 Supply Port",
+      "shape": "cylinder",
+      "position": [
+        -0.012,
+        0.052,
+        -0.111
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.008,
+        0.022
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear oxygen inlet fitting where supplemental O2 from a cylinder or wall supply enters.",
+      "connections": [
+        "rear_panel",
+        "tube_o2_port_to_mixer"
+      ]
+    },
+    {
+      "id": "o2_mixer_body",
+      "name": "Passive O2 Mixer Chamber",
+      "shape": "cylinder",
+      "position": [
+        0.025,
+        0.052,
+        0.018
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.018,
+        0.05
+      ],
+      "material": "white composite",
+      "role": "Inline mixing chamber that blends blower air with optional supplemental oxygen before metering.",
+      "connections": [
+        "base",
+        "tube_blower_to_mixer",
+        "tube_o2_port_to_mixer",
+        "tube_mixer_to_valve"
+      ]
+    },
+    {
+      "id": "tube_blower_to_mixer",
+      "name": "Tube - Blower Outlet to Mixer",
+      "shape": "cylinder",
+      "position": [
+        0.005,
+        0.058,
+        0.018
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.006,
+        0.045
+      ],
+      "material": "rubber",
+      "role": "Flexible tube carrying pressurized air from the blower outlet into the oxygen mixer.",
+      "connections": [
+        "blower_outlet_snout",
+        "o2_mixer_body"
+      ]
+    },
+    {
+      "id": "tube_o2_port_to_mixer",
+      "name": "Tube - O2 Port to Mixer",
+      "shape": "cylinder",
+      "position": [
+        0.004,
+        0.052,
+        -0.045
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.004,
+        0.13
+      ],
+      "material": "rubber",
+      "role": "Small oxygen hose routing supplemental O2 from the rear port into the mixer side inlet.",
+      "connections": [
+        "o2_supply_port",
+        "o2_mixer_body"
+      ]
+    },
+    {
+      "id": "proportional_valve_body",
+      "name": "Proportional Pressure Valve",
+      "shape": "box",
+      "position": [
+        0.067,
+        0.049,
+        0.018
+      ],
+      "size": [
+        0.045,
+        0.04,
+        0.038
+      ],
+      "material": "forged steel",
+      "role": "Servo-controlled valve that meters inspiratory pressure and flow into the patient line.",
+      "connections": [
+        "base",
+        "tube_mixer_to_valve",
+        "valve_servo_cap",
+        "flow_sensor_body",
+        "pressure_sensor_tap"
+      ]
+    },
+    {
+      "id": "tube_mixer_to_valve",
+      "name": "Tube - Mixer to Proportional Valve",
+      "shape": "cylinder",
+      "position": [
+        0.047,
+        0.052,
+        0.018
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.006,
+        0.038
+      ],
+      "material": "rubber",
+      "role": "Short tube that carries blended gas from the mixer outlet into the proportional valve.",
+      "connections": [
+        "o2_mixer_body",
+        "proportional_valve_body"
+      ]
+    },
+    {
+      "id": "valve_servo_cap",
+      "name": "Valve Servo Actuator Cap",
+      "shape": "cylinder",
+      "position": [
+        0.067,
+        0.082,
+        0.018
+      ],
+      "size": [
+        0.014,
+        0.018
+      ],
+      "material": "brushed steel",
+      "role": "Small actuator housing above the valve body that drives the proportional metering element.",
+      "connections": [
+        "proportional_valve_body"
+      ]
+    },
+    {
+      "id": "flow_sensor_body",
+      "name": "Inspiratory Flow Sensor",
+      "shape": "box",
+      "position": [
+        0.092,
+        0.052,
+        0.048
+      ],
+      "size": [
+        0.03,
+        0.024,
+        0.024
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Inline flow sensor that reports inspiratory flow for tidal-volume calculation and closed-loop control.",
+      "connections": [
+        "proportional_valve_body",
+        "tube_flow_to_patient_filter",
+        "sensor_wire_harness"
+      ]
+    },
+    {
+      "id": "pressure_sensor_tap",
+      "name": "Pressure Sensor Tap Tube",
+      "shape": "cylinder",
+      "position": [
+        0.067,
+        0.083,
+        -0.008
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.003,
+        0.045
+      ],
+      "material": "rubber",
+      "role": "Small pneumatic tap that samples pressure from the valve outlet and routes it to the pressure sensor.",
+      "connections": [
+        "proportional_valve_body",
+        "pressure_sensor_body"
+      ]
+    },
+    {
+      "id": "pressure_sensor_body",
+      "name": "Patient-Line Pressure Sensor",
+      "shape": "box",
+      "position": [
+        0.067,
+        0.103,
+        -0.032
+      ],
+      "size": [
+        0.026,
+        0.018,
+        0.024
+      ],
+      "material": "dark anodized aluminum",
+      "role": "MEMS pressure sensor module that feeds the pressure servo loop and over-pressure alarms.",
+      "connections": [
+        "pressure_sensor_tap",
+        "sensor_wire_harness"
+      ]
+    },
+    {
+      "id": "patient_hepa_filter",
+      "name": "Patient Inspiratory HEPA Filter",
+      "shape": "box",
+      "position": [
+        0.062,
+        0.048,
+        0.082
+      ],
+      "size": [
+        0.052,
+        0.052,
+        0.034
+      ],
+      "material": "white composite",
+      "role": "Disposable outlet HEPA filter that protects the inspiratory patient circuit and is swapped between patients.",
+      "connections": [
+        "base",
+        "tube_flow_to_patient_filter",
+        "tube_patient_filter_to_port",
+        "patient_filter_face"
+      ]
+    },
+    {
+      "id": "patient_filter_face",
+      "name": "Patient Filter Blue Media Face",
+      "shape": "box",
+      "position": [
+        0.062,
+        0.048,
+        0.101
+      ],
+      "size": [
+        0.046,
+        0.044,
+        0.003
+      ],
+      "material": "fiberglass",
+      "role": "Visible media face showing that the patient outlet component is a filter cartridge.",
+      "connections": [
+        "patient_hepa_filter",
+        "patient_pleat_1",
+        "patient_pleat_2",
+        "patient_pleat_3",
+        "patient_pleat_4"
+      ]
+    },
+    {
+      "id": "patient_pleat_1",
+      "name": "Patient HEPA Pleat 1",
+      "shape": "box",
+      "position": [
+        0.046,
+        0.048,
+        0.104
+      ],
+      "size": [
+        0.003,
+        0.04,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Raised pleat rib on the patient outlet HEPA filter media.",
+      "connections": [
+        "patient_filter_face"
+      ]
+    },
+    {
+      "id": "patient_pleat_2",
+      "name": "Patient HEPA Pleat 2",
+      "shape": "box",
+      "position": [
+        0.057,
+        0.048,
+        0.104
+      ],
+      "size": [
+        0.003,
+        0.04,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Raised pleat rib showing the folded patient filter element.",
+      "connections": [
+        "patient_filter_face"
+      ]
+    },
+    {
+      "id": "patient_pleat_3",
+      "name": "Patient HEPA Pleat 3",
+      "shape": "box",
+      "position": [
+        0.068,
+        0.048,
+        0.104
+      ],
+      "size": [
+        0.003,
+        0.04,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Raised pleat rib that distinguishes the inspiratory filter from a plain housing block.",
+      "connections": [
+        "patient_filter_face"
+      ]
+    },
+    {
+      "id": "patient_pleat_4",
+      "name": "Patient HEPA Pleat 4",
+      "shape": "box",
+      "position": [
+        0.079,
+        0.048,
+        0.104
+      ],
+      "size": [
+        0.003,
+        0.04,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Raised pleat rib completing the visible filter-media pattern.",
+      "connections": [
+        "patient_filter_face"
+      ]
+    },
+    {
+      "id": "tube_flow_to_patient_filter",
+      "name": "Tube - Flow Sensor to Patient Filter",
+      "shape": "cylinder",
+      "position": [
+        0.078,
+        0.052,
+        0.064
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.006,
+        0.04
+      ],
+      "material": "rubber",
+      "role": "Short inspiratory hose from the flow sensor outlet to the patient HEPA filter.",
+      "connections": [
+        "flow_sensor_body",
+        "patient_hepa_filter"
+      ]
+    },
+    {
+      "id": "tube_patient_filter_to_port",
+      "name": "Tube - Patient Filter to Front Port",
+      "shape": "cylinder",
+      "position": [
+        0.056,
+        0.088,
+        0.128
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.007,
+        0.08
+      ],
+      "material": "rubber",
+      "role": "Visible flexible outlet hose linking the internal patient HEPA filter to the exploded inspiratory front port.",
+      "connections": [
+        "patient_hepa_filter",
+        "patient_tube_port"
+      ]
+    },
+    {
+      "id": "exhaust_hepa_filter",
+      "name": "Exhalation Exhaust HEPA Filter",
+      "shape": "box",
+      "position": [
+        -0.056,
+        0.045,
+        0.052
+      ],
+      "size": [
+        0.046,
+        0.046,
+        0.034
+      ],
+      "material": "white composite",
+      "role": "Return-line HEPA filter that scrubs expired gas before it vents through the rear exhaust port.",
+      "connections": [
+        "base",
+        "tube_exhaust_filter_to_port",
+        "exhaust_filter_face",
+        "tube_exhale_port_to_filter"
+      ]
+    },
+    {
+      "id": "exhaust_filter_face",
+      "name": "Exhaust Filter Blue Media Face",
+      "shape": "box",
+      "position": [
+        -0.056,
+        0.045,
+        0.071
+      ],
+      "size": [
+        0.04,
+        0.038,
+        0.003
+      ],
+      "material": "fiberglass",
+      "role": "Visible media face marking the exhalation-return component as a filter.",
+      "connections": [
+        "exhaust_hepa_filter",
+        "exhaust_pleat_1",
+        "exhaust_pleat_2",
+        "exhaust_pleat_3",
+        "exhaust_pleat_4"
+      ]
+    },
+    {
+      "id": "exhaust_pleat_1",
+      "name": "Exhaust HEPA Pleat 1",
+      "shape": "box",
+      "position": [
+        -0.071,
+        0.045,
+        0.074
+      ],
+      "size": [
+        0.003,
+        0.034,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Raised pleat rib on the exhaust HEPA filter media.",
+      "connections": [
+        "exhaust_filter_face"
+      ]
+    },
+    {
+      "id": "exhaust_pleat_2",
+      "name": "Exhaust HEPA Pleat 2",
+      "shape": "box",
+      "position": [
+        -0.061,
+        0.045,
+        0.074
+      ],
+      "size": [
+        0.003,
+        0.034,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Raised pleat rib showing folded media in the return filter.",
+      "connections": [
+        "exhaust_filter_face"
+      ]
+    },
+    {
+      "id": "exhaust_pleat_3",
+      "name": "Exhaust HEPA Pleat 3",
+      "shape": "box",
+      "position": [
+        -0.051,
+        0.045,
+        0.074
+      ],
+      "size": [
+        0.003,
+        0.034,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Raised pleat rib that makes the exhaust filter readable from the open front.",
+      "connections": [
+        "exhaust_filter_face"
+      ]
+    },
+    {
+      "id": "exhaust_pleat_4",
+      "name": "Exhaust HEPA Pleat 4",
+      "shape": "box",
+      "position": [
+        -0.041,
+        0.045,
+        0.074
+      ],
+      "size": [
+        0.003,
+        0.034,
+        0.003
+      ],
+      "material": "white composite",
+      "role": "Raised pleat rib completing the visible exhaust filter pattern.",
+      "connections": [
+        "exhaust_filter_face"
+      ]
+    },
+    {
+      "id": "tube_exhale_port_to_filter",
+      "name": "Tube - Exhalation Port to Exhaust Filter",
+      "shape": "cylinder",
+      "position": [
+        0.016,
+        0.076,
+        0.112
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.007,
+        0.145
+      ],
+      "material": "rubber",
+      "role": "Return hose carrying exhaled gas from the front exhalation port toward the exhaust HEPA filter.",
+      "connections": [
+        "exhalation_return_port",
+        "exhaust_hepa_filter"
+      ]
+    },
+    {
+      "id": "exhaust_port",
+      "name": "Rear Exhaust Port",
+      "shape": "cylinder",
+      "position": [
+        0.042,
+        0.092,
+        -0.111
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.01,
+        0.02
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear outlet where filtered exhaled gas leaves the ventilator enclosure.",
+      "connections": [
+        "rear_panel",
+        "tube_exhaust_filter_to_port"
+      ]
+    },
+    {
+      "id": "tube_exhaust_filter_to_port",
+      "name": "Tube - Exhaust Filter to Rear Port",
+      "shape": "cylinder",
+      "position": [
+        -0.006,
+        0.068,
+        -0.028
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.006,
+        0.16
+      ],
+      "material": "rubber",
+      "role": "Return hose from the exhaust HEPA filter to the rear exhaust outlet.",
+      "connections": [
+        "exhaust_hepa_filter",
+        "exhaust_port"
+      ]
+    },
+    {
+      "id": "power_inlet",
+      "name": "IEC C14 Power Inlet",
+      "shape": "box",
+      "position": [
+        0.078,
+        0.048,
+        -0.111
+      ],
+      "size": [
+        0.032,
+        0.026,
+        0.014
+      ],
+      "material": "black composite",
+      "role": "Rear mains inlet that receives AC power for the internal supply.",
+      "connections": [
+        "rear_panel",
+        "power_supply"
+      ]
+    },
+    {
+      "id": "service_usb_port",
+      "name": "Service USB Port",
+      "shape": "box",
+      "position": [
+        0.078,
+        0.082,
+        -0.111
+      ],
+      "size": [
+        0.024,
+        0.012,
+        0.01
+      ],
+      "material": "black composite",
+      "role": "Rear service connector used for firmware access and diagnostics.",
+      "connections": [
+        "rear_panel",
+        "stm32_board"
+      ]
+    },
+    {
+      "id": "stm32_board",
+      "name": "STM32 Controller Board",
+      "shape": "box",
+      "position": [
+        0.02,
+        0.128,
+        -0.058
+      ],
+      "size": [
+        0.12,
+        0.006,
+        0.07
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Main embedded controller board that runs pressure and flow control, alarms, UI, and sensor acquisition.",
+      "connections": [
+        "base",
+        "board_standoff_1",
+        "board_standoff_2",
+        "board_standoff_3",
+        "board_standoff_4",
+        "motor_driver_board",
+        "power_supply",
+        "terminal_block",
+        "sensor_wire_harness",
+        "ui_ribbon_cable",
+        "service_usb_port",
+        "board_screw_1",
+        "board_screw_2",
+        "board_screw_3",
+        "board_screw_4"
+      ]
+    },
+    {
+      "id": "board_standoff_1",
+      "name": "Controller Board Standoff 1",
+      "shape": "cylinder",
+      "position": [
+        -0.035,
+        0.068,
+        -0.09
+      ],
+      "size": [
+        0.003,
+        0.12
+      ],
+      "material": "brushed steel",
+      "role": "Metal spacer supporting the rear-left corner of the controller board above the base.",
+      "connections": [
+        "base",
+        "stm32_board"
+      ]
+    },
+    {
+      "id": "board_standoff_2",
+      "name": "Controller Board Standoff 2",
+      "shape": "cylinder",
+      "position": [
+        0.075,
+        0.068,
+        -0.09
+      ],
+      "size": [
+        0.003,
+        0.12
+      ],
+      "material": "brushed steel",
+      "role": "Metal spacer supporting the rear-right corner of the controller board.",
+      "connections": [
+        "base",
+        "stm32_board"
+      ]
+    },
+    {
+      "id": "board_standoff_3",
+      "name": "Controller Board Standoff 3",
+      "shape": "cylinder",
+      "position": [
+        -0.035,
+        0.068,
+        -0.03
+      ],
+      "size": [
+        0.003,
+        0.12
+      ],
+      "material": "brushed steel",
+      "role": "Metal spacer supporting the front-left corner of the controller board.",
+      "connections": [
+        "base",
+        "stm32_board"
+      ]
+    },
+    {
+      "id": "board_standoff_4",
+      "name": "Controller Board Standoff 4",
+      "shape": "cylinder",
+      "position": [
+        0.075,
+        0.068,
+        -0.03
+      ],
+      "size": [
+        0.003,
+        0.12
+      ],
+      "material": "brushed steel",
+      "role": "Metal spacer supporting the front-right corner of the controller board.",
+      "connections": [
+        "base",
+        "stm32_board"
+      ]
+    },
+    {
+      "id": "board_screw_1",
+      "name": "Controller Board Screw 1",
+      "shape": "cylinder",
+      "position": [
+        -0.035,
+        0.134,
+        -0.09
+      ],
+      "size": [
+        0.0025,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Screw head fastening the rear-left board corner to its standoff.",
+      "connections": [
+        "stm32_board",
+        "board_standoff_1"
+      ]
+    },
+    {
+      "id": "board_screw_2",
+      "name": "Controller Board Screw 2",
+      "shape": "cylinder",
+      "position": [
+        0.075,
+        0.134,
+        -0.09
+      ],
+      "size": [
+        0.0025,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Screw head fastening the rear-right board corner to its standoff.",
+      "connections": [
+        "stm32_board",
+        "board_standoff_2"
+      ]
+    },
+    {
+      "id": "board_screw_3",
+      "name": "Controller Board Screw 3",
+      "shape": "cylinder",
+      "position": [
+        -0.035,
+        0.134,
+        -0.03
+      ],
+      "size": [
+        0.0025,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Screw head fastening the front-left board corner to its standoff.",
+      "connections": [
+        "stm32_board",
+        "board_standoff_3"
+      ]
+    },
+    {
+      "id": "board_screw_4",
+      "name": "Controller Board Screw 4",
+      "shape": "cylinder",
+      "position": [
+        0.075,
+        0.134,
+        -0.03
+      ],
+      "size": [
+        0.0025,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Screw head fastening the front-right board corner to its standoff.",
+      "connections": [
+        "stm32_board",
+        "board_standoff_4"
+      ]
+    },
+    {
+      "id": "motor_driver_board",
+      "name": "Blower Motor Driver Board",
+      "shape": "box",
+      "position": [
+        -0.066,
+        0.123,
+        -0.054
+      ],
+      "size": [
+        0.046,
+        0.008,
+        0.04
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Three-phase motor controller board that powers the brushless blower motor.",
+      "connections": [
+        "stm32_board",
+        "blower_body",
+        "motor_wire_harness"
+      ]
+    },
+    {
+      "id": "power_supply",
+      "name": "AC to DC Power Supply",
+      "shape": "box",
+      "position": [
+        0.064,
+        0.055,
+        -0.062
+      ],
+      "size": [
+        0.07,
+        0.038,
+        0.05
+      ],
+      "material": "brushed steel",
+      "role": "Internal power supply converting rear-panel AC input to low-voltage DC rails.",
+      "connections": [
+        "base",
+        "power_inlet",
+        "terminal_block",
+        "stm32_board",
+        "psu_screw_left",
+        "psu_screw_right"
+      ]
+    },
+    {
+      "id": "psu_screw_left",
+      "name": "Power Supply Left Screw",
+      "shape": "cylinder",
+      "position": [
+        0.038,
+        0.078,
+        -0.082
+      ],
+      "size": [
+        0.003,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head fastening the left side of the power supply to the base.",
+      "connections": [
+        "power_supply",
+        "base"
+      ]
+    },
+    {
+      "id": "psu_screw_right",
+      "name": "Power Supply Right Screw",
+      "shape": "cylinder",
+      "position": [
+        0.09,
+        0.078,
+        -0.042
+      ],
+      "size": [
+        0.003,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head fastening the right side of the power supply to the base.",
+      "connections": [
+        "power_supply",
+        "base"
+      ]
+    },
+    {
+      "id": "terminal_block",
+      "name": "Low-Voltage Terminal Block",
+      "shape": "box",
+      "position": [
+        0.018,
+        0.083,
+        -0.094
+      ],
+      "size": [
+        0.05,
+        0.018,
+        0.016
+      ],
+      "material": "brass",
+      "role": "Screw terminal strip distributing DC power from the supply to the boards and actuators.",
+      "connections": [
+        "power_supply",
+        "stm32_board",
+        "motor_driver_board"
+      ]
+    },
+    {
+      "id": "cooling_fan",
+      "name": "Electronics Cooling Fan",
+      "shape": "cylinder",
+      "position": [
+        0.092,
+        0.128,
+        -0.028
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.018,
+        0.012
+      ],
+      "material": "black composite",
+      "role": "Small axial fan that moves air across the power supply and controller board.",
+      "connections": [
+        "stm32_board",
+        "power_supply"
+      ]
+    },
+    {
+      "id": "ui_ribbon_cable",
+      "name": "Touchscreen Ribbon Cable",
+      "shape": "box",
+      "position": [
+        0,
+        0.122,
+        0.056
+      ],
+      "size": [
+        0.05,
+        0.004,
+        0.17
+      ],
+      "material": "copper",
+      "role": "Flat flexible cable bridging the exploded front touchscreen panel to the rear controller board.",
+      "connections": [
+        "front_operator_panel",
+        "touchscreen",
+        "stm32_board"
+      ]
+    },
+    {
+      "id": "motor_wire_harness",
+      "name": "Motor Wire Harness",
+      "shape": "cylinder",
+      "position": [
+        -0.058,
+        0.112,
+        -0.028
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.0025,
+        0.055
+      ],
+      "material": "copper",
+      "role": "Bundled motor phase wires from the driver board to the brushless blower motor.",
+      "connections": [
+        "motor_driver_board",
+        "blower_motor"
+      ]
+    },
+    {
+      "id": "sensor_wire_harness",
+      "name": "Sensor Wire Harness",
+      "shape": "cylinder",
+      "position": [
+        0.08,
+        0.112,
+        0.005
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.002,
+        0.09
+      ],
+      "material": "copper",
+      "role": "Signal harness from the pressure and flow sensors back to the STM32 controller board.",
+      "connections": [
+        "stm32_board",
+        "flow_sensor_body",
+        "pressure_sensor_body"
+      ]
+    }
   ]
 }

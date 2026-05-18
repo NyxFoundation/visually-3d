@@ -1,10 +1,14 @@
 {
   "machine_name": "Yale OpenHand Model T",
-  "assembly_instructions": "Tendon-driven, underactuated 3D-printed robotic hand from Yale's GRAB Lab. Four fingers arranged in a 2+2 pincer: two fingers on each side of the palm, all extending forward. Each finger is printed in Nylon 12 as three visible segments (proximal, middle, distal) separated by live flexure hinges — no pin joints. A single DC actuator inside the palm pulls four Spectra tendons through a central floating pulley tree so the whole hand closes in a conformal grasp when any tendon reaches the end of travel. A cylindrical wrist connector at the rear bolts the hand onto a robot arm; a cover plate closes the palm actuator bay. A small cylindrical object sits in the grasp zone to show the pincer closing around it.",
+  "assembly_instructions": "1. Print the Nylon-12 palm tray floor, side rails, rear wall, front finger crossmember, four standoffs, four base flexures, twelve finger links, and eight compliant interphalangeal flexure webs. 2. Bolt the dark anodized aluminum wrist connector to the rear wall through the brushed-steel flange disk using the four visible M3 flange bolt heads, then fasten the rear wall to the tray. 3. Install the 22 mm geared DC motor, gearbox cap, and 14 mm brass drive spool in the open tray, with the spool axis running across the hand width. 4. Mount the floating pulley tree with the primary yoke near the spool, the first-stage pulley in the yoke, the two second-stage pulleys forward and outboard, and four guide eyelets at the front crossmember. 5. Attach the four proximal links to their base flexures, then install the middle and distal links in the shown inward-curled posture so the inner fingers wrap around the 32 mm sample cylinder. 6. Route the main Spectra line from the spool to the primary pulley, split it to the two second-stage pulleys, then route four tendons through the guide eyelets along the underside of each finger to the distal anchor pads. 7. Tension all four tendons equally, tie off at the four black anchor pads, and verify the floating pulleys equalize when one finger contacts first. 8. Leave the cover plate offset above and behind the palm for inspection, or lower it onto the four standoffs and secure it with the four cover screw heads after testing free motion.",
   "metadata": {
     "reference": "https://www.eng.yale.edu/grablab/openhand/",
     "domain": "robotic-manipulation",
-    "thumbnail_camera": [0.4, 0.25, 0.4],
+    "thumbnail_camera": [
+      0.4,
+      0.25,
+      0.4
+    ],
     "info": {
       "japanese_name": "イェール OpenHand モデルT",
       "english_name": "Yale OpenHand Model T",
@@ -16,49 +20,1761 @@
       "contract_value": "≈US$500 in parts (one motor + printed shells + Spectra tendon)",
       "status": "Open-source, widely replicated in research labs",
       "facts": [
-        { "label": "Fingers",        "value": "4 — 2+2 pincer, each 3 visible segments (proximal + middle + distal)" },
-        { "label": "Joints",         "value": "Printed Nylon-12 flexure hinges (no pin joints)" },
-        { "label": "Actuation",      "value": "1 DC motor → floating pulley tree → 4 Spectra tendons" },
-        { "label": "Coupling",       "value": "Floating pulley tree equalizes tension across all four fingers" },
-        { "label": "Construction",   "value": "FDM/SLS 3D printing + off-the-shelf motor, Spectra line" },
-        { "label": "Footprint",      "value": "≈0.20 m (L) × 0.11 m (W) × 0.06 m (H)" },
-        { "label": "License",        "value": "CC BY-NC 3.0 (CAD, docs)" }
+        {
+          "label": "Fingers",
+          "value": "4 fingers in a 2+2 pincer layout; each finger has 3 visible links, 1 base flexure, and 2 printed interphalangeal flexure webs."
+        },
+        {
+          "label": "Joints",
+          "value": "Printed Nylon-12 compliant flexures replace pin joints at all 8 interphalangeal bends plus 4 base flexures."
+        },
+        {
+          "label": "Actuation",
+          "value": "1 geared DC motor drives a 14 mm spool feeding a two-stage floating pulley tree and 4 Spectra tendons."
+        },
+        {
+          "label": "Pulley equalization",
+          "value": "1 primary floating pulley and 2 second-stage floating pulleys split one motor stroke into four tendon branches."
+        },
+        {
+          "label": "Approximate envelope",
+          "value": "0.24 m long including wrist connector, 0.12 m wide across outer fingers, and about 0.13 m high with the offset exploded cover shown."
+        },
+        {
+          "label": "Palm tray",
+          "value": "Open tray about 0.14 m × 0.11 m × 0.018 m with separate rails, rear wall, crossmember, and standoffs instead of a closed shell."
+        },
+        {
+          "label": "Sample object",
+          "value": "Grasp demonstrator is a 0.032 m diameter cylinder centered between the two inner distal fingertips."
+        },
+        {
+          "label": "Fasteners",
+          "value": "4 cover screws and 4 wrist flange bolts are shown as separate heads so the service and mounting interfaces are buildable."
+        },
+        {
+          "label": "License",
+          "value": "CC BY-NC 3.0 for OpenHand CAD and documentation."
+        }
       ],
       "sources": [
-        { "title": "Yale OpenHand Project (GRAB Lab site)",               "url": "https://www.eng.yale.edu/grablab/openhand/" },
-        { "title": "Ma & Dollar — 'Underactuated hand for finger-gaiting'","url": "https://www.eng.yale.edu/grablab/pubs/Ma_ICRA2013.pdf" }
+        {
+          "title": "Yale OpenHand Project (GRAB Lab site)",
+          "url": "https://www.eng.yale.edu/grablab/openhand/"
+        },
+        {
+          "title": "Ma & Dollar — 'Underactuated hand for finger-gaiting'",
+          "url": "https://www.eng.yale.edu/grablab/pubs/Ma_ICRA2013.pdf"
+        },
+        {
+          "title": "Yale OpenHand Project GitHub organization",
+          "url": "https://github.com/grablab/openhand"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "palm_base",        "name": "Palm / Base",                 "shape": "box",      "position": [0, 0.15, 0],           "size": [0.14, 0.06, 0.11], "material": "white composite",       "role": "Printed Nylon-12 palm shell — houses the actuator, pulley tree, and tendon routing.", "connections": ["wrist_connector", "actuator", "pulley_tree", "cover_plate", "f1_prox", "f2_prox", "f3_prox", "f4_prox"] },
-    { "id": "cover_plate",      "name": "Palm Cover Plate",            "shape": "box",      "position": [0, 0.185, 0],          "size": [0.125, 0.008, 0.10],"material": "white composite",      "role": "Printed cover that closes the top of the palm over the actuator bay.", "connections": ["palm_base"] },
-    { "id": "wrist_connector",  "name": "Wrist Connector",             "shape": "cylinder", "position": [-0.115, 0.15, 0], "rotation": [0, 0, 1.5708], "size": [0.035, 0.10], "material": "dark anodized aluminum","role": "Cylindrical adapter that bolts the hand to a robot-arm flange.", "connections": ["palm_base"] },
-
-    { "id": "actuator",         "name": "Tendon Actuator (DC motor)",  "shape": "cylinder", "position": [-0.045, 0.15, 0], "rotation": [0, 0, 1.5708], "size": [0.022, 0.08], "material": "brushed steel",         "role": "Single geared DC motor + spool inside the palm — pulls all four tendons simultaneously.", "connections": ["palm_base", "pulley_tree"] },
-    { "id": "pulley_tree",      "name": "Floating Pulley Tree",        "shape": "cylinder", "position": [0.02, 0.15, 0],   "rotation": [0, 0, 1.5708], "size": [0.022, 0.018],"material": "dark anodized aluminum","role": "Free-floating two-stage pulley that equalizes tendon tension across the four fingers — the core of the underactuated mechanism.", "connections": ["actuator", "tendon_1", "tendon_2", "tendon_3", "tendon_4"] },
-
-    { "id": "f1_prox",          "name": "Finger 1 — Proximal",         "shape": "box",      "position": [0.095, 0.15, 0.045],   "size": [0.040, 0.018, 0.018], "material": "white composite",   "role": "Outer-left finger, proximal segment. Flexure hinge connects to the middle segment.", "connections": ["palm_base", "f1_mid", "tendon_1"] },
-    { "id": "f1_mid",           "name": "Finger 1 — Middle",           "shape": "box",      "position": [0.135, 0.15, 0.045],   "size": [0.035, 0.016, 0.016], "material": "white composite",   "role": "Outer-left finger, middle segment.", "connections": ["f1_prox", "f1_dist", "tendon_1"] },
-    { "id": "f1_dist",          "name": "Finger 1 — Distal",           "shape": "box",      "position": [0.170, 0.15, 0.045],   "size": [0.028, 0.014, 0.014], "material": "white composite",   "role": "Outer-left finger tip. Tendon anchors here.", "connections": ["f1_mid", "tendon_1"] },
-
-    { "id": "f2_prox",          "name": "Finger 2 — Proximal",         "shape": "box",      "position": [0.095, 0.15, 0.020],   "size": [0.040, 0.018, 0.018], "material": "white composite",   "role": "Inner-left finger, proximal segment.", "connections": ["palm_base", "f2_mid", "tendon_2"] },
-    { "id": "f2_mid",           "name": "Finger 2 — Middle",           "shape": "box",      "position": [0.135, 0.15, 0.020],   "size": [0.035, 0.016, 0.016], "material": "white composite",   "role": "Inner-left finger, middle segment.", "connections": ["f2_prox", "f2_dist", "tendon_2"] },
-    { "id": "f2_dist",          "name": "Finger 2 — Distal",           "shape": "box",      "position": [0.170, 0.15, 0.020],   "size": [0.028, 0.014, 0.014], "material": "white composite",   "role": "Inner-left finger tip.", "connections": ["f2_mid", "tendon_2"] },
-
-    { "id": "f3_prox",          "name": "Finger 3 — Proximal",         "shape": "box",      "position": [0.095, 0.15, -0.020],  "size": [0.040, 0.018, 0.018], "material": "white composite",   "role": "Inner-right finger, proximal segment.", "connections": ["palm_base", "f3_mid", "tendon_3"] },
-    { "id": "f3_mid",           "name": "Finger 3 — Middle",           "shape": "box",      "position": [0.135, 0.15, -0.020],  "size": [0.035, 0.016, 0.016], "material": "white composite",   "role": "Inner-right finger, middle segment.", "connections": ["f3_prox", "f3_dist", "tendon_3"] },
-    { "id": "f3_dist",          "name": "Finger 3 — Distal",           "shape": "box",      "position": [0.170, 0.15, -0.020],  "size": [0.028, 0.014, 0.014], "material": "white composite",   "role": "Inner-right finger tip.", "connections": ["f3_mid", "tendon_3"] },
-
-    { "id": "f4_prox",          "name": "Finger 4 — Proximal",         "shape": "box",      "position": [0.095, 0.15, -0.045],  "size": [0.040, 0.018, 0.018], "material": "white composite",   "role": "Outer-right finger, proximal segment.", "connections": ["palm_base", "f4_mid", "tendon_4"] },
-    { "id": "f4_mid",           "name": "Finger 4 — Middle",           "shape": "box",      "position": [0.135, 0.15, -0.045],  "size": [0.035, 0.016, 0.016], "material": "white composite",   "role": "Outer-right finger, middle segment.", "connections": ["f4_prox", "f4_dist", "tendon_4"] },
-    { "id": "f4_dist",          "name": "Finger 4 — Distal",           "shape": "box",      "position": [0.170, 0.15, -0.045],  "size": [0.028, 0.014, 0.014], "material": "white composite",   "role": "Outer-right finger tip.", "connections": ["f4_mid", "tendon_4"] },
-
-    { "id": "tendon_1",         "name": "Tendon (Finger 1)",           "shape": "cylinder", "position": [0.130, 0.141, 0.045],  "rotation": [0, 0, 1.5708], "size": [0.002, 0.11], "material": "black composite",         "role": "Spectra tendon running along the underside of finger 1 from the pulley tree to the distal anchor.", "connections": ["pulley_tree"] },
-    { "id": "tendon_2",         "name": "Tendon (Finger 2)",           "shape": "cylinder", "position": [0.130, 0.141, 0.020],  "rotation": [0, 0, 1.5708], "size": [0.002, 0.11], "material": "black composite",         "role": "Spectra tendon along finger 2.", "connections": ["pulley_tree"] },
-    { "id": "tendon_3",         "name": "Tendon (Finger 3)",           "shape": "cylinder", "position": [0.130, 0.141, -0.020], "rotation": [0, 0, 1.5708], "size": [0.002, 0.11], "material": "black composite",         "role": "Spectra tendon along finger 3.", "connections": ["pulley_tree"] },
-    { "id": "tendon_4",         "name": "Tendon (Finger 4)",           "shape": "cylinder", "position": [0.130, 0.141, -0.045], "rotation": [0, 0, 1.5708], "size": [0.002, 0.11], "material": "black composite",         "role": "Spectra tendon along finger 4.", "connections": ["pulley_tree"] },
-
-    { "id": "grasped_object",   "name": "Grasped Object (sample)",     "shape": "cylinder", "position": [0.145, 0.155, 0],                             "size": [0.016, 0.05], "material": "white composite",         "role": "Small cylindrical object (≈32 mm diameter) centered in the grasp zone, surrounded by the four fingertips.", "connections": ["f2_dist", "f3_dist"] }
+    {
+      "id": "palm_tray_floor",
+      "name": "Open Palm Tray Floor",
+      "shape": "box",
+      "position": [
+        0,
+        0.009,
+        0
+      ],
+      "size": [
+        0.14,
+        0.018,
+        0.11
+      ],
+      "material": "white composite",
+      "role": "Nylon-12 floor plate supports the motor, pulley tree, rails, and finger crossmember while leaving the actuator bay open for inspection.",
+      "connections": [
+        "left_side_rail",
+        "right_side_rail",
+        "rear_wall",
+        "front_crossmember",
+        "motor_can",
+        "pulley_yoke_primary"
+      ]
+    },
+    {
+      "id": "left_side_rail",
+      "name": "Palm Side Rail Port",
+      "shape": "box",
+      "position": [
+        0,
+        0.035,
+        0.058
+      ],
+      "size": [
+        0.14,
+        0.052,
+        0.008
+      ],
+      "material": "white composite",
+      "role": "Port-side printed rail stiffens the open palm tray without covering the motor or tendon routing.",
+      "connections": [
+        "palm_tray_floor",
+        "rear_wall",
+        "front_crossmember",
+        "standoff_port_rear",
+        "standoff_port_front"
+      ]
+    },
+    {
+      "id": "right_side_rail",
+      "name": "Palm Side Rail Starboard",
+      "shape": "box",
+      "position": [
+        0,
+        0.035,
+        -0.058
+      ],
+      "size": [
+        0.14,
+        0.052,
+        0.008
+      ],
+      "material": "white composite",
+      "role": "Starboard-side printed rail mirrors the port rail and keeps the tray rectangular while preserving a visible cutaway center.",
+      "connections": [
+        "palm_tray_floor",
+        "rear_wall",
+        "front_crossmember",
+        "standoff_starboard_rear",
+        "standoff_starboard_front"
+      ]
+    },
+    {
+      "id": "rear_wall",
+      "name": "Rear Wrist Wall",
+      "shape": "box",
+      "position": [
+        -0.073,
+        0.035,
+        0
+      ],
+      "size": [
+        0.008,
+        0.052,
+        0.11
+      ],
+      "material": "white composite",
+      "role": "Rear printed wall carries the wrist connector loads into the open palm tray.",
+      "connections": [
+        "palm_tray_floor",
+        "left_side_rail",
+        "right_side_rail",
+        "wrist_connector",
+        "wrist_flange_disk"
+      ]
+    },
+    {
+      "id": "front_crossmember",
+      "name": "Front Finger Crossmember",
+      "shape": "box",
+      "position": [
+        0.073,
+        0.034,
+        0
+      ],
+      "size": [
+        0.01,
+        0.05,
+        0.11
+      ],
+      "material": "white composite",
+      "role": "Front printed crossmember anchors the four finger-base flexures and the tendon guide eyelets.",
+      "connections": [
+        "palm_tray_floor",
+        "left_side_rail",
+        "right_side_rail",
+        "base_hinge_f1",
+        "base_hinge_f2",
+        "base_hinge_f3",
+        "base_hinge_f4"
+      ]
+    },
+    {
+      "id": "standoff_port_rear",
+      "name": "Cover Standoff Port Rear",
+      "shape": "cylinder",
+      "position": [
+        -0.052,
+        0.065,
+        0.045
+      ],
+      "size": [
+        0.004,
+        0.05
+      ],
+      "material": "brushed steel",
+      "role": "Rear port spacer sets the cover height and shows where the removable top plate bolts down.",
+      "connections": [
+        "palm_tray_floor",
+        "left_side_rail",
+        "cover_plate_exploded",
+        "cover_screw_port_rear"
+      ]
+    },
+    {
+      "id": "standoff_port_front",
+      "name": "Cover Standoff Port Front",
+      "shape": "cylinder",
+      "position": [
+        0.052,
+        0.065,
+        0.045
+      ],
+      "size": [
+        0.004,
+        0.05
+      ],
+      "material": "brushed steel",
+      "role": "Front port spacer supports the removable cover without obscuring the tendon guides.",
+      "connections": [
+        "palm_tray_floor",
+        "left_side_rail",
+        "cover_plate_exploded",
+        "cover_screw_port_front"
+      ]
+    },
+    {
+      "id": "standoff_starboard_rear",
+      "name": "Cover Standoff Starboard Rear",
+      "shape": "cylinder",
+      "position": [
+        -0.052,
+        0.065,
+        -0.045
+      ],
+      "size": [
+        0.004,
+        0.05
+      ],
+      "material": "brushed steel",
+      "role": "Rear starboard spacer mirrors the port standoff and makes the cover mounting pattern buildable.",
+      "connections": [
+        "palm_tray_floor",
+        "right_side_rail",
+        "cover_plate_exploded",
+        "cover_screw_starboard_rear"
+      ]
+    },
+    {
+      "id": "standoff_starboard_front",
+      "name": "Cover Standoff Starboard Front",
+      "shape": "cylinder",
+      "position": [
+        0.052,
+        0.065,
+        -0.045
+      ],
+      "size": [
+        0.004,
+        0.05
+      ],
+      "material": "brushed steel",
+      "role": "Front starboard spacer completes the four-point cover support pattern.",
+      "connections": [
+        "palm_tray_floor",
+        "right_side_rail",
+        "cover_plate_exploded",
+        "cover_screw_starboard_front"
+      ]
+    },
+    {
+      "id": "cover_plate_exploded",
+      "name": "Palm Cover Plate (Offset Exploded)",
+      "shape": "box",
+      "position": [
+        -0.026,
+        0.13,
+        0
+      ],
+      "size": [
+        0.125,
+        0.008,
+        0.1
+      ],
+      "material": "white composite",
+      "role": "Removable printed cover is offset above and behind the palm so the motor, spool, and pulley tree remain visible in the ISO render.",
+      "connections": [
+        "standoff_port_rear",
+        "standoff_port_front",
+        "standoff_starboard_rear",
+        "standoff_starboard_front",
+        "cover_screw_port_rear",
+        "cover_screw_port_front",
+        "cover_screw_starboard_rear",
+        "cover_screw_starboard_front"
+      ]
+    },
+    {
+      "id": "cover_screw_port_rear",
+      "name": "Cover Screw Head Port Rear",
+      "shape": "cylinder",
+      "position": [
+        -0.078,
+        0.137,
+        0.045
+      ],
+      "size": [
+        0.0045,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head marks the rear port cover fastener location when the exploded plate is lowered onto the standoff.",
+      "connections": [
+        "cover_plate_exploded",
+        "standoff_port_rear"
+      ]
+    },
+    {
+      "id": "cover_screw_port_front",
+      "name": "Cover Screw Head Port Front",
+      "shape": "cylinder",
+      "position": [
+        0.026,
+        0.137,
+        0.045
+      ],
+      "size": [
+        0.0045,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head marks the front port cover fastener location when the exploded plate is lowered onto the standoff.",
+      "connections": [
+        "cover_plate_exploded",
+        "standoff_port_front"
+      ]
+    },
+    {
+      "id": "cover_screw_starboard_rear",
+      "name": "Cover Screw Head Starboard Rear",
+      "shape": "cylinder",
+      "position": [
+        -0.078,
+        0.137,
+        -0.045
+      ],
+      "size": [
+        0.0045,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head marks the rear starboard cover fastener location when the exploded plate is lowered onto the standoff.",
+      "connections": [
+        "cover_plate_exploded",
+        "standoff_starboard_rear"
+      ]
+    },
+    {
+      "id": "cover_screw_starboard_front",
+      "name": "Cover Screw Head Starboard Front",
+      "shape": "cylinder",
+      "position": [
+        0.026,
+        0.137,
+        -0.045
+      ],
+      "size": [
+        0.0045,
+        0.003
+      ],
+      "material": "brushed steel",
+      "role": "Visible screw head marks the front starboard cover fastener location when the exploded plate is lowered onto the standoff.",
+      "connections": [
+        "cover_plate_exploded",
+        "standoff_starboard_front"
+      ]
+    },
+    {
+      "id": "wrist_connector",
+      "name": "Cylindrical Wrist Connector",
+      "shape": "cylinder",
+      "position": [
+        -0.128,
+        0.035,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.035,
+        0.1
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Robot-arm adapter cylinder bolts to the rear wall and defines the mounting axis behind the palm.",
+      "connections": [
+        "rear_wall",
+        "wrist_flange_disk"
+      ]
+    },
+    {
+      "id": "wrist_flange_disk",
+      "name": "Wrist Flange Face",
+      "shape": "cylinder",
+      "position": [
+        -0.079,
+        0.035,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.041,
+        0.008
+      ],
+      "material": "brushed steel",
+      "role": "Thin flange disk spreads wrist adapter clamp loads into the rear printed wall.",
+      "connections": [
+        "wrist_connector",
+        "rear_wall",
+        "wrist_bolt_top",
+        "wrist_bolt_bottom",
+        "wrist_bolt_port",
+        "wrist_bolt_starboard"
+      ]
+    },
+    {
+      "id": "wrist_bolt_top",
+      "name": "Wrist Flange Bolt Top",
+      "shape": "cylinder",
+      "position": [
+        -0.083,
+        0.057,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Top M3 bolt head clamps the wrist flange into the rear wall.",
+      "connections": [
+        "wrist_flange_disk",
+        "rear_wall"
+      ]
+    },
+    {
+      "id": "wrist_bolt_bottom",
+      "name": "Wrist Flange Bolt Bottom",
+      "shape": "cylinder",
+      "position": [
+        -0.083,
+        0.013,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Bottom M3 bolt head completes the vertical clamp pair on the wrist flange.",
+      "connections": [
+        "wrist_flange_disk",
+        "rear_wall"
+      ]
+    },
+    {
+      "id": "wrist_bolt_port",
+      "name": "Wrist Flange Bolt Port",
+      "shape": "cylinder",
+      "position": [
+        -0.083,
+        0.035,
+        0.024
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Port-side M3 bolt head locates the wrist flange against torsion from grasp loads.",
+      "connections": [
+        "wrist_flange_disk",
+        "rear_wall"
+      ]
+    },
+    {
+      "id": "wrist_bolt_starboard",
+      "name": "Wrist Flange Bolt Starboard",
+      "shape": "cylinder",
+      "position": [
+        -0.083,
+        0.035,
+        -0.024
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.004,
+        0.004
+      ],
+      "material": "brushed steel",
+      "role": "Starboard-side M3 bolt head mirrors the port fastener and completes the four-bolt wrist pattern.",
+      "connections": [
+        "wrist_flange_disk",
+        "rear_wall"
+      ]
+    },
+    {
+      "id": "motor_can",
+      "name": "Geared DC Motor Can",
+      "shape": "cylinder",
+      "position": [
+        -0.03,
+        0.036,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.022,
+        0.07
+      ],
+      "material": "brushed steel",
+      "role": "Single geared DC motor provides the only powered input for all four underactuated fingers.",
+      "connections": [
+        "palm_tray_floor",
+        "gearbox_cap",
+        "drive_spool"
+      ]
+    },
+    {
+      "id": "gearbox_cap",
+      "name": "Motor Gearbox Cap",
+      "shape": "cylinder",
+      "position": [
+        0.009,
+        0.036,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.018,
+        0.012
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Compact gearbox cap reduces motor speed and increases torque before the tendon spool.",
+      "connections": [
+        "motor_can",
+        "drive_spool"
+      ]
+    },
+    {
+      "id": "drive_spool",
+      "name": "Tendon Drive Spool",
+      "shape": "cylinder",
+      "position": [
+        0.026,
+        0.036,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.014,
+        0.032
+      ],
+      "material": "brass",
+      "role": "Grooved spool winds the primary Spectra line that pulls the floating pulley tree forward.",
+      "connections": [
+        "gearbox_cap",
+        "pulley_yoke_primary",
+        "tendon_main"
+      ]
+    },
+    {
+      "id": "pulley_yoke_primary",
+      "name": "Primary Floating Pulley Yoke",
+      "shape": "box",
+      "position": [
+        0.045,
+        0.043,
+        0
+      ],
+      "size": [
+        0.018,
+        0.014,
+        0.04
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Free yoke carries the first pulley and floats so motor force self-equalizes before splitting left and right.",
+      "connections": [
+        "palm_tray_floor",
+        "primary_pulley",
+        "secondary_pulley_left",
+        "secondary_pulley_right"
+      ]
+    },
+    {
+      "id": "primary_pulley",
+      "name": "Primary Floating Pulley Wheel",
+      "shape": "torus",
+      "position": [
+        0.045,
+        0.045,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.012,
+        0.0025
+      ],
+      "material": "dark anodized aluminum",
+      "role": "First pulley redirects the motor tendon into the two second-stage branches.",
+      "connections": [
+        "pulley_yoke_primary",
+        "tendon_main",
+        "tendon_split_left",
+        "tendon_split_right"
+      ]
+    },
+    {
+      "id": "secondary_pulley_left",
+      "name": "Second-Stage Pulley Port Pair",
+      "shape": "torus",
+      "position": [
+        0.06,
+        0.043,
+        0.03
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.01,
+        0.002
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Port-side second-stage pulley divides one branch into the two port-side finger tendons.",
+      "connections": [
+        "pulley_yoke_primary",
+        "tendon_split_left",
+        "tendon_f1",
+        "tendon_f2"
+      ]
+    },
+    {
+      "id": "secondary_pulley_right",
+      "name": "Second-Stage Pulley Starboard Pair",
+      "shape": "torus",
+      "position": [
+        0.06,
+        0.043,
+        -0.03
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.01,
+        0.002
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Starboard-side second-stage pulley divides one branch into the two starboard-side finger tendons.",
+      "connections": [
+        "pulley_yoke_primary",
+        "tendon_split_right",
+        "tendon_f3",
+        "tendon_f4"
+      ]
+    },
+    {
+      "id": "tendon_main",
+      "name": "Main Motor Tendon Loop",
+      "shape": "cylinder",
+      "position": [
+        0.036,
+        0.047,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.0015,
+        0.03
+      ],
+      "material": "black composite",
+      "role": "Spectra line from the drive spool to the primary floating pulley transmits the motor stroke.",
+      "connections": [
+        "drive_spool",
+        "primary_pulley"
+      ]
+    },
+    {
+      "id": "tendon_split_left",
+      "name": "Port Split Tendon",
+      "shape": "cylinder",
+      "position": [
+        0.055,
+        0.047,
+        0.016
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.0013,
+        0.03
+      ],
+      "material": "black composite",
+      "role": "Short Spectra branch links the primary pulley to the port second-stage pulley.",
+      "connections": [
+        "primary_pulley",
+        "secondary_pulley_left"
+      ]
+    },
+    {
+      "id": "tendon_split_right",
+      "name": "Starboard Split Tendon",
+      "shape": "cylinder",
+      "position": [
+        0.055,
+        0.047,
+        -0.016
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.0013,
+        0.03
+      ],
+      "material": "black composite",
+      "role": "Short Spectra branch links the primary pulley to the starboard second-stage pulley.",
+      "connections": [
+        "primary_pulley",
+        "secondary_pulley_right"
+      ]
+    },
+    {
+      "id": "guide_eyelet_f1",
+      "name": "Tendon Guide Eyelet F1",
+      "shape": "torus",
+      "position": [
+        0.08,
+        0.041,
+        0.045
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.005,
+        0.0012
+      ],
+      "material": "brushed steel",
+      "role": "Low-friction eyelet at the crossmember aligns finger 1 tendon with its underside groove.",
+      "connections": [
+        "front_crossmember",
+        "tendon_f1"
+      ]
+    },
+    {
+      "id": "guide_eyelet_f2",
+      "name": "Tendon Guide Eyelet F2",
+      "shape": "torus",
+      "position": [
+        0.08,
+        0.041,
+        0.02
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.005,
+        0.0012
+      ],
+      "material": "brushed steel",
+      "role": "Low-friction eyelet at the crossmember aligns finger 2 tendon with its underside groove.",
+      "connections": [
+        "front_crossmember",
+        "tendon_f2"
+      ]
+    },
+    {
+      "id": "guide_eyelet_f3",
+      "name": "Tendon Guide Eyelet F3",
+      "shape": "torus",
+      "position": [
+        0.08,
+        0.041,
+        -0.02
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.005,
+        0.0012
+      ],
+      "material": "brushed steel",
+      "role": "Low-friction eyelet at the crossmember aligns finger 3 tendon with its underside groove.",
+      "connections": [
+        "front_crossmember",
+        "tendon_f3"
+      ]
+    },
+    {
+      "id": "guide_eyelet_f4",
+      "name": "Tendon Guide Eyelet F4",
+      "shape": "torus",
+      "position": [
+        0.08,
+        0.041,
+        -0.045
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.005,
+        0.0012
+      ],
+      "material": "brushed steel",
+      "role": "Low-friction eyelet at the crossmember aligns finger 4 tendon with its underside groove.",
+      "connections": [
+        "front_crossmember",
+        "tendon_f4"
+      ]
+    },
+    {
+      "id": "base_hinge_f1",
+      "name": "Finger 1 Base Flexure",
+      "shape": "box",
+      "position": [
+        0.085,
+        0.042,
+        0.045
+      ],
+      "rotation": [
+        0,
+        -0.12,
+        0
+      ],
+      "size": [
+        0.01,
+        0.01,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Printed compliant root hinge lets the outer port finger rotate inward without a metal pin.",
+      "connections": [
+        "front_crossmember",
+        "f1_prox"
+      ]
+    },
+    {
+      "id": "f1_prox",
+      "name": "Finger 1 Proximal Link",
+      "shape": "box",
+      "position": [
+        0.105,
+        0.042,
+        0.043
+      ],
+      "rotation": [
+        0,
+        -0.12,
+        0
+      ],
+      "size": [
+        0.03,
+        0.016,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Outer port proximal phalanx begins the inward curl and carries the first tendon groove.",
+      "connections": [
+        "base_hinge_f1",
+        "hinge_f1_mid",
+        "tendon_f1"
+      ]
+    },
+    {
+      "id": "hinge_f1_mid",
+      "name": "Finger 1 Middle Flexure",
+      "shape": "box",
+      "position": [
+        0.123,
+        0.041,
+        0.039
+      ],
+      "rotation": [
+        0,
+        -0.22,
+        0
+      ],
+      "size": [
+        0.006,
+        0.008,
+        0.016
+      ],
+      "material": "white composite",
+      "role": "Thin Nylon web bends elastically between the proximal and middle links of finger 1.",
+      "connections": [
+        "f1_prox",
+        "f1_mid"
+      ]
+    },
+    {
+      "id": "f1_mid",
+      "name": "Finger 1 Middle Link",
+      "shape": "box",
+      "position": [
+        0.144,
+        0.04,
+        0.034
+      ],
+      "rotation": [
+        0,
+        -0.28,
+        0
+      ],
+      "size": [
+        0.034,
+        0.014,
+        0.016
+      ],
+      "material": "white composite",
+      "role": "Outer port middle phalanx is yawed inward so the outer finger helps funnel objects toward the centerline.",
+      "connections": [
+        "hinge_f1_mid",
+        "hinge_f1_dist",
+        "tendon_f1"
+      ]
+    },
+    {
+      "id": "hinge_f1_dist",
+      "name": "Finger 1 Distal Flexure",
+      "shape": "box",
+      "position": [
+        0.164,
+        0.039,
+        0.027
+      ],
+      "rotation": [
+        0,
+        -0.38,
+        0
+      ],
+      "size": [
+        0.006,
+        0.007,
+        0.014
+      ],
+      "material": "white composite",
+      "role": "Second compliant web lets the fingertip curl after proximal contact is resisted.",
+      "connections": [
+        "f1_mid",
+        "f1_dist"
+      ]
+    },
+    {
+      "id": "f1_dist",
+      "name": "Finger 1 Distal Tip",
+      "shape": "box",
+      "position": [
+        0.183,
+        0.039,
+        0.02
+      ],
+      "rotation": [
+        0,
+        -0.45,
+        0
+      ],
+      "size": [
+        0.026,
+        0.012,
+        0.014
+      ],
+      "material": "white composite",
+      "role": "Outer port fingertip curls toward the sample cylinder and contains the tendon tie-off pad.",
+      "connections": [
+        "hinge_f1_dist",
+        "anchor_f1",
+        "tendon_f1"
+      ]
+    },
+    {
+      "id": "anchor_f1",
+      "name": "Finger 1 Tendon Anchor",
+      "shape": "box",
+      "position": [
+        0.191,
+        0.033,
+        0.016
+      ],
+      "rotation": [
+        0,
+        -0.45,
+        0
+      ],
+      "size": [
+        0.006,
+        0.004,
+        0.012
+      ],
+      "material": "black composite",
+      "role": "Small clamp pad ties the Spectra tendon to the distal end of finger 1.",
+      "connections": [
+        "f1_dist",
+        "tendon_f1"
+      ]
+    },
+    {
+      "id": "base_hinge_f2",
+      "name": "Finger 2 Base Flexure",
+      "shape": "box",
+      "position": [
+        0.085,
+        0.042,
+        0.02
+      ],
+      "rotation": [
+        0,
+        -0.08,
+        0
+      ],
+      "size": [
+        0.01,
+        0.01,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Printed compliant root hinge lets the inner port finger close toward the centerline.",
+      "connections": [
+        "front_crossmember",
+        "f2_prox"
+      ]
+    },
+    {
+      "id": "f2_prox",
+      "name": "Finger 2 Proximal Link",
+      "shape": "box",
+      "position": [
+        0.105,
+        0.042,
+        0.019
+      ],
+      "rotation": [
+        0,
+        -0.08,
+        0
+      ],
+      "size": [
+        0.03,
+        0.016,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Inner port proximal phalanx is one side of the 2+2 pincer around the sample cylinder.",
+      "connections": [
+        "base_hinge_f2",
+        "hinge_f2_mid",
+        "tendon_f2"
+      ]
+    },
+    {
+      "id": "hinge_f2_mid",
+      "name": "Finger 2 Middle Flexure",
+      "shape": "box",
+      "position": [
+        0.124,
+        0.041,
+        0.016
+      ],
+      "rotation": [
+        0,
+        -0.16,
+        0
+      ],
+      "size": [
+        0.006,
+        0.008,
+        0.016
+      ],
+      "material": "white composite",
+      "role": "Thin Nylon web bends elastically between the proximal and middle links of finger 2.",
+      "connections": [
+        "f2_prox",
+        "f2_mid"
+      ]
+    },
+    {
+      "id": "f2_mid",
+      "name": "Finger 2 Middle Link",
+      "shape": "box",
+      "position": [
+        0.145,
+        0.04,
+        0.012
+      ],
+      "rotation": [
+        0,
+        -0.22,
+        0
+      ],
+      "size": [
+        0.034,
+        0.014,
+        0.016
+      ],
+      "material": "white composite",
+      "role": "Inner port middle phalanx angles toward the cylinder to show the adaptive closing posture.",
+      "connections": [
+        "hinge_f2_mid",
+        "hinge_f2_dist",
+        "tendon_f2"
+      ]
+    },
+    {
+      "id": "hinge_f2_dist",
+      "name": "Finger 2 Distal Flexure",
+      "shape": "box",
+      "position": [
+        0.165,
+        0.039,
+        0.006
+      ],
+      "rotation": [
+        0,
+        -0.32,
+        0
+      ],
+      "size": [
+        0.006,
+        0.007,
+        0.014
+      ],
+      "material": "white composite",
+      "role": "Second compliant web lets the finger 2 tip curl around the cylinder after contact.",
+      "connections": [
+        "f2_mid",
+        "f2_dist"
+      ]
+    },
+    {
+      "id": "f2_dist",
+      "name": "Finger 2 Distal Tip",
+      "shape": "box",
+      "position": [
+        0.183,
+        0.039,
+        0.002
+      ],
+      "rotation": [
+        0,
+        -0.38,
+        0
+      ],
+      "size": [
+        0.026,
+        0.012,
+        0.014
+      ],
+      "material": "white composite",
+      "role": "Inner port fingertip provides one near-side contact patch on the sample cylinder.",
+      "connections": [
+        "hinge_f2_dist",
+        "anchor_f2",
+        "grasped_object",
+        "tendon_f2"
+      ]
+    },
+    {
+      "id": "anchor_f2",
+      "name": "Finger 2 Tendon Anchor",
+      "shape": "box",
+      "position": [
+        0.191,
+        0.033,
+        0
+      ],
+      "rotation": [
+        0,
+        -0.38,
+        0
+      ],
+      "size": [
+        0.006,
+        0.004,
+        0.012
+      ],
+      "material": "black composite",
+      "role": "Small clamp pad ties the Spectra tendon to the distal end of finger 2.",
+      "connections": [
+        "f2_dist",
+        "tendon_f2"
+      ]
+    },
+    {
+      "id": "base_hinge_f3",
+      "name": "Finger 3 Base Flexure",
+      "shape": "box",
+      "position": [
+        0.085,
+        0.042,
+        -0.02
+      ],
+      "rotation": [
+        0,
+        0.08,
+        0
+      ],
+      "size": [
+        0.01,
+        0.01,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Printed compliant root hinge lets the inner starboard finger close toward the centerline.",
+      "connections": [
+        "front_crossmember",
+        "f3_prox"
+      ]
+    },
+    {
+      "id": "f3_prox",
+      "name": "Finger 3 Proximal Link",
+      "shape": "box",
+      "position": [
+        0.105,
+        0.042,
+        -0.019
+      ],
+      "rotation": [
+        0,
+        0.08,
+        0
+      ],
+      "size": [
+        0.03,
+        0.016,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Inner starboard proximal phalanx mirrors finger 2 to form the opposing half of the pincer.",
+      "connections": [
+        "base_hinge_f3",
+        "hinge_f3_mid",
+        "tendon_f3"
+      ]
+    },
+    {
+      "id": "hinge_f3_mid",
+      "name": "Finger 3 Middle Flexure",
+      "shape": "box",
+      "position": [
+        0.124,
+        0.041,
+        -0.016
+      ],
+      "rotation": [
+        0,
+        0.16,
+        0
+      ],
+      "size": [
+        0.006,
+        0.008,
+        0.016
+      ],
+      "material": "white composite",
+      "role": "Thin Nylon web bends elastically between the proximal and middle links of finger 3.",
+      "connections": [
+        "f3_prox",
+        "f3_mid"
+      ]
+    },
+    {
+      "id": "f3_mid",
+      "name": "Finger 3 Middle Link",
+      "shape": "box",
+      "position": [
+        0.145,
+        0.04,
+        -0.012
+      ],
+      "rotation": [
+        0,
+        0.22,
+        0
+      ],
+      "size": [
+        0.034,
+        0.014,
+        0.016
+      ],
+      "material": "white composite",
+      "role": "Inner starboard middle phalanx angles toward the cylinder and balances load with finger 2.",
+      "connections": [
+        "hinge_f3_mid",
+        "hinge_f3_dist",
+        "tendon_f3"
+      ]
+    },
+    {
+      "id": "hinge_f3_dist",
+      "name": "Finger 3 Distal Flexure",
+      "shape": "box",
+      "position": [
+        0.165,
+        0.039,
+        -0.006
+      ],
+      "rotation": [
+        0,
+        0.32,
+        0
+      ],
+      "size": [
+        0.006,
+        0.007,
+        0.014
+      ],
+      "material": "white composite",
+      "role": "Second compliant web lets the finger 3 tip curl around the cylinder after contact.",
+      "connections": [
+        "f3_mid",
+        "f3_dist"
+      ]
+    },
+    {
+      "id": "f3_dist",
+      "name": "Finger 3 Distal Tip",
+      "shape": "box",
+      "position": [
+        0.183,
+        0.039,
+        -0.002
+      ],
+      "rotation": [
+        0,
+        0.38,
+        0
+      ],
+      "size": [
+        0.026,
+        0.012,
+        0.014
+      ],
+      "material": "white composite",
+      "role": "Inner starboard fingertip provides the opposing near-side contact patch on the sample cylinder.",
+      "connections": [
+        "hinge_f3_dist",
+        "anchor_f3",
+        "grasped_object",
+        "tendon_f3"
+      ]
+    },
+    {
+      "id": "anchor_f3",
+      "name": "Finger 3 Tendon Anchor",
+      "shape": "box",
+      "position": [
+        0.191,
+        0.033,
+        0
+      ],
+      "rotation": [
+        0,
+        0.38,
+        0
+      ],
+      "size": [
+        0.006,
+        0.004,
+        0.012
+      ],
+      "material": "black composite",
+      "role": "Small clamp pad ties the Spectra tendon to the distal end of finger 3.",
+      "connections": [
+        "f3_dist",
+        "tendon_f3"
+      ]
+    },
+    {
+      "id": "base_hinge_f4",
+      "name": "Finger 4 Base Flexure",
+      "shape": "box",
+      "position": [
+        0.085,
+        0.042,
+        -0.045
+      ],
+      "rotation": [
+        0,
+        0.12,
+        0
+      ],
+      "size": [
+        0.01,
+        0.01,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Printed compliant root hinge lets the outer starboard finger rotate inward without a metal pin.",
+      "connections": [
+        "front_crossmember",
+        "f4_prox"
+      ]
+    },
+    {
+      "id": "f4_prox",
+      "name": "Finger 4 Proximal Link",
+      "shape": "box",
+      "position": [
+        0.105,
+        0.042,
+        -0.043
+      ],
+      "rotation": [
+        0,
+        0.12,
+        0
+      ],
+      "size": [
+        0.03,
+        0.016,
+        0.018
+      ],
+      "material": "white composite",
+      "role": "Outer starboard proximal phalanx completes the four-finger pincer width while starting the inward curl.",
+      "connections": [
+        "base_hinge_f4",
+        "hinge_f4_mid",
+        "tendon_f4"
+      ]
+    },
+    {
+      "id": "hinge_f4_mid",
+      "name": "Finger 4 Middle Flexure",
+      "shape": "box",
+      "position": [
+        0.123,
+        0.041,
+        -0.039
+      ],
+      "rotation": [
+        0,
+        0.22,
+        0
+      ],
+      "size": [
+        0.006,
+        0.008,
+        0.016
+      ],
+      "material": "white composite",
+      "role": "Thin Nylon web bends elastically between the proximal and middle links of finger 4.",
+      "connections": [
+        "f4_prox",
+        "f4_mid"
+      ]
+    },
+    {
+      "id": "f4_mid",
+      "name": "Finger 4 Middle Link",
+      "shape": "box",
+      "position": [
+        0.144,
+        0.04,
+        -0.034
+      ],
+      "rotation": [
+        0,
+        0.28,
+        0
+      ],
+      "size": [
+        0.034,
+        0.014,
+        0.016
+      ],
+      "material": "white composite",
+      "role": "Outer starboard middle phalanx is yawed inward so the outer finger helps funnel objects toward the centerline.",
+      "connections": [
+        "hinge_f4_mid",
+        "hinge_f4_dist",
+        "tendon_f4"
+      ]
+    },
+    {
+      "id": "hinge_f4_dist",
+      "name": "Finger 4 Distal Flexure",
+      "shape": "box",
+      "position": [
+        0.164,
+        0.039,
+        -0.027
+      ],
+      "rotation": [
+        0,
+        0.38,
+        0
+      ],
+      "size": [
+        0.006,
+        0.007,
+        0.014
+      ],
+      "material": "white composite",
+      "role": "Second compliant web lets the fingertip curl after proximal contact is resisted.",
+      "connections": [
+        "f4_mid",
+        "f4_dist"
+      ]
+    },
+    {
+      "id": "f4_dist",
+      "name": "Finger 4 Distal Tip",
+      "shape": "box",
+      "position": [
+        0.183,
+        0.039,
+        -0.02
+      ],
+      "rotation": [
+        0,
+        0.45,
+        0
+      ],
+      "size": [
+        0.026,
+        0.012,
+        0.014
+      ],
+      "material": "white composite",
+      "role": "Outer starboard fingertip curls toward the sample cylinder and contains the tendon tie-off pad.",
+      "connections": [
+        "hinge_f4_dist",
+        "anchor_f4",
+        "tendon_f4"
+      ]
+    },
+    {
+      "id": "anchor_f4",
+      "name": "Finger 4 Tendon Anchor",
+      "shape": "box",
+      "position": [
+        0.191,
+        0.033,
+        -0.016
+      ],
+      "rotation": [
+        0,
+        0.45,
+        0
+      ],
+      "size": [
+        0.006,
+        0.004,
+        0.012
+      ],
+      "material": "black composite",
+      "role": "Small clamp pad ties the Spectra tendon to the distal end of finger 4.",
+      "connections": [
+        "f4_dist",
+        "tendon_f4"
+      ]
+    },
+    {
+      "id": "tendon_f1",
+      "name": "Spectra Tendon Finger 1",
+      "shape": "cylinder",
+      "position": [
+        0.136,
+        0.031,
+        0.034
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.0012,
+        0.114
+      ],
+      "material": "black composite",
+      "role": "Finger 1 tendon runs visibly under the outer port finger from guide eyelet to distal anchor.",
+      "connections": [
+        "secondary_pulley_left",
+        "guide_eyelet_f1",
+        "f1_prox",
+        "f1_mid",
+        "anchor_f1"
+      ]
+    },
+    {
+      "id": "tendon_f2",
+      "name": "Spectra Tendon Finger 2",
+      "shape": "cylinder",
+      "position": [
+        0.137,
+        0.031,
+        0.011
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.0012,
+        0.114
+      ],
+      "material": "black composite",
+      "role": "Finger 2 tendon runs visibly under the inner port finger and curls that finger around the object first.",
+      "connections": [
+        "secondary_pulley_left",
+        "guide_eyelet_f2",
+        "f2_prox",
+        "f2_mid",
+        "anchor_f2"
+      ]
+    },
+    {
+      "id": "tendon_f3",
+      "name": "Spectra Tendon Finger 3",
+      "shape": "cylinder",
+      "position": [
+        0.137,
+        0.031,
+        -0.011
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.0012,
+        0.114
+      ],
+      "material": "black composite",
+      "role": "Finger 3 tendon runs visibly under the inner starboard finger and balances tension against finger 2.",
+      "connections": [
+        "secondary_pulley_right",
+        "guide_eyelet_f3",
+        "f3_prox",
+        "f3_mid",
+        "anchor_f3"
+      ]
+    },
+    {
+      "id": "tendon_f4",
+      "name": "Spectra Tendon Finger 4",
+      "shape": "cylinder",
+      "position": [
+        0.136,
+        0.031,
+        -0.034
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.0012,
+        0.114
+      ],
+      "material": "black composite",
+      "role": "Finger 4 tendon runs visibly under the outer starboard finger from guide eyelet to distal anchor.",
+      "connections": [
+        "secondary_pulley_right",
+        "guide_eyelet_f4",
+        "f4_prox",
+        "f4_mid",
+        "anchor_f4"
+      ]
+    },
+    {
+      "id": "grasped_object",
+      "name": "Sample Grasp Cylinder",
+      "shape": "cylinder",
+      "position": [
+        0.166,
+        0.042,
+        0
+      ],
+      "size": [
+        0.016,
+        0.052
+      ],
+      "material": "white composite",
+      "role": "Thirty-two millimetre diameter cylinder sits between the inward-curled inner fingertips to show the intended conformal pincer grasp zone.",
+      "connections": [
+        "f2_dist",
+        "f3_dist"
+      ]
+    }
   ]
 }

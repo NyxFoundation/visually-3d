@@ -1,10 +1,28 @@
 {
   "machine_name": "LifeTrac Open-Source Tractor",
-  "assembly_instructions": "OSE bolt-together modular tractor. A bolted XYZ space frame of 4×4 in square steel tubing — floor pan, two top side rails, four vertical corner posts — forms the chassis. Four large wheels sit at the corners, each driven by its own hub-mounted hydraulic 'universal rotor' motor for independent skid-steer 4WD. A modular PowerCube engine/pump block bolts to the rear-upper of the frame and supplies pressure to every hydraulic consumer. A front loader assembly — two side-by-side arms pivoting on brackets at the forward posts, raised by two hydraulic cylinders — carries a universal quick-attach bucket. A rear universal tool bar accepts three-point implements. The operator sits mid-frame with a tilt-forward steering column under a simple two-post ROPS roll cage.",
+  "assembly_instructions": [
+    "Set four 4x4 in lower frame rails on stands: port and starboard longitudinal rails first, then bolt the front and rear crossmembers between them to form the rectangular base.",
+    "Bolt the middle deck crossmember and thin operator deck plate to the lower rails, leaving the four wheel-hub bays open for hydraulic motor service.",
+    "Install the four vertical corner posts and bolt the two upper side rails to their tops, completing the bolted XYZ space frame.",
+    "Mount the rear tool bar and three-point hitch lugs to the rear crossmember before installing rear wheels, because the hitch bolts pass through the rear frame bay.",
+    "Bolt each hub motor bracket to its corner of the space frame, slide the hydraulic universal-rotor motor and planetary gear-down into the bracket, then install the steel rim and rubber tire at all four corners.",
+    "Assemble the removable PowerCube on its skid: engine block, hydraulic pump, reservoir, radiator, fuel tank, exhaust stack, hose manifold, and labelled quick-coupler blocks; lower the skid onto the rear upper rails and bolt it down.",
+    "Install the operator station by bolting the seat base to the deck, adding the cushion, backrest, foot plate, steering column, and joystick valve console.",
+    "Bolt the ROPS posts to the upper rails, add the top crossbar and two diagonal braces, then verify the seat is inside the rollover envelope.",
+    "Attach the front loader pivot brackets to the forward posts, insert the main pivot pins, and hang the left and right loader arms with the cross tube square to both arms.",
+    "Pin each lift-cylinder barrel eye to the lower frame clevis, extend the chrome rod to the loader-arm clevis, insert the upper rod pin, and check that both cylinder axes align between their two pin centers.",
+    "Build the bucket as an open scoop from the sloped floor, angled rear shell segments, rolled top back strip, side cheeks, cutting edge, tooth bar, and bottom wear strips.",
+    "Bolt the quick-attach plate to the bucket rear plate, install the lower bucket pins and top latch bar, then pin the assembly to both loader arms.",
+    "Route four drive hoses to the hub motors plus two lift hoses to the loader cylinders through the visible manifold and quick-coupler blocks, then pressure-test the hydraulic system before fitting rear implements."
+  ],
   "metadata": {
     "reference": "https://www.opensourceecology.org/portfolio/tractor/",
     "domain": "open-source-heavy-machinery",
-    "thumbnail_camera": [4.2, 2.8, 4.2],
+    "thumbnail_camera": [
+      4.2,
+      2.8,
+      4.2
+    ],
     "info": {
       "japanese_name": "ライフトラック（オープンソース・トラクター）",
       "english_name": "Open Source Ecology LifeTrac",
@@ -16,60 +34,2315 @@
       "contract_value": "≈US$12,000 in materials (self-build kit)",
       "status": "Open-source, production-tested; multiple independent builds in service",
       "facts": [
-        { "label": "Configuration",       "value": "Four-wheel hydraulic skid-steer, bolted XYZ space frame" },
-        { "label": "Length × Width × Height", "value": "≈3.0 m × 1.5 m × 2.0 m" },
-        { "label": "Drive",               "value": "4 × hub-mounted hydraulic universal-rotor + planetary gear-down (independent)" },
-        { "label": "Power",               "value": "Removable PowerCube engine/pump module (≈27 hp typical)" },
-        { "label": "Front attachment",    "value": "Two-arm loader with two hydraulic cylinders + universal bucket" },
-        { "label": "Rear attachment",     "value": "Universal tool bar — ripper, 3-point hitch, backhoe, auger" },
-        { "label": "Chassis",             "value": "4×4 in square steel tubing, bolted (not welded)" },
-        { "label": "License",             "value": "CC BY-SA 4.0 (docs, CAD, BOM)" }
+        {
+          "label": "Configuration",
+          "value": "Four-wheel hydraulic skid-steer, bolted XYZ space frame"
+        },
+        {
+          "label": "Length × Width × Height",
+          "value": "≈3.0 m × 1.5 m × 2.0 m"
+        },
+        {
+          "label": "Drive",
+          "value": "4 × hub-mounted hydraulic universal-rotor + planetary gear-down (independent)"
+        },
+        {
+          "label": "Power",
+          "value": "Removable PowerCube engine/pump module (≈27 hp typical)"
+        },
+        {
+          "label": "Front attachment",
+          "value": "Two-arm loader with two hydraulic cylinders + universal bucket"
+        },
+        {
+          "label": "Rear attachment",
+          "value": "Universal tool bar — ripper, 3-point hitch, backhoe, auger"
+        },
+        {
+          "label": "Chassis",
+          "value": "4×4 in square steel tubing, bolted (not welded)"
+        },
+        {
+          "label": "License",
+          "value": "CC BY-SA 4.0 (docs, CAD, BOM)"
+        }
       ],
       "sources": [
-        { "title": "OSE — Tractor (LifeTrac) portfolio page", "url": "https://www.opensourceecology.org/portfolio/tractor/" },
-        { "title": "OSE Wiki — LifeTrac",                     "url": "https://wiki.opensourceecology.org/wiki/LifeTrac" },
-        { "title": "OSE — Global Village Construction Set",   "url": "https://www.opensourceecology.org/gvcs/" }
+        {
+          "title": "OSE — Tractor (LifeTrac) portfolio page",
+          "url": "https://www.opensourceecology.org/portfolio/tractor/"
+        },
+        {
+          "title": "OSE Wiki — LifeTrac",
+          "url": "https://wiki.opensourceecology.org/wiki/LifeTrac"
+        },
+        {
+          "title": "OSE — Global Village Construction Set",
+          "url": "https://www.opensourceecology.org/gvcs/"
+        }
       ]
     }
   },
   "parts": [
-    { "id": "chassis_floor",       "name": "Chassis Floor Pan",               "shape": "box",      "position": [0, 0.40, 0],                                   "size": [2.20, 0.10, 1.20], "material": "welded steel",          "role": "Bolted 4×4 in tubing floor pan. Every module above and the wheels below tie into it.", "connections": ["rail_port", "rail_stbd", "post_fl", "post_fr", "post_rl", "post_rr", "powercube", "tool_bar", "seat", "hub_fl", "hub_fr", "hub_rl", "hub_rr"] },
-    { "id": "rail_port",           "name": "Top Rail (Port)",                 "shape": "box",      "position": [0, 0.80, 0.55],                                "size": [2.30, 0.10, 0.10], "material": "welded steel",          "role": "Port-side top rail of the XYZ space frame. Connects the four vertical corner posts.", "connections": ["post_fl", "post_rl", "chassis_floor"] },
-    { "id": "rail_stbd",           "name": "Top Rail (Starboard)",            "shape": "box",      "position": [0, 0.80, -0.55],                               "size": [2.30, 0.10, 0.10], "material": "welded steel",          "role": "Starboard-side top rail.", "connections": ["post_fr", "post_rr", "chassis_floor"] },
-
-    { "id": "post_fl",             "name": "Corner Post (Fwd-Left)",          "shape": "box",      "position": [ 1.05, 0.62, 0.55],                            "size": [0.10, 0.40, 0.10], "material": "welded steel",          "role": "Forward-left corner post tying the top rail to the floor; carries the loader pivot.", "connections": ["chassis_floor", "rail_port", "pivot_port"] },
-    { "id": "post_fr",             "name": "Corner Post (Fwd-Right)",         "shape": "box",      "position": [ 1.05, 0.62, -0.55],                           "size": [0.10, 0.40, 0.10], "material": "welded steel",          "role": "Forward-right corner post; carries the starboard loader pivot.", "connections": ["chassis_floor", "rail_stbd", "pivot_stbd"] },
-    { "id": "post_rl",             "name": "Corner Post (Rear-Left)",         "shape": "box",      "position": [-1.05, 0.62, 0.55],                            "size": [0.10, 0.40, 0.10], "material": "welded steel",          "role": "Rear-left corner post.", "connections": ["chassis_floor", "rail_port"] },
-    { "id": "post_rr",             "name": "Corner Post (Rear-Right)",        "shape": "box",      "position": [-1.05, 0.62, -0.55],                           "size": [0.10, 0.40, 0.10], "material": "welded steel",          "role": "Rear-right corner post.", "connections": ["chassis_floor", "rail_stbd"] },
-
-    { "id": "wheel_fl",            "name": "Wheel (Fwd-Left)",                "shape": "cylinder", "position": [ 0.95, 0.35, 0.78], "rotation": [1.5708, 0, 0], "size": [0.35, 0.28],       "material": "rubber",                "role": "Front-left wheel on a quick-connect hub.", "connections": ["hub_fl"] },
-    { "id": "wheel_fr",            "name": "Wheel (Fwd-Right)",               "shape": "cylinder", "position": [ 0.95, 0.35, -0.78],"rotation": [1.5708, 0, 0], "size": [0.35, 0.28],       "material": "rubber",                "role": "Front-right wheel.", "connections": ["hub_fr"] },
-    { "id": "wheel_rl",            "name": "Wheel (Rear-Left)",               "shape": "cylinder", "position": [-0.95, 0.35, 0.78], "rotation": [1.5708, 0, 0], "size": [0.35, 0.28],       "material": "rubber",                "role": "Rear-left wheel.", "connections": ["hub_rl"] },
-    { "id": "wheel_rr",            "name": "Wheel (Rear-Right)",              "shape": "cylinder", "position": [-0.95, 0.35, -0.78],"rotation": [1.5708, 0, 0], "size": [0.35, 0.28],       "material": "rubber",                "role": "Rear-right wheel.", "connections": ["hub_rr"] },
-
-    { "id": "hub_fl",              "name": "Universal Rotor + Gear-Down (FL)","shape": "cylinder", "position": [ 0.95, 0.35, 0.55], "rotation": [1.5708, 0, 0], "size": [0.09, 0.16],       "material": "dark anodized aluminum","role": "Hydraulic universal-rotor hub motor + planetary gear-down at the front-left wheel. One of four identical drives — true 4WD skid-steer.", "connections": ["chassis_floor", "wheel_fl"] },
-    { "id": "hub_fr",              "name": "Universal Rotor + Gear-Down (FR)","shape": "cylinder", "position": [ 0.95, 0.35, -0.55],"rotation": [1.5708, 0, 0], "size": [0.09, 0.16],       "material": "dark anodized aluminum","role": "Front-right hydraulic hub motor.", "connections": ["chassis_floor", "wheel_fr"] },
-    { "id": "hub_rl",              "name": "Universal Rotor + Gear-Down (RL)","shape": "cylinder", "position": [-0.95, 0.35, 0.55], "rotation": [1.5708, 0, 0], "size": [0.09, 0.16],       "material": "dark anodized aluminum","role": "Rear-left hydraulic hub motor.", "connections": ["chassis_floor", "wheel_rl"] },
-    { "id": "hub_rr",              "name": "Universal Rotor + Gear-Down (RR)","shape": "cylinder", "position": [-0.95, 0.35, -0.55],"rotation": [1.5708, 0, 0], "size": [0.09, 0.16],       "material": "dark anodized aluminum","role": "Rear-right hydraulic hub motor.", "connections": ["chassis_floor", "wheel_rr"] },
-
-    { "id": "powercube",           "name": "PowerCube (engine + pump)",       "shape": "box",      "position": [-0.70, 0.95, 0],                               "size": [0.80, 0.55, 0.65], "material": "dark anodized aluminum","role": "Modular diesel/gas engine + hydraulic pump block bolted to the rear of the frame. Supplies pressure to every hydraulic consumer.", "connections": ["chassis_floor", "powercube_exhaust"] },
-    { "id": "powercube_exhaust",   "name": "PowerCube Exhaust Stack",         "shape": "cylinder", "position": [-0.70, 1.34, 0.25],                            "size": [0.025, 0.25],      "material": "brushed steel",         "role": "Short vertical exhaust stack on top of the PowerCube.", "connections": ["powercube"] },
-
-    { "id": "pivot_port",          "name": "Loader Pivot Bracket (Port)",     "shape": "box",      "position": [ 1.10, 0.92, 0.48],                            "size": [0.12, 0.30, 0.08], "material": "welded steel",          "role": "Pivot bracket bolted to the forward-left post — the loader arm hinges here.", "connections": ["post_fl", "loader_arm_port", "loader_cyl_port"] },
-    { "id": "pivot_stbd",          "name": "Loader Pivot Bracket (Stbd)",     "shape": "box",      "position": [ 1.10, 0.92, -0.48],                           "size": [0.12, 0.30, 0.08], "material": "welded steel",          "role": "Starboard loader pivot bracket.", "connections": ["post_fr", "loader_arm_stbd", "loader_cyl_stbd"] },
-    { "id": "loader_arm_port",     "name": "Loader Arm (Port)",               "shape": "box",      "position": [ 1.83, 1.40, 0.45], "rotation": [0, 0, 0.524],  "size": [1.80, 0.14, 0.10],  "material": "welded steel",         "role": "Port-side loader arm hinged at the pivot bracket; raised 30° in the reference pose.", "connections": ["pivot_port", "loader_cyl_port", "bucket"] },
-    { "id": "loader_arm_stbd",     "name": "Loader Arm (Stbd)",               "shape": "box",      "position": [ 1.83, 1.40, -0.45],"rotation": [0, 0, 0.524],  "size": [1.80, 0.14, 0.10],  "material": "welded steel",         "role": "Starboard-side loader arm.", "connections": ["pivot_stbd", "loader_cyl_stbd", "bucket"] },
-    { "id": "loader_cyl_port",     "name": "Loader Hydraulic Cylinder (Port)","shape": "cylinder", "position": [ 0.90, 1.00, 0.45], "rotation": [0, 0, -0.938], "size": [0.040, 0.80],       "material": "brushed steel",        "role": "Port-side hydraulic lift cylinder — raises and lowers the arm.", "connections": ["pivot_port", "chassis_floor"] },
-    { "id": "loader_cyl_stbd",     "name": "Loader Hydraulic Cylinder (Stbd)","shape": "cylinder", "position": [ 0.90, 1.00, -0.45],"rotation": [0, 0, -0.938], "size": [0.040, 0.80],       "material": "brushed steel",        "role": "Starboard-side hydraulic lift cylinder.", "connections": ["pivot_stbd", "chassis_floor"] },
-    { "id": "bucket",              "name": "Universal Front Bucket",          "shape": "box",      "position": [ 2.55, 1.65, 0],                              "size": [0.50, 0.38, 1.20], "material": "forged steel",          "role": "Standard quick-attach front bucket for earth, gravel, and material handling.", "connections": ["loader_arm_port", "loader_arm_stbd"] },
-
-    { "id": "tool_bar",            "name": "Universal Rear Tool Bar",         "shape": "box",      "position": [-1.55, 0.60, 0],                               "size": [0.15, 0.20, 1.20], "material": "welded steel",          "role": "Rear tool bar — accepts ripper, 3-point hitch, backhoe, auger, and other standard implements.", "connections": ["chassis_floor"] },
-
-    { "id": "seat",                "name": "Operator Seat",                   "shape": "box",      "position": [-0.30, 1.05, 0],                               "size": [0.50, 0.45, 0.50], "material": "black composite",       "role": "Central operator seat.", "connections": ["chassis_floor", "steering_column"] },
-    { "id": "steering_column",     "name": "Steering / Joystick Column",      "shape": "cylinder", "position": [ 0.15, 1.25, 0],  "rotation": [0, 0, -0.25],    "size": [0.025, 0.55],       "material": "brushed steel",        "role": "Forward-tilted control column carrying the skid-steer joysticks and throttle.", "connections": ["seat"] },
-
-    { "id": "rops_bar_port",       "name": "ROPS Post (Port)",                "shape": "box",      "position": [-0.20, 1.50, 0.50],                            "size": [0.06, 0.85, 0.06], "material": "welded steel",          "role": "Port-side roll-over protective-structure post.", "connections": ["rail_port", "rops_top"] },
-    { "id": "rops_bar_stbd",       "name": "ROPS Post (Starboard)",           "shape": "box",      "position": [-0.20, 1.50, -0.50],                           "size": [0.06, 0.85, 0.06], "material": "welded steel",          "role": "Starboard-side ROPS post.", "connections": ["rail_stbd", "rops_top"] },
-    { "id": "rops_top",            "name": "ROPS Top Bar",                    "shape": "box",      "position": [-0.20, 1.92, 0],                               "size": [0.06, 0.06, 1.04], "material": "welded steel",          "role": "Cross bar joining the two ROPS posts across the top.", "connections": ["rops_bar_port", "rops_bar_stbd"] }
+    {
+      "id": "lower_rail_port",
+      "name": "Lower Frame Rail Port",
+      "shape": "box",
+      "position": [
+        0,
+        0.52,
+        0.55
+      ],
+      "size": [
+        2.45,
+        0.1,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Port 4x4 in square-tube lower rail that carries deck, hub brackets, posts, and rear tool bar loads.",
+      "connections": [
+        "front_crossmember",
+        "rear_crossmember",
+        "deck_plate",
+        "post_fl",
+        "post_rl",
+        "hub_mount_fl",
+        "hub_mount_rl"
+      ]
+    },
+    {
+      "id": "lower_rail_stbd",
+      "name": "Lower Frame Rail Starboard",
+      "shape": "box",
+      "position": [
+        0,
+        0.52,
+        -0.55
+      ],
+      "size": [
+        2.45,
+        0.1,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Starboard 4x4 in square-tube lower rail mirroring the port rail for the bolted space frame.",
+      "connections": [
+        "front_crossmember",
+        "rear_crossmember",
+        "deck_plate",
+        "post_fr",
+        "post_rr",
+        "hub_mount_fr",
+        "hub_mount_rr"
+      ]
+    },
+    {
+      "id": "front_crossmember",
+      "name": "Front Lower Crossmember",
+      "shape": "box",
+      "position": [
+        1.1,
+        0.52,
+        0
+      ],
+      "size": [
+        0.12,
+        0.1,
+        1.22
+      ],
+      "material": "welded steel",
+      "role": "Bolted front crossmember tying the lower rails together and taking loader reaction loads.",
+      "connections": [
+        "lower_rail_port",
+        "lower_rail_stbd",
+        "loader_clevis_lower_port",
+        "loader_clevis_lower_stbd"
+      ]
+    },
+    {
+      "id": "rear_crossmember",
+      "name": "Rear Lower Crossmember",
+      "shape": "box",
+      "position": [
+        -1.12,
+        0.52,
+        0
+      ],
+      "size": [
+        0.12,
+        0.1,
+        1.22
+      ],
+      "material": "welded steel",
+      "role": "Rear bolted crossmember that anchors the universal tool bar and rear hitch lugs.",
+      "connections": [
+        "lower_rail_port",
+        "lower_rail_stbd",
+        "tool_bar",
+        "hitch_lug_port",
+        "hitch_lug_stbd"
+      ]
+    },
+    {
+      "id": "mid_crossmember",
+      "name": "Middle Deck Crossmember",
+      "shape": "box",
+      "position": [
+        -0.05,
+        0.54,
+        0
+      ],
+      "size": [
+        0.1,
+        0.08,
+        1.18
+      ],
+      "material": "welded steel",
+      "role": "Central cross-tube supporting the operator deck and resisting twist between the two side rails.",
+      "connections": [
+        "lower_rail_port",
+        "lower_rail_stbd",
+        "deck_plate"
+      ]
+    },
+    {
+      "id": "deck_plate",
+      "name": "Thin Operator Deck Plate",
+      "shape": "box",
+      "position": [
+        -0.15,
+        0.61,
+        0
+      ],
+      "size": [
+        1.35,
+        0.035,
+        0.82
+      ],
+      "material": "steel",
+      "role": "Thin bolted floor plate for the operator station; it leaves the side bays open for visible service access.",
+      "connections": [
+        "lower_rail_port",
+        "lower_rail_stbd",
+        "mid_crossmember",
+        "seat_base",
+        "foot_plate"
+      ]
+    },
+    {
+      "id": "top_rail_port",
+      "name": "Top Rail Port",
+      "shape": "box",
+      "position": [
+        0,
+        0.98,
+        0.55
+      ],
+      "size": [
+        2.42,
+        0.1,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Upper port side rail of the XYZ frame, bolted to the front and rear posts and to the ROPS base.",
+      "connections": [
+        "post_fl",
+        "post_rl",
+        "rops_post_port",
+        "powercube_skid_port"
+      ]
+    },
+    {
+      "id": "top_rail_stbd",
+      "name": "Top Rail Starboard",
+      "shape": "box",
+      "position": [
+        0,
+        0.98,
+        -0.55
+      ],
+      "size": [
+        2.42,
+        0.1,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Upper starboard side rail completing the open space frame and supporting the ROPS base.",
+      "connections": [
+        "post_fr",
+        "post_rr",
+        "rops_post_stbd",
+        "powercube_skid_stbd"
+      ]
+    },
+    {
+      "id": "post_fl",
+      "name": "Corner Post Front Port",
+      "shape": "box",
+      "position": [
+        1.08,
+        0.75,
+        0.55
+      ],
+      "size": [
+        0.1,
+        0.48,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Front port vertical tube tying lower and upper rails and carrying the loader pivot bracket.",
+      "connections": [
+        "lower_rail_port",
+        "top_rail_port",
+        "pivot_bracket_port"
+      ]
+    },
+    {
+      "id": "post_fr",
+      "name": "Corner Post Front Starboard",
+      "shape": "box",
+      "position": [
+        1.08,
+        0.75,
+        -0.55
+      ],
+      "size": [
+        0.1,
+        0.48,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Front starboard vertical tube tying lower and upper rails and carrying the right loader pivot.",
+      "connections": [
+        "lower_rail_stbd",
+        "top_rail_stbd",
+        "pivot_bracket_stbd"
+      ]
+    },
+    {
+      "id": "post_rl",
+      "name": "Corner Post Rear Port",
+      "shape": "box",
+      "position": [
+        -1.08,
+        0.75,
+        0.55
+      ],
+      "size": [
+        0.1,
+        0.48,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Rear port vertical tube tying the rear frame bay together and supporting the PowerCube skid.",
+      "connections": [
+        "lower_rail_port",
+        "top_rail_port",
+        "powercube_skid_port"
+      ]
+    },
+    {
+      "id": "post_rr",
+      "name": "Corner Post Rear Starboard",
+      "shape": "box",
+      "position": [
+        -1.08,
+        0.75,
+        -0.55
+      ],
+      "size": [
+        0.1,
+        0.48,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Rear starboard vertical tube tying the rear frame bay together and supporting the PowerCube skid.",
+      "connections": [
+        "lower_rail_stbd",
+        "top_rail_stbd",
+        "powercube_skid_stbd"
+      ]
+    },
+    {
+      "id": "hub_mount_fl",
+      "name": "Hub Motor Mount Front Port",
+      "shape": "box",
+      "position": [
+        0.93,
+        0.45,
+        0.66
+      ],
+      "size": [
+        0.28,
+        0.16,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Bolted plate bracket that fixes the front port hydraulic hub motor to the lower rail.",
+      "connections": [
+        "lower_rail_port",
+        "hub_fl"
+      ]
+    },
+    {
+      "id": "hub_mount_fr",
+      "name": "Hub Motor Mount Front Starboard",
+      "shape": "box",
+      "position": [
+        0.93,
+        0.45,
+        -0.66
+      ],
+      "size": [
+        0.28,
+        0.16,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Bolted plate bracket that fixes the front starboard hydraulic hub motor to the lower rail.",
+      "connections": [
+        "lower_rail_stbd",
+        "hub_fr"
+      ]
+    },
+    {
+      "id": "hub_mount_rl",
+      "name": "Hub Motor Mount Rear Port",
+      "shape": "box",
+      "position": [
+        -0.93,
+        0.45,
+        0.66
+      ],
+      "size": [
+        0.28,
+        0.16,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Bolted plate bracket that fixes the rear port hydraulic hub motor to the lower rail.",
+      "connections": [
+        "lower_rail_port",
+        "hub_rl"
+      ]
+    },
+    {
+      "id": "hub_mount_rr",
+      "name": "Hub Motor Mount Rear Starboard",
+      "shape": "box",
+      "position": [
+        -0.93,
+        0.45,
+        -0.66
+      ],
+      "size": [
+        0.28,
+        0.16,
+        0.1
+      ],
+      "material": "welded steel",
+      "role": "Bolted plate bracket that fixes the rear starboard hydraulic hub motor to the lower rail.",
+      "connections": [
+        "lower_rail_stbd",
+        "hub_rr"
+      ]
+    },
+    {
+      "id": "tire_fl",
+      "name": "Rubber Tire Front Port",
+      "shape": "torus",
+      "position": [
+        0.93,
+        0.42,
+        0.84
+      ],
+      "size": [
+        0.34,
+        0.08
+      ],
+      "material": "rubber",
+      "role": "Front port pneumatic tire, shown as a torus so the wheel reads correctly in side and front views.",
+      "connections": [
+        "rim_fl"
+      ]
+    },
+    {
+      "id": "tire_fr",
+      "name": "Rubber Tire Front Starboard",
+      "shape": "torus",
+      "position": [
+        0.93,
+        0.42,
+        -0.84
+      ],
+      "size": [
+        0.34,
+        0.08
+      ],
+      "material": "rubber",
+      "role": "Front starboard pneumatic tire for the independent skid-steer drive.",
+      "connections": [
+        "rim_fr"
+      ]
+    },
+    {
+      "id": "tire_rl",
+      "name": "Rubber Tire Rear Port",
+      "shape": "torus",
+      "position": [
+        -0.93,
+        0.42,
+        0.84
+      ],
+      "size": [
+        0.34,
+        0.08
+      ],
+      "material": "rubber",
+      "role": "Rear port pneumatic tire mounted outside the open frame bay.",
+      "connections": [
+        "rim_rl"
+      ]
+    },
+    {
+      "id": "tire_rr",
+      "name": "Rubber Tire Rear Starboard",
+      "shape": "torus",
+      "position": [
+        -0.93,
+        0.42,
+        -0.84
+      ],
+      "size": [
+        0.34,
+        0.08
+      ],
+      "material": "rubber",
+      "role": "Rear starboard pneumatic tire mounted outside the open frame bay.",
+      "connections": [
+        "rim_rr"
+      ]
+    },
+    {
+      "id": "rim_fl",
+      "name": "Steel Wheel Rim Front Port",
+      "shape": "cylinder",
+      "position": [
+        0.93,
+        0.42,
+        0.84
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.22,
+        0.12
+      ],
+      "material": "steel",
+      "role": "Steel rim that bolts the front port tire to the hydraulic hub output flange.",
+      "connections": [
+        "tire_fl",
+        "hub_fl"
+      ]
+    },
+    {
+      "id": "rim_fr",
+      "name": "Steel Wheel Rim Front Starboard",
+      "shape": "cylinder",
+      "position": [
+        0.93,
+        0.42,
+        -0.84
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.22,
+        0.12
+      ],
+      "material": "steel",
+      "role": "Steel rim that bolts the front starboard tire to the hydraulic hub output flange.",
+      "connections": [
+        "tire_fr",
+        "hub_fr"
+      ]
+    },
+    {
+      "id": "rim_rl",
+      "name": "Steel Wheel Rim Rear Port",
+      "shape": "cylinder",
+      "position": [
+        -0.93,
+        0.42,
+        0.84
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.22,
+        0.12
+      ],
+      "material": "steel",
+      "role": "Steel rim that bolts the rear port tire to the hydraulic hub output flange.",
+      "connections": [
+        "tire_rl",
+        "hub_rl"
+      ]
+    },
+    {
+      "id": "rim_rr",
+      "name": "Steel Wheel Rim Rear Starboard",
+      "shape": "cylinder",
+      "position": [
+        -0.93,
+        0.42,
+        -0.84
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.22,
+        0.12
+      ],
+      "material": "steel",
+      "role": "Steel rim that bolts the rear starboard tire to the hydraulic hub output flange.",
+      "connections": [
+        "tire_rr",
+        "hub_rr"
+      ]
+    },
+    {
+      "id": "hub_fl",
+      "name": "Universal Rotor and Gear-Down Front Port",
+      "shape": "cylinder",
+      "position": [
+        0.93,
+        0.42,
+        0.68
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        0.22
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Front port hydraulic universal-rotor motor plus planetary gear-down, one of four independent skid-steer drives.",
+      "connections": [
+        "hub_mount_fl",
+        "rim_fl",
+        "drive_hose_fl"
+      ]
+    },
+    {
+      "id": "hub_fr",
+      "name": "Universal Rotor and Gear-Down Front Starboard",
+      "shape": "cylinder",
+      "position": [
+        0.93,
+        0.42,
+        -0.68
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        0.22
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Front starboard hydraulic universal-rotor motor plus planetary gear-down for independent drive.",
+      "connections": [
+        "hub_mount_fr",
+        "rim_fr",
+        "drive_hose_fr"
+      ]
+    },
+    {
+      "id": "hub_rl",
+      "name": "Universal Rotor and Gear-Down Rear Port",
+      "shape": "cylinder",
+      "position": [
+        -0.93,
+        0.42,
+        0.68
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        0.22
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear port hydraulic universal-rotor motor plus planetary gear-down for independent drive.",
+      "connections": [
+        "hub_mount_rl",
+        "rim_rl",
+        "drive_hose_rl"
+      ]
+    },
+    {
+      "id": "hub_rr",
+      "name": "Universal Rotor and Gear-Down Rear Starboard",
+      "shape": "cylinder",
+      "position": [
+        -0.93,
+        0.42,
+        -0.68
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        0.22
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Rear starboard hydraulic universal-rotor motor plus planetary gear-down for independent drive.",
+      "connections": [
+        "hub_mount_rr",
+        "rim_rr",
+        "drive_hose_rr"
+      ]
+    },
+    {
+      "id": "powercube_skid_port",
+      "name": "PowerCube Skid Rail Port",
+      "shape": "box",
+      "position": [
+        -0.74,
+        1.08,
+        0.32
+      ],
+      "size": [
+        0.86,
+        0.06,
+        0.08
+      ],
+      "material": "welded steel",
+      "role": "Port skid rail for the removable PowerCube module, bolted across the rear upper frame.",
+      "connections": [
+        "top_rail_port",
+        "engine_block",
+        "hydraulic_reservoir"
+      ]
+    },
+    {
+      "id": "powercube_skid_stbd",
+      "name": "PowerCube Skid Rail Starboard",
+      "shape": "box",
+      "position": [
+        -0.74,
+        1.08,
+        -0.32
+      ],
+      "size": [
+        0.86,
+        0.06,
+        0.08
+      ],
+      "material": "welded steel",
+      "role": "Starboard skid rail for the removable PowerCube module.",
+      "connections": [
+        "top_rail_stbd",
+        "engine_block",
+        "fuel_tank"
+      ]
+    },
+    {
+      "id": "engine_block",
+      "name": "PowerCube Engine Block",
+      "shape": "box",
+      "position": [
+        -0.78,
+        1.26,
+        0.08
+      ],
+      "size": [
+        0.48,
+        0.28,
+        0.36
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Exposed 27 hp class engine block that drives the hydraulic pump; it is visible instead of hidden inside a cube.",
+      "connections": [
+        "powercube_skid_port",
+        "powercube_skid_stbd",
+        "hydraulic_pump",
+        "exhaust_stack",
+        "radiator"
+      ]
+    },
+    {
+      "id": "hydraulic_pump",
+      "name": "Hydraulic Pump",
+      "shape": "cylinder",
+      "position": [
+        -0.42,
+        1.24,
+        0.08
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.1,
+        0.24
+      ],
+      "material": "brushed steel",
+      "role": "Belt- or shaft-driven hydraulic pump that pressurizes drive, loader, and implement circuits.",
+      "connections": [
+        "engine_block",
+        "hose_manifold",
+        "hydraulic_reservoir"
+      ]
+    },
+    {
+      "id": "hydraulic_reservoir",
+      "name": "Hydraulic Oil Reservoir",
+      "shape": "box",
+      "position": [
+        -0.92,
+        1.23,
+        0.37
+      ],
+      "size": [
+        0.38,
+        0.24,
+        0.2
+      ],
+      "material": "steel",
+      "role": "Small rectangular oil reservoir feeding the pump and returning warm hydraulic fluid.",
+      "connections": [
+        "powercube_skid_port",
+        "hydraulic_pump",
+        "hose_manifold"
+      ]
+    },
+    {
+      "id": "fuel_tank",
+      "name": "PowerCube Fuel Tank",
+      "shape": "box",
+      "position": [
+        -0.95,
+        1.22,
+        -0.33
+      ],
+      "size": [
+        0.34,
+        0.22,
+        0.2
+      ],
+      "material": "steel",
+      "role": "Exposed rectangular fuel tank strapped to the PowerCube skid for field refill access.",
+      "connections": [
+        "powercube_skid_stbd",
+        "engine_block"
+      ]
+    },
+    {
+      "id": "radiator",
+      "name": "PowerCube Radiator",
+      "shape": "box",
+      "position": [
+        -0.32,
+        1.29,
+        -0.24
+      ],
+      "size": [
+        0.08,
+        0.34,
+        0.28
+      ],
+      "material": "brushed steel",
+      "role": "Vertical radiator panel placed at the front edge of the PowerCube for visible cooling airflow.",
+      "connections": [
+        "engine_block"
+      ]
+    },
+    {
+      "id": "exhaust_stack",
+      "name": "PowerCube Exhaust Stack",
+      "shape": "cylinder",
+      "position": [
+        -0.9,
+        1.57,
+        0.18
+      ],
+      "size": [
+        0.028,
+        0.46
+      ],
+      "material": "brushed steel",
+      "role": "Vertical exhaust stack rising above the engine so heat and fumes clear the operator station.",
+      "connections": [
+        "engine_block",
+        "exhaust_cap"
+      ]
+    },
+    {
+      "id": "exhaust_cap",
+      "name": "Exhaust Rain Cap",
+      "shape": "box",
+      "position": [
+        -0.9,
+        1.82,
+        0.18
+      ],
+      "size": [
+        0.12,
+        0.025,
+        0.1
+      ],
+      "material": "brushed steel",
+      "role": "Simple hinged rain cap on top of the vertical exhaust stack.",
+      "connections": [
+        "exhaust_stack"
+      ]
+    },
+    {
+      "id": "hose_manifold",
+      "name": "Hydraulic Quick-Coupler Manifold",
+      "shape": "box",
+      "position": [
+        -0.28,
+        1.16,
+        0.36
+      ],
+      "size": [
+        0.22,
+        0.12,
+        0.12
+      ],
+      "material": "brass",
+      "role": "Visible hydraulic manifold with quick-couplers distributing pump flow to four drive motors and two lift cylinders.",
+      "connections": [
+        "hydraulic_pump",
+        "hydraulic_reservoir",
+        "drive_coupler_block",
+        "lift_coupler_block"
+      ]
+    },
+    {
+      "id": "drive_coupler_block",
+      "name": "Drive Circuit Coupler Block",
+      "shape": "box",
+      "position": [
+        -0.12,
+        1.11,
+        0.48
+      ],
+      "size": [
+        0.16,
+        0.08,
+        0.08
+      ],
+      "material": "brass",
+      "role": "Grouped quick-couplers for the four wheel-motor drive hoses so the PowerCube can be unplugged.",
+      "connections": [
+        "hose_manifold",
+        "drive_hose_fl",
+        "drive_hose_fr",
+        "drive_hose_rl",
+        "drive_hose_rr"
+      ]
+    },
+    {
+      "id": "lift_coupler_block",
+      "name": "Loader Lift Coupler Block",
+      "shape": "box",
+      "position": [
+        -0.12,
+        1.23,
+        0.48
+      ],
+      "size": [
+        0.16,
+        0.08,
+        0.08
+      ],
+      "material": "brass",
+      "role": "Grouped quick-couplers for the paired loader lift-cylinder hoses.",
+      "connections": [
+        "hose_manifold",
+        "lift_hose_port",
+        "lift_hose_stbd"
+      ]
+    },
+    {
+      "id": "drive_hose_fl",
+      "name": "Hydraulic Drive Hose Front Port",
+      "shape": "capsule",
+      "position": [
+        0.35,
+        0.86,
+        0.58
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.018,
+        1.3
+      ],
+      "material": "rubber",
+      "role": "Black pressure hose from the drive coupler block to the front port hub motor.",
+      "connections": [
+        "drive_coupler_block",
+        "hub_fl"
+      ]
+    },
+    {
+      "id": "drive_hose_fr",
+      "name": "Hydraulic Drive Hose Front Starboard",
+      "shape": "capsule",
+      "position": [
+        0.35,
+        0.82,
+        -0.58
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.018,
+        1.3
+      ],
+      "material": "rubber",
+      "role": "Black pressure hose from the drive coupler block to the front starboard hub motor.",
+      "connections": [
+        "drive_coupler_block",
+        "hub_fr"
+      ]
+    },
+    {
+      "id": "drive_hose_rl",
+      "name": "Hydraulic Drive Hose Rear Port",
+      "shape": "capsule",
+      "position": [
+        -0.72,
+        0.88,
+        0.58
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.018,
+        0.7
+      ],
+      "material": "rubber",
+      "role": "Short pressure hose from the drive coupler block to the rear port hub motor.",
+      "connections": [
+        "drive_coupler_block",
+        "hub_rl"
+      ]
+    },
+    {
+      "id": "drive_hose_rr",
+      "name": "Hydraulic Drive Hose Rear Starboard",
+      "shape": "capsule",
+      "position": [
+        -0.72,
+        0.84,
+        -0.58
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.018,
+        0.7
+      ],
+      "material": "rubber",
+      "role": "Short pressure hose from the drive coupler block to the rear starboard hub motor.",
+      "connections": [
+        "drive_coupler_block",
+        "hub_rr"
+      ]
+    },
+    {
+      "id": "seat_base",
+      "name": "Operator Seat Base",
+      "shape": "box",
+      "position": [
+        -0.18,
+        0.84,
+        0
+      ],
+      "size": [
+        0.38,
+        0.2,
+        0.42
+      ],
+      "material": "welded steel",
+      "role": "Bolted pedestal lifting the operator seat above the open deck plate.",
+      "connections": [
+        "deck_plate",
+        "seat_cushion"
+      ]
+    },
+    {
+      "id": "seat_cushion",
+      "name": "Operator Seat Cushion",
+      "shape": "box",
+      "position": [
+        -0.18,
+        1.02,
+        0
+      ],
+      "size": [
+        0.48,
+        0.16,
+        0.46
+      ],
+      "material": "black composite",
+      "role": "Black weather-resistant seat cushion for the central operator position.",
+      "connections": [
+        "seat_base",
+        "seat_back"
+      ]
+    },
+    {
+      "id": "seat_back",
+      "name": "Operator Seat Back",
+      "shape": "box",
+      "position": [
+        -0.38,
+        1.22,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.22
+      ],
+      "size": [
+        0.1,
+        0.46,
+        0.46
+      ],
+      "material": "black composite",
+      "role": "Upright backrest locating the operator inside the ROPS envelope.",
+      "connections": [
+        "seat_cushion"
+      ]
+    },
+    {
+      "id": "foot_plate",
+      "name": "Operator Foot Plate",
+      "shape": "box",
+      "position": [
+        0.32,
+        0.67,
+        0
+      ],
+      "size": [
+        0.42,
+        0.035,
+        0.58
+      ],
+      "material": "steel",
+      "role": "Flat anti-slip foot plate between the seat and steering column.",
+      "connections": [
+        "deck_plate",
+        "steering_column"
+      ]
+    },
+    {
+      "id": "steering_column",
+      "name": "Tilted Steering Column",
+      "shape": "cylinder",
+      "position": [
+        0.28,
+        1.03,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.35
+      ],
+      "size": [
+        0.025,
+        0.62
+      ],
+      "material": "brushed steel",
+      "role": "Forward-tilted control column carrying throttle and steering controls.",
+      "connections": [
+        "foot_plate",
+        "joystick_console"
+      ]
+    },
+    {
+      "id": "joystick_console",
+      "name": "Joystick and Valve Console",
+      "shape": "box",
+      "position": [
+        0.45,
+        1.24,
+        0.16
+      ],
+      "size": [
+        0.2,
+        0.12,
+        0.22
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Operator valve console with skid-steer joysticks and loader control levers.",
+      "connections": [
+        "steering_column"
+      ]
+    },
+    {
+      "id": "rops_post_port",
+      "name": "ROPS Post Port",
+      "shape": "box",
+      "position": [
+        -0.25,
+        1.52,
+        0.5
+      ],
+      "size": [
+        0.07,
+        1.08,
+        0.07
+      ],
+      "material": "welded steel",
+      "role": "Port rollover-protective post bolted to the upper rail beside the operator.",
+      "connections": [
+        "top_rail_port",
+        "rops_top_bar",
+        "rops_brace_port"
+      ]
+    },
+    {
+      "id": "rops_post_stbd",
+      "name": "ROPS Post Starboard",
+      "shape": "box",
+      "position": [
+        -0.25,
+        1.52,
+        -0.5
+      ],
+      "size": [
+        0.07,
+        1.08,
+        0.07
+      ],
+      "material": "welded steel",
+      "role": "Starboard rollover-protective post bolted to the upper rail beside the operator.",
+      "connections": [
+        "top_rail_stbd",
+        "rops_top_bar",
+        "rops_brace_stbd"
+      ]
+    },
+    {
+      "id": "rops_top_bar",
+      "name": "ROPS Top Crossbar",
+      "shape": "box",
+      "position": [
+        -0.25,
+        2.08,
+        0
+      ],
+      "size": [
+        0.08,
+        0.08,
+        1.08
+      ],
+      "material": "welded steel",
+      "role": "Top crossbar joining the two ROPS posts above the operator seat.",
+      "connections": [
+        "rops_post_port",
+        "rops_post_stbd"
+      ]
+    },
+    {
+      "id": "rops_brace_port",
+      "name": "ROPS Diagonal Brace Port",
+      "shape": "box",
+      "position": [
+        -0.58,
+        1.42,
+        0.5
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.55
+      ],
+      "size": [
+        0.6,
+        0.05,
+        0.05
+      ],
+      "material": "welded steel",
+      "role": "Port diagonal brace triangulating the ROPS post back into the rear frame.",
+      "connections": [
+        "rops_post_port",
+        "top_rail_port"
+      ]
+    },
+    {
+      "id": "rops_brace_stbd",
+      "name": "ROPS Diagonal Brace Starboard",
+      "shape": "box",
+      "position": [
+        -0.58,
+        1.42,
+        -0.5
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.55
+      ],
+      "size": [
+        0.6,
+        0.05,
+        0.05
+      ],
+      "material": "welded steel",
+      "role": "Starboard diagonal brace triangulating the ROPS post back into the rear frame.",
+      "connections": [
+        "rops_post_stbd",
+        "top_rail_stbd"
+      ]
+    },
+    {
+      "id": "pivot_bracket_port",
+      "name": "Loader Pivot Bracket Port",
+      "shape": "box",
+      "position": [
+        1.15,
+        1.08,
+        0.47
+      ],
+      "size": [
+        0.16,
+        0.26,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Port loader hinge bracket bolted to the front post and bored for the main pivot pin.",
+      "connections": [
+        "post_fl",
+        "loader_pivot_pin_port",
+        "loader_arm_port"
+      ]
+    },
+    {
+      "id": "pivot_bracket_stbd",
+      "name": "Loader Pivot Bracket Starboard",
+      "shape": "box",
+      "position": [
+        1.15,
+        1.08,
+        -0.47
+      ],
+      "size": [
+        0.16,
+        0.26,
+        0.12
+      ],
+      "material": "welded steel",
+      "role": "Starboard loader hinge bracket bolted to the front post and bored for the main pivot pin.",
+      "connections": [
+        "post_fr",
+        "loader_pivot_pin_stbd",
+        "loader_arm_stbd"
+      ]
+    },
+    {
+      "id": "loader_pivot_pin_port",
+      "name": "Loader Pivot Pin Port",
+      "shape": "cylinder",
+      "position": [
+        1.16,
+        1.12,
+        0.47
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        0.2
+      ],
+      "material": "forged steel",
+      "role": "Removable steel pin forming the hinge between the port bracket and loader arm.",
+      "connections": [
+        "pivot_bracket_port",
+        "loader_arm_port"
+      ]
+    },
+    {
+      "id": "loader_pivot_pin_stbd",
+      "name": "Loader Pivot Pin Starboard",
+      "shape": "cylinder",
+      "position": [
+        1.16,
+        1.12,
+        -0.47
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        0.2
+      ],
+      "material": "forged steel",
+      "role": "Removable steel pin forming the hinge between the starboard bracket and loader arm.",
+      "connections": [
+        "pivot_bracket_stbd",
+        "loader_arm_stbd"
+      ]
+    },
+    {
+      "id": "loader_arm_port",
+      "name": "Loader Arm Port",
+      "shape": "box",
+      "position": [
+        1.88,
+        1.46,
+        0.44
+      ],
+      "rotation": [
+        0,
+        0,
+        0.45
+      ],
+      "size": [
+        1.75,
+        0.12,
+        0.09
+      ],
+      "material": "welded steel",
+      "role": "Port rectangular loader arm raised about 26 degrees from the hinge to the quick-attach plate.",
+      "connections": [
+        "loader_pivot_pin_port",
+        "arm_clevis_port",
+        "loader_cross_tube",
+        "quick_attach_plate"
+      ]
+    },
+    {
+      "id": "loader_arm_stbd",
+      "name": "Loader Arm Starboard",
+      "shape": "box",
+      "position": [
+        1.88,
+        1.46,
+        -0.44
+      ],
+      "rotation": [
+        0,
+        0,
+        0.45
+      ],
+      "size": [
+        1.75,
+        0.12,
+        0.09
+      ],
+      "material": "welded steel",
+      "role": "Starboard rectangular loader arm raised to match the port arm and keep the bucket level side to side.",
+      "connections": [
+        "loader_pivot_pin_stbd",
+        "arm_clevis_stbd",
+        "loader_cross_tube",
+        "quick_attach_plate"
+      ]
+    },
+    {
+      "id": "loader_cross_tube",
+      "name": "Loader Front Cross Tube",
+      "shape": "box",
+      "position": [
+        2.62,
+        1.72,
+        0
+      ],
+      "size": [
+        0.14,
+        0.12,
+        1.05
+      ],
+      "material": "welded steel",
+      "role": "Cross tube tying both loader arms together immediately behind the quick-attach plate.",
+      "connections": [
+        "loader_arm_port",
+        "loader_arm_stbd",
+        "quick_attach_plate"
+      ]
+    },
+    {
+      "id": "loader_clevis_lower_port",
+      "name": "Lower Lift Cylinder Clevis Port",
+      "shape": "box",
+      "position": [
+        0.75,
+        0.72,
+        0.47
+      ],
+      "size": [
+        0.14,
+        0.12,
+        0.1
+      ],
+      "material": "forged steel",
+      "role": "Lower port clevis bracket that pins the base of the loader lift cylinder to the frame.",
+      "connections": [
+        "front_crossmember",
+        "lift_lower_pin_port"
+      ]
+    },
+    {
+      "id": "loader_clevis_lower_stbd",
+      "name": "Lower Lift Cylinder Clevis Starboard",
+      "shape": "box",
+      "position": [
+        0.75,
+        0.72,
+        -0.47
+      ],
+      "size": [
+        0.14,
+        0.12,
+        0.1
+      ],
+      "material": "forged steel",
+      "role": "Lower starboard clevis bracket that pins the base of the loader lift cylinder to the frame.",
+      "connections": [
+        "front_crossmember",
+        "lift_lower_pin_stbd"
+      ]
+    },
+    {
+      "id": "arm_clevis_port",
+      "name": "Loader Arm Cylinder Clevis Port",
+      "shape": "box",
+      "position": [
+        1.48,
+        1.32,
+        0.47
+      ],
+      "size": [
+        0.16,
+        0.12,
+        0.1
+      ],
+      "material": "forged steel",
+      "role": "Upper port clevis welded to the loader arm for the lift-cylinder rod eye.",
+      "connections": [
+        "loader_arm_port",
+        "lift_upper_pin_port"
+      ]
+    },
+    {
+      "id": "arm_clevis_stbd",
+      "name": "Loader Arm Cylinder Clevis Starboard",
+      "shape": "box",
+      "position": [
+        1.48,
+        1.32,
+        -0.47
+      ],
+      "size": [
+        0.16,
+        0.12,
+        0.1
+      ],
+      "material": "forged steel",
+      "role": "Upper starboard clevis welded to the loader arm for the lift-cylinder rod eye.",
+      "connections": [
+        "loader_arm_stbd",
+        "lift_upper_pin_stbd"
+      ]
+    },
+    {
+      "id": "lift_lower_pin_port",
+      "name": "Lift Cylinder Lower Pin Port",
+      "shape": "cylinder",
+      "position": [
+        0.75,
+        0.72,
+        0.47
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.032,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port lower clevis pin through the cylinder base eye and frame bracket.",
+      "connections": [
+        "loader_clevis_lower_port",
+        "lift_cyl_barrel_port"
+      ]
+    },
+    {
+      "id": "lift_upper_pin_port",
+      "name": "Lift Cylinder Upper Pin Port",
+      "shape": "cylinder",
+      "position": [
+        1.48,
+        1.32,
+        0.47
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.032,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port upper clevis pin through the chrome rod eye and loader-arm bracket.",
+      "connections": [
+        "arm_clevis_port",
+        "lift_cyl_rod_port"
+      ]
+    },
+    {
+      "id": "lift_lower_pin_stbd",
+      "name": "Lift Cylinder Lower Pin Starboard",
+      "shape": "cylinder",
+      "position": [
+        0.75,
+        0.72,
+        -0.47
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.032,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard lower clevis pin through the cylinder base eye and frame bracket.",
+      "connections": [
+        "loader_clevis_lower_stbd",
+        "lift_cyl_barrel_stbd"
+      ]
+    },
+    {
+      "id": "lift_upper_pin_stbd",
+      "name": "Lift Cylinder Upper Pin Starboard",
+      "shape": "cylinder",
+      "position": [
+        1.48,
+        1.32,
+        -0.47
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.032,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard upper clevis pin through the chrome rod eye and loader-arm bracket.",
+      "connections": [
+        "arm_clevis_stbd",
+        "lift_cyl_rod_stbd"
+      ]
+    },
+    {
+      "id": "lift_cyl_barrel_port",
+      "name": "Loader Lift Cylinder Barrel Port",
+      "shape": "capsule",
+      "position": [
+        0.97,
+        0.9,
+        0.47
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.855
+      ],
+      "size": [
+        0.055,
+        0.58
+      ],
+      "material": "brushed steel",
+      "role": "Port hydraulic cylinder barrel aligned from the lower frame clevis toward the loader-arm clevis.",
+      "connections": [
+        "lift_lower_pin_port",
+        "lift_cyl_rod_port",
+        "lift_hose_port"
+      ]
+    },
+    {
+      "id": "lift_cyl_rod_port",
+      "name": "Loader Lift Cylinder Chrome Rod Port",
+      "shape": "capsule",
+      "position": [
+        1.32,
+        1.19,
+        0.47
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.855
+      ],
+      "size": [
+        0.03,
+        0.38
+      ],
+      "material": "brushed steel",
+      "role": "Exposed chrome rod continuing the same cylinder axis into the port loader-arm clevis.",
+      "connections": [
+        "lift_cyl_barrel_port",
+        "lift_upper_pin_port"
+      ]
+    },
+    {
+      "id": "lift_cyl_barrel_stbd",
+      "name": "Loader Lift Cylinder Barrel Starboard",
+      "shape": "capsule",
+      "position": [
+        0.97,
+        0.9,
+        -0.47
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.855
+      ],
+      "size": [
+        0.055,
+        0.58
+      ],
+      "material": "brushed steel",
+      "role": "Starboard hydraulic cylinder barrel aligned from the lower frame clevis toward the loader-arm clevis.",
+      "connections": [
+        "lift_lower_pin_stbd",
+        "lift_cyl_rod_stbd",
+        "lift_hose_stbd"
+      ]
+    },
+    {
+      "id": "lift_cyl_rod_stbd",
+      "name": "Loader Lift Cylinder Chrome Rod Starboard",
+      "shape": "capsule",
+      "position": [
+        1.32,
+        1.19,
+        -0.47
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.855
+      ],
+      "size": [
+        0.03,
+        0.38
+      ],
+      "material": "brushed steel",
+      "role": "Exposed chrome rod continuing the same cylinder axis into the starboard loader-arm clevis.",
+      "connections": [
+        "lift_cyl_barrel_stbd",
+        "lift_upper_pin_stbd"
+      ]
+    },
+    {
+      "id": "lift_hose_port",
+      "name": "Loader Lift Hose Port",
+      "shape": "capsule",
+      "position": [
+        0.55,
+        1.06,
+        0.43
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.016,
+        1.05
+      ],
+      "material": "rubber",
+      "role": "Hydraulic hose feeding the port loader lift cylinder from the lift coupler block.",
+      "connections": [
+        "lift_coupler_block",
+        "lift_cyl_barrel_port"
+      ]
+    },
+    {
+      "id": "lift_hose_stbd",
+      "name": "Loader Lift Hose Starboard",
+      "shape": "capsule",
+      "position": [
+        0.55,
+        1.02,
+        -0.43
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.016,
+        1.05
+      ],
+      "material": "rubber",
+      "role": "Hydraulic hose feeding the starboard loader lift cylinder from the lift coupler block.",
+      "connections": [
+        "lift_coupler_block",
+        "lift_cyl_barrel_stbd"
+      ]
+    },
+    {
+      "id": "quick_attach_plate",
+      "name": "Universal Quick-Attach Plate",
+      "shape": "box",
+      "position": [
+        2.77,
+        1.7,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.12
+      ],
+      "size": [
+        0.1,
+        0.48,
+        1.04
+      ],
+      "material": "forged steel",
+      "role": "Flat universal quick-attach plate that pins to both loader arms and locks the bucket rear plate.",
+      "connections": [
+        "loader_arm_port",
+        "loader_arm_stbd",
+        "loader_cross_tube",
+        "bucket_back_plate",
+        "bucket_lower_pin_port",
+        "bucket_lower_pin_stbd",
+        "quick_attach_latch_bar"
+      ]
+    },
+    {
+      "id": "quick_attach_latch_bar",
+      "name": "Quick-Attach Top Latch Bar",
+      "shape": "box",
+      "position": [
+        2.82,
+        1.9,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.12
+      ],
+      "size": [
+        0.08,
+        0.08,
+        1.02
+      ],
+      "material": "forged steel",
+      "role": "Top latch bar clamping the bucket rear shell to the universal quick-attach plate.",
+      "connections": [
+        "quick_attach_plate",
+        "bucket_back_plate"
+      ]
+    },
+    {
+      "id": "bucket_lower_pin_port",
+      "name": "Bucket Lower Pin Port",
+      "shape": "cylinder",
+      "position": [
+        2.82,
+        1.5,
+        0.48
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Port lower pin locking the bucket shell to the quick-attach plate.",
+      "connections": [
+        "quick_attach_plate",
+        "bucket_back_plate"
+      ]
+    },
+    {
+      "id": "bucket_lower_pin_stbd",
+      "name": "Bucket Lower Pin Starboard",
+      "shape": "cylinder",
+      "position": [
+        2.82,
+        1.5,
+        -0.48
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.035,
+        0.16
+      ],
+      "material": "forged steel",
+      "role": "Starboard lower pin locking the bucket shell to the quick-attach plate.",
+      "connections": [
+        "quick_attach_plate",
+        "bucket_back_plate"
+      ]
+    },
+    {
+      "id": "bucket_bottom_plate",
+      "name": "Bucket Bottom Plate",
+      "shape": "box",
+      "position": [
+        3.07,
+        1.45,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.16
+      ],
+      "size": [
+        0.68,
+        0.05,
+        1.18
+      ],
+      "material": "forged steel",
+      "role": "Sloped floor plate of the open loader bucket for carrying soil and gravel.",
+      "connections": [
+        "bucket_back_plate",
+        "bucket_inner_back_plate",
+        "bucket_side_port",
+        "bucket_side_stbd",
+        "cutting_edge"
+      ]
+    },
+    {
+      "id": "bucket_inner_back_plate",
+      "name": "Bucket Angled Inner Back Plate",
+      "shape": "box",
+      "position": [
+        2.88,
+        1.61,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.36
+      ],
+      "size": [
+        0.32,
+        0.05,
+        1.16
+      ],
+      "material": "forged steel",
+      "role": "Angled inner shell segment that approximates the curved transition from bucket floor to rear wall.",
+      "connections": [
+        "bucket_bottom_plate",
+        "bucket_back_plate",
+        "bucket_side_port",
+        "bucket_side_stbd"
+      ]
+    },
+    {
+      "id": "bucket_back_plate",
+      "name": "Bucket Rear Plate",
+      "shape": "box",
+      "position": [
+        2.72,
+        1.78,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0.12
+      ],
+      "size": [
+        0.08,
+        0.52,
+        1.18
+      ],
+      "material": "forged steel",
+      "role": "Rear wall of the open bucket bolted to the quick-attach plate and visible from the isometric view.",
+      "connections": [
+        "quick_attach_plate",
+        "bucket_bottom_plate",
+        "bucket_inner_back_plate",
+        "bucket_top_roll",
+        "bucket_side_port",
+        "bucket_side_stbd"
+      ]
+    },
+    {
+      "id": "bucket_top_roll",
+      "name": "Bucket Rolled Top Back Strip",
+      "shape": "cylinder",
+      "position": [
+        2.73,
+        2.06,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.045,
+        1.2
+      ],
+      "material": "forged steel",
+      "role": "Round top reinforcement tube along the rear lip of the bucket shell.",
+      "connections": [
+        "bucket_back_plate",
+        "bucket_side_port",
+        "bucket_side_stbd"
+      ]
+    },
+    {
+      "id": "bucket_side_port",
+      "name": "Bucket Side Cheek Port",
+      "shape": "box",
+      "position": [
+        3.03,
+        1.65,
+        0.62
+      ],
+      "rotation": [
+        0,
+        0,
+        0.08
+      ],
+      "size": [
+        0.64,
+        0.45,
+        0.06
+      ],
+      "material": "forged steel",
+      "role": "Port side cheek plate closing the bucket end while leaving the open scoop interior visible.",
+      "connections": [
+        "bucket_back_plate",
+        "bucket_inner_back_plate",
+        "bucket_bottom_plate",
+        "bucket_top_roll"
+      ]
+    },
+    {
+      "id": "bucket_side_stbd",
+      "name": "Bucket Side Cheek Starboard",
+      "shape": "box",
+      "position": [
+        3.03,
+        1.65,
+        -0.62
+      ],
+      "rotation": [
+        0,
+        0,
+        0.08
+      ],
+      "size": [
+        0.64,
+        0.45,
+        0.06
+      ],
+      "material": "forged steel",
+      "role": "Starboard side cheek plate closing the bucket end while leaving the open scoop interior visible.",
+      "connections": [
+        "bucket_back_plate",
+        "bucket_inner_back_plate",
+        "bucket_bottom_plate",
+        "bucket_top_roll"
+      ]
+    },
+    {
+      "id": "cutting_edge",
+      "name": "Bucket Cutting Edge",
+      "shape": "box",
+      "position": [
+        3.41,
+        1.35,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.16
+      ],
+      "size": [
+        0.1,
+        0.07,
+        1.24
+      ],
+      "material": "forged steel",
+      "role": "Hardened front cutting edge that scrapes the ground and protects the bucket bottom plate.",
+      "connections": [
+        "bucket_bottom_plate",
+        "bucket_tooth_bar",
+        "bucket_wear_strip_port",
+        "bucket_wear_strip_center",
+        "bucket_wear_strip_stbd"
+      ]
+    },
+    {
+      "id": "bucket_tooth_bar",
+      "name": "Bucket Bolt-On Tooth Bar",
+      "shape": "box",
+      "position": [
+        3.49,
+        1.31,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.16
+      ],
+      "size": [
+        0.06,
+        0.08,
+        1.18
+      ],
+      "material": "forged steel",
+      "role": "Bolt-on tooth bar shown as a narrow steel strip ahead of the cutting edge for digging traction.",
+      "connections": [
+        "cutting_edge"
+      ]
+    },
+    {
+      "id": "bucket_wear_strip_port",
+      "name": "Bucket Wear Strip Port",
+      "shape": "box",
+      "position": [
+        3.12,
+        1.41,
+        0.36
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.16
+      ],
+      "size": [
+        0.55,
+        0.035,
+        0.07
+      ],
+      "material": "forged steel",
+      "role": "Port bottom wear strip that stiffens the bucket floor and takes abrasion.",
+      "connections": [
+        "bucket_bottom_plate",
+        "cutting_edge"
+      ]
+    },
+    {
+      "id": "bucket_wear_strip_center",
+      "name": "Bucket Wear Strip Center",
+      "shape": "box",
+      "position": [
+        3.12,
+        1.41,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.16
+      ],
+      "size": [
+        0.55,
+        0.035,
+        0.07
+      ],
+      "material": "forged steel",
+      "role": "Center bottom wear strip that supports the bucket floor under central loads.",
+      "connections": [
+        "bucket_bottom_plate",
+        "cutting_edge"
+      ]
+    },
+    {
+      "id": "bucket_wear_strip_stbd",
+      "name": "Bucket Wear Strip Starboard",
+      "shape": "box",
+      "position": [
+        3.12,
+        1.41,
+        -0.36
+      ],
+      "rotation": [
+        0,
+        0,
+        -0.16
+      ],
+      "size": [
+        0.55,
+        0.035,
+        0.07
+      ],
+      "material": "forged steel",
+      "role": "Starboard bottom wear strip that stiffens the bucket floor and takes abrasion.",
+      "connections": [
+        "bucket_bottom_plate",
+        "cutting_edge"
+      ]
+    },
+    {
+      "id": "tool_bar",
+      "name": "Universal Rear Tool Bar",
+      "shape": "box",
+      "position": [
+        -1.45,
+        0.72,
+        0
+      ],
+      "size": [
+        0.14,
+        0.18,
+        1.18
+      ],
+      "material": "welded steel",
+      "role": "Rear universal tool bar for bolting on rippers, three-point adapters, augers, or backhoe modules.",
+      "connections": [
+        "rear_crossmember",
+        "hitch_lug_port",
+        "hitch_lug_stbd",
+        "hitch_center_lug"
+      ]
+    },
+    {
+      "id": "hitch_lug_port",
+      "name": "Three-Point Hitch Lug Port",
+      "shape": "box",
+      "position": [
+        -1.56,
+        0.5,
+        0.38
+      ],
+      "size": [
+        0.12,
+        0.18,
+        0.1
+      ],
+      "material": "forged steel",
+      "role": "Port lower hitch lug with pin hole for rear implements.",
+      "connections": [
+        "rear_crossmember",
+        "tool_bar"
+      ]
+    },
+    {
+      "id": "hitch_lug_stbd",
+      "name": "Three-Point Hitch Lug Starboard",
+      "shape": "box",
+      "position": [
+        -1.56,
+        0.5,
+        -0.38
+      ],
+      "size": [
+        0.12,
+        0.18,
+        0.1
+      ],
+      "material": "forged steel",
+      "role": "Starboard lower hitch lug with pin hole for rear implements.",
+      "connections": [
+        "rear_crossmember",
+        "tool_bar"
+      ]
+    },
+    {
+      "id": "hitch_center_lug",
+      "name": "Upper Center Hitch Lug",
+      "shape": "box",
+      "position": [
+        -1.56,
+        0.9,
+        0
+      ],
+      "size": [
+        0.1,
+        0.2,
+        0.12
+      ],
+      "material": "forged steel",
+      "role": "Upper center hitch lug completing a three-point attachment triangle.",
+      "connections": [
+        "tool_bar"
+      ]
+    }
   ]
 }
