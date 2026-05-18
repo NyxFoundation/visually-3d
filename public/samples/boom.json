@@ -1,0 +1,1143 @@
+{
+  "machine_name": "BOOM — Berkeley Out-of-Order Machine",
+  "assembly_instructions": "Abstract microarchitecture block diagram, not a physical machine — there is no real-world scale, so the scene is laid out ~17.5 m wide purely for legibility. Build the black PCB backplane first (centered at origin, bottom edge on the grid). Mount every functional block as a box standing proud of the front face (+Z). Pipeline flows left-to-right along +X: front end (L1 I-cache with its I-cache MSHR and instruction TLB, a global history register feeding the TAGE predictor, BTB, return address stack, fetch target queue, fetch unit, fetch buffer) → decode → register rename (map table, free list, busy table) with a per-branch rename checkpoint → dispatch → issue queues → physical register files → reorder buffer with commit/retire logic → execution units (two integer ALUs, branch unit, integer mul/div, two FP pipelines) wrapped by an operand bypass/forwarding network → load-store unit with its data TLB → load queue, store queue → L1 D-cache with its D-cache MSHR; a page table walker in the lower right refills both TLBs. The speculative out-of-order structures — rename map table, free list, busy table, branch snapshot, the three issue queues, the tall ROB bank, the TLBs, GHR, RAS, FTQ and commit logic — are rendered in white composite so they read prominently against the black board. Copper buses are laid flat on the backplane surface tracing the pipeline, branch-redirect, writeback and memory paths.",
+  "metadata": {
+    "reference": "https://github.com/riscv-boom/riscv-boom",
+    "domain": "computer-architecture",
+    "thumbnail_camera": [
+      11.4,
+      12,
+      11.9
+    ],
+    "info": {
+      "japanese_name": "BOOM（バークレー・アウトオブオーダー・マシン）",
+      "english_name": "BOOM — Berkeley Out-of-Order Machine",
+      "summary": "BOOM is an open-source superscalar, out-of-order RISC-V core generator developed at UC Berkeley. It implements the full RV64GC ISA and is widely used in academic and industrial microarchitecture research.",
+      "description": "BOOM is a synthesizable, parameterized out-of-order processor written in the Chisel hardware construction language, which elaborates to Verilog. Its datapath spans roughly ten pipeline stages: a decoupled front end with a TAGE-L branch predictor, branch target buffer and return address stack feeds a fetch target queue and fetch buffer; instructions are then decoded, register-renamed against a map table with an explicit free list and busy table, dispatched into separate integer, memory and floating-point issue queues, and executed out of order against unified physical register files. A reorder buffer (ROB) tracks in-flight instructions and enforces precise, in-order commit and speculation recovery.",
+      "description_extra": "The current generation, BOOMv3 — also called SonicBOOM (2020) — added a load/store unit with decoupled load and store queues, an improved TAGE predictor, and short-forwards branch optimization, reaching competitive IPC for an academic core. BOOM ships as part of the Chipyard SoC framework and reuses the Rocket Chip non-blocking caches, TLBs, page table walker and TileLink interconnect.",
+      "operator": "UC Berkeley Architecture Research (BAR) group and the RISC-V community",
+      "contractor": "University of California, Berkeley — EECS / SLICE Lab",
+      "contract_date": "First public release 2015; BOOMv3 'SonicBOOM' 2020",
+      "contract_value": "Open source (no cost) — BSD 3-Clause licensed",
+      "status": "Actively maintained open-source project",
+      "facts": [
+        {
+          "label": "ISA",
+          "value": "RV64GC (RISC-V 64-bit, G + compressed)"
+        },
+        {
+          "label": "Microarchitecture",
+          "value": "Superscalar, out-of-order, speculative"
+        },
+        {
+          "label": "HDL",
+          "value": "Chisel (elaborates to Verilog)"
+        },
+        {
+          "label": "Latest version",
+          "value": "BOOMv3 'SonicBOOM' (2020)"
+        },
+        {
+          "label": "Pipeline depth",
+          "value": "~10 stages, decoupled front end"
+        },
+        {
+          "label": "Branch predictor",
+          "value": "TAGE-L + BTB + RAS, global history register"
+        },
+        {
+          "label": "Register file",
+          "value": "Unified physical RF (configurable, ~100+ entries)"
+        },
+        {
+          "label": "Issue width",
+          "value": "Configurable; LargeBoom ~3-4 wide"
+        },
+        {
+          "label": "Address translation",
+          "value": "Sv39/Sv48 ITLB + DTLB, shared page table walker"
+        },
+        {
+          "label": "Framework",
+          "value": "Chipyard / Rocket Chip ecosystem"
+        }
+      ],
+      "sources": [
+        {
+          "title": "riscv-boom/riscv-boom — GitHub repository",
+          "url": "https://github.com/riscv-boom/riscv-boom"
+        },
+        {
+          "title": "RISCV-BOOM documentation (boom-core.org)",
+          "url": "https://docs.boom-core.org/"
+        },
+        {
+          "title": "SonicBOOM: The 3rd Generation Berkeley Out-of-Order Machine (CARRV 2020)",
+          "url": "https://carrv.github.io/2020/papers/CARRV2020_paper_15_Zhao.pdf"
+        },
+        {
+          "title": "Chipyard SoC framework",
+          "url": "https://github.com/ucb-bar/chipyard"
+        }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "backplane",
+      "name": "Block-diagram backplane (PCB)",
+      "shape": "box",
+      "position": [
+        0,
+        4,
+        0
+      ],
+      "size": [
+        17.5,
+        8,
+        0.3
+      ],
+      "material": "black composite",
+      "role": "Root structural board that all functional blocks and copper buses are mounted on.",
+      "connections": [
+        "l1_icache",
+        "icache_mshr",
+        "itlb",
+        "ghr",
+        "tage_predictor",
+        "btb",
+        "ras",
+        "ftq",
+        "fetch_unit",
+        "fetch_buffer",
+        "decode_unit",
+        "rename_map_table",
+        "branch_snapshot",
+        "free_list",
+        "busy_table",
+        "dispatch_unit",
+        "issue_queue_int",
+        "issue_queue_mem",
+        "issue_queue_fp",
+        "prf_int",
+        "prf_fp",
+        "rob",
+        "commit_unit",
+        "alu_0",
+        "alu_1",
+        "branch_unit",
+        "muldiv_unit",
+        "fpu_fma",
+        "fpu_divsqrt",
+        "bypass_network",
+        "lsu",
+        "dtlb",
+        "load_queue",
+        "store_queue",
+        "l1_dcache",
+        "dcache_mshr",
+        "ptw",
+        "main_pipeline_bus",
+        "branch_redirect_bus",
+        "writeback_bus",
+        "memory_bus"
+      ]
+    },
+    {
+      "id": "l1_icache",
+      "name": "L1 Instruction Cache",
+      "shape": "box",
+      "position": [
+        -7.4,
+        6,
+        0.55
+      ],
+      "size": [
+        1.5,
+        1.5,
+        0.8
+      ],
+      "material": "brushed steel",
+      "role": "Supplies instruction bytes to the fetch unit each cycle.",
+      "connections": [
+        "backplane",
+        "icache_mshr",
+        "itlb",
+        "fetch_unit",
+        "memory_bus"
+      ]
+    },
+    {
+      "id": "icache_mshr",
+      "name": "I-Cache Miss-Status Holding Registers",
+      "shape": "box",
+      "position": [
+        -8.5,
+        6,
+        0.5
+      ],
+      "size": [
+        0.45,
+        1,
+        0.5
+      ],
+      "material": "white composite",
+      "role": "Tracks outstanding instruction-cache misses so the front end stays non-blocking while a refill is in flight.",
+      "connections": [
+        "backplane",
+        "l1_icache",
+        "memory_bus"
+      ]
+    },
+    {
+      "id": "itlb",
+      "name": "Instruction TLB",
+      "shape": "box",
+      "position": [
+        -7.6,
+        7.3,
+        0.5
+      ],
+      "size": [
+        1.4,
+        0.7,
+        0.5
+      ],
+      "material": "white composite",
+      "role": "Translates instruction virtual addresses to physical addresses for every fetch; a miss traps to the page table walker.",
+      "connections": [
+        "backplane",
+        "l1_icache",
+        "fetch_unit",
+        "ptw"
+      ]
+    },
+    {
+      "id": "ghr",
+      "name": "Global History Register",
+      "shape": "box",
+      "position": [
+        -8.45,
+        3.8,
+        0.55
+      ],
+      "size": [
+        0.5,
+        1.6,
+        0.5
+      ],
+      "material": "white composite",
+      "role": "Shift register of recent branch outcomes that indexes the TAGE-L tagged tables and is corrected on every branch resolution.",
+      "connections": [
+        "backplane",
+        "tage_predictor",
+        "btb",
+        "branch_redirect_bus"
+      ]
+    },
+    {
+      "id": "tage_predictor",
+      "name": "TAGE-L Branch Predictor",
+      "shape": "box",
+      "position": [
+        -7.4,
+        3.8,
+        0.6
+      ],
+      "size": [
+        1.3,
+        1.9,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Speculatively predicts branch directions from tagged-geometric history so the front end can run ahead of resolution.",
+      "connections": [
+        "backplane",
+        "ghr",
+        "fetch_unit",
+        "btb",
+        "ftq",
+        "branch_redirect_bus"
+      ]
+    },
+    {
+      "id": "btb",
+      "name": "Branch Target Buffer (BTB)",
+      "shape": "box",
+      "position": [
+        -7.4,
+        1.8,
+        0.55
+      ],
+      "size": [
+        1.5,
+        1.1,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Predicts branch target addresses to steer the next fetch before the branch is decoded.",
+      "connections": [
+        "backplane",
+        "tage_predictor",
+        "ras",
+        "fetch_unit"
+      ]
+    },
+    {
+      "id": "ras",
+      "name": "Return Address Stack (RAS)",
+      "shape": "box",
+      "position": [
+        -7.4,
+        0.75,
+        0.55
+      ],
+      "size": [
+        1.5,
+        0.9,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Stack of recent call sites that predicts return-instruction targets for the front end.",
+      "connections": [
+        "backplane",
+        "btb",
+        "fetch_unit"
+      ]
+    },
+    {
+      "id": "ftq",
+      "name": "Fetch Target Queue (FTQ)",
+      "shape": "box",
+      "position": [
+        -6,
+        6.8,
+        0.6
+      ],
+      "size": [
+        1,
+        1,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Buffers predicted fetch addresses, decoupling the branch predictor from instruction fetch and holding branch metadata until resolution.",
+      "connections": [
+        "backplane",
+        "tage_predictor",
+        "fetch_unit",
+        "branch_redirect_bus"
+      ]
+    },
+    {
+      "id": "fetch_unit",
+      "name": "Instruction Fetch Unit",
+      "shape": "box",
+      "position": [
+        -5.7,
+        5,
+        0.55
+      ],
+      "size": [
+        1.4,
+        1.7,
+        0.8
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Fetches a packet of instructions per cycle using the predicted PC stream from the FTQ.",
+      "connections": [
+        "backplane",
+        "l1_icache",
+        "itlb",
+        "tage_predictor",
+        "btb",
+        "ras",
+        "ftq",
+        "fetch_buffer",
+        "main_pipeline_bus"
+      ]
+    },
+    {
+      "id": "fetch_buffer",
+      "name": "Fetch Buffer",
+      "shape": "box",
+      "position": [
+        -5.7,
+        2.8,
+        0.55
+      ],
+      "size": [
+        1.4,
+        1.3,
+        0.8
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Decouples the front end from the back end, queuing fetched instructions for decode.",
+      "connections": [
+        "backplane",
+        "fetch_unit",
+        "decode_unit"
+      ]
+    },
+    {
+      "id": "decode_unit",
+      "name": "Decode Stage",
+      "shape": "box",
+      "position": [
+        -4.2,
+        4,
+        0.55
+      ],
+      "size": [
+        1.3,
+        2.6,
+        0.8
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Expands fetched bytes into micro-ops and reads architectural register specifiers.",
+      "connections": [
+        "backplane",
+        "fetch_buffer",
+        "rename_map_table",
+        "main_pipeline_bus"
+      ]
+    },
+    {
+      "id": "rename_map_table",
+      "name": "Rename Map Table",
+      "shape": "box",
+      "position": [
+        -2.9,
+        5.3,
+        0.65
+      ],
+      "size": [
+        1.6,
+        1.9,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Maps architectural registers to physical registers, removing false dependencies for out-of-order execution.",
+      "connections": [
+        "backplane",
+        "decode_unit",
+        "branch_snapshot",
+        "free_list",
+        "busy_table",
+        "dispatch_unit"
+      ]
+    },
+    {
+      "id": "branch_snapshot",
+      "name": "Branch Snapshot / Rename Checkpoint",
+      "shape": "box",
+      "position": [
+        -3.6,
+        6.9,
+        0.6
+      ],
+      "size": [
+        1,
+        0.9,
+        0.6
+      ],
+      "material": "white composite",
+      "role": "Captures a checkpoint of the rename map table and front-end state for each in-flight branch, restored verbatim on a mispredict.",
+      "connections": [
+        "backplane",
+        "rename_map_table",
+        "ftq",
+        "branch_unit",
+        "branch_redirect_bus"
+      ]
+    },
+    {
+      "id": "free_list",
+      "name": "Free List",
+      "shape": "box",
+      "position": [
+        -2.9,
+        3.3,
+        0.6
+      ],
+      "size": [
+        1.5,
+        1.3,
+        0.9
+      ],
+      "material": "white composite",
+      "role": "Tracks unallocated physical registers and hands one to each renamed destination.",
+      "connections": [
+        "backplane",
+        "rename_map_table",
+        "rob",
+        "commit_unit"
+      ]
+    },
+    {
+      "id": "busy_table",
+      "name": "Busy Table",
+      "shape": "box",
+      "position": [
+        -2.9,
+        1.6,
+        0.6
+      ],
+      "size": [
+        1.5,
+        1,
+        0.9
+      ],
+      "material": "white composite",
+      "role": "Records whether each physical register's value is ready, feeding wakeup logic in the issue queues.",
+      "connections": [
+        "backplane",
+        "rename_map_table",
+        "dispatch_unit"
+      ]
+    },
+    {
+      "id": "dispatch_unit",
+      "name": "Dispatch Stage",
+      "shape": "box",
+      "position": [
+        -1.6,
+        4,
+        0.55
+      ],
+      "size": [
+        1.2,
+        2.8,
+        0.8
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Steers renamed micro-ops into the appropriate issue queue and allocates ROB entries.",
+      "connections": [
+        "backplane",
+        "rename_map_table",
+        "busy_table",
+        "issue_queue_int",
+        "issue_queue_mem",
+        "issue_queue_fp",
+        "rob"
+      ]
+    },
+    {
+      "id": "issue_queue_int",
+      "name": "Integer Issue Queue",
+      "shape": "box",
+      "position": [
+        -0.2,
+        5.4,
+        0.65
+      ],
+      "size": [
+        1.6,
+        1.6,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Holds integer micro-ops and issues them out of order once their operands wake up.",
+      "connections": [
+        "backplane",
+        "dispatch_unit",
+        "prf_int",
+        "alu_0",
+        "alu_1",
+        "branch_unit",
+        "muldiv_unit",
+        "bypass_network"
+      ]
+    },
+    {
+      "id": "issue_queue_mem",
+      "name": "Memory Issue Queue",
+      "shape": "box",
+      "position": [
+        -0.2,
+        3.5,
+        0.65
+      ],
+      "size": [
+        1.6,
+        1.5,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Issues load and store address micro-ops out of order to the load-store unit.",
+      "connections": [
+        "backplane",
+        "dispatch_unit",
+        "prf_int",
+        "lsu",
+        "memory_bus"
+      ]
+    },
+    {
+      "id": "issue_queue_fp",
+      "name": "Floating-Point Issue Queue",
+      "shape": "box",
+      "position": [
+        -0.2,
+        1.7,
+        0.65
+      ],
+      "size": [
+        1.6,
+        1.5,
+        1.1
+      ],
+      "material": "white composite",
+      "role": "Issues floating-point micro-ops out of order to the FP pipelines.",
+      "connections": [
+        "backplane",
+        "dispatch_unit",
+        "prf_fp",
+        "fpu_fma",
+        "fpu_divsqrt",
+        "bypass_network"
+      ]
+    },
+    {
+      "id": "prf_int",
+      "name": "Integer Physical Register File",
+      "shape": "box",
+      "position": [
+        1.3,
+        5.1,
+        0.65
+      ],
+      "size": [
+        1.5,
+        2.3,
+        1.1
+      ],
+      "material": "brushed steel",
+      "role": "Large unified store of integer physical registers read by execution units and written by writeback.",
+      "connections": [
+        "backplane",
+        "issue_queue_int",
+        "issue_queue_mem",
+        "alu_0",
+        "alu_1",
+        "writeback_bus"
+      ]
+    },
+    {
+      "id": "prf_fp",
+      "name": "Floating-Point Physical Register File",
+      "shape": "box",
+      "position": [
+        1.3,
+        2.3,
+        0.65
+      ],
+      "size": [
+        1.5,
+        1.9,
+        1.1
+      ],
+      "material": "brushed steel",
+      "role": "Holds floating-point physical registers feeding and capturing results from the FP pipelines.",
+      "connections": [
+        "backplane",
+        "issue_queue_fp",
+        "fpu_fma",
+        "fpu_divsqrt",
+        "writeback_bus"
+      ]
+    },
+    {
+      "id": "rob",
+      "name": "Reorder Buffer (ROB)",
+      "shape": "box",
+      "position": [
+        2.8,
+        4,
+        0.7
+      ],
+      "size": [
+        1.4,
+        6.4,
+        1.2
+      ],
+      "material": "white composite",
+      "role": "Tall bank tracking every in-flight instruction in program order to enforce precise commit and speculation recovery.",
+      "connections": [
+        "backplane",
+        "dispatch_unit",
+        "free_list",
+        "commit_unit",
+        "alu_0",
+        "branch_unit",
+        "store_queue",
+        "branch_redirect_bus"
+      ]
+    },
+    {
+      "id": "commit_unit",
+      "name": "Commit / Retire Logic",
+      "shape": "box",
+      "position": [
+        2.8,
+        7.65,
+        0.6
+      ],
+      "size": [
+        1.5,
+        0.6,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Retires completed instructions from the ROB head in program order, freeing physical registers and releasing stores to drain to cache.",
+      "connections": [
+        "backplane",
+        "rob",
+        "free_list",
+        "store_queue",
+        "prf_int"
+      ]
+    },
+    {
+      "id": "alu_0",
+      "name": "Integer ALU 0",
+      "shape": "box",
+      "position": [
+        4.4,
+        6.3,
+        0.55
+      ],
+      "size": [
+        1.3,
+        1.1,
+        0.8
+      ],
+      "material": "welded steel",
+      "role": "Executes one integer arithmetic/logic micro-op per cycle.",
+      "connections": [
+        "backplane",
+        "issue_queue_int",
+        "prf_int",
+        "rob",
+        "bypass_network",
+        "writeback_bus"
+      ]
+    },
+    {
+      "id": "alu_1",
+      "name": "Integer ALU 1",
+      "shape": "box",
+      "position": [
+        4.4,
+        4.9,
+        0.55
+      ],
+      "size": [
+        1.3,
+        1.1,
+        0.8
+      ],
+      "material": "welded steel",
+      "role": "Second integer ALU giving the core dual-issue arithmetic throughput.",
+      "connections": [
+        "backplane",
+        "issue_queue_int",
+        "prf_int",
+        "bypass_network",
+        "writeback_bus"
+      ]
+    },
+    {
+      "id": "branch_unit",
+      "name": "Branch Resolution Unit",
+      "shape": "box",
+      "position": [
+        4.4,
+        3.5,
+        0.55
+      ],
+      "size": [
+        1.3,
+        1.1,
+        0.8
+      ],
+      "material": "welded steel",
+      "role": "Resolves branch outcomes and signals mispredict redirects back to the front end.",
+      "connections": [
+        "backplane",
+        "issue_queue_int",
+        "rob",
+        "bypass_network",
+        "branch_redirect_bus"
+      ]
+    },
+    {
+      "id": "muldiv_unit",
+      "name": "Integer Multiply / Divide Unit",
+      "shape": "box",
+      "position": [
+        4.4,
+        1.9,
+        0.55
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.8
+      ],
+      "material": "welded steel",
+      "role": "Performs multi-cycle integer multiply and divide operations.",
+      "connections": [
+        "backplane",
+        "issue_queue_int",
+        "prf_int",
+        "bypass_network",
+        "writeback_bus"
+      ]
+    },
+    {
+      "id": "fpu_fma",
+      "name": "FP Fused-Multiply-Add Pipeline",
+      "shape": "box",
+      "position": [
+        5.7,
+        5.4,
+        0.55
+      ],
+      "size": [
+        1.3,
+        1.4,
+        0.8
+      ],
+      "material": "forged steel",
+      "role": "Pipelined floating-point multiply-add datapath for the bulk of FP work.",
+      "connections": [
+        "backplane",
+        "issue_queue_fp",
+        "prf_fp",
+        "bypass_network",
+        "writeback_bus"
+      ]
+    },
+    {
+      "id": "fpu_divsqrt",
+      "name": "FP Divide / Square-Root Unit",
+      "shape": "box",
+      "position": [
+        5.7,
+        3.4,
+        0.55
+      ],
+      "size": [
+        1.3,
+        1.3,
+        0.8
+      ],
+      "material": "forged steel",
+      "role": "Iterative unit handling floating-point divide and square-root operations.",
+      "connections": [
+        "backplane",
+        "issue_queue_fp",
+        "prf_fp",
+        "bypass_network",
+        "writeback_bus"
+      ]
+    },
+    {
+      "id": "bypass_network",
+      "name": "Operand Bypass / Forwarding Network",
+      "shape": "box",
+      "position": [
+        5.7,
+        1.95,
+        0.55
+      ],
+      "size": [
+        1.3,
+        1.3,
+        0.9
+      ],
+      "material": "brass",
+      "role": "Forwards each execution unit's result directly to dependent operands a cycle before writeback, so back-to-back dependent micro-ops issue without stalling.",
+      "connections": [
+        "backplane",
+        "alu_0",
+        "alu_1",
+        "branch_unit",
+        "muldiv_unit",
+        "fpu_fma",
+        "fpu_divsqrt",
+        "issue_queue_int",
+        "issue_queue_fp"
+      ]
+    },
+    {
+      "id": "lsu",
+      "name": "Load-Store Unit",
+      "shape": "box",
+      "position": [
+        7,
+        6,
+        0.55
+      ],
+      "size": [
+        1.4,
+        1.3,
+        0.8
+      ],
+      "material": "brushed steel",
+      "role": "Generates and disambiguates memory addresses and arbitrates the data-cache port.",
+      "connections": [
+        "backplane",
+        "issue_queue_mem",
+        "dtlb",
+        "load_queue",
+        "store_queue",
+        "l1_dcache",
+        "dcache_mshr"
+      ]
+    },
+    {
+      "id": "dtlb",
+      "name": "Data TLB",
+      "shape": "box",
+      "position": [
+        8,
+        7,
+        0.5
+      ],
+      "size": [
+        1.3,
+        0.7,
+        0.5
+      ],
+      "material": "white composite",
+      "role": "Translates load and store virtual addresses to physical addresses for the data cache; a miss invokes the page table walker.",
+      "connections": [
+        "backplane",
+        "lsu",
+        "l1_dcache",
+        "ptw"
+      ]
+    },
+    {
+      "id": "load_queue",
+      "name": "Load Queue",
+      "shape": "box",
+      "position": [
+        7,
+        4.2,
+        0.6
+      ],
+      "size": [
+        1.4,
+        1.4,
+        0.9
+      ],
+      "material": "brushed steel",
+      "role": "Tracks in-flight loads and checks for memory-ordering violations against stores.",
+      "connections": [
+        "backplane",
+        "lsu",
+        "memory_bus"
+      ]
+    },
+    {
+      "id": "store_queue",
+      "name": "Store Queue",
+      "shape": "box",
+      "position": [
+        7,
+        2.4,
+        0.6
+      ],
+      "size": [
+        1.4,
+        1.4,
+        0.9
+      ],
+      "material": "brushed steel",
+      "role": "Buffers store addresses and data, forwarding to loads and draining to cache at commit.",
+      "connections": [
+        "backplane",
+        "lsu",
+        "rob",
+        "l1_dcache"
+      ]
+    },
+    {
+      "id": "l1_dcache",
+      "name": "L1 Data Cache",
+      "shape": "box",
+      "position": [
+        7.9,
+        4,
+        0.55
+      ],
+      "size": [
+        1.4,
+        1.6,
+        0.8
+      ],
+      "material": "brushed steel",
+      "role": "Non-blocking first-level data cache serving loads and accepting committed stores.",
+      "connections": [
+        "backplane",
+        "lsu",
+        "dtlb",
+        "store_queue",
+        "dcache_mshr",
+        "ptw",
+        "memory_bus"
+      ]
+    },
+    {
+      "id": "dcache_mshr",
+      "name": "D-Cache Miss-Status Holding Registers",
+      "shape": "box",
+      "position": [
+        8.3,
+        2.5,
+        0.55
+      ],
+      "size": [
+        0.7,
+        1,
+        0.6
+      ],
+      "material": "white composite",
+      "role": "Tracks multiple outstanding data-cache misses so loads and stores keep issuing while refills are in flight.",
+      "connections": [
+        "backplane",
+        "l1_dcache",
+        "lsu",
+        "memory_bus"
+      ]
+    },
+    {
+      "id": "ptw",
+      "name": "Page Table Walker (PTW)",
+      "shape": "box",
+      "position": [
+        8,
+        1,
+        0.55
+      ],
+      "size": [
+        1.3,
+        1.3,
+        0.7
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Walks in-memory page tables to refill the instruction and data TLBs on a translation miss.",
+      "connections": [
+        "backplane",
+        "itlb",
+        "dtlb",
+        "l1_dcache",
+        "memory_bus"
+      ]
+    },
+    {
+      "id": "main_pipeline_bus",
+      "name": "Main Pipeline Data Bus",
+      "shape": "box",
+      "position": [
+        0,
+        0.55,
+        0.22
+      ],
+      "size": [
+        16.8,
+        0.26,
+        0.16
+      ],
+      "material": "copper",
+      "role": "Copper trace carrying the in-order instruction stream from fetch through dispatch.",
+      "connections": [
+        "backplane",
+        "fetch_unit",
+        "decode_unit"
+      ]
+    },
+    {
+      "id": "branch_redirect_bus",
+      "name": "Branch Redirect Bus",
+      "shape": "box",
+      "position": [
+        -1.3,
+        7.5,
+        0.22
+      ],
+      "size": [
+        12,
+        0.22,
+        0.16
+      ],
+      "material": "copper",
+      "role": "Copper control trace routing mispredict redirects from the branch unit back to the front-end predictor, GHR, snapshot and FTQ.",
+      "connections": [
+        "backplane",
+        "branch_unit",
+        "rob",
+        "tage_predictor",
+        "ghr",
+        "branch_snapshot",
+        "ftq"
+      ]
+    },
+    {
+      "id": "writeback_bus",
+      "name": "Writeback Result Bus",
+      "shape": "box",
+      "position": [
+        3.5,
+        7,
+        0.22
+      ],
+      "size": [
+        5.2,
+        0.24,
+        0.16
+      ],
+      "material": "copper",
+      "role": "Copper trace broadcasting committed execution results back to the register files for architectural state.",
+      "connections": [
+        "backplane",
+        "prf_int",
+        "prf_fp",
+        "alu_0",
+        "alu_1",
+        "muldiv_unit",
+        "fpu_fma",
+        "fpu_divsqrt"
+      ]
+    },
+    {
+      "id": "memory_bus",
+      "name": "Memory Access Bus",
+      "shape": "box",
+      "position": [
+        3.8,
+        1,
+        0.22
+      ],
+      "size": [
+        9.2,
+        0.22,
+        0.16
+      ],
+      "material": "copper",
+      "role": "Copper trace linking the memory issue queue, load queue, MSHRs and page table walker to the L1 caches.",
+      "connections": [
+        "backplane",
+        "issue_queue_mem",
+        "load_queue",
+        "l1_dcache",
+        "l1_icache",
+        "icache_mshr",
+        "dcache_mshr",
+        "ptw"
+      ]
+    }
+  ]
+}

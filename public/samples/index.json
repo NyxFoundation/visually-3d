@@ -8,7 +8,8 @@
     { "id": "energy",        "label": "Energy" },
     { "id": "medical",       "label": "Medical" },
     { "id": "defense",       "label": "Defense / RF" },
-    { "id": "ml",            "label": "ML Architectures" }
+    { "id": "ml",            "label": "ML Architectures" },
+    { "id": "silicon",       "label": "CPU / GPU" }
   ],
   "samples": [
     {
@@ -218,6 +219,70 @@
       "path": "/samples/qwen-3-6.json",
       "accent": "#67e8f9",
       "category": "ml"
+    },
+    {
+      "id": "ibex",
+      "title": "Ibex RISC-V Core",
+      "subtitle": "lowRISC open-source 2-stage in-order 32-bit RISC-V core (RV32IMC) for embedded / OpenTitan",
+      "path": "/samples/ibex.json",
+      "accent": "#5eead4",
+      "category": "silicon"
+    },
+    {
+      "id": "rocket",
+      "title": "Rocket Core",
+      "subtitle": "UC Berkeley open-source 5-stage single-issue in-order RV64GC core (RocketChip / Chipyard)",
+      "path": "/samples/rocket.json",
+      "accent": "#7dd3fc",
+      "category": "silicon"
+    },
+    {
+      "id": "cva6",
+      "title": "CVA6 (Ariane)",
+      "subtitle": "ETH Zurich / OpenHW 6-stage in-order application-class RV64GC core — boots Linux",
+      "path": "/samples/cva6.json",
+      "accent": "#38bdf8",
+      "category": "silicon"
+    },
+    {
+      "id": "boom",
+      "title": "BOOM",
+      "subtitle": "Berkeley Out-of-Order Machine — open-source superscalar out-of-order RISC-V core",
+      "path": "/samples/boom.json",
+      "accent": "#818cf8",
+      "category": "silicon"
+    },
+    {
+      "id": "xiangshan",
+      "title": "XiangShan",
+      "subtitle": "Chinese Academy of Sciences open-source high-performance out-of-order RISC-V processor",
+      "path": "/samples/xiangshan.json",
+      "accent": "#a78bfa",
+      "category": "silicon"
+    },
+    {
+      "id": "opensparc-t2",
+      "title": "OpenSPARC T2",
+      "subtitle": "Sun / Oracle open-sourced UltraSPARC T2 — 8 cores × 8 threads (64-thread) SPARC V9 CMT",
+      "path": "/samples/opensparc-t2.json",
+      "accent": "#c4b5fd",
+      "category": "silicon"
+    },
+    {
+      "id": "vortex",
+      "title": "Vortex GPGPU",
+      "subtitle": "Georgia Tech open-source RISC-V SIMT GPGPU — clusters of warp-scheduled cores",
+      "path": "/samples/vortex.json",
+      "accent": "#f0abfc",
+      "category": "silicon"
+    },
+    {
+      "id": "miaow",
+      "title": "MIAOW GPGPU",
+      "subtitle": "UW-Madison open RTL of an AMD Southern Islands (GCN) GPGPU compute unit",
+      "path": "/samples/miaow.json",
+      "accent": "#fda4af",
+      "category": "silicon"
     }
   ]
 }

@@ -1,0 +1,1328 @@
+{
+  "machine_name": "Ibex RISC-V Core",
+  "assembly_instructions": "Microarchitecture block diagram of the lowRISC Ibex RV32IMC core, not a physical machine — scale is abstract (1x, units treated as meters). Everything sits on a single black-composite backplane board (root) lying flat in the XZ plane with its top surface at y=0.3; there is deliberately NO enclosing chassis so every functional block stays visible. The pipeline reads left-to-right along +X. The IF stage occupies X < -1 (instruction-memory port, prefetch buffer, fetch unit, with the program counter and PC-increment adder on the +Z side row). The translucent glass pipeline register at X=-1 marks the single IF -> ID/EX stage boundary. The ID/EX stage occupies X > -1 (decoder, ALU, load-store unit, data-memory port on the central spine; RVC compressed decoder, register file, CSR block and external interrupt port on the +Z row; controller, branch-target calculation and multiplier/divider on the -Z row). The -Z row also carries the clock/reset port at X=-4.3 (IF side) and the PMP unit at X=4.7. Parallel side rows are placed at Z = +2.6/+2.7 and Z = -2.6. The integer ALU is modelled as a carrier plate holding three exposed execution sub-units (adder, shifter, logic/compare) so its interior is legible. The register file's interior is exposed as a four-plate exploded stack lifted directly above the file. Copper cylinders are the datapath buses connecting block faces: X-aligned buses use rotation [0,0,1.5708], Z-aligned buses use rotation [1.5708,0,0]. The instruction-side PMP check is routed as a thinner copper bus along the back channel at Z=-3.95 from the PMP unit to the instruction-memory port. Build the board first, then the spine blocks, then the +Z and -Z side rows, then the ALU sub-units and exploded register stack, then the buses last.",
+  "metadata": {
+    "reference": "https://ibex-core.readthedocs.io/en/latest/01_overview/index.html",
+    "domain": "computer-architecture",
+    "thumbnail_camera": [
+      9.1,
+      7.5,
+      9.1
+    ],
+    "info": {
+      "japanese_name": "Ibex RISC-V コア",
+      "english_name": "Ibex RISC-V Core",
+      "summary": "Ibex is a small, 2-stage in-order 32-bit RISC-V CPU core maintained by lowRISC, designed for embedded control and security applications. It implements the RV32IMC instruction set and is the root-of-trust processor in the OpenTitan project.",
+      "description": "Ibex (formerly 'Zero-riscy' from ETH Zurich's PULP platform) is a production-quality open-source RISC-V core written in SystemVerilog. Its pipeline has just two stages: an Instruction Fetch (IF) stage with a FIFO prefetch buffer that decouples fetch from memory latency, and a combined Instruction Decode / Execute (ID/EX) stage that performs decode, register read, ALU execution, multiply/divide, CSR access and load/store in program order. The decoder also expands compressed (RVC) 16-bit instructions. The architecture is highly configurable: the M (multiply/divide) extension can be a fast single-cycle multiplier or an area-optimized multi-cycle unit, and security-hardened variants add dual-core lockstep and ECC. Ibex achieves roughly 2.4 CoreMark/MHz in its baseline configuration and is released under the permissive Apache-2.0 license.",
+      "operator": "lowRISC C.I.C.",
+      "contractor": "lowRISC C.I.C. (original 'Zero-riscy' design by ETH Zurich / University of Bologna PULP team)",
+      "contract_date": "2018 (renamed Ibex; Zero-riscy origin 2016)",
+      "contract_value": "Open-source, no license cost (Apache-2.0)",
+      "status": "In active development — Apache-2.0 open-source",
+      "facts": [
+        {
+          "label": "ISA",
+          "value": "RV32IMC (configurable, optional B/E)"
+        },
+        {
+          "label": "Pipeline",
+          "value": "2-stage in-order (IF, ID/EX)"
+        },
+        {
+          "label": "Register file",
+          "value": "32 x 32-bit, 2 read / 1 write port"
+        },
+        {
+          "label": "Data width",
+          "value": "32-bit"
+        },
+        {
+          "label": "CoreMark/MHz",
+          "value": "~2.4 baseline (up to ~3.1)"
+        },
+        {
+          "label": "Privilege modes",
+          "value": "Machine + optional User"
+        },
+        {
+          "label": "Memory protection",
+          "value": "Optional PMP, up to 16 regions"
+        },
+        {
+          "label": "Interrupts",
+          "value": "Standard + up to 15 fast local IRQs"
+        },
+        {
+          "label": "License",
+          "value": "Apache-2.0"
+        },
+        {
+          "label": "Notable use",
+          "value": "OpenTitan silicon root-of-trust"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Ibex Documentation — Overview",
+          "url": "https://ibex-core.readthedocs.io/en/latest/01_overview/index.html"
+        },
+        {
+          "title": "lowRISC/ibex on GitHub",
+          "url": "https://github.com/lowRISC/ibex"
+        },
+        {
+          "title": "lowRISC — Ibex project page",
+          "url": "https://lowrisc.org/ibex/"
+        }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "backplane_board",
+      "name": "Backplane Board",
+      "shape": "box",
+      "position": [
+        0,
+        0.15,
+        0
+      ],
+      "size": [
+        14,
+        0.3,
+        9.5
+      ],
+      "material": "black composite",
+      "role": "Root substrate that carries and visually anchors every functional block of the block diagram.",
+      "connections": [
+        "imem_port",
+        "prefetch_buffer",
+        "fetch_unit",
+        "program_counter",
+        "pc_increment",
+        "if_id_pipeline_reg",
+        "instr_decoder",
+        "rvc_decoder",
+        "controller",
+        "debug_interface",
+        "register_file",
+        "alu",
+        "mult_div",
+        "csr_block",
+        "irq_port",
+        "branch_calc",
+        "load_store_unit",
+        "dmem_port",
+        "pmp_unit",
+        "clk_reset_port"
+      ]
+    },
+    {
+      "id": "imem_port",
+      "name": "Instruction-Memory Interface Port",
+      "shape": "box",
+      "position": [
+        -6,
+        0.85,
+        0
+      ],
+      "size": [
+        1.3,
+        1.1,
+        2.6
+      ],
+      "material": "brass / copper",
+      "role": "32-bit instruction-side memory port — issues fetch addresses and receives instruction words from the I-bus.",
+      "connections": [
+        "backplane_board",
+        "prefetch_buffer",
+        "pmp_unit"
+      ]
+    },
+    {
+      "id": "prefetch_buffer",
+      "name": "Prefetch Buffer (FIFO)",
+      "shape": "box",
+      "position": [
+        -4.3,
+        0.95,
+        0
+      ],
+      "size": [
+        1.7,
+        1.3,
+        2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "FIFO that decouples instruction fetch from memory latency, supplying the fetch unit with a steady instruction stream.",
+      "connections": [
+        "backplane_board",
+        "imem_port",
+        "fetch_unit",
+        "pc_increment",
+        "clk_reset_port"
+      ]
+    },
+    {
+      "id": "fetch_unit",
+      "name": "Instruction Fetch Unit",
+      "shape": "box",
+      "position": [
+        -2.4,
+        0.85,
+        0
+      ],
+      "size": [
+        1.7,
+        1.1,
+        2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Selects the next program-counter value and aligns compressed (RVC) and uncompressed instructions before the pipeline register.",
+      "connections": [
+        "backplane_board",
+        "prefetch_buffer",
+        "program_counter",
+        "if_id_pipeline_reg",
+        "debug_interface"
+      ]
+    },
+    {
+      "id": "program_counter",
+      "name": "Program Counter",
+      "shape": "box",
+      "position": [
+        -2.4,
+        0.8,
+        2.6
+      ],
+      "size": [
+        1.3,
+        1,
+        1.3
+      ],
+      "material": "welded steel",
+      "role": "Register holding the address of the instruction currently in the IF stage.",
+      "connections": [
+        "backplane_board",
+        "fetch_unit",
+        "pc_increment"
+      ]
+    },
+    {
+      "id": "pc_increment",
+      "name": "PC Increment Adder",
+      "shape": "box",
+      "position": [
+        -4.3,
+        0.75,
+        2.6
+      ],
+      "size": [
+        1.2,
+        0.9,
+        1.2
+      ],
+      "material": "aluminum",
+      "role": "Computes PC+2 / PC+4 for sequential instruction fetch.",
+      "connections": [
+        "backplane_board",
+        "program_counter",
+        "prefetch_buffer"
+      ]
+    },
+    {
+      "id": "if_id_pipeline_reg",
+      "name": "IF -> ID/EX Pipeline Register",
+      "shape": "box",
+      "position": [
+        -1,
+        1.1,
+        0
+      ],
+      "size": [
+        0.5,
+        2,
+        5.6
+      ],
+      "material": "glass display",
+      "role": "Latches the fetched instruction and PC at the single pipeline-stage boundary of Ibex's 2-stage design.",
+      "connections": [
+        "backplane_board",
+        "fetch_unit",
+        "instr_decoder",
+        "rvc_decoder",
+        "controller"
+      ]
+    },
+    {
+      "id": "instr_decoder",
+      "name": "Instruction Decoder",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.95,
+        0
+      ],
+      "size": [
+        1.8,
+        1.3,
+        2
+      ],
+      "material": "welded steel",
+      "role": "Produces register addresses, immediates, ALU operation and control signals for the ID/EX stage from the registered instruction word.",
+      "connections": [
+        "backplane_board",
+        "if_id_pipeline_reg",
+        "rvc_decoder",
+        "controller",
+        "register_file",
+        "alu",
+        "branch_calc"
+      ]
+    },
+    {
+      "id": "rvc_decoder",
+      "name": "Compressed (RVC) Instruction Decoder",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.85,
+        2.6
+      ],
+      "size": [
+        1.5,
+        1.1,
+        1.5
+      ],
+      "material": "brushed steel",
+      "role": "Expands 16-bit RVC compressed instructions into their 32-bit base-ISA equivalents before main decode.",
+      "connections": [
+        "backplane_board",
+        "if_id_pipeline_reg",
+        "instr_decoder"
+      ]
+    },
+    {
+      "id": "controller",
+      "name": "ID/EX Controller FSM",
+      "shape": "box",
+      "position": [
+        -1,
+        0.85,
+        -2.6
+      ],
+      "size": [
+        1.6,
+        1.1,
+        1.7
+      ],
+      "material": "black composite",
+      "role": "Sequences multi-cycle operations, pipeline stalls, flushes and exception/interrupt entry.",
+      "connections": [
+        "backplane_board",
+        "if_id_pipeline_reg",
+        "instr_decoder",
+        "debug_interface",
+        "csr_block",
+        "clk_reset_port"
+      ]
+    },
+    {
+      "id": "debug_interface",
+      "name": "RISC-V Debug Module Interface",
+      "shape": "box",
+      "position": [
+        -2.4,
+        0.8,
+        -2.6
+      ],
+      "size": [
+        1.4,
+        1,
+        1.6
+      ],
+      "material": "black composite",
+      "role": "Injects debug-mode entry and single-step control into the fetch and controller logic.",
+      "connections": [
+        "backplane_board",
+        "fetch_unit",
+        "controller"
+      ]
+    },
+    {
+      "id": "clk_reset_port",
+      "name": "Clock / Reset & Gating Port",
+      "shape": "box",
+      "position": [
+        -4.3,
+        0.8,
+        -2.6
+      ],
+      "size": [
+        1.2,
+        1,
+        1.6
+      ],
+      "material": "brass / copper",
+      "role": "Receives clk_i and rst_ni and drives the integrated clock-gating cell that stalls the prefetch buffer to save power when fetch is idle.",
+      "connections": [
+        "backplane_board",
+        "prefetch_buffer",
+        "controller"
+      ]
+    },
+    {
+      "id": "register_file",
+      "name": "32 x 32-bit Register File",
+      "shape": "box",
+      "position": [
+        2.4,
+        1.25,
+        2.7
+      ],
+      "size": [
+        2.1,
+        1.9,
+        2.8
+      ],
+      "material": "brass / copper",
+      "role": "General-purpose register file with two read ports and one write port; register x0 is hard-wired to zero.",
+      "connections": [
+        "backplane_board",
+        "instr_decoder",
+        "alu",
+        "load_store_unit",
+        "reg_bank_1",
+        "reg_bank_2",
+        "reg_bank_3",
+        "reg_bank_4"
+      ]
+    },
+    {
+      "id": "reg_bank_1",
+      "name": "Register Bank Plate 1 (x0–x7)",
+      "shape": "box",
+      "position": [
+        2.4,
+        2.65,
+        2.7
+      ],
+      "size": [
+        1.7,
+        0.16,
+        2.3
+      ],
+      "material": "brushed steel",
+      "role": "Exploded view: representative bank of eight 32-bit registers lifted above the file to expose the array interior.",
+      "connections": [
+        "register_file"
+      ]
+    },
+    {
+      "id": "reg_bank_2",
+      "name": "Register Bank Plate 2 (x8–x15)",
+      "shape": "box",
+      "position": [
+        2.4,
+        3.05,
+        2.7
+      ],
+      "size": [
+        1.7,
+        0.16,
+        2.3
+      ],
+      "material": "brushed steel",
+      "role": "Exploded view: representative bank of eight 32-bit registers, second plate of the lifted register-file stack.",
+      "connections": [
+        "register_file"
+      ]
+    },
+    {
+      "id": "reg_bank_3",
+      "name": "Register Bank Plate 3 (x16–x23)",
+      "shape": "box",
+      "position": [
+        2.4,
+        3.45,
+        2.7
+      ],
+      "size": [
+        1.7,
+        0.16,
+        2.3
+      ],
+      "material": "brushed steel",
+      "role": "Exploded view: representative bank of eight 32-bit registers, third plate of the lifted register-file stack.",
+      "connections": [
+        "register_file"
+      ]
+    },
+    {
+      "id": "reg_bank_4",
+      "name": "Register Bank Plate 4 (x24–x31)",
+      "shape": "box",
+      "position": [
+        2.4,
+        3.85,
+        2.7
+      ],
+      "size": [
+        1.7,
+        0.16,
+        2.3
+      ],
+      "material": "brushed steel",
+      "role": "Exploded view: representative bank of eight 32-bit registers, top plate of the lifted register-file stack.",
+      "connections": [
+        "register_file"
+      ]
+    },
+    {
+      "id": "alu",
+      "name": "Integer ALU Carrier",
+      "shape": "box",
+      "position": [
+        2.4,
+        0.6,
+        0
+      ],
+      "size": [
+        2,
+        0.6,
+        2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Carrier plate for the integer execution sub-units — routes decoded operands to the adder, shifter and logic/compare blocks and returns the selected result onto the datapath.",
+      "connections": [
+        "backplane_board",
+        "instr_decoder",
+        "register_file",
+        "mult_div",
+        "load_store_unit",
+        "alu_adder",
+        "alu_shifter",
+        "alu_logic"
+      ]
+    },
+    {
+      "id": "alu_adder",
+      "name": "ALU Adder / Subtractor",
+      "shape": "box",
+      "position": [
+        2.4,
+        1.375,
+        0.6
+      ],
+      "size": [
+        0.5,
+        0.95,
+        1.7
+      ],
+      "material": "brushed steel",
+      "role": "Single-cycle add/subtract unit that also computes effective addresses and branch comparisons' difference.",
+      "connections": [
+        "alu"
+      ]
+    },
+    {
+      "id": "alu_shifter",
+      "name": "ALU Barrel Shifter",
+      "shape": "box",
+      "position": [
+        2.4,
+        1.375,
+        0
+      ],
+      "size": [
+        0.5,
+        0.95,
+        1.7
+      ],
+      "material": "brushed steel",
+      "role": "Single-cycle barrel shifter performing logical and arithmetic left/right shifts.",
+      "connections": [
+        "alu"
+      ]
+    },
+    {
+      "id": "alu_logic",
+      "name": "ALU Logic / Comparator",
+      "shape": "box",
+      "position": [
+        2.4,
+        1.375,
+        -0.6
+      ],
+      "size": [
+        0.5,
+        0.95,
+        1.7
+      ],
+      "material": "brushed steel",
+      "role": "Bitwise AND/OR/XOR logic and signed/unsigned comparison unit feeding branch-condition resolution.",
+      "connections": [
+        "alu"
+      ]
+    },
+    {
+      "id": "mult_div",
+      "name": "Multiplier / Divider",
+      "shape": "box",
+      "position": [
+        2.4,
+        0.9,
+        -2.6
+      ],
+      "size": [
+        1.8,
+        1.2,
+        1.8
+      ],
+      "material": "forged steel",
+      "role": "Implements the RV32M extension — multi-cycle multiply and iterative divide.",
+      "connections": [
+        "backplane_board",
+        "alu"
+      ]
+    },
+    {
+      "id": "csr_block",
+      "name": "CSR (Control & Status Registers)",
+      "shape": "box",
+      "position": [
+        4.7,
+        1.05,
+        2.7
+      ],
+      "size": [
+        1.7,
+        1.5,
+        1.9
+      ],
+      "material": "white composite",
+      "role": "Holds machine-mode control/status registers and handles trap, interrupt and exception entry and return.",
+      "connections": [
+        "backplane_board",
+        "load_store_unit",
+        "controller",
+        "irq_port",
+        "pmp_unit"
+      ]
+    },
+    {
+      "id": "irq_port",
+      "name": "External Interrupt Interface Port",
+      "shape": "box",
+      "position": [
+        6.5,
+        0.8,
+        2.7
+      ],
+      "size": [
+        1,
+        1,
+        1.8
+      ],
+      "material": "brass / copper",
+      "role": "Receives the external/timer/software and up to 15 fast local interrupt request lines and presents them to the CSR interrupt registers.",
+      "connections": [
+        "backplane_board",
+        "csr_block"
+      ]
+    },
+    {
+      "id": "branch_calc",
+      "name": "Branch Target Calculation",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.8,
+        -2.6
+      ],
+      "size": [
+        1.5,
+        1,
+        1.7
+      ],
+      "material": "aluminum",
+      "role": "Computes branch/jump target addresses and resolves taken branches, feeding the next-PC selection.",
+      "connections": [
+        "backplane_board",
+        "instr_decoder",
+        "alu",
+        "program_counter"
+      ]
+    },
+    {
+      "id": "load_store_unit",
+      "name": "Load-Store Unit",
+      "shape": "box",
+      "position": [
+        4.7,
+        0.95,
+        0
+      ],
+      "size": [
+        1.9,
+        1.3,
+        1.9
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Generates data-memory addresses and handles byte/halfword/word alignment and misaligned-access splitting.",
+      "connections": [
+        "backplane_board",
+        "alu",
+        "register_file",
+        "csr_block",
+        "dmem_port",
+        "pmp_unit"
+      ]
+    },
+    {
+      "id": "pmp_unit",
+      "name": "Physical Memory Protection Unit",
+      "shape": "box",
+      "position": [
+        4.7,
+        0.9,
+        -2.6
+      ],
+      "size": [
+        1.7,
+        1.2,
+        1.8
+      ],
+      "material": "brushed steel",
+      "role": "Checks every load/store and instruction-fetch address against up to 16 configurable PMP regions and raises an access fault on a violation.",
+      "connections": [
+        "backplane_board",
+        "load_store_unit",
+        "csr_block",
+        "imem_port"
+      ]
+    },
+    {
+      "id": "dmem_port",
+      "name": "Data-Memory Interface Port",
+      "shape": "box",
+      "position": [
+        6.2,
+        0.85,
+        0
+      ],
+      "size": [
+        1.3,
+        1.1,
+        2.6
+      ],
+      "material": "brass / copper",
+      "role": "32-bit data-side memory port — drives load and store transactions onto the D-bus.",
+      "connections": [
+        "backplane_board",
+        "load_store_unit"
+      ]
+    },
+    {
+      "id": "bus_imem_prefetch",
+      "name": "Instruction Bus: I-Port -> Prefetch",
+      "shape": "cylinder",
+      "position": [
+        -5.15,
+        0.55,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.11,
+        1.7
+      ],
+      "material": "copper",
+      "role": "Carries fetched instruction words from the instruction-memory port into the prefetch buffer.",
+      "connections": [
+        "imem_port",
+        "prefetch_buffer"
+      ]
+    },
+    {
+      "id": "bus_prefetch_fetch",
+      "name": "Instruction Bus: Prefetch -> Fetch",
+      "shape": "cylinder",
+      "position": [
+        -3.35,
+        0.55,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.11,
+        1.9
+      ],
+      "material": "copper",
+      "role": "Feeds buffered instructions from the FIFO into the fetch/alignment unit.",
+      "connections": [
+        "prefetch_buffer",
+        "fetch_unit"
+      ]
+    },
+    {
+      "id": "bus_fetch_pipereg",
+      "name": "Instruction Bus: Fetch -> Pipeline Register",
+      "shape": "cylinder",
+      "position": [
+        -1.7,
+        0.55,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.11,
+        1.4
+      ],
+      "material": "copper",
+      "role": "Latches the aligned instruction and PC into the IF -> ID/EX pipeline register.",
+      "connections": [
+        "fetch_unit",
+        "if_id_pipeline_reg"
+      ]
+    },
+    {
+      "id": "bus_pipereg_decoder",
+      "name": "Instruction Bus: Pipeline Register -> Decoder",
+      "shape": "cylinder",
+      "position": [
+        -0.25,
+        0.55,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.11,
+        1.5
+      ],
+      "material": "copper",
+      "role": "Delivers the registered instruction word to the decoder in the ID/EX stage.",
+      "connections": [
+        "if_id_pipeline_reg",
+        "instr_decoder"
+      ]
+    },
+    {
+      "id": "bus_rvc_decoder",
+      "name": "Bus: RVC Decoder -> Instruction Decoder",
+      "shape": "cylinder",
+      "position": [
+        0.5,
+        0.55,
+        1.3
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Carries the RVC-expanded 32-bit instruction from the compressed decoder into the main instruction decoder.",
+      "connections": [
+        "rvc_decoder",
+        "instr_decoder"
+      ]
+    },
+    {
+      "id": "bus_decoder_alu",
+      "name": "Control Bus: Decoder -> ALU",
+      "shape": "cylinder",
+      "position": [
+        1.45,
+        0.55,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.11,
+        1.9
+      ],
+      "material": "copper",
+      "role": "Carries the decoded ALU operation and immediate operand to the integer ALU carrier.",
+      "connections": [
+        "instr_decoder",
+        "alu"
+      ]
+    },
+    {
+      "id": "bus_alu_lsu",
+      "name": "Address Bus: ALU -> Load-Store Unit",
+      "shape": "cylinder",
+      "position": [
+        3.55,
+        0.55,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.11,
+        2.3
+      ],
+      "material": "copper",
+      "role": "Passes computed effective addresses from the ALU to the load-store unit.",
+      "connections": [
+        "alu",
+        "load_store_unit"
+      ]
+    },
+    {
+      "id": "bus_lsu_dmem",
+      "name": "Data Bus: Load-Store Unit -> D-Port",
+      "shape": "cylinder",
+      "position": [
+        5.45,
+        0.55,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.11,
+        1.5
+      ],
+      "material": "copper",
+      "role": "Carries load/store data and addresses between the load-store unit and the data-memory port.",
+      "connections": [
+        "load_store_unit",
+        "dmem_port"
+      ]
+    },
+    {
+      "id": "bus_lsu_pmp",
+      "name": "Bus: Load-Store Unit -> PMP Unit",
+      "shape": "cylinder",
+      "position": [
+        4.7,
+        0.55,
+        -1.3
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Routes each data-access address from the load-store unit to the PMP unit and returns the access-grant or fault result.",
+      "connections": [
+        "load_store_unit",
+        "pmp_unit"
+      ]
+    },
+    {
+      "id": "bus_clk_prefetch",
+      "name": "Clock Bus: Clock Port -> Prefetch Buffer",
+      "shape": "cylinder",
+      "position": [
+        -4.3,
+        0.55,
+        -1.3
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Distributes the gated clock from the clock/reset port to the prefetch buffer FIFO.",
+      "connections": [
+        "clk_reset_port",
+        "prefetch_buffer"
+      ]
+    },
+    {
+      "id": "bus_pcinc_pc",
+      "name": "Next-PC Bus: Increment -> Program Counter",
+      "shape": "cylinder",
+      "position": [
+        -3.35,
+        0.55,
+        2.6
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.11,
+        1.9
+      ],
+      "material": "copper",
+      "role": "Feeds the incremented address back into the program counter for sequential fetch.",
+      "connections": [
+        "pc_increment",
+        "program_counter"
+      ]
+    },
+    {
+      "id": "bus_pc_fetch",
+      "name": "PC Bus: Program Counter -> Fetch",
+      "shape": "cylinder",
+      "position": [
+        -2.4,
+        0.55,
+        1.3
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Supplies the current program-counter value to the fetch unit's address generation.",
+      "connections": [
+        "program_counter",
+        "fetch_unit"
+      ]
+    },
+    {
+      "id": "bus_debug_fetch",
+      "name": "Control Bus: Debug Interface -> Fetch Unit",
+      "shape": "cylinder",
+      "position": [
+        -2.4,
+        0.55,
+        -1.3
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Carries debug-mode entry and single-step requests from the debug interface into the fetch unit.",
+      "connections": [
+        "debug_interface",
+        "fetch_unit"
+      ]
+    },
+    {
+      "id": "bus_controller_pipereg",
+      "name": "Control Bus: Controller -> Pipeline Register",
+      "shape": "cylinder",
+      "position": [
+        -1,
+        0.55,
+        -1.3
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Routes stall, flush and valid signals between the controller FSM and the IF -> ID/EX pipeline register.",
+      "connections": [
+        "controller",
+        "if_id_pipeline_reg"
+      ]
+    },
+    {
+      "id": "bus_rs1_operand",
+      "name": "Operand Bus: Register File rs1 -> ALU",
+      "shape": "cylinder",
+      "position": [
+        2,
+        0.55,
+        1.35
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.1,
+        2.7
+      ],
+      "material": "copper",
+      "role": "Carries the first source operand from register-file read port A into the ALU.",
+      "connections": [
+        "register_file",
+        "alu"
+      ]
+    },
+    {
+      "id": "bus_rs2_operand",
+      "name": "Operand Bus: Register File rs2 -> ALU",
+      "shape": "cylinder",
+      "position": [
+        2.35,
+        0.55,
+        1.35
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.1,
+        2.7
+      ],
+      "material": "copper",
+      "role": "Carries the second source operand from register-file read port B into the ALU.",
+      "connections": [
+        "register_file",
+        "alu"
+      ]
+    },
+    {
+      "id": "bus_alu_regfile_wb",
+      "name": "Writeback Bus: ALU -> Register File",
+      "shape": "cylinder",
+      "position": [
+        2.75,
+        0.55,
+        1.35
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        2.7
+      ],
+      "material": "copper",
+      "role": "Returns the ALU/load result to the register file's single write port to complete the datapath loop.",
+      "connections": [
+        "alu",
+        "register_file"
+      ]
+    },
+    {
+      "id": "bus_alu_multdiv",
+      "name": "Operand Bus: ALU -> Multiplier/Divider",
+      "shape": "cylinder",
+      "position": [
+        2.4,
+        0.55,
+        -1.3
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Shares operands and returns multi-cycle results between the ALU datapath and the multiply/divide unit.",
+      "connections": [
+        "alu",
+        "mult_div"
+      ]
+    },
+    {
+      "id": "bus_decoder_branch",
+      "name": "Bus: Decoder -> Branch Target Calc",
+      "shape": "cylinder",
+      "position": [
+        0.5,
+        0.55,
+        -1.3
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Delivers branch immediates and the PC to the branch-target calculation unit.",
+      "connections": [
+        "instr_decoder",
+        "branch_calc"
+      ]
+    },
+    {
+      "id": "bus_lsu_csr",
+      "name": "Bus: Load-Store Unit -> CSR Block",
+      "shape": "cylinder",
+      "position": [
+        4.7,
+        0.55,
+        1.35
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        2.7
+      ],
+      "material": "copper",
+      "role": "Routes CSR read/write traffic and trap status between the execute path and the CSR block.",
+      "connections": [
+        "load_store_unit",
+        "csr_block"
+      ]
+    },
+    {
+      "id": "bus_irq_csr",
+      "name": "Interrupt Bus: IRQ Port -> CSR Block",
+      "shape": "cylinder",
+      "position": [
+        5.775,
+        0.55,
+        2.7
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.11,
+        0.5
+      ],
+      "material": "copper",
+      "role": "Carries the external interrupt request lines from the interrupt port into the CSR interrupt-pending registers.",
+      "connections": [
+        "irq_port",
+        "csr_block"
+      ]
+    },
+    {
+      "id": "bus_ipmp_jog",
+      "name": "Instruction-PMP Bus: PMP Unit Drop",
+      "shape": "cylinder",
+      "position": [
+        4.7,
+        0.55,
+        -3.725
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        0.45
+      ],
+      "material": "copper",
+      "role": "Short jog dropping the instruction-fetch PMP check path from the PMP unit onto the rear routing channel.",
+      "connections": [
+        "pmp_unit",
+        "imem_port"
+      ]
+    },
+    {
+      "id": "bus_ipmp_run",
+      "name": "Instruction-PMP Bus: Rear Routing Channel",
+      "shape": "cylinder",
+      "position": [
+        -0.65,
+        0.55,
+        -3.95
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.09,
+        10.7
+      ],
+      "material": "copper",
+      "role": "Rear-channel bus carrying instruction-fetch addresses from the PMP unit toward the instruction-memory port for region checking.",
+      "connections": [
+        "pmp_unit",
+        "imem_port"
+      ]
+    },
+    {
+      "id": "bus_ipmp_in",
+      "name": "Instruction-PMP Bus: Into I-Port",
+      "shape": "cylinder",
+      "position": [
+        -6,
+        0.55,
+        -2.625
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        2.65
+      ],
+      "material": "copper",
+      "role": "Returns the instruction-fetch access-grant or fault result from the PMP routing channel into the instruction-memory port.",
+      "connections": [
+        "imem_port",
+        "pmp_unit"
+      ]
+    }
+  ]
+}

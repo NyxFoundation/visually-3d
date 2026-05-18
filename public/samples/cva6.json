@@ -1,0 +1,1250 @@
+{
+  "machine_name": "CVA6 (Ariane) RISC-V Core",
+  "assembly_instructions": "Open microarchitecture block diagram, no chassis. Scale 1x (the pipeline is treated as a ~14 m logical board so bounds.radius stays near 7.6). +X is the instruction-flow direction; the six in-order stages sit on the ground line (z=0) left-to-right: PC generation, instruction fetch, decode, issue, execute, commit. Five tall translucent glass plates straddle z=0 between consecutive stages — these are the pipeline registers. Front-end support (BHT/BTB/RAS predictors tied to PC-gen by a Z-running prediction bus, L1 I$, instruction queue, I-TLB) is placed on the -Z side near fetch; the compressed-instruction decoder sits on -Z by decode; the scoreboard sits on -Z by issue; the register file — split into a stacked integer bank and floating-point bank — sits on +Z by issue. The six functional units fed by the issue stage form a 2x3 grid on the +Z side behind execute: ALU/branch/CSR on the near row, multiplier/FPU/LSU on the far row. The LSU's store buffer, L1 D$ and D-TLB cluster around the LSU. The hardware page-table walker sits deep on -Z and bridges both TLBs: a copper bus runs to the I-TLB, and a two-segment L-routed copper bus runs east then up the data column to the D-TLB. Behind the walker the AXI4 main-memory interface forms the memory-side boundary, and external DRAM (main memory) sits behind the AXI interface, closing the hierarchy. Copper cylinders are the buses: five backbone buses thread the pipeline through the register plates, a Z-running dispatch bus feeds the functional units, a Z-running writeback bus returns their results to commit, and short copper stubs link the caches, the predictors, the PTW, the AXI interface and DRAM.",
+  "metadata": {
+    "reference": "https://github.com/openhwgroup/cva6",
+    "domain": "computer-architecture",
+    "thumbnail_camera": [
+      15.9,
+      7.8,
+      10.1
+    ],
+    "info": {
+      "japanese_name": "CVA6（アリアーネ）RISC-Vコア",
+      "english_name": "CVA6 (Ariane) RISC-V Core",
+      "summary": "CVA6 is an open-source 6-stage, single-issue, in-order 64-bit RISC-V application-class core (RV64GC) capable of booting Linux. It was created at ETH Zurich/University of Bologna as 'Ariane' and is now maintained by the OpenHW Group.",
+      "description": "CVA6 implements the RV64GC instruction set with M/S/U privilege modes and a full memory-management unit, making it one of the smallest fully Linux-capable open-source cores. Its six-stage in-order pipeline — PC generation, instruction fetch, decode, issue, execute, commit — buffers instructions in an instruction queue after fetch so the front-end and back-end decouple. The issue stage is built around a scoreboard that tracks in-flight instructions and dispatches them to six functional units (ALU, branch unit, CSR unit, integer multiplier, FPU, and a load-store unit with a store buffer), then commits results strictly in program order from the 64-entry register file.",
+      "operator": "OpenHW Group",
+      "contractor": "ETH Zurich & University of Bologna (PULP Platform)",
+      "contract_date": "2018 (first 'Ariane' release)",
+      "contract_value": "Open source (Solderpad Hardware License, no cost)",
+      "status": "Actively maintained / in production",
+      "facts": [
+        {
+          "label": "ISA",
+          "value": "RV64GC (RV64IMAFDC)"
+        },
+        {
+          "label": "Pipeline",
+          "value": "6 stages, single-issue, in-order"
+        },
+        {
+          "label": "Privilege modes",
+          "value": "Machine / Supervisor / User"
+        },
+        {
+          "label": "Register file",
+          "value": "64 entries (32 integer + 32 FP), 64-bit"
+        },
+        {
+          "label": "L1 I-cache",
+          "value": "16 KiB, default config"
+        },
+        {
+          "label": "L1 D-cache",
+          "value": "32 KiB, write-back, default config"
+        },
+        {
+          "label": "MMU",
+          "value": "Separate I/D TLBs + hardware page-table walker (Sv39)"
+        },
+        {
+          "label": "Branch prediction",
+          "value": "Branch history table, branch target buffer, return stack"
+        },
+        {
+          "label": "Memory interface",
+          "value": "AXI4, separate instruction and data ports"
+        },
+        {
+          "label": "Ariane tapeout",
+          "value": "GLOBALFOUNDRIES 22 nm FDX, ~1.7 GHz"
+        }
+      ],
+      "sources": [
+        {
+          "title": "CVA6 source repository (OpenHW Group)",
+          "url": "https://github.com/openhwgroup/cva6"
+        },
+        {
+          "title": "CVA6 / Ariane User Manual",
+          "url": "https://docs.openhwgroup.org/projects/cva6-user-manual/"
+        },
+        {
+          "title": "Zaruba & Benini, 'The Cost of Application-Class Processing' (IEEE TVLSI 2019)",
+          "url": "https://ieeexplore.ieee.org/document/8777130"
+        },
+        {
+          "title": "PULP Platform",
+          "url": "https://pulp-platform.org/"
+        }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "pc_gen",
+      "name": "PC Generation Stage",
+      "shape": "box",
+      "position": [
+        0,
+        0.9,
+        0
+      ],
+      "size": [
+        1.4,
+        1.8,
+        1.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Computes the next program counter, applying branch predictions to steer the front-end.",
+      "connections": [
+        "preg_pc_if",
+        "bus_pc_if",
+        "bht",
+        "btb",
+        "ras",
+        "bus_pred"
+      ]
+    },
+    {
+      "id": "bht",
+      "name": "Branch History Table",
+      "shape": "box",
+      "position": [
+        -0.3,
+        0.45,
+        -2.3
+      ],
+      "size": [
+        1,
+        0.9,
+        0.9
+      ],
+      "material": "black composite",
+      "role": "Records taken/not-taken history so PC generation can predict conditional branch direction.",
+      "connections": [
+        "pc_gen",
+        "bus_pred"
+      ]
+    },
+    {
+      "id": "btb",
+      "name": "Branch Target Buffer",
+      "shape": "box",
+      "position": [
+        0.9,
+        0.45,
+        -2.3
+      ],
+      "size": [
+        1,
+        0.9,
+        0.9
+      ],
+      "material": "black composite",
+      "role": "Caches predicted target addresses of branches and jumps for the PC generation stage.",
+      "connections": [
+        "pc_gen",
+        "bus_pred"
+      ]
+    },
+    {
+      "id": "ras",
+      "name": "Return Address Stack",
+      "shape": "box",
+      "position": [
+        0.3,
+        0.4,
+        -3.7
+      ],
+      "size": [
+        0.95,
+        0.8,
+        0.85
+      ],
+      "material": "black composite",
+      "role": "Pushes return addresses on calls and pops them on returns so PC generation predicts function-return targets.",
+      "connections": [
+        "pc_gen",
+        "bus_pred"
+      ]
+    },
+    {
+      "id": "bus_pred",
+      "name": "Branch-Prediction Bus",
+      "shape": "cylinder",
+      "position": [
+        0.3,
+        0.5,
+        -1.85
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        3.9
+      ],
+      "material": "copper",
+      "role": "Carries direction, target and return-address predictions from the BHT, BTB and RAS into PC generation.",
+      "connections": [
+        "pc_gen",
+        "bht",
+        "btb",
+        "ras"
+      ]
+    },
+    {
+      "id": "preg_pc_if",
+      "name": "PC/Fetch Pipeline Register",
+      "shape": "box",
+      "position": [
+        1.3,
+        1.15,
+        0
+      ],
+      "size": [
+        0.18,
+        2.3,
+        1.8
+      ],
+      "material": "glass display",
+      "role": "Latches the program counter between PC generation and instruction fetch.",
+      "connections": [
+        "pc_gen",
+        "ifetch",
+        "bus_pc_if"
+      ]
+    },
+    {
+      "id": "bus_pc_if",
+      "name": "PC-to-Fetch Bus",
+      "shape": "cylinder",
+      "position": [
+        1.3,
+        0.6,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.09,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Carries the resolved program counter from PC generation into the fetch stage.",
+      "connections": [
+        "pc_gen",
+        "ifetch"
+      ]
+    },
+    {
+      "id": "ifetch",
+      "name": "Instruction Fetch Stage",
+      "shape": "box",
+      "position": [
+        2.6,
+        0.9,
+        0
+      ],
+      "size": [
+        1.4,
+        1.8,
+        1.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Reads instruction words from the L1 instruction cache and pushes them into the instruction queue.",
+      "connections": [
+        "preg_pc_if",
+        "preg_if_id",
+        "bus_pc_if",
+        "bus_if_id",
+        "l1_icache",
+        "instr_queue",
+        "itlb",
+        "bus_icache"
+      ]
+    },
+    {
+      "id": "l1_icache",
+      "name": "L1 Instruction Cache",
+      "shape": "box",
+      "position": [
+        2.3,
+        0.6,
+        -2.5
+      ],
+      "size": [
+        1.3,
+        1.2,
+        1.2
+      ],
+      "material": "brushed steel",
+      "role": "16 KiB cache supplying instruction words to the fetch stage at low latency.",
+      "connections": [
+        "ifetch",
+        "bus_icache",
+        "axi_interface"
+      ]
+    },
+    {
+      "id": "bus_icache",
+      "name": "I-Cache Refill Bus",
+      "shape": "cylinder",
+      "position": [
+        2.4,
+        0.6,
+        -1.25
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        2.5
+      ],
+      "material": "copper",
+      "role": "Connects the fetch stage to the L1 instruction cache for instruction reads and refills.",
+      "connections": [
+        "ifetch",
+        "l1_icache"
+      ]
+    },
+    {
+      "id": "instr_queue",
+      "name": "Instruction Queue",
+      "shape": "capsule",
+      "position": [
+        3.7,
+        0.5,
+        -2.2
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.42,
+        1.5
+      ],
+      "material": "black composite",
+      "role": "Buffers fetched instructions in a FIFO, decoupling the front-end from the in-order back-end.",
+      "connections": [
+        "ifetch",
+        "decode"
+      ]
+    },
+    {
+      "id": "itlb",
+      "name": "Instruction TLB",
+      "shape": "box",
+      "position": [
+        2,
+        0.4,
+        -4
+      ],
+      "size": [
+        0.9,
+        0.8,
+        0.9
+      ],
+      "material": "welded steel",
+      "role": "Translates instruction virtual addresses to physical addresses for the fetch path.",
+      "connections": [
+        "ifetch",
+        "ptw",
+        "bus_ptw_itlb"
+      ]
+    },
+    {
+      "id": "preg_if_id",
+      "name": "Fetch/Decode Pipeline Register",
+      "shape": "box",
+      "position": [
+        3.9,
+        1.15,
+        0
+      ],
+      "size": [
+        0.18,
+        2.3,
+        1.8
+      ],
+      "material": "glass display",
+      "role": "Latches fetched instruction words between fetch and decode.",
+      "connections": [
+        "ifetch",
+        "decode",
+        "bus_if_id"
+      ]
+    },
+    {
+      "id": "bus_if_id",
+      "name": "Fetch-to-Decode Bus",
+      "shape": "cylinder",
+      "position": [
+        3.9,
+        0.6,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.09,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Carries raw instruction words from the fetch stage to the decoder.",
+      "connections": [
+        "ifetch",
+        "decode"
+      ]
+    },
+    {
+      "id": "decode",
+      "name": "Decode Stage",
+      "shape": "box",
+      "position": [
+        5.2,
+        0.9,
+        0
+      ],
+      "size": [
+        1.4,
+        1.8,
+        1.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Expands instruction words into the internal micro-op format with source/destination operand fields.",
+      "connections": [
+        "preg_if_id",
+        "preg_id_is",
+        "bus_if_id",
+        "bus_id_is",
+        "instr_queue",
+        "compressed_decoder"
+      ]
+    },
+    {
+      "id": "compressed_decoder",
+      "name": "Compressed Instruction Decoder",
+      "shape": "box",
+      "position": [
+        5.2,
+        0.45,
+        -2.1
+      ],
+      "size": [
+        1.1,
+        0.9,
+        0.95
+      ],
+      "material": "black composite",
+      "role": "Expands 16-bit RV64C compressed instructions into their 32-bit equivalents before main decoding.",
+      "connections": [
+        "decode"
+      ]
+    },
+    {
+      "id": "preg_id_is",
+      "name": "Decode/Issue Pipeline Register",
+      "shape": "box",
+      "position": [
+        6.5,
+        1.15,
+        0
+      ],
+      "size": [
+        0.18,
+        2.3,
+        1.8
+      ],
+      "material": "glass display",
+      "role": "Latches decoded micro-ops between decode and issue.",
+      "connections": [
+        "decode",
+        "issue",
+        "bus_id_is"
+      ]
+    },
+    {
+      "id": "bus_id_is",
+      "name": "Decode-to-Issue Bus",
+      "shape": "cylinder",
+      "position": [
+        6.5,
+        0.6,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.09,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Carries decoded micro-ops from the decoder into the issue stage.",
+      "connections": [
+        "decode",
+        "issue"
+      ]
+    },
+    {
+      "id": "issue",
+      "name": "Issue Stage",
+      "shape": "box",
+      "position": [
+        7.8,
+        0.9,
+        0
+      ],
+      "size": [
+        1.4,
+        1.8,
+        1.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Reads operands, tracks dependencies via the scoreboard, and dispatches micro-ops to functional units.",
+      "connections": [
+        "preg_id_is",
+        "preg_is_ex",
+        "bus_id_is",
+        "bus_is_ex",
+        "scoreboard",
+        "register_file",
+        "regfile_fp",
+        "dispatch_bus"
+      ]
+    },
+    {
+      "id": "scoreboard",
+      "name": "Scoreboard",
+      "shape": "box",
+      "position": [
+        7.8,
+        0.5,
+        -2.3
+      ],
+      "size": [
+        1.1,
+        1,
+        1
+      ],
+      "material": "black composite",
+      "role": "Tracks every in-flight instruction and its pending result to enforce data hazards and in-order commit.",
+      "connections": [
+        "issue"
+      ]
+    },
+    {
+      "id": "register_file",
+      "name": "Register File — Integer Bank",
+      "shape": "box",
+      "position": [
+        7,
+        0.42,
+        2.3
+      ],
+      "size": [
+        1.5,
+        0.5,
+        1.6
+      ],
+      "material": "brushed steel",
+      "role": "Holds the 32 architectural 64-bit integer registers, read at issue and written back in order at commit.",
+      "connections": [
+        "issue",
+        "commit"
+      ]
+    },
+    {
+      "id": "regfile_fp",
+      "name": "Register File — Floating-Point Bank",
+      "shape": "box",
+      "position": [
+        7,
+        0.95,
+        2.3
+      ],
+      "size": [
+        1.5,
+        0.5,
+        1.6
+      ],
+      "material": "brushed steel",
+      "role": "Holds the 32 architectural 64-bit floating-point registers of the F/D extensions, stacked above the integer bank.",
+      "connections": [
+        "issue",
+        "commit"
+      ]
+    },
+    {
+      "id": "dispatch_bus",
+      "name": "Dispatch Bus",
+      "shape": "cylinder",
+      "position": [
+        8.5,
+        0.6,
+        2.05
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        5.5
+      ],
+      "material": "copper",
+      "role": "Fans micro-ops and operands from the issue stage out to all six functional units.",
+      "connections": [
+        "issue",
+        "alu",
+        "branch_unit",
+        "csr_unit",
+        "multiplier",
+        "fpu",
+        "lsu"
+      ]
+    },
+    {
+      "id": "preg_is_ex",
+      "name": "Issue/Execute Pipeline Register",
+      "shape": "box",
+      "position": [
+        9.1,
+        1.15,
+        0
+      ],
+      "size": [
+        0.18,
+        2.3,
+        1.8
+      ],
+      "material": "glass display",
+      "role": "Latches dispatched operations between issue and execute.",
+      "connections": [
+        "issue",
+        "execute",
+        "bus_is_ex"
+      ]
+    },
+    {
+      "id": "bus_is_ex",
+      "name": "Issue-to-Execute Bus",
+      "shape": "cylinder",
+      "position": [
+        9.1,
+        0.6,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.09,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Carries dispatched operations from the issue stage into the execute stage.",
+      "connections": [
+        "issue",
+        "execute"
+      ]
+    },
+    {
+      "id": "execute",
+      "name": "Execute Stage",
+      "shape": "box",
+      "position": [
+        10.4,
+        0.9,
+        0
+      ],
+      "size": [
+        1.4,
+        1.8,
+        1.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Sequences operations through the functional units and gathers their results for commit.",
+      "connections": [
+        "preg_is_ex",
+        "preg_ex_cm",
+        "bus_is_ex",
+        "bus_ex_cm",
+        "alu",
+        "branch_unit",
+        "csr_unit",
+        "multiplier",
+        "fpu",
+        "lsu"
+      ]
+    },
+    {
+      "id": "alu",
+      "name": "ALU",
+      "shape": "box",
+      "position": [
+        9.2,
+        0.525,
+        2.4
+      ],
+      "size": [
+        1.05,
+        1.05,
+        1.05
+      ],
+      "material": "brushed steel",
+      "role": "Performs single-cycle integer arithmetic, logic and shift operations.",
+      "connections": [
+        "execute",
+        "dispatch_bus",
+        "writeback_bus"
+      ]
+    },
+    {
+      "id": "branch_unit",
+      "name": "Branch Unit",
+      "shape": "box",
+      "position": [
+        10.4,
+        0.525,
+        2.4
+      ],
+      "size": [
+        1.05,
+        1.05,
+        1.05
+      ],
+      "material": "brushed steel",
+      "role": "Resolves branches and jumps, signalling mispredictions back to the front-end.",
+      "connections": [
+        "execute",
+        "dispatch_bus",
+        "writeback_bus"
+      ]
+    },
+    {
+      "id": "csr_unit",
+      "name": "CSR Unit",
+      "shape": "box",
+      "position": [
+        11.6,
+        0.525,
+        2.4
+      ],
+      "size": [
+        1.05,
+        1.05,
+        1.05
+      ],
+      "material": "brushed steel",
+      "role": "Reads and writes control and status registers for the M/S/U privilege modes.",
+      "connections": [
+        "execute",
+        "dispatch_bus",
+        "writeback_bus"
+      ]
+    },
+    {
+      "id": "multiplier",
+      "name": "Integer Multiplier / Divider",
+      "shape": "box",
+      "position": [
+        9.2,
+        0.525,
+        4.2
+      ],
+      "size": [
+        1.05,
+        1.05,
+        1.05
+      ],
+      "material": "brushed steel",
+      "role": "Executes multi-cycle integer multiply and divide operations of the M extension.",
+      "connections": [
+        "execute",
+        "dispatch_bus",
+        "writeback_bus"
+      ]
+    },
+    {
+      "id": "fpu",
+      "name": "Floating-Point Unit",
+      "shape": "box",
+      "position": [
+        10.4,
+        0.525,
+        4.2
+      ],
+      "size": [
+        1.05,
+        1.05,
+        1.05
+      ],
+      "material": "brushed steel",
+      "role": "Executes IEEE-754 single and double precision floating-point operations (F/D extensions).",
+      "connections": [
+        "execute",
+        "dispatch_bus",
+        "writeback_bus"
+      ]
+    },
+    {
+      "id": "lsu",
+      "name": "Load-Store Unit",
+      "shape": "box",
+      "position": [
+        11.6,
+        0.525,
+        4.2
+      ],
+      "size": [
+        1.05,
+        1.05,
+        1.05
+      ],
+      "material": "brushed steel",
+      "role": "Issues memory accesses, translating addresses through the D-TLB and queuing writes in the store buffer.",
+      "connections": [
+        "execute",
+        "dispatch_bus",
+        "writeback_bus",
+        "store_buffer",
+        "l1_dcache",
+        "dtlb",
+        "bus_dcache"
+      ]
+    },
+    {
+      "id": "store_buffer",
+      "name": "Store Buffer",
+      "shape": "capsule",
+      "position": [
+        11.6,
+        0.45,
+        5.6
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.38,
+        1.2
+      ],
+      "material": "black composite",
+      "role": "Holds committed stores in a FIFO until they drain to the data cache, letting the pipeline advance.",
+      "connections": [
+        "lsu"
+      ]
+    },
+    {
+      "id": "l1_dcache",
+      "name": "L1 Data Cache",
+      "shape": "box",
+      "position": [
+        13.1,
+        0.6,
+        4.2
+      ],
+      "size": [
+        1.3,
+        1.2,
+        1.2
+      ],
+      "material": "brushed steel",
+      "role": "32 KiB write-back cache serving load and store data to the load-store unit.",
+      "connections": [
+        "lsu",
+        "bus_dcache",
+        "axi_interface"
+      ]
+    },
+    {
+      "id": "bus_dcache",
+      "name": "D-Cache Access Bus",
+      "shape": "cylinder",
+      "position": [
+        12.35,
+        0.55,
+        4.2
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.08,
+        1.5
+      ],
+      "material": "copper",
+      "role": "Connects the load-store unit to the L1 data cache for load and store traffic.",
+      "connections": [
+        "lsu",
+        "l1_dcache"
+      ]
+    },
+    {
+      "id": "dtlb",
+      "name": "Data TLB",
+      "shape": "box",
+      "position": [
+        13.1,
+        0.4,
+        5.6
+      ],
+      "size": [
+        0.9,
+        0.8,
+        0.9
+      ],
+      "material": "welded steel",
+      "role": "Translates data virtual addresses to physical addresses for the load-store unit.",
+      "connections": [
+        "lsu",
+        "ptw",
+        "bus_ptw_dtlb_z"
+      ]
+    },
+    {
+      "id": "ptw",
+      "name": "Hardware Page-Table Walker",
+      "shape": "box",
+      "position": [
+        7,
+        0.475,
+        -4.3
+      ],
+      "size": [
+        1,
+        0.95,
+        1
+      ],
+      "material": "welded steel",
+      "role": "Walks Sv39 page tables in memory to refill the instruction and data TLBs on a miss.",
+      "connections": [
+        "itlb",
+        "dtlb",
+        "bus_ptw_itlb",
+        "bus_ptw_dtlb_x",
+        "axi_interface",
+        "bus_axi_ptw"
+      ]
+    },
+    {
+      "id": "bus_ptw_itlb",
+      "name": "I-TLB Refill Bus",
+      "shape": "cylinder",
+      "position": [
+        4.5,
+        0.45,
+        -4.15
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.08,
+        5
+      ],
+      "material": "copper",
+      "role": "Carries page-table-walk results from the walker into the instruction TLB on a translation miss.",
+      "connections": [
+        "ptw",
+        "itlb"
+      ]
+    },
+    {
+      "id": "bus_ptw_dtlb_x",
+      "name": "D-TLB Refill Bus (memory-side run)",
+      "shape": "cylinder",
+      "position": [
+        10.05,
+        0.45,
+        -4.3
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.08,
+        6.1
+      ],
+      "material": "copper",
+      "role": "Carries page-table-walk results from the walker eastward toward the data-side memory-management cluster.",
+      "connections": [
+        "ptw",
+        "bus_ptw_dtlb_z"
+      ]
+    },
+    {
+      "id": "bus_ptw_dtlb_z",
+      "name": "D-TLB Refill Bus (data-side run)",
+      "shape": "cylinder",
+      "position": [
+        13.1,
+        0.45,
+        0.65
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        9.9
+      ],
+      "material": "copper",
+      "role": "Carries page-table-walk results up the data column into the data TLB on a translation miss.",
+      "connections": [
+        "bus_ptw_dtlb_x",
+        "dtlb"
+      ]
+    },
+    {
+      "id": "bus_axi_ptw",
+      "name": "PTW Memory-Access Bus",
+      "shape": "cylinder",
+      "position": [
+        7,
+        0.5,
+        -5.075
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        0.9
+      ],
+      "material": "copper",
+      "role": "Carries page-table-walk memory requests from the walker down to the AXI memory interface.",
+      "connections": [
+        "ptw",
+        "axi_interface"
+      ]
+    },
+    {
+      "id": "axi_interface",
+      "name": "AXI4 Main-Memory Interface",
+      "shape": "box",
+      "position": [
+        7,
+        0.6,
+        -6
+      ],
+      "size": [
+        3,
+        1.2,
+        1.3
+      ],
+      "material": "welded steel",
+      "role": "Bridges the L1 caches and page-table walker to external DRAM over the AXI4 bus, arbitrating instruction and data traffic.",
+      "connections": [
+        "l1_icache",
+        "l1_dcache",
+        "ptw",
+        "bus_axi_ptw",
+        "main_memory",
+        "bus_axi_dram"
+      ]
+    },
+    {
+      "id": "main_memory",
+      "name": "External DRAM (Main Memory)",
+      "shape": "box",
+      "position": [
+        7,
+        0.6,
+        -7.55
+      ],
+      "size": [
+        3.2,
+        1.2,
+        1.2
+      ],
+      "material": "black composite",
+      "role": "Off-chip DRAM holding instructions, data and page tables, accessed by the core through the AXI4 interface.",
+      "connections": [
+        "axi_interface",
+        "bus_axi_dram"
+      ]
+    },
+    {
+      "id": "bus_axi_dram",
+      "name": "AXI4 DRAM Bus",
+      "shape": "cylinder",
+      "position": [
+        7,
+        0.55,
+        -6.8
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.09,
+        0.9
+      ],
+      "material": "copper",
+      "role": "Carries AXI4 read/write transactions between the memory interface and external DRAM.",
+      "connections": [
+        "axi_interface",
+        "main_memory"
+      ]
+    },
+    {
+      "id": "preg_ex_cm",
+      "name": "Execute/Commit Pipeline Register",
+      "shape": "box",
+      "position": [
+        11.7,
+        1.15,
+        0
+      ],
+      "size": [
+        0.18,
+        2.3,
+        1.8
+      ],
+      "material": "glass display",
+      "role": "Latches functional-unit results between execute and commit.",
+      "connections": [
+        "execute",
+        "commit",
+        "bus_ex_cm"
+      ]
+    },
+    {
+      "id": "bus_ex_cm",
+      "name": "Execute-to-Commit Bus",
+      "shape": "cylinder",
+      "position": [
+        11.7,
+        0.6,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.09,
+        2.6
+      ],
+      "material": "copper",
+      "role": "Carries completed results from the execute stage into the commit stage.",
+      "connections": [
+        "execute",
+        "commit"
+      ]
+    },
+    {
+      "id": "commit",
+      "name": "Commit Stage",
+      "shape": "box",
+      "position": [
+        13,
+        0.9,
+        0
+      ],
+      "size": [
+        1.4,
+        1.8,
+        1.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Retires instructions strictly in program order, writing results back to the register file.",
+      "connections": [
+        "preg_ex_cm",
+        "bus_ex_cm",
+        "register_file",
+        "regfile_fp",
+        "writeback_bus",
+        "exception_unit"
+      ]
+    },
+    {
+      "id": "exception_unit",
+      "name": "Exception / Trap Controller",
+      "shape": "box",
+      "position": [
+        13,
+        0.5,
+        -2.3
+      ],
+      "size": [
+        1.1,
+        1,
+        0.95
+      ],
+      "material": "black composite",
+      "role": "Detects faults and interrupts at commit and redirects the front-end into the M/S trap handlers.",
+      "connections": [
+        "commit"
+      ]
+    },
+    {
+      "id": "writeback_bus",
+      "name": "Writeback Bus",
+      "shape": "cylinder",
+      "position": [
+        12.5,
+        0.6,
+        2.2
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.11,
+        5.6
+      ],
+      "material": "copper",
+      "role": "Returns functional-unit results to the commit stage for in-order retirement.",
+      "connections": [
+        "commit",
+        "alu",
+        "branch_unit",
+        "csr_unit",
+        "multiplier",
+        "fpu",
+        "lsu"
+      ]
+    }
+  ]
+}

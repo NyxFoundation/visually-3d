@@ -1,0 +1,1591 @@
+{
+  "machine_name": "MIAOW GPGPU Compute Unit",
+  "assembly_instructions": "Open block-diagram floorplan of a GCN-style GPGPU, laid flat on the X-Z plane with each block extruded upward in +Y. It is not drawn to physical silicon scale: the real die is ~20 mm and the whole floorplan is rendered at a deliberate non-physical scale so the package reads ~11.9 m across (a uniform 0.7x reduction from earlier passes keeps bounds.radius under 9 m) while individual units stay legible; each block's extruded height is scaled to its relative silicon area so the vector register file, LDS scratchpad and L2 banks rise tallest. The dark substrate (die_substrate) is the root and represents the silicon die. The carbon-fibre cu0_tile carries the detailed centrepiece Compute Unit. The fetch and decode front end plus the wavefront scheduler sit at the back edge of the tile, nearest the dispatch processor. The large white vector register file, the small scalar register file and the scalar ALU sit mid-tile. The four SIMD units run across the front: SIMD0 is broken out into its 16 individual vector-ALU lane pillars in a 4x4 grid whose tops align with the solid SIMD1-SIMD3 blocks, so the exposed unit and the legibility blocks share one envelope. The LDS scratchpad and the vector/scalar memory units flank the SIMDs. CU0's private L1 is split into a small instruction cache feeding the fetch unit and a larger data cache feeding the memory units. The ultra-threaded dispatch processor spans the far edge and fans wavefronts forward over the copper dispatch bus, with port-via stubs marking each tap. Neighbour compute units cu1 and cu2 are each partially broken out onto their own tiles (scheduler, register file and a 4-lane SIMD strip) to show that every CU shares CU0's microarchitecture; cu3 is left as a single solid block as the deliberate legibility counterpart. Each compute unit owns an L1 cache, linked to its tile by a copper port via; a shared L2 cache - drawn as a base slab carrying three interleaved banks - and the memory interface run down the right edge, joined by copper memory buses. There is no enclosing chassis - every block is exposed.",
+  "metadata": {
+    "reference": "https://github.com/VerticalResearchGroup/miaow",
+    "domain": "computer-architecture",
+    "thumbnail_camera": [
+      11,
+      8.2,
+      11
+    ],
+    "info": {
+      "japanese_name": "MIAOW（ミャオウ）オープンソース GPGPU",
+      "english_name": "MIAOW Open-Source GPGPU Compute Unit",
+      "summary": "MIAOW is an open-source Verilog RTL implementation of a compute unit from AMD's Southern Islands (GCN) GPGPU instruction set, built by the University of Wisconsin-Madison. It lets researchers simulate, modify and tape out a real GPU compute unit.",
+      "description": "MIAOW (Many-core Integrated Accelerator Of Wisconsin) was created by the Vertical Research Group at the University of Wisconsin-Madison as the first widely available open-source RTL implementation of a general-purpose GPU. It implements a subset of AMD's Southern Islands (GCN 1.0) instruction set - roughly 95 of the architecture's instructions - in synthesizable Verilog/SystemVerilog, and is structured around a single compute unit faithful to the real GCN microarchitecture.",
+      "description2": "A MIAOW compute unit fetches and decodes instructions, schedules 64-wide wavefronts, and issues them to four SIMD units that each contain 16 vector-ALU lanes (64 ALU lanes total), plus a separate scalar ALU. Operands are held in a large vector register file and a smaller scalar register file, with a 64 KB Local Data Share scratchpad shared between the SIMDs and dedicated vector- and scalar-memory units feeding the cache hierarchy. The design has been simulated against real OpenCL kernels and FPGA-prototyped, making it a reference vehicle for GPU architecture research and security studies.",
+      "operator": "Open-source community and academic researchers",
+      "contractor": "Vertical Research Group, University of Wisconsin-Madison",
+      "contract_date": "2015",
+      "contract_value": "Open source (no cost)",
+      "status": "Open-source research project, publicly archived",
+      "facts": [
+        {
+          "label": "Developer",
+          "value": "Vertical Research Group, UW-Madison"
+        },
+        {
+          "label": "ISA",
+          "value": "AMD Southern Islands (GCN) subset"
+        },
+        {
+          "label": "Instructions",
+          "value": "~95 of the SI instruction set"
+        },
+        {
+          "label": "SIMD units per CU",
+          "value": "4 x SIMD-16 = 64 ALU lanes"
+        },
+        {
+          "label": "Wavefront width",
+          "value": "64 work-items"
+        },
+        {
+          "label": "Local Data Share",
+          "value": "64 KB scratchpad per compute unit"
+        },
+        {
+          "label": "RTL language",
+          "value": "Verilog / SystemVerilog"
+        },
+        {
+          "label": "License",
+          "value": "Open source (BSD-style)"
+        },
+        {
+          "label": "First public release",
+          "value": "2015"
+        },
+        {
+          "label": "Verification",
+          "value": "Runs AMD SI compute kernels; FPGA-prototyped"
+        }
+      ],
+      "sources": [
+        {
+          "title": "MIAOW GPGPU source repository (GitHub)",
+          "url": "https://github.com/VerticalResearchGroup/miaow"
+        },
+        {
+          "title": "MIAOW project wiki and documentation",
+          "url": "https://github.com/VerticalResearchGroup/miaow/wiki"
+        },
+        {
+          "title": "Graphics Core Next - Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Graphics_Core_Next"
+        }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "die_substrate",
+      "name": "Silicon Die Substrate",
+      "shape": "box",
+      "position": [
+        0,
+        -0.14,
+        0
+      ],
+      "size": [
+        11.9,
+        0.28,
+        10.5
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Root block-diagram floor representing the GPGPU silicon die that carries every functional unit.",
+      "connections": [
+        "cu0_tile",
+        "dispatch_processor",
+        "cu1",
+        "cu2",
+        "cu3",
+        "cu0_l1i",
+        "cu0_l1d",
+        "cu1_l1",
+        "cu2_l1",
+        "cu3_l1",
+        "l2_cache",
+        "memory_interface",
+        "dispatch_bus",
+        "mem_bus_cu_l2",
+        "mem_bus_l2_mc"
+      ]
+    },
+    {
+      "id": "cu0_tile",
+      "name": "Compute Unit 0 Floorplan Tile",
+      "shape": "box",
+      "position": [
+        -0.28,
+        0.056,
+        0.42
+      ],
+      "size": [
+        6.3,
+        0.112,
+        8.05
+      ],
+      "material": "carbon fiber",
+      "role": "Outlines the centrepiece GCN compute unit and groups all of its sub-blocks on the die.",
+      "connections": [
+        "die_substrate",
+        "cu0_fetch",
+        "cu0_decode",
+        "cu0_wave_scheduler",
+        "cu0_vrf",
+        "cu0_srf",
+        "cu0_scalar_alu",
+        "cu0_simd0",
+        "cu0_simd1",
+        "cu0_simd2",
+        "cu0_simd3",
+        "cu0_lds",
+        "cu0_vmem",
+        "cu0_smem"
+      ]
+    },
+    {
+      "id": "cu0_fetch",
+      "name": "Instruction Fetch Unit",
+      "shape": "box",
+      "position": [
+        -2.1,
+        0.952,
+        -2.73
+      ],
+      "size": [
+        1.68,
+        1.68,
+        0.98
+      ],
+      "material": "brushed steel",
+      "role": "Front-end block that fetches instruction packets for active wavefronts from the L1 instruction cache.",
+      "connections": [
+        "cu0_tile",
+        "cu0_decode",
+        "cu0_l1i",
+        "dispatch_bus"
+      ]
+    },
+    {
+      "id": "cu0_decode",
+      "name": "Instruction Decode Unit",
+      "shape": "box",
+      "position": [
+        -0.14,
+        0.952,
+        -2.73
+      ],
+      "size": [
+        1.68,
+        1.68,
+        0.98
+      ],
+      "material": "brushed steel",
+      "role": "Decodes Southern Islands instructions and routes them toward the wavefront scheduler.",
+      "connections": [
+        "cu0_tile",
+        "cu0_fetch",
+        "cu0_wave_scheduler"
+      ]
+    },
+    {
+      "id": "cu0_wave_scheduler",
+      "name": "Wavefront Scheduler",
+      "shape": "box",
+      "position": [
+        1.82,
+        1.022,
+        -2.73
+      ],
+      "size": [
+        1.82,
+        1.82,
+        0.98
+      ],
+      "material": "forged steel",
+      "role": "Selects ready wavefronts each cycle and issues their instructions to the SIMD units and scalar ALU.",
+      "connections": [
+        "cu0_tile",
+        "cu0_decode",
+        "cu0_simd0",
+        "cu0_simd1",
+        "cu0_simd2",
+        "cu0_simd3",
+        "cu0_scalar_alu",
+        "cu0_vrf",
+        "cu0_srf"
+      ]
+    },
+    {
+      "id": "cu0_vrf",
+      "name": "Vector Register File",
+      "shape": "box",
+      "position": [
+        -1.68,
+        1.092,
+        -0.84
+      ],
+      "size": [
+        2.8,
+        1.96,
+        1.4
+      ],
+      "material": "white composite",
+      "role": "Large per-CU register array holding the vector operands for all 64 lanes of every active wavefront.",
+      "connections": [
+        "cu0_tile",
+        "cu0_wave_scheduler",
+        "cu0_simd0",
+        "cu0_simd1",
+        "cu0_simd2",
+        "cu0_simd3",
+        "cu0_vmem"
+      ]
+    },
+    {
+      "id": "cu0_srf",
+      "name": "Scalar Register File",
+      "shape": "box",
+      "position": [
+        0.49,
+        0.637,
+        -1.05
+      ],
+      "size": [
+        1.12,
+        1.05,
+        0.98
+      ],
+      "material": "white composite",
+      "role": "Smaller register file storing scalar values shared uniformly across a wavefront.",
+      "connections": [
+        "cu0_tile",
+        "cu0_wave_scheduler",
+        "cu0_scalar_alu",
+        "cu0_smem"
+      ]
+    },
+    {
+      "id": "cu0_scalar_alu",
+      "name": "Scalar ALU",
+      "shape": "box",
+      "position": [
+        1.89,
+        0.707,
+        -1.05
+      ],
+      "size": [
+        1.12,
+        1.19,
+        0.98
+      ],
+      "material": "brushed steel",
+      "role": "Executes control-flow and uniform scalar arithmetic operations once per wavefront.",
+      "connections": [
+        "cu0_tile",
+        "cu0_wave_scheduler",
+        "cu0_srf"
+      ]
+    },
+    {
+      "id": "cu0_simd0",
+      "name": "SIMD Unit 0 (lanes exposed)",
+      "shape": "box",
+      "position": [
+        -2.59,
+        0.287,
+        2.8
+      ],
+      "size": [
+        1.05,
+        0.35,
+        2.8
+      ],
+      "material": "dark anodized aluminum",
+      "role": "First of four SIMD units; drawn as a thin base with its 16 vector-ALU lanes broken out as individual pillars above.",
+      "connections": [
+        "cu0_tile",
+        "cu0_vrf",
+        "cu0_wave_scheduler",
+        "cu0_lds",
+        "cu0_simd0_lane00",
+        "cu0_simd0_lane01",
+        "cu0_simd0_lane02",
+        "cu0_simd0_lane03",
+        "cu0_simd0_lane04",
+        "cu0_simd0_lane05",
+        "cu0_simd0_lane06",
+        "cu0_simd0_lane07",
+        "cu0_simd0_lane08",
+        "cu0_simd0_lane09",
+        "cu0_simd0_lane10",
+        "cu0_simd0_lane11",
+        "cu0_simd0_lane12",
+        "cu0_simd0_lane13",
+        "cu0_simd0_lane14",
+        "cu0_simd0_lane15"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane00",
+      "name": "SIMD0 Vector ALU Lane 0",
+      "shape": "box",
+      "position": [
+        -2.982,
+        1.162,
+        1.75
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane01",
+      "name": "SIMD0 Vector ALU Lane 1",
+      "shape": "box",
+      "position": [
+        -2.723,
+        1.162,
+        1.75
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane02",
+      "name": "SIMD0 Vector ALU Lane 2",
+      "shape": "box",
+      "position": [
+        -2.457,
+        1.162,
+        1.75
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane03",
+      "name": "SIMD0 Vector ALU Lane 3",
+      "shape": "box",
+      "position": [
+        -2.198,
+        1.162,
+        1.75
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane04",
+      "name": "SIMD0 Vector ALU Lane 4",
+      "shape": "box",
+      "position": [
+        -2.982,
+        1.162,
+        2.45
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane05",
+      "name": "SIMD0 Vector ALU Lane 5",
+      "shape": "box",
+      "position": [
+        -2.723,
+        1.162,
+        2.45
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane06",
+      "name": "SIMD0 Vector ALU Lane 6",
+      "shape": "box",
+      "position": [
+        -2.457,
+        1.162,
+        2.45
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane07",
+      "name": "SIMD0 Vector ALU Lane 7",
+      "shape": "box",
+      "position": [
+        -2.198,
+        1.162,
+        2.45
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane08",
+      "name": "SIMD0 Vector ALU Lane 8",
+      "shape": "box",
+      "position": [
+        -2.982,
+        1.162,
+        3.15
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane09",
+      "name": "SIMD0 Vector ALU Lane 9",
+      "shape": "box",
+      "position": [
+        -2.723,
+        1.162,
+        3.15
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane10",
+      "name": "SIMD0 Vector ALU Lane 10",
+      "shape": "box",
+      "position": [
+        -2.457,
+        1.162,
+        3.15
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane11",
+      "name": "SIMD0 Vector ALU Lane 11",
+      "shape": "box",
+      "position": [
+        -2.198,
+        1.162,
+        3.15
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane12",
+      "name": "SIMD0 Vector ALU Lane 12",
+      "shape": "box",
+      "position": [
+        -2.982,
+        1.162,
+        3.85
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane13",
+      "name": "SIMD0 Vector ALU Lane 13",
+      "shape": "box",
+      "position": [
+        -2.723,
+        1.162,
+        3.85
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane14",
+      "name": "SIMD0 Vector ALU Lane 14",
+      "shape": "box",
+      "position": [
+        -2.457,
+        1.162,
+        3.85
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd0_lane15",
+      "name": "SIMD0 Vector ALU Lane 15",
+      "shape": "box",
+      "position": [
+        -2.198,
+        1.162,
+        3.85
+      ],
+      "size": [
+        0.21,
+        1.4,
+        0.56
+      ],
+      "material": "brushed steel",
+      "role": "One of the 16 parallel vector-ALU lanes of SIMD0, processing a single work-item slot of the wavefront.",
+      "connections": [
+        "cu0_simd0"
+      ]
+    },
+    {
+      "id": "cu0_simd1",
+      "name": "SIMD Unit 1",
+      "shape": "box",
+      "position": [
+        -1.47,
+        0.987,
+        2.8
+      ],
+      "size": [
+        1.05,
+        1.75,
+        2.8
+      ],
+      "material": "brushed steel",
+      "role": "Second SIMD unit; a solid block of 16 vector-ALU lanes identical to the exposed SIMD0, drawn whole for legibility.",
+      "connections": [
+        "cu0_tile",
+        "cu0_vrf",
+        "cu0_wave_scheduler",
+        "cu0_lds"
+      ]
+    },
+    {
+      "id": "cu0_simd2",
+      "name": "SIMD Unit 2",
+      "shape": "box",
+      "position": [
+        -0.35,
+        0.987,
+        2.8
+      ],
+      "size": [
+        1.05,
+        1.75,
+        2.8
+      ],
+      "material": "brushed steel",
+      "role": "Third SIMD unit; a solid block of 16 vector-ALU lanes identical to the exposed SIMD0, drawn whole for legibility.",
+      "connections": [
+        "cu0_tile",
+        "cu0_vrf",
+        "cu0_wave_scheduler",
+        "cu0_lds"
+      ]
+    },
+    {
+      "id": "cu0_simd3",
+      "name": "SIMD Unit 3",
+      "shape": "box",
+      "position": [
+        0.77,
+        0.987,
+        2.8
+      ],
+      "size": [
+        1.05,
+        1.75,
+        2.8
+      ],
+      "material": "brushed steel",
+      "role": "Fourth SIMD unit; a solid block of 16 vector-ALU lanes identical to the exposed SIMD0, drawn whole for legibility.",
+      "connections": [
+        "cu0_tile",
+        "cu0_vrf",
+        "cu0_wave_scheduler",
+        "cu0_lds"
+      ]
+    },
+    {
+      "id": "cu0_lds",
+      "name": "Local Data Share (LDS)",
+      "shape": "box",
+      "position": [
+        2.1,
+        1.022,
+        2.8
+      ],
+      "size": [
+        1.4,
+        1.82,
+        2.8
+      ],
+      "material": "glass display",
+      "role": "64 KB on-chip scratchpad that the four SIMD units use to share data within a workgroup.",
+      "connections": [
+        "cu0_tile",
+        "cu0_simd0",
+        "cu0_simd1",
+        "cu0_simd2",
+        "cu0_simd3",
+        "cu0_vmem"
+      ]
+    },
+    {
+      "id": "cu0_vmem",
+      "name": "Vector Memory Unit",
+      "shape": "box",
+      "position": [
+        0.49,
+        0.707,
+        0.42
+      ],
+      "size": [
+        1.26,
+        1.19,
+        0.98
+      ],
+      "material": "forged steel",
+      "role": "Generates per-lane vector loads and stores, coalescing them toward the L1 data cache.",
+      "connections": [
+        "cu0_tile",
+        "cu0_vrf",
+        "cu0_lds",
+        "cu0_l1d"
+      ]
+    },
+    {
+      "id": "cu0_smem",
+      "name": "Scalar Memory Unit",
+      "shape": "box",
+      "position": [
+        1.89,
+        0.637,
+        0.42
+      ],
+      "size": [
+        1.12,
+        1.05,
+        0.98
+      ],
+      "material": "forged steel",
+      "role": "Handles uniform scalar loads such as constant and descriptor fetches into the scalar register file.",
+      "connections": [
+        "cu0_tile",
+        "cu0_srf",
+        "cu0_l1d"
+      ]
+    },
+    {
+      "id": "dispatch_processor",
+      "name": "Ultra-Threaded Dispatch Processor",
+      "shape": "box",
+      "position": [
+        0,
+        0.91,
+        -4.62
+      ],
+      "size": [
+        9.1,
+        1.82,
+        0.91
+      ],
+      "material": "forged steel",
+      "role": "Distributes incoming workgroups as wavefronts across all compute units on the die.",
+      "connections": [
+        "die_substrate",
+        "dispatch_bus"
+      ]
+    },
+    {
+      "id": "cu1",
+      "name": "Compute Unit 1 Floorplan Tile",
+      "shape": "box",
+      "position": [
+        -4.9,
+        0.056,
+        -2.66
+      ],
+      "size": [
+        1.96,
+        0.112,
+        1.68
+      ],
+      "material": "carbon fiber",
+      "role": "Neighbouring GCN compute unit, partially broken out onto its own tile to show it shares CU0's microarchitecture.",
+      "connections": [
+        "die_substrate",
+        "cu1_l1",
+        "dispatch_bus",
+        "cu1_wave_scheduler",
+        "cu1_vrf",
+        "cu1_simd0"
+      ]
+    },
+    {
+      "id": "cu1_wave_scheduler",
+      "name": "CU1 Wavefront Scheduler",
+      "shape": "box",
+      "position": [
+        -4.9,
+        0.672,
+        -3.185
+      ],
+      "size": [
+        1.68,
+        1.12,
+        0.49
+      ],
+      "material": "forged steel",
+      "role": "Back-edge front-end of compute unit 1, mirroring CU0's scheduler that issues wavefronts to its SIMD lanes.",
+      "connections": [
+        "cu1",
+        "cu1_vrf"
+      ]
+    },
+    {
+      "id": "cu1_vrf",
+      "name": "CU1 Vector Register File",
+      "shape": "box",
+      "position": [
+        -4.9,
+        0.882,
+        -2.59
+      ],
+      "size": [
+        1.68,
+        1.54,
+        0.63
+      ],
+      "material": "white composite",
+      "role": "Mid-tile vector register array of compute unit 1, identical in role to CU0's vector register file.",
+      "connections": [
+        "cu1",
+        "cu1_wave_scheduler",
+        "cu1_simd0"
+      ]
+    },
+    {
+      "id": "cu1_simd0",
+      "name": "CU1 SIMD Unit 0 (lanes exposed)",
+      "shape": "box",
+      "position": [
+        -4.9,
+        0.252,
+        -2.1
+      ],
+      "size": [
+        1.68,
+        0.28,
+        0.63
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Front SIMD base of compute unit 1, with four representative vector-ALU lane pillars broken out above it.",
+      "connections": [
+        "cu1",
+        "cu1_vrf",
+        "cu1_simd0_lane0",
+        "cu1_simd0_lane1",
+        "cu1_simd0_lane2",
+        "cu1_simd0_lane3"
+      ]
+    },
+    {
+      "id": "cu1_simd0_lane0",
+      "name": "CU1 SIMD0 Vector ALU Lane 0",
+      "shape": "box",
+      "position": [
+        -5.495,
+        0.952,
+        -2.1
+      ],
+      "size": [
+        0.28,
+        1.12,
+        0.49
+      ],
+      "material": "brushed steel",
+      "role": "Representative vector-ALU lane of compute unit 1, showing its SIMD array matches CU0's exposed lanes.",
+      "connections": [
+        "cu1_simd0"
+      ]
+    },
+    {
+      "id": "cu1_simd0_lane1",
+      "name": "CU1 SIMD0 Vector ALU Lane 1",
+      "shape": "box",
+      "position": [
+        -5.11,
+        0.952,
+        -2.1
+      ],
+      "size": [
+        0.28,
+        1.12,
+        0.49
+      ],
+      "material": "brushed steel",
+      "role": "Representative vector-ALU lane of compute unit 1, showing its SIMD array matches CU0's exposed lanes.",
+      "connections": [
+        "cu1_simd0"
+      ]
+    },
+    {
+      "id": "cu1_simd0_lane2",
+      "name": "CU1 SIMD0 Vector ALU Lane 2",
+      "shape": "box",
+      "position": [
+        -4.725,
+        0.952,
+        -2.1
+      ],
+      "size": [
+        0.28,
+        1.12,
+        0.49
+      ],
+      "material": "brushed steel",
+      "role": "Representative vector-ALU lane of compute unit 1, showing its SIMD array matches CU0's exposed lanes.",
+      "connections": [
+        "cu1_simd0"
+      ]
+    },
+    {
+      "id": "cu1_simd0_lane3",
+      "name": "CU1 SIMD0 Vector ALU Lane 3",
+      "shape": "box",
+      "position": [
+        -4.34,
+        0.952,
+        -2.1
+      ],
+      "size": [
+        0.28,
+        1.12,
+        0.49
+      ],
+      "material": "brushed steel",
+      "role": "Representative vector-ALU lane of compute unit 1, showing its SIMD array matches CU0's exposed lanes.",
+      "connections": [
+        "cu1_simd0"
+      ]
+    },
+    {
+      "id": "cu2",
+      "name": "Compute Unit 2 Floorplan Tile",
+      "shape": "box",
+      "position": [
+        -4.9,
+        0.056,
+        -0.56
+      ],
+      "size": [
+        1.96,
+        0.112,
+        1.68
+      ],
+      "material": "carbon fiber",
+      "role": "Neighbouring GCN compute unit, partially broken out onto its own tile to show it shares CU0's microarchitecture.",
+      "connections": [
+        "die_substrate",
+        "cu2_l1",
+        "dispatch_bus",
+        "cu2_wave_scheduler",
+        "cu2_vrf",
+        "cu2_simd0"
+      ]
+    },
+    {
+      "id": "cu2_wave_scheduler",
+      "name": "CU2 Wavefront Scheduler",
+      "shape": "box",
+      "position": [
+        -4.9,
+        0.672,
+        -1.1
+      ],
+      "size": [
+        1.68,
+        1.12,
+        0.49
+      ],
+      "material": "forged steel",
+      "role": "Back-edge wavefront scheduler of compute unit 2, mirroring CU0's scheduler that issues wavefronts to its SIMD lanes.",
+      "connections": [
+        "cu2",
+        "cu2_vrf"
+      ]
+    },
+    {
+      "id": "cu2_vrf",
+      "name": "CU2 Vector Register File",
+      "shape": "box",
+      "position": [
+        -4.9,
+        0.882,
+        -0.5
+      ],
+      "size": [
+        1.68,
+        1.54,
+        0.63
+      ],
+      "material": "white composite",
+      "role": "Mid-tile vector register array of compute unit 2, identical in role to CU0's vector register file.",
+      "connections": [
+        "cu2",
+        "cu2_wave_scheduler",
+        "cu2_simd0"
+      ]
+    },
+    {
+      "id": "cu2_simd0",
+      "name": "CU2 SIMD Unit 0 (lanes exposed)",
+      "shape": "box",
+      "position": [
+        -4.9,
+        0.252,
+        0
+      ],
+      "size": [
+        1.68,
+        0.28,
+        0.63
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Front SIMD base of compute unit 2, with four representative vector-ALU lane pillars broken out above it.",
+      "connections": [
+        "cu2",
+        "cu2_vrf",
+        "cu2_simd0_lane0",
+        "cu2_simd0_lane1",
+        "cu2_simd0_lane2",
+        "cu2_simd0_lane3"
+      ]
+    },
+    {
+      "id": "cu2_simd0_lane0",
+      "name": "CU2 SIMD0 Vector ALU Lane 0",
+      "shape": "box",
+      "position": [
+        -5.495,
+        0.952,
+        0
+      ],
+      "size": [
+        0.28,
+        1.12,
+        0.49
+      ],
+      "material": "brushed steel",
+      "role": "Representative vector-ALU lane of compute unit 2, showing its SIMD array matches CU0's exposed lanes.",
+      "connections": [
+        "cu2_simd0"
+      ]
+    },
+    {
+      "id": "cu2_simd0_lane1",
+      "name": "CU2 SIMD0 Vector ALU Lane 1",
+      "shape": "box",
+      "position": [
+        -5.11,
+        0.952,
+        0
+      ],
+      "size": [
+        0.28,
+        1.12,
+        0.49
+      ],
+      "material": "brushed steel",
+      "role": "Representative vector-ALU lane of compute unit 2, showing its SIMD array matches CU0's exposed lanes.",
+      "connections": [
+        "cu2_simd0"
+      ]
+    },
+    {
+      "id": "cu2_simd0_lane2",
+      "name": "CU2 SIMD0 Vector ALU Lane 2",
+      "shape": "box",
+      "position": [
+        -4.725,
+        0.952,
+        0
+      ],
+      "size": [
+        0.28,
+        1.12,
+        0.49
+      ],
+      "material": "brushed steel",
+      "role": "Representative vector-ALU lane of compute unit 2, showing its SIMD array matches CU0's exposed lanes.",
+      "connections": [
+        "cu2_simd0"
+      ]
+    },
+    {
+      "id": "cu2_simd0_lane3",
+      "name": "CU2 SIMD0 Vector ALU Lane 3",
+      "shape": "box",
+      "position": [
+        -4.34,
+        0.952,
+        0
+      ],
+      "size": [
+        0.28,
+        1.12,
+        0.49
+      ],
+      "material": "brushed steel",
+      "role": "Representative vector-ALU lane of compute unit 2, showing its SIMD array matches CU0's exposed lanes.",
+      "connections": [
+        "cu2_simd0"
+      ]
+    },
+    {
+      "id": "cu3",
+      "name": "Compute Unit 3",
+      "shape": "box",
+      "position": [
+        -4.9,
+        0.77,
+        1.54
+      ],
+      "size": [
+        1.96,
+        1.54,
+        1.68
+      ],
+      "material": "welded steel",
+      "role": "Fourth GCN compute unit, kept as one solid block as the deliberate legibility counterpart to the broken-out CU1 and CU2; structurally identical to CU0.",
+      "connections": [
+        "die_substrate",
+        "cu3_l1",
+        "dispatch_bus"
+      ]
+    },
+    {
+      "id": "cu0_l1i",
+      "name": "L1 Instruction Cache (CU0)",
+      "shape": "box",
+      "position": [
+        3.29,
+        0.56,
+        -1.4
+      ],
+      "size": [
+        0.91,
+        1.12,
+        1.26
+      ],
+      "material": "white composite",
+      "role": "Private first-level cache holding instruction packets fetched by CU0's front-end fetch unit.",
+      "connections": [
+        "die_substrate",
+        "cu0_fetch",
+        "mem_bus_cu_l2"
+      ]
+    },
+    {
+      "id": "cu0_l1d",
+      "name": "L1 Data Cache (CU0)",
+      "shape": "box",
+      "position": [
+        3.29,
+        0.525,
+        0.98
+      ],
+      "size": [
+        0.91,
+        1.05,
+        2.52
+      ],
+      "material": "white composite",
+      "role": "Private first-level data cache serving CU0's coalesced vector- and scalar-memory traffic.",
+      "connections": [
+        "die_substrate",
+        "cu0_vmem",
+        "cu0_smem",
+        "mem_bus_cu_l2"
+      ]
+    },
+    {
+      "id": "cu1_l1",
+      "name": "L1 Cache (CU1)",
+      "shape": "box",
+      "position": [
+        -3.5,
+        0.49,
+        -2.66
+      ],
+      "size": [
+        0.91,
+        0.98,
+        1.4
+      ],
+      "material": "white composite",
+      "role": "Private first-level cache for compute unit 1, backing into the shared L2.",
+      "connections": [
+        "die_substrate",
+        "cu1",
+        "l2_cache"
+      ]
+    },
+    {
+      "id": "cu2_l1",
+      "name": "L1 Cache (CU2)",
+      "shape": "box",
+      "position": [
+        -3.5,
+        0.49,
+        -0.56
+      ],
+      "size": [
+        0.91,
+        0.98,
+        1.4
+      ],
+      "material": "white composite",
+      "role": "Private first-level cache for compute unit 2, backing into the shared L2.",
+      "connections": [
+        "die_substrate",
+        "cu2",
+        "l2_cache"
+      ]
+    },
+    {
+      "id": "cu3_l1",
+      "name": "L1 Cache (CU3)",
+      "shape": "box",
+      "position": [
+        -3.5,
+        0.49,
+        1.54
+      ],
+      "size": [
+        0.91,
+        0.98,
+        1.4
+      ],
+      "material": "white composite",
+      "role": "Private first-level cache for compute unit 3, backing into the shared L2.",
+      "connections": [
+        "die_substrate",
+        "cu3",
+        "l2_cache"
+      ]
+    },
+    {
+      "id": "l2_cache",
+      "name": "Shared L2 Cache Base",
+      "shape": "box",
+      "position": [
+        5.04,
+        0.15,
+        0
+      ],
+      "size": [
+        1.68,
+        0.3,
+        5.95
+      ],
+      "material": "white composite",
+      "role": "Unified second-level cache base shared by every compute unit; split into three interleaved banks rising above it, sitting between the L1s and main memory.",
+      "connections": [
+        "die_substrate",
+        "mem_bus_cu_l2",
+        "cu1_l1",
+        "cu2_l1",
+        "cu3_l1",
+        "mem_bus_l2_mc",
+        "l2_bank0",
+        "l2_bank1",
+        "l2_bank2"
+      ]
+    },
+    {
+      "id": "l2_bank0",
+      "name": "L2 Cache Bank 0",
+      "shape": "box",
+      "position": [
+        5.04,
+        1.35,
+        -1.95
+      ],
+      "size": [
+        1.5,
+        2.1,
+        1.8
+      ],
+      "material": "white composite",
+      "role": "One of three banked sub-arrays of the shared L2 cache, interleaving addresses to sustain parallel CU memory traffic.",
+      "connections": [
+        "l2_cache"
+      ]
+    },
+    {
+      "id": "l2_bank1",
+      "name": "L2 Cache Bank 1",
+      "shape": "box",
+      "position": [
+        5.04,
+        1.35,
+        0
+      ],
+      "size": [
+        1.5,
+        2.1,
+        1.8
+      ],
+      "material": "white composite",
+      "role": "One of three banked sub-arrays of the shared L2 cache, interleaving addresses to sustain parallel CU memory traffic.",
+      "connections": [
+        "l2_cache"
+      ]
+    },
+    {
+      "id": "l2_bank2",
+      "name": "L2 Cache Bank 2",
+      "shape": "box",
+      "position": [
+        5.04,
+        1.35,
+        1.95
+      ],
+      "size": [
+        1.5,
+        2.1,
+        1.8
+      ],
+      "material": "white composite",
+      "role": "One of three banked sub-arrays of the shared L2 cache, interleaving addresses to sustain parallel CU memory traffic.",
+      "connections": [
+        "l2_cache"
+      ]
+    },
+    {
+      "id": "memory_interface",
+      "name": "Memory Interface / Controller",
+      "shape": "box",
+      "position": [
+        5.04,
+        0.91,
+        -3.95
+      ],
+      "size": [
+        1.68,
+        1.82,
+        1.96
+      ],
+      "material": "welded steel",
+      "role": "External memory controller and PHY moving data between the L2 cache and off-chip DRAM.",
+      "connections": [
+        "die_substrate",
+        "mem_bus_l2_mc"
+      ]
+    },
+    {
+      "id": "dispatch_bus",
+      "name": "Copper Dispatch Bus",
+      "shape": "box",
+      "position": [
+        0,
+        0.105,
+        -3.78
+      ],
+      "size": [
+        9.1,
+        0.21,
+        0.56
+      ],
+      "material": "copper",
+      "role": "Copper bus tracing the wavefront-dispatch path from the dispatch processor out to every compute unit.",
+      "connections": [
+        "die_substrate",
+        "dispatch_processor",
+        "cu0_fetch",
+        "cu1",
+        "cu2",
+        "cu3"
+      ]
+    },
+    {
+      "id": "stub_disp_cu0",
+      "name": "Dispatch Bus Port Via (CU0)",
+      "shape": "cylinder",
+      "position": [
+        -2.1,
+        0.245,
+        -3.395
+      ],
+      "size": [
+        0.126,
+        0.49
+      ],
+      "material": "copper",
+      "role": "Copper port via tapping the dispatch bus up into CU0's fetch unit, marking the dispatch connection point.",
+      "connections": [
+        "dispatch_bus",
+        "cu0_fetch"
+      ]
+    },
+    {
+      "id": "stub_disp_cu1",
+      "name": "Dispatch Bus Port Via (CU1)",
+      "shape": "cylinder",
+      "position": [
+        -4.9,
+        0.245,
+        -3.5
+      ],
+      "size": [
+        0.126,
+        0.49
+      ],
+      "material": "copper",
+      "role": "Copper port via tapping the dispatch bus up into compute unit 1, marking its dispatch connection point.",
+      "connections": [
+        "dispatch_bus",
+        "cu1"
+      ]
+    },
+    {
+      "id": "stub_cu1_l1",
+      "name": "L1 Port Via (CU1)",
+      "shape": "cylinder",
+      "position": [
+        -3.93,
+        0.245,
+        -2.66
+      ],
+      "size": [
+        0.126,
+        0.49
+      ],
+      "material": "copper",
+      "role": "Copper port via linking compute unit 1's tile to its private L1 cache.",
+      "connections": [
+        "cu1",
+        "cu1_l1"
+      ]
+    },
+    {
+      "id": "stub_cu2_l1",
+      "name": "L1 Port Via (CU2)",
+      "shape": "cylinder",
+      "position": [
+        -3.93,
+        0.245,
+        -0.56
+      ],
+      "size": [
+        0.126,
+        0.49
+      ],
+      "material": "copper",
+      "role": "Copper port via linking compute unit 2's tile to its private L1 cache.",
+      "connections": [
+        "cu2",
+        "cu2_l1"
+      ]
+    },
+    {
+      "id": "mem_bus_cu_l2",
+      "name": "Copper Memory Bus (L1 to L2)",
+      "shape": "box",
+      "position": [
+        3.955,
+        0.105,
+        0
+      ],
+      "size": [
+        0.98,
+        0.21,
+        3.85
+      ],
+      "material": "copper",
+      "role": "Copper bus tracing the memory path from CU0's L1 instruction and data caches into the shared L2 cache.",
+      "connections": [
+        "die_substrate",
+        "cu0_l1i",
+        "cu0_l1d",
+        "l2_cache"
+      ]
+    },
+    {
+      "id": "stub_l1d_via",
+      "name": "Memory Bus Port Via (L1 Data)",
+      "shape": "cylinder",
+      "position": [
+        3.5,
+        0.245,
+        0.98
+      ],
+      "size": [
+        0.126,
+        0.49
+      ],
+      "material": "copper",
+      "role": "Copper port via linking CU0's L1 data cache down to the L1-to-L2 memory bus.",
+      "connections": [
+        "cu0_l1d",
+        "mem_bus_cu_l2"
+      ]
+    },
+    {
+      "id": "stub_l2_via",
+      "name": "Memory Bus Port Via (L2)",
+      "shape": "cylinder",
+      "position": [
+        4.27,
+        0.245,
+        0
+      ],
+      "size": [
+        0.126,
+        0.49
+      ],
+      "material": "copper",
+      "role": "Copper port via linking the L1-to-L2 memory bus up into the shared L2 cache.",
+      "connections": [
+        "mem_bus_cu_l2",
+        "l2_cache"
+      ]
+    },
+    {
+      "id": "mem_bus_l2_mc",
+      "name": "Copper Memory Bus (L2 to Controller)",
+      "shape": "box",
+      "position": [
+        5.04,
+        0.105,
+        -2.975
+      ],
+      "size": [
+        1.4,
+        0.21,
+        0.49
+      ],
+      "material": "copper",
+      "role": "Copper bus tracing the memory path from the shared L2 cache to the off-chip memory interface.",
+      "connections": [
+        "die_substrate",
+        "l2_cache",
+        "memory_interface"
+      ]
+    }
+  ]
+}

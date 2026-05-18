@@ -1,0 +1,1111 @@
+{
+  "machine_name": "XiangShan RISC-V Processor (Nanhu generation)",
+  "assembly_instructions": "Abstract micro-architecture block diagram, not to physical scale — XiangShan's die is only a few mm² and the picosecond-scale signal paths cannot be drawn literally. Blocks are sized for legibility and all floor-standing blocks sit on the ground line (y=0). The pipeline flows along +X: the decoupled front end (a fast uBTB plus the TAGE/ITTAGE predictors -> FTQ -> instruction-fetch unit -> instruction buffer) occupies negative X; decode/rename/dispatch sit at the origin; the wide back end fans out along Z — integer datapath on the centre line, the floating-point datapath toward +Z, and the memory datapath toward -Z. Materials are colour-coded by block class: 'black composite' = predictor and fetch logic, 'white composite' = decode/rename/dispatch logic, 'dark anodized aluminum' = queues and buffers, 'brushed steel' = register files and the ROB, 'welded/forged steel' = functional units, 'glass display' = caches. The reorder buffer is modelled as a tall slab with three thin entry-bank slabs exploded directly above it, so its ~256-entry retirement array is legible rather than a solid block. Copper cylinders are explicit datapath buses along the front-end spine, the dispatch-to-issue path, the integer and FP writeback paths, and the L2->L3 path; remaining edges are logical connections. The integer multiplier/divider and the FP divide/sqrt unit are modelled as cylinders to distinguish the long-latency units from the box-shaped ALUs and FMA pipes. The multi-level cache hierarchy is parked at far +X with L1s closest to their clients and the shared L3 last.",
+  "metadata": {
+    "reference": "https://github.com/OpenXiangShan/XiangShan",
+    "domain": "computer-architecture",
+    "thumbnail_camera": [
+      11.7,
+      9.5,
+      10.8
+    ],
+    "info": {
+      "japanese_name": "香山 RISC-Vプロセッサ（南湖世代）",
+      "english_name": "XiangShan Open-Source RISC-V Processor",
+      "summary": "XiangShan is an open-source, high-performance out-of-order RISC-V processor core developed by the Institute of Computing Technology of the Chinese Academy of Sciences. The Nanhu generation is a six-wide superscalar core with a decoupled front end and a deep, multi-ported back end.",
+      "description": "XiangShan implements the RV64GC ISA and is written in the Chisel hardware-construction language. Its front end is decoupled from fetch: a branch-prediction unit combining a fast uBTB first stage with TAGE-SC-L for conditional-branch direction and ITTAGE for indirect-branch targets drives a Fetch Target Queue, which in turn steers the instruction-fetch unit and L1 instruction cache; fetched bytes land in an instruction buffer ahead of decode, rename and dispatch. The back end is built from separate integer, memory and floating-point issue queues that read a multi-ported physical register file and feed many functional units — multiple integer ALUs, an integer multiplier, fused-multiply-add floating-point units, an FP divide/sqrt unit, and several load/store units. A large reorder buffer (around 256 entries in Nanhu) tracks every in-flight instruction for precise, in-order retirement, while the memory subsystem pairs load and store queues with a data TLB, an L1 data cache, a unified private L2 and a shared L3.",
+      "operator": "Institute of Computing Technology, Chinese Academy of Sciences (ICT, CAS) / Beijing Institute of Open Source Chip (BOSC)",
+      "contractor": "OpenXiangShan open-source community",
+      "contract_date": "2019 (project start)",
+      "contract_value": "Open source — released under Mulan PSL v2 (no commercial contract)",
+      "status": "Active development; Nanhu (南湖) released, Kunminghu (昆明湖) generation in progress",
+      "facts": [
+        {
+          "label": "Developer",
+          "value": "ICT, Chinese Academy of Sciences"
+        },
+        {
+          "label": "ISA",
+          "value": "RV64GC (RISC-V)"
+        },
+        {
+          "label": "HDL",
+          "value": "Chisel / FIRRTL"
+        },
+        {
+          "label": "Microarchitecture",
+          "value": "Superscalar out-of-order"
+        },
+        {
+          "label": "Decode/rename width",
+          "value": "6 instructions per cycle"
+        },
+        {
+          "label": "Pipeline depth",
+          "value": "~11 stages (Nanhu)"
+        },
+        {
+          "label": "Reorder buffer",
+          "value": "~256 entries"
+        },
+        {
+          "label": "Branch prediction",
+          "value": "uBTB + TAGE-SC-L + ITTAGE"
+        },
+        {
+          "label": "Process node",
+          "value": "14 nm tapeout (Nanhu)"
+        },
+        {
+          "label": "Target clock",
+          "value": "~2 GHz"
+        }
+      ],
+      "sources": [
+        {
+          "title": "OpenXiangShan/XiangShan — GitHub repository",
+          "url": "https://github.com/OpenXiangShan/XiangShan"
+        },
+        {
+          "title": "XiangShan documentation",
+          "url": "https://docs.xiangshan.cc/"
+        },
+        {
+          "title": "Towards Developing High Performance RISC-V Processors Using Agile Methodology (MICRO 2022)",
+          "url": "https://ieeexplore.ieee.org/document/9923860"
+        },
+        {
+          "title": "XiangShan — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/XiangShan_(processor)"
+        }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "bpu_ubtb",
+      "name": "Micro Branch Target Buffer (uBTB)",
+      "shape": "box",
+      "position": [
+        -7.9,
+        0.45,
+        2.7
+      ],
+      "size": [
+        1,
+        0.9,
+        0.9
+      ],
+      "material": "black composite",
+      "role": "Fast single-cycle first-stage predictor that supplies an immediate branch-target guess each cycle before the slower tagged predictors confirm or override it.",
+      "connections": [
+        "bpu_ftq",
+        "bpu_direction_tage"
+      ]
+    },
+    {
+      "id": "bpu_direction_tage",
+      "name": "TAGE-SC-L Direction Predictor",
+      "shape": "box",
+      "position": [
+        -7.9,
+        0.8,
+        1.4
+      ],
+      "size": [
+        1.4,
+        1.6,
+        1.2
+      ],
+      "material": "black composite",
+      "role": "Predicts the taken/not-taken direction of conditional branches using tagged geometric-history tables with a statistical corrector and loop predictor.",
+      "connections": [
+        "bpu_ftq",
+        "instruction_fetch_unit"
+      ]
+    },
+    {
+      "id": "bpu_indirect_ittage",
+      "name": "ITTAGE Indirect Target Predictor",
+      "shape": "box",
+      "position": [
+        -7.9,
+        0.6,
+        -0.1
+      ],
+      "size": [
+        1.4,
+        1.2,
+        1
+      ],
+      "material": "black composite",
+      "role": "Predicts the target address of indirect branches and returns using an indirect-target TAGE structure.",
+      "connections": [
+        "bpu_ftq",
+        "instruction_fetch_unit"
+      ]
+    },
+    {
+      "id": "bpu_ftq",
+      "name": "Fetch Target Queue (FTQ)",
+      "shape": "box",
+      "position": [
+        -7.9,
+        0.5,
+        -1.5
+      ],
+      "size": [
+        1.1,
+        1,
+        1
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Buffers predicted fetch streams from the branch predictors and decouples prediction from the instruction-fetch pipeline.",
+      "connections": [
+        "bpu_ubtb",
+        "bpu_direction_tage",
+        "bpu_indirect_ittage",
+        "instruction_fetch_unit"
+      ]
+    },
+    {
+      "id": "instruction_fetch_unit",
+      "name": "Instruction Fetch Unit (IFU)",
+      "shape": "box",
+      "position": [
+        -6.4,
+        0.9,
+        0
+      ],
+      "size": [
+        1.3,
+        1.8,
+        1.5
+      ],
+      "material": "black composite",
+      "role": "Reads cache lines indicated by the FTQ, aligns and pre-decodes instructions, and forwards them to the instruction buffer.",
+      "connections": [
+        "bpu_ftq",
+        "l1_icache",
+        "instruction_buffer",
+        "bus_fetch_to_ibuf"
+      ]
+    },
+    {
+      "id": "l1_icache",
+      "name": "L1 Instruction Cache",
+      "shape": "box",
+      "position": [
+        -6.4,
+        0.7,
+        -2.3
+      ],
+      "size": [
+        1.4,
+        1.4,
+        1.5
+      ],
+      "material": "glass display",
+      "role": "Private first-level cache supplying instruction bytes to the fetch unit; refilled from the unified L2.",
+      "connections": [
+        "instruction_fetch_unit",
+        "l2_cache"
+      ]
+    },
+    {
+      "id": "instruction_buffer",
+      "name": "Instruction Buffer (IBUF)",
+      "shape": "box",
+      "position": [
+        -5,
+        0.75,
+        0
+      ],
+      "size": [
+        1,
+        1.5,
+        1.6
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Holds fetched instructions to smooth the rate mismatch between the front end and the decode stage.",
+      "connections": [
+        "instruction_fetch_unit",
+        "decode_unit",
+        "bus_fetch_to_ibuf",
+        "bus_ibuf_to_decode"
+      ]
+    },
+    {
+      "id": "decode_unit",
+      "name": "Decode Unit",
+      "shape": "box",
+      "position": [
+        -3.7,
+        0.8,
+        0
+      ],
+      "size": [
+        1.1,
+        1.6,
+        1.8
+      ],
+      "material": "white composite",
+      "role": "Decodes up to six RISC-V instructions per cycle into internal micro-operations.",
+      "connections": [
+        "instruction_buffer",
+        "rename_unit",
+        "bus_ibuf_to_decode",
+        "bus_decode_to_rename"
+      ]
+    },
+    {
+      "id": "rename_unit",
+      "name": "Register Rename Unit",
+      "shape": "box",
+      "position": [
+        -2.4,
+        0.8,
+        0
+      ],
+      "size": [
+        1.1,
+        1.6,
+        1.8
+      ],
+      "material": "white composite",
+      "role": "Maps architectural registers to physical registers to eliminate false dependencies and enable out-of-order execution.",
+      "connections": [
+        "decode_unit",
+        "dispatch_unit",
+        "bus_decode_to_rename",
+        "bus_rename_to_dispatch"
+      ]
+    },
+    {
+      "id": "dispatch_unit",
+      "name": "Dispatch Unit",
+      "shape": "box",
+      "position": [
+        -1.1,
+        0.8,
+        0
+      ],
+      "size": [
+        1.1,
+        1.6,
+        2
+      ],
+      "material": "white composite",
+      "role": "Allocates reorder-buffer entries and steers renamed micro-ops into the integer, memory and floating-point issue queues.",
+      "connections": [
+        "rename_unit",
+        "int_issue_queue",
+        "mem_issue_queue",
+        "fp_issue_queue",
+        "reorder_buffer",
+        "bus_rename_to_dispatch",
+        "bus_dispatch_to_issue"
+      ]
+    },
+    {
+      "id": "int_issue_queue",
+      "name": "Integer Issue Queue",
+      "shape": "box",
+      "position": [
+        0.2,
+        0.75,
+        0
+      ],
+      "size": [
+        1.1,
+        1.5,
+        1.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Holds integer micro-ops and wakes them for out-of-order issue to the integer functional units as operands become ready.",
+      "connections": [
+        "dispatch_unit",
+        "int_phys_regfile",
+        "bus_dispatch_to_issue",
+        "bus_issue_to_regfile"
+      ]
+    },
+    {
+      "id": "mem_issue_queue",
+      "name": "Memory Issue Queue",
+      "shape": "box",
+      "position": [
+        0.2,
+        0.65,
+        -2.6
+      ],
+      "size": [
+        1.1,
+        1.3,
+        1.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Holds load and store micro-ops and issues them to the load/store units in dependence order.",
+      "connections": [
+        "dispatch_unit",
+        "load_store_unit_0",
+        "load_store_unit_1"
+      ]
+    },
+    {
+      "id": "fp_issue_queue",
+      "name": "Floating-Point Issue Queue",
+      "shape": "box",
+      "position": [
+        0.2,
+        0.65,
+        2.6
+      ],
+      "size": [
+        1.1,
+        1.3,
+        1.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Holds floating-point micro-ops and issues them to the FP functional units when their operands are ready.",
+      "connections": [
+        "dispatch_unit",
+        "fp_phys_regfile",
+        "bus_fp_issue_to_regfile"
+      ]
+    },
+    {
+      "id": "int_phys_regfile",
+      "name": "Integer Physical Register File",
+      "shape": "box",
+      "position": [
+        1.6,
+        0.9,
+        -0.4
+      ],
+      "size": [
+        1,
+        1.8,
+        1.8
+      ],
+      "material": "brushed steel",
+      "role": "Multi-ported physical register file supplying integer operands to, and collecting results from, every integer functional unit.",
+      "connections": [
+        "int_issue_queue",
+        "int_alu_0",
+        "int_alu_1",
+        "int_alu_2",
+        "integer_multiplier",
+        "bus_issue_to_regfile"
+      ]
+    },
+    {
+      "id": "fp_phys_regfile",
+      "name": "Floating-Point Physical Register File",
+      "shape": "box",
+      "position": [
+        1.6,
+        0.8,
+        2.4
+      ],
+      "size": [
+        1,
+        1.6,
+        1.5
+      ],
+      "material": "brushed steel",
+      "role": "Multi-ported register file holding floating-point operands and results for the FP datapath, feeding both FMA pipes and the FP divide unit.",
+      "connections": [
+        "fp_issue_queue",
+        "fp_fma_0",
+        "fp_fma_1",
+        "fp_fpdiv",
+        "bus_fp_issue_to_regfile"
+      ]
+    },
+    {
+      "id": "int_alu_0",
+      "name": "Integer ALU 0",
+      "shape": "box",
+      "position": [
+        3,
+        0.5,
+        1
+      ],
+      "size": [
+        0.9,
+        1,
+        0.85
+      ],
+      "material": "welded steel",
+      "role": "Single-cycle integer arithmetic and logic unit; also resolves branch conditions.",
+      "connections": [
+        "int_phys_regfile",
+        "reorder_buffer",
+        "bus_fu_to_rob"
+      ]
+    },
+    {
+      "id": "int_alu_1",
+      "name": "Integer ALU 1",
+      "shape": "box",
+      "position": [
+        3,
+        0.5,
+        0
+      ],
+      "size": [
+        0.9,
+        1,
+        0.85
+      ],
+      "material": "welded steel",
+      "role": "Second single-cycle integer ALU, widening integer issue width.",
+      "connections": [
+        "int_phys_regfile",
+        "reorder_buffer",
+        "bus_fu_to_rob"
+      ]
+    },
+    {
+      "id": "int_alu_2",
+      "name": "Integer ALU 2",
+      "shape": "box",
+      "position": [
+        3,
+        0.5,
+        -1
+      ],
+      "size": [
+        0.9,
+        1,
+        0.85
+      ],
+      "material": "welded steel",
+      "role": "Third single-cycle integer ALU sustaining the wide superscalar back end.",
+      "connections": [
+        "int_phys_regfile",
+        "reorder_buffer",
+        "bus_fu_to_rob"
+      ]
+    },
+    {
+      "id": "integer_multiplier",
+      "name": "Integer Multiplier / Divider",
+      "shape": "cylinder",
+      "position": [
+        4.2,
+        0.6,
+        0.5
+      ],
+      "size": [
+        0.5,
+        1.2
+      ],
+      "material": "welded steel",
+      "role": "Pipelined multiplier and iterative divider handling long-latency integer operations; cylindrical body distinguishes it from the single-cycle ALUs.",
+      "connections": [
+        "int_phys_regfile",
+        "reorder_buffer",
+        "bus_fu_to_rob"
+      ]
+    },
+    {
+      "id": "fp_fma_0",
+      "name": "Floating-Point FMA Unit 0",
+      "shape": "box",
+      "position": [
+        3.3,
+        0.55,
+        2.6
+      ],
+      "size": [
+        1,
+        1.1,
+        0.95
+      ],
+      "material": "forged steel",
+      "role": "First fused multiply-add pipe executing IEEE-754 floating-point multiply-add arithmetic.",
+      "connections": [
+        "fp_phys_regfile",
+        "reorder_buffer",
+        "bus_fp_writeback"
+      ]
+    },
+    {
+      "id": "fp_fma_1",
+      "name": "Floating-Point FMA Unit 1",
+      "shape": "box",
+      "position": [
+        3.3,
+        0.55,
+        3.7
+      ],
+      "size": [
+        1,
+        1.1,
+        0.95
+      ],
+      "material": "forged steel",
+      "role": "Second fused multiply-add pipe, doubling floating-point multiply-add issue width per cycle.",
+      "connections": [
+        "fp_phys_regfile",
+        "reorder_buffer",
+        "bus_fp_writeback"
+      ]
+    },
+    {
+      "id": "fp_fpdiv",
+      "name": "Floating-Point Divide / Sqrt Unit",
+      "shape": "cylinder",
+      "position": [
+        4.5,
+        0.6,
+        3
+      ],
+      "size": [
+        0.5,
+        1.2
+      ],
+      "material": "forged steel",
+      "role": "Iterative floating-point divide and square-root unit handling long-latency FP operations off the FMA pipes; cylindrical body marks it as the long-latency FP unit.",
+      "connections": [
+        "fp_phys_regfile",
+        "reorder_buffer",
+        "bus_fp_writeback"
+      ]
+    },
+    {
+      "id": "dtlb",
+      "name": "Data TLB (DTLB)",
+      "shape": "box",
+      "position": [
+        3.6,
+        0.5,
+        -1.5
+      ],
+      "size": [
+        0.9,
+        1,
+        0.9
+      ],
+      "material": "black composite",
+      "role": "Translates virtual load/store addresses to physical addresses for the memory pipelines, caching recent page-table entries.",
+      "connections": [
+        "load_store_unit_0",
+        "load_store_unit_1"
+      ]
+    },
+    {
+      "id": "load_store_unit_0",
+      "name": "Load/Store Unit 0",
+      "shape": "box",
+      "position": [
+        3,
+        0.55,
+        -2.6
+      ],
+      "size": [
+        1,
+        1.1,
+        1
+      ],
+      "material": "welded steel",
+      "role": "Generates addresses and executes memory accesses, performing store-to-load forwarding through the load/store queues.",
+      "connections": [
+        "mem_issue_queue",
+        "dtlb",
+        "load_queue",
+        "store_queue",
+        "l1_dcache",
+        "reorder_buffer"
+      ]
+    },
+    {
+      "id": "load_store_unit_1",
+      "name": "Load/Store Unit 1",
+      "shape": "box",
+      "position": [
+        4.2,
+        0.55,
+        -2.6
+      ],
+      "size": [
+        1,
+        1.1,
+        1
+      ],
+      "material": "welded steel",
+      "role": "Second memory pipeline, doubling load/store throughput per cycle.",
+      "connections": [
+        "mem_issue_queue",
+        "dtlb",
+        "load_queue",
+        "store_queue",
+        "l1_dcache",
+        "reorder_buffer"
+      ]
+    },
+    {
+      "id": "reorder_buffer",
+      "name": "Reorder Buffer (ROB)",
+      "shape": "box",
+      "position": [
+        5.7,
+        1.5,
+        0.2
+      ],
+      "size": [
+        2,
+        3,
+        2.4
+      ],
+      "material": "brushed steel",
+      "role": "Tracks every in-flight instruction in program order and retires results in order, providing precise exceptions and recovery; its ~256-entry array is shown exploded in the three banks stacked above it.",
+      "connections": [
+        "dispatch_unit",
+        "int_alu_0",
+        "int_alu_1",
+        "int_alu_2",
+        "integer_multiplier",
+        "fp_fma_0",
+        "fp_fma_1",
+        "fp_fpdiv",
+        "load_store_unit_0",
+        "load_store_unit_1",
+        "rob_entry_bank_0",
+        "bus_fu_to_rob",
+        "bus_fp_writeback"
+      ]
+    },
+    {
+      "id": "rob_entry_bank_0",
+      "name": "ROB Entry Bank 0 (exploded)",
+      "shape": "box",
+      "position": [
+        5.7,
+        3.65,
+        0.2
+      ],
+      "size": [
+        1.9,
+        0.3,
+        2.3
+      ],
+      "material": "brushed steel",
+      "role": "Exploded view: first slice of the ROB's ~256-entry circular array, lifted clear of the slab to reveal that the retirement backbone is a banked entry table rather than a solid block.",
+      "connections": [
+        "reorder_buffer",
+        "rob_entry_bank_1"
+      ]
+    },
+    {
+      "id": "rob_entry_bank_1",
+      "name": "ROB Entry Bank 1 (exploded)",
+      "shape": "box",
+      "position": [
+        5.7,
+        4.15,
+        0.2
+      ],
+      "size": [
+        1.9,
+        0.3,
+        2.3
+      ],
+      "material": "brushed steel",
+      "role": "Exploded view: second slice of the ROB entry array; each bank holds head/tail pointers and per-instruction status bits used to drive in-order commit.",
+      "connections": [
+        "rob_entry_bank_0",
+        "rob_entry_bank_2"
+      ]
+    },
+    {
+      "id": "rob_entry_bank_2",
+      "name": "ROB Entry Bank 2 (exploded)",
+      "shape": "box",
+      "position": [
+        5.7,
+        4.65,
+        0.2
+      ],
+      "size": [
+        1.9,
+        0.3,
+        2.3
+      ],
+      "material": "brushed steel",
+      "role": "Exploded view: top slice of the ROB entry array; the stacked banks show the buffer is multi-banked so several instructions can be allocated and retired per cycle.",
+      "connections": [
+        "rob_entry_bank_1"
+      ]
+    },
+    {
+      "id": "load_queue",
+      "name": "Load Queue",
+      "shape": "box",
+      "position": [
+        4.2,
+        0.6,
+        -3.9
+      ],
+      "size": [
+        0.95,
+        1.2,
+        1.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Holds in-flight loads, detecting memory-ordering violations against later stores.",
+      "connections": [
+        "load_store_unit_0",
+        "load_store_unit_1",
+        "l1_dcache"
+      ]
+    },
+    {
+      "id": "store_queue",
+      "name": "Store Queue",
+      "shape": "box",
+      "position": [
+        3,
+        0.6,
+        -3.9
+      ],
+      "size": [
+        0.95,
+        1.2,
+        1.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Buffers committed-pending stores and forwards their data to dependent loads before they drain to the cache.",
+      "connections": [
+        "load_store_unit_0",
+        "load_store_unit_1",
+        "l1_dcache"
+      ]
+    },
+    {
+      "id": "l1_dcache",
+      "name": "L1 Data Cache",
+      "shape": "box",
+      "position": [
+        5.5,
+        0.7,
+        -2.7
+      ],
+      "size": [
+        1.4,
+        1.4,
+        1.5
+      ],
+      "material": "glass display",
+      "role": "Private first-level data cache serving the load/store units; refilled from the unified L2.",
+      "connections": [
+        "load_store_unit_0",
+        "load_store_unit_1",
+        "load_queue",
+        "store_queue",
+        "l2_cache"
+      ]
+    },
+    {
+      "id": "l2_cache",
+      "name": "Unified L2 Cache",
+      "shape": "box",
+      "position": [
+        6.9,
+        0.9,
+        -1.3
+      ],
+      "size": [
+        1.8,
+        1.8,
+        2
+      ],
+      "material": "glass display",
+      "role": "Private unified second-level cache backing both L1 caches and connecting to the shared L3.",
+      "connections": [
+        "l1_icache",
+        "l1_dcache",
+        "l3_cache",
+        "bus_l2_to_l3"
+      ]
+    },
+    {
+      "id": "l3_cache",
+      "name": "Shared L3 Cache",
+      "shape": "box",
+      "position": [
+        7.8,
+        1.15,
+        1
+      ],
+      "size": [
+        1.8,
+        2.3,
+        2.6
+      ],
+      "material": "glass display",
+      "role": "Large last-level cache shared across cores, the final on-chip stop before main memory.",
+      "connections": [
+        "l2_cache",
+        "bus_l2_to_l3"
+      ]
+    },
+    {
+      "id": "bus_fetch_to_ibuf",
+      "name": "Fetch Datapath Bus",
+      "shape": "cylinder",
+      "position": [
+        -5.7,
+        0.4,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.2,
+        1.4
+      ],
+      "material": "copper",
+      "role": "Copper datapath bus carrying fetched instruction bytes from the fetch unit to the instruction buffer.",
+      "connections": [
+        "instruction_fetch_unit",
+        "instruction_buffer"
+      ]
+    },
+    {
+      "id": "bus_ibuf_to_decode",
+      "name": "Decode Feed Bus",
+      "shape": "cylinder",
+      "position": [
+        -4.35,
+        0.4,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.2,
+        1.3
+      ],
+      "material": "copper",
+      "role": "Copper bus delivering buffered instructions from the instruction buffer to the decode unit.",
+      "connections": [
+        "instruction_buffer",
+        "decode_unit"
+      ]
+    },
+    {
+      "id": "bus_decode_to_rename",
+      "name": "Decode-to-Rename Bus",
+      "shape": "cylinder",
+      "position": [
+        -3.05,
+        0.4,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.2,
+        1.2
+      ],
+      "material": "copper",
+      "role": "Copper bus carrying decoded micro-ops from decode to register rename.",
+      "connections": [
+        "decode_unit",
+        "rename_unit"
+      ]
+    },
+    {
+      "id": "bus_rename_to_dispatch",
+      "name": "Rename-to-Dispatch Bus",
+      "shape": "cylinder",
+      "position": [
+        -1.75,
+        0.4,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.2,
+        1.2
+      ],
+      "material": "copper",
+      "role": "Copper bus carrying renamed micro-ops from rename into the dispatch stage.",
+      "connections": [
+        "rename_unit",
+        "dispatch_unit"
+      ]
+    },
+    {
+      "id": "bus_dispatch_to_issue",
+      "name": "Dispatch-to-Issue Bus",
+      "shape": "cylinder",
+      "position": [
+        -0.45,
+        0.4,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.2,
+        1.3
+      ],
+      "material": "copper",
+      "role": "Copper bus distributing dispatched micro-ops from the dispatch unit into the issue queues.",
+      "connections": [
+        "dispatch_unit",
+        "int_issue_queue"
+      ]
+    },
+    {
+      "id": "bus_issue_to_regfile",
+      "name": "Issue-to-Register-File Bus",
+      "shape": "cylinder",
+      "position": [
+        0.9,
+        0.4,
+        -0.2
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.2,
+        1.4
+      ],
+      "material": "copper",
+      "role": "Copper bus connecting the integer issue queue to the multi-ported physical register file.",
+      "connections": [
+        "int_issue_queue",
+        "int_phys_regfile"
+      ]
+    },
+    {
+      "id": "bus_fp_issue_to_regfile",
+      "name": "FP Issue-to-Register-File Bus",
+      "shape": "cylinder",
+      "position": [
+        0.9,
+        0.4,
+        2.5
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.2,
+        1.4
+      ],
+      "material": "copper",
+      "role": "Copper bus connecting the floating-point issue queue to the FP physical register file.",
+      "connections": [
+        "fp_issue_queue",
+        "fp_phys_regfile"
+      ]
+    },
+    {
+      "id": "bus_fu_to_rob",
+      "name": "Integer Writeback-to-ROB Bus",
+      "shape": "cylinder",
+      "position": [
+        4.65,
+        0.6,
+        0.1
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.22,
+        2.1
+      ],
+      "material": "copper",
+      "role": "Copper writeback bus carrying integer functional-unit results back to the reorder buffer for retirement.",
+      "connections": [
+        "int_alu_0",
+        "int_alu_1",
+        "int_alu_2",
+        "integer_multiplier",
+        "reorder_buffer"
+      ]
+    },
+    {
+      "id": "bus_fp_writeback",
+      "name": "FP Writeback-to-ROB Bus",
+      "shape": "cylinder",
+      "position": [
+        4.9,
+        0.6,
+        3
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.22,
+        1.8
+      ],
+      "material": "copper",
+      "role": "Copper writeback bus carrying floating-point FMA and divide results back to the reorder buffer for retirement.",
+      "connections": [
+        "fp_fma_0",
+        "fp_fma_1",
+        "fp_fpdiv",
+        "reorder_buffer"
+      ]
+    },
+    {
+      "id": "bus_l2_to_l3",
+      "name": "L2-to-L3 Cache Bus",
+      "shape": "cylinder",
+      "position": [
+        7.45,
+        0.6,
+        -0.3
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.22,
+        1.1
+      ],
+      "material": "copper",
+      "role": "Copper bus linking the private unified L2 cache to the shared L3 cache.",
+      "connections": [
+        "l2_cache",
+        "l3_cache"
+      ]
+    }
+  ]
+}

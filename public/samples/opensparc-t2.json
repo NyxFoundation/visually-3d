@@ -1,0 +1,1142 @@
+{
+  "machine_name": "OpenSPARC T2",
+  "assembly_instructions": "Chip-floorplan model of the OpenSPARC T2 (UltraSPARC T2 / Niagara 2) die with the package lid removed so every functional block is exposed from above. The ~342 mm-sq (~18.5 mm-square) silicon die is scaled up ~487x to a 9 m square plate for inspectability. Build order: (1) lay the silicon die plate as the root; (2) frame it with the 4-segment copper I/O pad / seal ring (ring_n/s/e/w); (3) drop the central CCX crossbar switch at die centre; (4) place the 8 SPARC physical cores in two rows of 4 along the +Z and -Z edges; (5) fit the 8 L2 cache banks in two rows flanking the crossbar, each bank built as a large white data array plus a smaller tan tag array facing the crossbar; (6) install the 4 FBDIMM memory controllers in the X-edge columns, each wired to its pair of L2 data arrays; (7) add the Clock Control Unit (CCU) and Test Control Unit (TCU) in the remaining edge-column slots; (8) seat the System Interface Unit (SIU) and Non-Cacheable Unit (NCU) beside the crossbar with the dual-10GbE NIU and x8 PCI-Express blocks outboard of them; (9) finally stack core_0's six exploded internal sub-units (L1 I-cache, L1 D-cache, two integer pipelines, load-store unit, FPU/graphics unit) in a 2x3 grid above the core, tied down by two thin guide posts. The other 7 cores are left as solid blocks of identical footprint.",
+  "metadata": {
+    "reference": "https://www.oracle.com/servers/technologies/opensparc-t2-page.html",
+    "domain": "microprocessor-architecture",
+    "thumbnail_camera": [
+      6,
+      5.1,
+      6
+    ],
+    "info": {
+      "japanese_name": "オープンスパーク T2",
+      "english_name": "OpenSPARC T2 (UltraSPARC T2 / Niagara 2)",
+      "summary": "OpenSPARC T2 is the open-sourced RTL of Sun Microsystems' UltraSPARC T2 chip-multithreading SPARC V9 processor, a 65 nm system-on-a-chip carrying 8 cores and 64 hardware threads. It was the first commercial processor whose full source RTL was released under an open license.",
+      "description": "The UltraSPARC T2, codenamed Niagara 2, integrates 8 SPARC physical cores on a single 65 nm die of roughly 342 mm sq with about 503 million transistors. Each core executes 8 hardware threads via two integer execution pipelines and a load-store unit, and carries a dedicated 16 KB L1 instruction cache, 8 KB L1 data cache, and a per-core floating-point and graphics unit — giving 64 threads in total at clock speeds up to 1.4 GHz. A central crossbar switch (CCX) connects all 8 cores to 8 banks of shared L2 cache totalling 4 MB; the L2 banks feed 4 dual-channel on-chip FBDIMM memory controllers. The chip is a true SoC, integrating a Network Interface Unit with two 10 Gigabit Ethernet ports and an x8 PCI-Express interface through a System Interface Unit, eliminating much of the support chipset. In 2008 Sun released the complete OpenSPARC T2 design — RTL, verification environment, simulation models and tool scripts — under the GNU GPL.",
+      "operator": "Sun Microsystems (later Oracle Corporation)",
+      "contractor": "Sun Microsystems / Texas Instruments (65 nm fabrication)",
+      "contract_date": "2007 (UltraSPARC T2 launch); 2008 (OpenSPARC T2 RTL release)",
+      "contract_value": "Open-source release — no license fee (GNU GPL v2)",
+      "status": "Open-sourced design; UltraSPARC T2 silicon discontinued, RTL still publicly available",
+      "facts": [
+        {
+          "label": "Cores",
+          "value": "8 SPARC V9 physical cores"
+        },
+        {
+          "label": "Threads",
+          "value": "64 (8 per core)"
+        },
+        {
+          "label": "Process",
+          "value": "65 nm CMOS"
+        },
+        {
+          "label": "Transistors",
+          "value": "~503 million"
+        },
+        {
+          "label": "Die area",
+          "value": "~342 mm sq (~18.5 mm square)"
+        },
+        {
+          "label": "Clock",
+          "value": "Up to 1.4 GHz"
+        },
+        {
+          "label": "L2 cache",
+          "value": "4 MB, 8 banks, 16-way (tag + data arrays)"
+        },
+        {
+          "label": "Memory",
+          "value": "4 dual-channel FBDIMM controllers"
+        },
+        {
+          "label": "I/O",
+          "value": "Dual 10 GbE NIU + x8 PCI-Express"
+        },
+        {
+          "label": "License",
+          "value": "GNU GPL v2 (OpenSPARC T2)"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Oracle — OpenSPARC T2 Page",
+          "url": "https://www.oracle.com/servers/technologies/opensparc-t2-page.html"
+        },
+        {
+          "title": "Wikipedia — UltraSPARC T2",
+          "url": "https://en.wikipedia.org/wiki/UltraSPARC_T2"
+        },
+        {
+          "title": "Wikipedia — OpenSPARC",
+          "url": "https://en.wikipedia.org/wiki/OpenSPARC"
+        },
+        {
+          "title": "OpenSPARC T2 Core Microarchitecture Specification",
+          "url": "https://www.oracle.com/technetwork/systems/opensparc/opensparc-t2-page-1446157.html"
+        }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "die",
+      "name": "Silicon die substrate",
+      "shape": "box",
+      "position": [
+        0,
+        0.125,
+        0
+      ],
+      "size": [
+        9,
+        0.25,
+        9
+      ],
+      "material": "dark anodized aluminum",
+      "role": "The 65 nm, ~342 mm-sq silicon die carrying every functional block; root of the floorplan with no package lid so all blocks are visible from above.",
+      "connections": [
+        "ring_n",
+        "ring_s",
+        "ring_e",
+        "ring_w",
+        "core_0",
+        "core_1",
+        "core_2",
+        "core_3",
+        "core_4",
+        "core_5",
+        "core_6",
+        "core_7",
+        "crossbar",
+        "mcu_0",
+        "mcu_1",
+        "mcu_2",
+        "mcu_3",
+        "niu",
+        "pcie",
+        "ccu",
+        "tcu"
+      ]
+    },
+    {
+      "id": "ring_n",
+      "name": "I/O pad / seal ring — north edge",
+      "shape": "box",
+      "position": [
+        0,
+        0.475,
+        4.2
+      ],
+      "size": [
+        9,
+        0.45,
+        0.6
+      ],
+      "material": "copper",
+      "role": "North run of the bond-pad and crack-stop seal ring that frames the die and routes power and signal pads to the package.",
+      "connections": [
+        "die"
+      ]
+    },
+    {
+      "id": "ring_s",
+      "name": "I/O pad / seal ring — south edge",
+      "shape": "box",
+      "position": [
+        0,
+        0.475,
+        -4.2
+      ],
+      "size": [
+        9,
+        0.45,
+        0.6
+      ],
+      "material": "copper",
+      "role": "South run of the bond-pad and crack-stop seal ring framing the die perimeter.",
+      "connections": [
+        "die"
+      ]
+    },
+    {
+      "id": "ring_e",
+      "name": "I/O pad / seal ring — east edge",
+      "shape": "box",
+      "position": [
+        4.2,
+        0.475,
+        0
+      ],
+      "size": [
+        0.6,
+        0.45,
+        9
+      ],
+      "material": "copper",
+      "role": "East run of the bond-pad and crack-stop seal ring, carrying FBDIMM and I/O pads on the +X flank.",
+      "connections": [
+        "die"
+      ]
+    },
+    {
+      "id": "ring_w",
+      "name": "I/O pad / seal ring — west edge",
+      "shape": "box",
+      "position": [
+        -4.2,
+        0.475,
+        0
+      ],
+      "size": [
+        0.6,
+        0.45,
+        9
+      ],
+      "material": "copper",
+      "role": "West run of the bond-pad and crack-stop seal ring, carrying FBDIMM and I/O pads on the -X flank.",
+      "connections": [
+        "die"
+      ]
+    },
+    {
+      "id": "core_0",
+      "name": "SPARC core 0",
+      "shape": "box",
+      "position": [
+        -2.55,
+        0.525,
+        2.6
+      ],
+      "size": [
+        1.5,
+        0.55,
+        1.4
+      ],
+      "material": "brushed steel",
+      "role": "One of 8 identical SPARC physical cores; runs 8 hardware threads through two integer pipelines, a load-store unit and a per-core FPU — its interior is exploded above for inspection.",
+      "connections": [
+        "die",
+        "crossbar",
+        "icache",
+        "dcache",
+        "intpipe_a",
+        "intpipe_b",
+        "lsu",
+        "fpu",
+        "post_a",
+        "post_b"
+      ]
+    },
+    {
+      "id": "core_1",
+      "name": "SPARC core 1",
+      "shape": "box",
+      "position": [
+        -0.85,
+        0.525,
+        2.6
+      ],
+      "size": [
+        1.5,
+        0.55,
+        1.4
+      ],
+      "material": "brushed steel",
+      "role": "SPARC physical core running 8 hardware threads through two integer pipelines plus load-store and floating-point units.",
+      "connections": [
+        "die",
+        "crossbar"
+      ]
+    },
+    {
+      "id": "core_2",
+      "name": "SPARC core 2",
+      "shape": "box",
+      "position": [
+        0.85,
+        0.525,
+        2.6
+      ],
+      "size": [
+        1.5,
+        0.55,
+        1.4
+      ],
+      "material": "brushed steel",
+      "role": "SPARC physical core running 8 hardware threads, with private 16 KB L1 I-cache and 8 KB L1 D-cache.",
+      "connections": [
+        "die",
+        "crossbar"
+      ]
+    },
+    {
+      "id": "core_3",
+      "name": "SPARC core 3",
+      "shape": "box",
+      "position": [
+        2.55,
+        0.525,
+        2.6
+      ],
+      "size": [
+        1.5,
+        0.55,
+        1.4
+      ],
+      "material": "brushed steel",
+      "role": "SPARC physical core running 8 hardware threads through its integer pipelines and load-store unit.",
+      "connections": [
+        "die",
+        "crossbar"
+      ]
+    },
+    {
+      "id": "core_4",
+      "name": "SPARC core 4",
+      "shape": "box",
+      "position": [
+        -2.55,
+        0.525,
+        -2.6
+      ],
+      "size": [
+        1.5,
+        0.55,
+        1.4
+      ],
+      "material": "brushed steel",
+      "role": "SPARC physical core running 8 hardware threads; identical microarchitecture to cores 0-3.",
+      "connections": [
+        "die",
+        "crossbar"
+      ]
+    },
+    {
+      "id": "core_5",
+      "name": "SPARC core 5",
+      "shape": "box",
+      "position": [
+        -0.85,
+        0.525,
+        -2.6
+      ],
+      "size": [
+        1.5,
+        0.55,
+        1.4
+      ],
+      "material": "brushed steel",
+      "role": "SPARC physical core running 8 hardware threads with private L1 instruction and data caches.",
+      "connections": [
+        "die",
+        "crossbar"
+      ]
+    },
+    {
+      "id": "core_6",
+      "name": "SPARC core 6",
+      "shape": "box",
+      "position": [
+        0.85,
+        0.525,
+        -2.6
+      ],
+      "size": [
+        1.5,
+        0.55,
+        1.4
+      ],
+      "material": "brushed steel",
+      "role": "SPARC physical core running 8 hardware threads through two integer pipelines and an FPU/graphics unit.",
+      "connections": [
+        "die",
+        "crossbar"
+      ]
+    },
+    {
+      "id": "core_7",
+      "name": "SPARC core 7",
+      "shape": "box",
+      "position": [
+        2.55,
+        0.525,
+        -2.6
+      ],
+      "size": [
+        1.5,
+        0.55,
+        1.4
+      ],
+      "material": "brushed steel",
+      "role": "SPARC physical core running 8 hardware threads; eighth of the 8 cores giving 64 threads total.",
+      "connections": [
+        "die",
+        "crossbar"
+      ]
+    },
+    {
+      "id": "crossbar",
+      "name": "CCX cache crossbar switch",
+      "shape": "box",
+      "position": [
+        0,
+        0.575,
+        0
+      ],
+      "size": [
+        1.7,
+        0.65,
+        1.7
+      ],
+      "material": "brass",
+      "role": "Central non-blocking 8x9 crossbar (CCX) connecting all 8 SPARC cores to the 8 L2 tag arrays and to the SIU/NCU.",
+      "connections": [
+        "die",
+        "core_0",
+        "core_1",
+        "core_2",
+        "core_3",
+        "core_4",
+        "core_5",
+        "core_6",
+        "core_7",
+        "l2t_0",
+        "l2t_1",
+        "l2t_2",
+        "l2t_3",
+        "l2t_4",
+        "l2t_5",
+        "l2t_6",
+        "l2t_7",
+        "siu",
+        "ncu",
+        "ccu"
+      ]
+    },
+    {
+      "id": "l2_0",
+      "name": "L2 bank 0 — data array",
+      "shape": "box",
+      "position": [
+        -2.55,
+        0.45,
+        1.52
+      ],
+      "size": [
+        1.5,
+        0.4,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Data array of L2 bank 0, one eighth of the 4 MB 16-way shared L2; holds cache lines and routes misses to FBDIMM controller mcu_0.",
+      "connections": [
+        "l2t_0",
+        "mcu_0"
+      ]
+    },
+    {
+      "id": "l2_1",
+      "name": "L2 bank 1 — data array",
+      "shape": "box",
+      "position": [
+        -0.85,
+        0.45,
+        1.52
+      ],
+      "size": [
+        1.5,
+        0.4,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Data array of L2 bank 1 holding 16-way set-associative cache lines, backed by FBDIMM controller mcu_0.",
+      "connections": [
+        "l2t_1",
+        "mcu_0"
+      ]
+    },
+    {
+      "id": "l2_2",
+      "name": "L2 bank 2 — data array",
+      "shape": "box",
+      "position": [
+        0.85,
+        0.45,
+        1.52
+      ],
+      "size": [
+        1.5,
+        0.4,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Data array of L2 bank 2; one eighth of the on-chip 4 MB L2, backed by FBDIMM controller mcu_2.",
+      "connections": [
+        "l2t_2",
+        "mcu_2"
+      ]
+    },
+    {
+      "id": "l2_3",
+      "name": "L2 bank 3 — data array",
+      "shape": "box",
+      "position": [
+        2.55,
+        0.45,
+        1.52
+      ],
+      "size": [
+        1.5,
+        0.4,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Data array of L2 bank 3 holding cache lines, backed by FBDIMM memory controller mcu_2.",
+      "connections": [
+        "l2t_3",
+        "mcu_2"
+      ]
+    },
+    {
+      "id": "l2_4",
+      "name": "L2 bank 4 — data array",
+      "shape": "box",
+      "position": [
+        -2.55,
+        0.45,
+        -1.52
+      ],
+      "size": [
+        1.5,
+        0.4,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Data array of L2 bank 4 holding 16-way cache lines, backed by FBDIMM controller mcu_1.",
+      "connections": [
+        "l2t_4",
+        "mcu_1"
+      ]
+    },
+    {
+      "id": "l2_5",
+      "name": "L2 bank 5 — data array",
+      "shape": "box",
+      "position": [
+        -0.85,
+        0.45,
+        -1.52
+      ],
+      "size": [
+        1.5,
+        0.4,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Data array of L2 bank 5; one eighth of the 4 MB L2, backed by FBDIMM controller mcu_1.",
+      "connections": [
+        "l2t_5",
+        "mcu_1"
+      ]
+    },
+    {
+      "id": "l2_6",
+      "name": "L2 bank 6 — data array",
+      "shape": "box",
+      "position": [
+        0.85,
+        0.45,
+        -1.52
+      ],
+      "size": [
+        1.5,
+        0.4,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Data array of L2 bank 6 holding cache lines; routes misses to FBDIMM controller mcu_3.",
+      "connections": [
+        "l2t_6",
+        "mcu_3"
+      ]
+    },
+    {
+      "id": "l2_7",
+      "name": "L2 bank 7 — data array",
+      "shape": "box",
+      "position": [
+        2.55,
+        0.45,
+        -1.52
+      ],
+      "size": [
+        1.5,
+        0.4,
+        0.7
+      ],
+      "material": "white composite",
+      "role": "Data array of L2 bank 7 completing the 4 MB on-chip L2, backed by FBDIMM controller mcu_3.",
+      "connections": [
+        "l2t_7",
+        "mcu_3"
+      ]
+    },
+    {
+      "id": "l2t_0",
+      "name": "L2 bank 0 — tag array",
+      "shape": "box",
+      "position": [
+        -2.55,
+        0.425,
+        0.98
+      ],
+      "size": [
+        1.5,
+        0.35,
+        0.25
+      ],
+      "material": "fiberglass",
+      "role": "Tag array of L2 bank 0; stores line tags and directory state, fielding crossbar requests and steering hits to data array l2_0.",
+      "connections": [
+        "crossbar",
+        "l2_0"
+      ]
+    },
+    {
+      "id": "l2t_1",
+      "name": "L2 bank 1 — tag array",
+      "shape": "box",
+      "position": [
+        -0.85,
+        0.425,
+        0.98
+      ],
+      "size": [
+        1.5,
+        0.35,
+        0.25
+      ],
+      "material": "fiberglass",
+      "role": "Tag array of L2 bank 1; performs the 16-way tag compare and forwards hits to data array l2_1.",
+      "connections": [
+        "crossbar",
+        "l2_1"
+      ]
+    },
+    {
+      "id": "l2t_2",
+      "name": "L2 bank 2 — tag array",
+      "shape": "box",
+      "position": [
+        0.85,
+        0.425,
+        0.98
+      ],
+      "size": [
+        1.5,
+        0.35,
+        0.25
+      ],
+      "material": "fiberglass",
+      "role": "Tag array of L2 bank 2; resolves crossbar lookups and directs accesses into data array l2_2.",
+      "connections": [
+        "crossbar",
+        "l2_2"
+      ]
+    },
+    {
+      "id": "l2t_3",
+      "name": "L2 bank 3 — tag array",
+      "shape": "box",
+      "position": [
+        2.55,
+        0.425,
+        0.98
+      ],
+      "size": [
+        1.5,
+        0.35,
+        0.25
+      ],
+      "material": "fiberglass",
+      "role": "Tag array of L2 bank 3; holds line tags and steers crossbar hits to data array l2_3.",
+      "connections": [
+        "crossbar",
+        "l2_3"
+      ]
+    },
+    {
+      "id": "l2t_4",
+      "name": "L2 bank 4 — tag array",
+      "shape": "box",
+      "position": [
+        -2.55,
+        0.425,
+        -0.98
+      ],
+      "size": [
+        1.5,
+        0.35,
+        0.25
+      ],
+      "material": "fiberglass",
+      "role": "Tag array of L2 bank 4; performs tag compares and routes hits into data array l2_4.",
+      "connections": [
+        "crossbar",
+        "l2_4"
+      ]
+    },
+    {
+      "id": "l2t_5",
+      "name": "L2 bank 5 — tag array",
+      "shape": "box",
+      "position": [
+        -0.85,
+        0.425,
+        -0.98
+      ],
+      "size": [
+        1.5,
+        0.35,
+        0.25
+      ],
+      "material": "fiberglass",
+      "role": "Tag array of L2 bank 5; stores directory state and steers crossbar accesses to data array l2_5.",
+      "connections": [
+        "crossbar",
+        "l2_5"
+      ]
+    },
+    {
+      "id": "l2t_6",
+      "name": "L2 bank 6 — tag array",
+      "shape": "box",
+      "position": [
+        0.85,
+        0.425,
+        -0.98
+      ],
+      "size": [
+        1.5,
+        0.35,
+        0.25
+      ],
+      "material": "fiberglass",
+      "role": "Tag array of L2 bank 6; resolves the 16-way tag lookup and forwards hits to data array l2_6.",
+      "connections": [
+        "crossbar",
+        "l2_6"
+      ]
+    },
+    {
+      "id": "l2t_7",
+      "name": "L2 bank 7 — tag array",
+      "shape": "box",
+      "position": [
+        2.55,
+        0.425,
+        -0.98
+      ],
+      "size": [
+        1.5,
+        0.35,
+        0.25
+      ],
+      "material": "fiberglass",
+      "role": "Tag array of L2 bank 7; holds line tags and steers crossbar hits into data array l2_7.",
+      "connections": [
+        "crossbar",
+        "l2_7"
+      ]
+    },
+    {
+      "id": "mcu_0",
+      "name": "FBDIMM memory controller 0",
+      "shape": "box",
+      "position": [
+        -3.6,
+        0.5,
+        1.95
+      ],
+      "size": [
+        0.55,
+        0.5,
+        1.5
+      ],
+      "material": "welded steel",
+      "role": "One of 4 dual-channel FBDIMM memory controllers driving off-chip DRAM; serves L2 data arrays l2_0 and l2_1.",
+      "connections": [
+        "die",
+        "l2_0",
+        "l2_1"
+      ]
+    },
+    {
+      "id": "mcu_1",
+      "name": "FBDIMM memory controller 1",
+      "shape": "box",
+      "position": [
+        -3.6,
+        0.5,
+        -1.95
+      ],
+      "size": [
+        0.55,
+        0.5,
+        1.5
+      ],
+      "material": "welded steel",
+      "role": "Dual-channel FBDIMM memory controller serving L2 data arrays l2_4 and l2_5.",
+      "connections": [
+        "die",
+        "l2_4",
+        "l2_5"
+      ]
+    },
+    {
+      "id": "mcu_2",
+      "name": "FBDIMM memory controller 2",
+      "shape": "box",
+      "position": [
+        3.6,
+        0.5,
+        1.95
+      ],
+      "size": [
+        0.55,
+        0.5,
+        1.5
+      ],
+      "material": "welded steel",
+      "role": "Dual-channel FBDIMM memory controller serving L2 data arrays l2_2 and l2_3.",
+      "connections": [
+        "die",
+        "l2_2",
+        "l2_3"
+      ]
+    },
+    {
+      "id": "mcu_3",
+      "name": "FBDIMM memory controller 3",
+      "shape": "box",
+      "position": [
+        3.6,
+        0.5,
+        -1.95
+      ],
+      "size": [
+        0.55,
+        0.5,
+        1.5
+      ],
+      "material": "welded steel",
+      "role": "Fourth dual-channel FBDIMM memory controller serving L2 data arrays l2_6 and l2_7.",
+      "connections": [
+        "die",
+        "l2_6",
+        "l2_7"
+      ]
+    },
+    {
+      "id": "siu",
+      "name": "System Interface Unit (SIU)",
+      "shape": "box",
+      "position": [
+        -1.6,
+        0.5,
+        0
+      ],
+      "size": [
+        0.7,
+        0.5,
+        1.5
+      ],
+      "material": "forged steel",
+      "role": "System Interface Unit that bridges the NIU and PCI-Express I/O blocks into the L2 cache through the crossbar.",
+      "connections": [
+        "crossbar",
+        "niu",
+        "pcie",
+        "ncu"
+      ]
+    },
+    {
+      "id": "ncu",
+      "name": "Non-Cacheable Unit (NCU)",
+      "shape": "box",
+      "position": [
+        1.6,
+        0.5,
+        0
+      ],
+      "size": [
+        0.7,
+        0.5,
+        1.5
+      ],
+      "material": "forged steel",
+      "role": "Non-Cacheable Unit routing programmed-I/O, interrupt and configuration-register traffic between the cores, crossbar and TCU.",
+      "connections": [
+        "crossbar",
+        "siu",
+        "tcu"
+      ]
+    },
+    {
+      "id": "niu",
+      "name": "Network Interface Unit (dual 10 GbE)",
+      "shape": "box",
+      "position": [
+        -2.7,
+        0.5,
+        0
+      ],
+      "size": [
+        0.9,
+        0.5,
+        1.3
+      ],
+      "material": "black composite",
+      "role": "On-chip networking unit providing two 10 Gigabit Ethernet ports, feeding the L2 cache through the SIU.",
+      "connections": [
+        "die",
+        "siu"
+      ]
+    },
+    {
+      "id": "pcie",
+      "name": "PCI-Express interface (x8)",
+      "shape": "box",
+      "position": [
+        2.7,
+        0.5,
+        0
+      ],
+      "size": [
+        0.9,
+        0.5,
+        1.3
+      ],
+      "material": "black composite",
+      "role": "On-chip x8 PCI-Express interface linking the SoC to external I/O devices through the SIU.",
+      "connections": [
+        "die",
+        "siu"
+      ]
+    },
+    {
+      "id": "ccu",
+      "name": "Clock Control Unit (CCU / PLLs)",
+      "shape": "box",
+      "position": [
+        -3.6,
+        0.5,
+        0
+      ],
+      "size": [
+        0.55,
+        0.5,
+        1.4
+      ],
+      "material": "brass",
+      "role": "Clock Control Unit housing the on-die PLLs that generate and distribute the up-to-1.4 GHz core and I/O clocks.",
+      "connections": [
+        "die",
+        "crossbar"
+      ]
+    },
+    {
+      "id": "tcu",
+      "name": "Test Control Unit (TCU / JTAG)",
+      "shape": "box",
+      "position": [
+        3.6,
+        0.5,
+        0
+      ],
+      "size": [
+        0.55,
+        0.5,
+        1.4
+      ],
+      "material": "black composite",
+      "role": "Test Control Unit driving JTAG scan, built-in self-test and debug access across every block on the die.",
+      "connections": [
+        "die",
+        "ncu"
+      ]
+    },
+    {
+      "id": "icache",
+      "name": "core_0 L1 instruction cache",
+      "shape": "box",
+      "position": [
+        -2.9,
+        1.5,
+        2.05
+      ],
+      "size": [
+        0.62,
+        0.28,
+        0.42
+      ],
+      "material": "glass display",
+      "role": "16 KB private L1 instruction cache of core_0, shown in the exploded 2x3 grid directly above the core for inspectability.",
+      "connections": [
+        "core_0",
+        "intpipe_a"
+      ]
+    },
+    {
+      "id": "dcache",
+      "name": "core_0 L1 data cache",
+      "shape": "box",
+      "position": [
+        -2.2,
+        1.5,
+        2.05
+      ],
+      "size": [
+        0.62,
+        0.28,
+        0.42
+      ],
+      "material": "glass display",
+      "role": "8 KB private L1 data cache of core_0, shown above the core in the exploded view.",
+      "connections": [
+        "core_0",
+        "lsu"
+      ]
+    },
+    {
+      "id": "intpipe_a",
+      "name": "core_0 integer pipeline A",
+      "shape": "box",
+      "position": [
+        -2.9,
+        1.5,
+        2.6
+      ],
+      "size": [
+        0.62,
+        0.28,
+        0.42
+      ],
+      "material": "carbon fiber",
+      "role": "First of core_0's two integer execution pipelines, serving 4 of its 8 threads, shown in the exploded view above the core.",
+      "connections": [
+        "core_0",
+        "icache",
+        "lsu"
+      ]
+    },
+    {
+      "id": "intpipe_b",
+      "name": "core_0 integer pipeline B",
+      "shape": "box",
+      "position": [
+        -2.2,
+        1.5,
+        2.6
+      ],
+      "size": [
+        0.62,
+        0.28,
+        0.42
+      ],
+      "material": "carbon fiber",
+      "role": "Second of core_0's two integer execution pipelines, serving the other 4 threads, shown in the exploded view.",
+      "connections": [
+        "core_0",
+        "lsu"
+      ]
+    },
+    {
+      "id": "lsu",
+      "name": "core_0 load-store unit",
+      "shape": "box",
+      "position": [
+        -2.9,
+        1.5,
+        3.15
+      ],
+      "size": [
+        0.62,
+        0.28,
+        0.42
+      ],
+      "material": "welded steel",
+      "role": "Load-store unit of core_0 handling memory accesses for all 8 threads, shown above the core in the exploded view.",
+      "connections": [
+        "core_0",
+        "dcache",
+        "fpu"
+      ]
+    },
+    {
+      "id": "fpu",
+      "name": "core_0 FPU / graphics unit",
+      "shape": "box",
+      "position": [
+        -2.2,
+        1.5,
+        3.15
+      ],
+      "size": [
+        0.62,
+        0.28,
+        0.42
+      ],
+      "material": "brass",
+      "role": "Per-core floating-point and graphics unit of core_0, shared by its 8 threads, shown in the exploded view above the core.",
+      "connections": [
+        "core_0",
+        "lsu"
+      ]
+    },
+    {
+      "id": "post_a",
+      "name": "core_0 explosion guide post — front",
+      "shape": "cylinder",
+      "position": [
+        -2.9,
+        1.08,
+        2.05
+      ],
+      "size": [
+        0.07,
+        0.56
+      ],
+      "material": "welded steel",
+      "role": "Thin guide post tying core_0's top face to the exploded I-cache sub-unit above it, showing the explosion came straight out of this core.",
+      "connections": [
+        "core_0",
+        "icache"
+      ]
+    },
+    {
+      "id": "post_b",
+      "name": "core_0 explosion guide post — rear",
+      "shape": "cylinder",
+      "position": [
+        -2.2,
+        1.08,
+        3.15
+      ],
+      "size": [
+        0.07,
+        0.56
+      ],
+      "material": "welded steel",
+      "role": "Thin guide post tying core_0's top face to the exploded FPU sub-unit above it, anchoring the exploded 2x3 grid to its core.",
+      "connections": [
+        "core_0",
+        "fpu"
+      ]
+    }
+  ]
+}

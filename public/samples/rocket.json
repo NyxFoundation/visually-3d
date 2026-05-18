@@ -1,0 +1,1045 @@
+{
+  "machine_name": "Rocket Core (RISC-V)",
+  "assembly_instructions": "Open block-diagram layout — no enclosing chassis. A single thin backplane plate is the ground line and the structural root for every block. The classic 5-stage in-order pipeline runs left-to-right along +X: Fetch (x=-4), Decode (x=-2), Execute (x=0), Memory (x=+2), Writeback (x=+4). Between each pair of stages sits a thin tinted glass pipeline-register plate (x=-3,-1,+1,+3). Fetch carries the branch target buffer, branch history table, program counter and the copper PC+4 adder loop on its roof; Decode carries the integer register file and the hazard scoreboard; Execute carries the integer ALU and the integer multiply/divide unit; Memory carries the CSR (control/status) register file. A copper bypass/forwarding bus runs the length of the pipeline roof, returning results to Decode. The L1 instruction and data caches stand on the +Z side and both attach outward to the TileLink memory interface — modelled as its real channel pair, the A (request) channel and the D (response) channel — along the +Z back edge. The FPU FMA datapath (unpack -> multiply -> add/round, plus the FP register file) stands further along +Z; the MMU (I-TLB, D-TLB, page-table walker) plus the RoCC coprocessor port stand on the -Z side. Copper buses (thin cylinders) trace every off-pipeline connection. Scale is abstract-diagrammatic at 1x; backplane spans 12 m so bounds.radius ~7.5.",
+  "metadata": {
+    "reference": "https://github.com/chipsalliance/rocket-chip",
+    "domain": "computer-architecture",
+    "thumbnail_camera": [
+      7.8,
+      6.3,
+      7.8
+    ],
+    "info": {
+      "japanese_name": "ロケット・コア (RISC-V)",
+      "english_name": "Rocket Core (RISC-V)",
+      "summary": "Rocket is UC Berkeley's open-source 64-bit RISC-V application processor core: a 5-stage, single-issue, in-order pipeline implementing the RV64GC ISA. It is the reference in-order core of the RocketChip / Chipyard SoC generator.",
+      "description": "Rocket is a 5-stage (Fetch, Decode, Execute, Memory, Writeback) single-issue in-order scalar core written in Chisel. It implements RV64GC — the 64-bit base integer ISA plus the M (multiply/divide), A (atomic), F/D (single/double floating point) and C (compressed) extensions — and supports machine, supervisor and user privilege modes with full virtual memory. Front-end speculation uses a branch target buffer and a branch history table; the memory system is a Harvard-style pair of blocking L1 caches (instruction and data) backed by a TLB-and-page-table-walker MMU, and the caches attach outward over a TileLink interface whose master request (A) and slave response (D) channels are modelled separately. An IEEE-754 FPU runs as a decoupled pipelined FMA datapath, and the RoCC (Rocket Custom Coprocessor) interface lets accelerators be attached directly to the core's decode/commit path.",
+      "operator": "SiFive, Chipyard / RocketChip users worldwide",
+      "contractor": "UC Berkeley (ASPIRE / ADEPT Lab), CHIPS Alliance",
+      "contract_date": "2012 (RISC-V), Rocket open-sourced ~2016",
+      "contract_value": "Open source (BSD/Apache-licensed RTL generator)",
+      "status": "Actively maintained open-source IP",
+      "facts": [
+        {
+          "label": "ISA",
+          "value": "RV64GC (RV64IMAFDC)"
+        },
+        {
+          "label": "Pipeline",
+          "value": "5-stage, single-issue, in-order"
+        },
+        {
+          "label": "Register file",
+          "value": "32 x 64-bit integer + 32 x 64-bit FP"
+        },
+        {
+          "label": "L1 caches",
+          "value": "16 KiB I + 16 KiB D, 4-way set-associative (typical)"
+        },
+        {
+          "label": "TLBs",
+          "value": "32-entry fully-associative I-TLB and D-TLB (typical)"
+        },
+        {
+          "label": "FPU",
+          "value": "Pipelined IEEE-754 FMA datapath, ~3 stages"
+        },
+        {
+          "label": "Branch prediction",
+          "value": "BTB + BHT (gshare-style)"
+        },
+        {
+          "label": "Memory interface",
+          "value": "TileLink — A request + D response channels"
+        },
+        {
+          "label": "Diagram scale",
+          "value": "12 m backplane span, bounds.radius ~7.5"
+        }
+      ],
+      "sources": [
+        {
+          "title": "rocket-chip — CHIPS Alliance (GitHub)",
+          "url": "https://github.com/chipsalliance/rocket-chip"
+        },
+        {
+          "title": "Chipyard documentation — Rocket core",
+          "url": "https://chipyard.readthedocs.io/en/stable/Generators/Rocket.html"
+        },
+        {
+          "title": "The RISC-V Instruction Set Manual",
+          "url": "https://riscv.org/technical/specifications/"
+        }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "backplane",
+      "name": "Diagram backplane",
+      "shape": "box",
+      "position": [
+        0,
+        -0.075,
+        0
+      ],
+      "size": [
+        12,
+        0.15,
+        9
+      ],
+      "material": "black composite",
+      "role": "Flat PCB-style thin floor plate that is the ground line and structural root for every block in the open diagram.",
+      "connections": [
+        "fetch_stage",
+        "decode_stage",
+        "execute_stage",
+        "memory_stage",
+        "writeback_stage",
+        "l1_icache",
+        "l1_dcache",
+        "fpu_unpack",
+        "fpu_multiply",
+        "fpu_addround",
+        "fp_register_file",
+        "itlb",
+        "dtlb",
+        "ptw",
+        "rocc_port",
+        "tilelink_a_channel",
+        "tilelink_d_channel"
+      ]
+    },
+    {
+      "id": "fetch_stage",
+      "name": "Fetch stage (IF)",
+      "shape": "box",
+      "position": [
+        -4,
+        0.65,
+        0
+      ],
+      "size": [
+        1.4,
+        1.3,
+        1.6
+      ],
+      "material": "brushed steel",
+      "role": "First pipeline stage — fetches instructions from the I-cache and drives the program counter.",
+      "connections": [
+        "backplane",
+        "preg_if_id",
+        "branch_target_buffer",
+        "branch_history_table",
+        "program_counter",
+        "pc_adder",
+        "bus_fetch_icache",
+        "bus_fetch_itlb"
+      ]
+    },
+    {
+      "id": "decode_stage",
+      "name": "Decode stage (ID)",
+      "shape": "box",
+      "position": [
+        -2,
+        0.65,
+        0
+      ],
+      "size": [
+        1.4,
+        1.3,
+        1.6
+      ],
+      "material": "brushed steel",
+      "role": "Decodes the instruction, expands compressed forms and reads operands from the integer register file.",
+      "connections": [
+        "backplane",
+        "preg_if_id",
+        "preg_id_ex",
+        "integer_register_file",
+        "scoreboard",
+        "bypass_network"
+      ]
+    },
+    {
+      "id": "execute_stage",
+      "name": "Execute stage (EX)",
+      "shape": "box",
+      "position": [
+        0,
+        0.65,
+        0
+      ],
+      "size": [
+        1.4,
+        1.3,
+        1.6
+      ],
+      "material": "brushed steel",
+      "role": "Performs arithmetic, logic and address calculation; hosts the integer ALU and multiply/divide unit.",
+      "connections": [
+        "backplane",
+        "preg_id_ex",
+        "preg_ex_mem",
+        "integer_alu",
+        "mul_div_unit",
+        "bus_execute_fpu",
+        "bypass_network"
+      ]
+    },
+    {
+      "id": "memory_stage",
+      "name": "Memory stage (MEM)",
+      "shape": "box",
+      "position": [
+        2,
+        0.65,
+        0
+      ],
+      "size": [
+        1.4,
+        1.3,
+        1.6
+      ],
+      "material": "brushed steel",
+      "role": "Issues load/store accesses to the L1 data cache and the data TLB.",
+      "connections": [
+        "backplane",
+        "preg_ex_mem",
+        "preg_mem_wb",
+        "csr_file",
+        "bus_mem_dcache",
+        "bus_mem_dtlb",
+        "bypass_network"
+      ]
+    },
+    {
+      "id": "writeback_stage",
+      "name": "Writeback stage (WB)",
+      "shape": "box",
+      "position": [
+        4,
+        0.65,
+        0
+      ],
+      "size": [
+        1.4,
+        1.3,
+        1.6
+      ],
+      "material": "brushed steel",
+      "role": "Commits results back into the register file and retires the instruction.",
+      "connections": [
+        "backplane",
+        "preg_mem_wb",
+        "bus_writeback_rocc",
+        "bypass_network"
+      ]
+    },
+    {
+      "id": "preg_if_id",
+      "name": "IF/ID pipeline register",
+      "shape": "box",
+      "position": [
+        -3,
+        0.85,
+        0
+      ],
+      "size": [
+        0.1,
+        1.7,
+        1.9
+      ],
+      "material": "glass display",
+      "role": "Thin latch plate carrying fetched instruction state from Fetch into Decode.",
+      "connections": [
+        "fetch_stage",
+        "decode_stage"
+      ]
+    },
+    {
+      "id": "preg_id_ex",
+      "name": "ID/EX pipeline register",
+      "shape": "box",
+      "position": [
+        -1,
+        0.85,
+        0
+      ],
+      "size": [
+        0.1,
+        1.7,
+        1.9
+      ],
+      "material": "glass display",
+      "role": "Latch plate carrying decoded control and operand values from Decode into Execute.",
+      "connections": [
+        "decode_stage",
+        "execute_stage"
+      ]
+    },
+    {
+      "id": "preg_ex_mem",
+      "name": "EX/MEM pipeline register",
+      "shape": "box",
+      "position": [
+        1,
+        0.85,
+        0
+      ],
+      "size": [
+        0.1,
+        1.7,
+        1.9
+      ],
+      "material": "glass display",
+      "role": "Latch plate carrying ALU results and memory addresses from Execute into Memory.",
+      "connections": [
+        "execute_stage",
+        "memory_stage"
+      ]
+    },
+    {
+      "id": "preg_mem_wb",
+      "name": "MEM/WB pipeline register",
+      "shape": "box",
+      "position": [
+        3,
+        0.85,
+        0
+      ],
+      "size": [
+        0.1,
+        1.7,
+        1.9
+      ],
+      "material": "glass display",
+      "role": "Latch plate carrying load data and results from Memory into Writeback.",
+      "connections": [
+        "memory_stage",
+        "writeback_stage"
+      ]
+    },
+    {
+      "id": "branch_target_buffer",
+      "name": "Branch target buffer",
+      "shape": "box",
+      "position": [
+        -4,
+        1.55,
+        0.5
+      ],
+      "size": [
+        0.7,
+        0.45,
+        0.5
+      ],
+      "material": "black composite",
+      "role": "Caches predicted target addresses of taken branches to steer the front end speculatively.",
+      "connections": [
+        "fetch_stage"
+      ]
+    },
+    {
+      "id": "branch_history_table",
+      "name": "Branch history table",
+      "shape": "box",
+      "position": [
+        -4,
+        1.55,
+        -0.5
+      ],
+      "size": [
+        0.7,
+        0.45,
+        0.5
+      ],
+      "material": "black composite",
+      "role": "Stores per-branch direction history to predict taken/not-taken outcomes.",
+      "connections": [
+        "fetch_stage"
+      ]
+    },
+    {
+      "id": "program_counter",
+      "name": "Program counter",
+      "shape": "box",
+      "position": [
+        -4,
+        1.55,
+        0
+      ],
+      "size": [
+        0.4,
+        0.45,
+        0.4
+      ],
+      "material": "forged steel",
+      "role": "Holds and advances the 64-bit address of the next instruction to fetch.",
+      "connections": [
+        "fetch_stage",
+        "pc_adder"
+      ]
+    },
+    {
+      "id": "pc_adder",
+      "name": "PC+4 increment adder loop",
+      "shape": "torus",
+      "position": [
+        -4,
+        2.05,
+        0
+      ],
+      "size": [
+        0.25,
+        0.05
+      ],
+      "material": "copper",
+      "role": "Copper feedback loop adding 4 (or 2 for compressed) to the program counter each cycle, sequencing the fetch stream until a branch redirects it.",
+      "connections": [
+        "program_counter",
+        "fetch_stage"
+      ]
+    },
+    {
+      "id": "integer_register_file",
+      "name": "Integer register file (x0-x31)",
+      "shape": "box",
+      "position": [
+        -2,
+        1.55,
+        -0.35
+      ],
+      "size": [
+        0.9,
+        0.5,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "32-entry 64-bit integer register file read during Decode and written during Writeback.",
+      "connections": [
+        "decode_stage"
+      ]
+    },
+    {
+      "id": "scoreboard",
+      "name": "Hazard scoreboard / interlock unit",
+      "shape": "box",
+      "position": [
+        -2,
+        1.55,
+        0.45
+      ],
+      "size": [
+        0.7,
+        0.5,
+        0.55
+      ],
+      "material": "black composite",
+      "role": "Tracks in-flight register destinations and stalls Decode when a read-after-write hazard cannot be bypassed.",
+      "connections": [
+        "decode_stage"
+      ]
+    },
+    {
+      "id": "integer_alu",
+      "name": "Integer ALU",
+      "shape": "box",
+      "position": [
+        0,
+        1.575,
+        0.45
+      ],
+      "size": [
+        0.6,
+        0.55,
+        0.6
+      ],
+      "material": "forged steel",
+      "role": "Single-cycle arithmetic/logic unit handling adds, shifts, comparisons and branch resolution.",
+      "connections": [
+        "execute_stage"
+      ]
+    },
+    {
+      "id": "mul_div_unit",
+      "name": "Integer multiply/divide unit",
+      "shape": "box",
+      "position": [
+        0,
+        1.575,
+        -0.45
+      ],
+      "size": [
+        0.6,
+        0.55,
+        0.6
+      ],
+      "material": "forged steel",
+      "role": "Implements the RV64M extension — iterative integer multiply and divide.",
+      "connections": [
+        "execute_stage"
+      ]
+    },
+    {
+      "id": "csr_file",
+      "name": "Control/status register file (CSRs)",
+      "shape": "box",
+      "position": [
+        2,
+        1.575,
+        0
+      ],
+      "size": [
+        0.95,
+        0.55,
+        1
+      ],
+      "material": "white composite",
+      "role": "Holds the machine/supervisor/user control and status registers — privilege state, trap vectors and the SATP page-table base.",
+      "connections": [
+        "memory_stage"
+      ]
+    },
+    {
+      "id": "bypass_network",
+      "name": "Operand bypass / forwarding bus",
+      "shape": "cylinder",
+      "position": [
+        1,
+        2.15,
+        -0.75
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.05,
+        6.2
+      ],
+      "material": "copper",
+      "role": "Roof-level forwarding bus that returns ALU, multiply and load results from Execute, Memory and Writeback back to Decode so dependent instructions issue without stalling.",
+      "connections": [
+        "decode_stage",
+        "execute_stage",
+        "memory_stage",
+        "writeback_stage"
+      ]
+    },
+    {
+      "id": "l1_icache",
+      "name": "L1 instruction cache",
+      "shape": "box",
+      "position": [
+        -4,
+        0.6,
+        2.6
+      ],
+      "size": [
+        1.3,
+        1.2,
+        1.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "4-way set-associative 16 KiB L1 cache supplying instruction words to the Fetch stage.",
+      "connections": [
+        "backplane",
+        "bus_fetch_icache",
+        "bus_icache_tilelink"
+      ]
+    },
+    {
+      "id": "l1_dcache",
+      "name": "L1 data cache",
+      "shape": "box",
+      "position": [
+        2,
+        0.6,
+        2.6
+      ],
+      "size": [
+        1.3,
+        1.2,
+        1.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Blocking 16 KiB L1 data cache servicing loads and stores from the Memory stage.",
+      "connections": [
+        "backplane",
+        "bus_mem_dcache",
+        "bus_dcache_tilelink"
+      ]
+    },
+    {
+      "id": "tilelink_a_channel",
+      "name": "TileLink A (request) channel",
+      "shape": "box",
+      "position": [
+        -1,
+        0.45,
+        3.75
+      ],
+      "size": [
+        6,
+        0.9,
+        0.5
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Master-to-slave TileLink channel carrying L1 instruction- and data-cache miss requests (address + opcode) outward to the L2/uncore interconnect.",
+      "connections": [
+        "backplane",
+        "bus_icache_tilelink",
+        "bus_dcache_tilelink",
+        "tilelink_d_channel"
+      ]
+    },
+    {
+      "id": "tilelink_d_channel",
+      "name": "TileLink D (response) channel",
+      "shape": "box",
+      "position": [
+        -1,
+        0.45,
+        4.2
+      ],
+      "size": [
+        6,
+        0.9,
+        0.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Slave-to-master TileLink channel returning refill data and grant/ack responses inward to the L1 caches, completing the coherent A/D handshake.",
+      "connections": [
+        "backplane",
+        "tilelink_a_channel"
+      ]
+    },
+    {
+      "id": "fpu_unpack",
+      "name": "FPU FMA stage 1 — unpack",
+      "shape": "box",
+      "position": [
+        -1.4,
+        0.6,
+        2.6
+      ],
+      "size": [
+        1,
+        1.2,
+        1
+      ],
+      "material": "welded steel",
+      "role": "First FPU stage — unpacks IEEE-754 operands and aligns exponents for the fused multiply-add.",
+      "connections": [
+        "backplane",
+        "fpu_multiply",
+        "bus_execute_fpu"
+      ]
+    },
+    {
+      "id": "fpu_multiply",
+      "name": "FPU FMA stage 2 — multiply",
+      "shape": "box",
+      "position": [
+        0,
+        0.6,
+        2.6
+      ],
+      "size": [
+        1,
+        1.2,
+        1
+      ],
+      "material": "welded steel",
+      "role": "Middle FPU stage — computes the significand product of the fused multiply-add datapath.",
+      "connections": [
+        "backplane",
+        "fpu_unpack",
+        "fpu_addround"
+      ]
+    },
+    {
+      "id": "fpu_addround",
+      "name": "FPU FMA stage 3 — add/round",
+      "shape": "box",
+      "position": [
+        1.4,
+        0.6,
+        2.6
+      ],
+      "size": [
+        1,
+        1.2,
+        1
+      ],
+      "material": "welded steel",
+      "role": "Final FPU stage — adds the addend, normalizes and rounds the IEEE-754 result.",
+      "connections": [
+        "backplane",
+        "fpu_multiply",
+        "fp_register_file"
+      ]
+    },
+    {
+      "id": "fp_register_file",
+      "name": "Floating-point register file (f0-f31)",
+      "shape": "box",
+      "position": [
+        -2.8,
+        0.55,
+        2.6
+      ],
+      "size": [
+        0.9,
+        0.55,
+        1
+      ],
+      "material": "white composite",
+      "role": "32-entry 64-bit floating-point register file feeding and retiring FPU operands.",
+      "connections": [
+        "backplane",
+        "fpu_addround"
+      ]
+    },
+    {
+      "id": "itlb",
+      "name": "Instruction TLB",
+      "shape": "box",
+      "position": [
+        -4,
+        0.5,
+        -2.6
+      ],
+      "size": [
+        1,
+        1,
+        1
+      ],
+      "material": "black composite",
+      "role": "32-entry fully-associative instruction-side TLB translating fetch virtual addresses to physical.",
+      "connections": [
+        "backplane",
+        "bus_fetch_itlb",
+        "bus_itlb_ptw"
+      ]
+    },
+    {
+      "id": "dtlb",
+      "name": "Data TLB",
+      "shape": "box",
+      "position": [
+        2,
+        0.5,
+        -2.6
+      ],
+      "size": [
+        1,
+        1,
+        1
+      ],
+      "material": "black composite",
+      "role": "32-entry fully-associative data-side TLB translating load/store virtual addresses to physical.",
+      "connections": [
+        "backplane",
+        "bus_mem_dtlb",
+        "bus_dtlb_ptw"
+      ]
+    },
+    {
+      "id": "ptw",
+      "name": "Page-table walker",
+      "shape": "box",
+      "position": [
+        -1,
+        0.55,
+        -2.6
+      ],
+      "size": [
+        1.2,
+        1.1,
+        1.2
+      ],
+      "material": "black composite",
+      "role": "Hardware MMU engine that walks the in-memory page tables to refill the I-TLB and D-TLB on a miss.",
+      "connections": [
+        "backplane",
+        "bus_itlb_ptw",
+        "bus_dtlb_ptw"
+      ]
+    },
+    {
+      "id": "rocc_port",
+      "name": "RoCC coprocessor interface port",
+      "shape": "box",
+      "position": [
+        4,
+        0.7,
+        -2.6
+      ],
+      "size": [
+        1.1,
+        1.4,
+        1.2
+      ],
+      "material": "brass",
+      "role": "Rocket Custom Coprocessor port that hands custom instructions to and receives results from attached accelerators, tied to the Writeback spine by its commit-path bus.",
+      "connections": [
+        "backplane",
+        "bus_writeback_rocc"
+      ]
+    },
+    {
+      "id": "bus_fetch_icache",
+      "name": "Copper bus — Fetch to I-cache",
+      "shape": "cylinder",
+      "position": [
+        -4,
+        0.6,
+        1.4
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.06,
+        1.2
+      ],
+      "material": "copper",
+      "role": "Carries instruction-fetch requests and returned instruction words between Fetch and the L1 I-cache.",
+      "connections": [
+        "fetch_stage",
+        "l1_icache"
+      ]
+    },
+    {
+      "id": "bus_mem_dcache",
+      "name": "Copper bus — Memory to D-cache",
+      "shape": "cylinder",
+      "position": [
+        2,
+        0.6,
+        1.4
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.06,
+        1.2
+      ],
+      "material": "copper",
+      "role": "Carries load/store traffic between the Memory stage and the L1 data cache.",
+      "connections": [
+        "memory_stage",
+        "l1_dcache"
+      ]
+    },
+    {
+      "id": "bus_icache_tilelink",
+      "name": "Copper bus — I-cache to TileLink A channel",
+      "shape": "cylinder",
+      "position": [
+        -4,
+        0.6,
+        3.35
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.06,
+        0.3
+      ],
+      "material": "copper",
+      "role": "Routes L1 instruction-cache miss refill requests outward onto the TileLink A (request) channel.",
+      "connections": [
+        "l1_icache",
+        "tilelink_a_channel"
+      ]
+    },
+    {
+      "id": "bus_dcache_tilelink",
+      "name": "Copper bus — D-cache to TileLink A channel",
+      "shape": "cylinder",
+      "position": [
+        2,
+        0.6,
+        3.35
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.06,
+        0.3
+      ],
+      "material": "copper",
+      "role": "Routes L1 data-cache miss and writeback requests outward onto the TileLink A (request) channel.",
+      "connections": [
+        "l1_dcache",
+        "tilelink_a_channel"
+      ]
+    },
+    {
+      "id": "bus_fetch_itlb",
+      "name": "Copper bus — Fetch to I-TLB",
+      "shape": "cylinder",
+      "position": [
+        -4,
+        0.6,
+        -1.45
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.06,
+        1.3
+      ],
+      "material": "copper",
+      "role": "Carries fetch virtual addresses to the instruction TLB for translation.",
+      "connections": [
+        "fetch_stage",
+        "itlb"
+      ]
+    },
+    {
+      "id": "bus_mem_dtlb",
+      "name": "Copper bus — Memory to D-TLB",
+      "shape": "cylinder",
+      "position": [
+        2,
+        0.6,
+        -1.45
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.06,
+        1.3
+      ],
+      "material": "copper",
+      "role": "Carries load/store virtual addresses to the data TLB for translation.",
+      "connections": [
+        "memory_stage",
+        "dtlb"
+      ]
+    },
+    {
+      "id": "bus_itlb_ptw",
+      "name": "Copper bus — I-TLB to page-table walker",
+      "shape": "cylinder",
+      "position": [
+        -2.55,
+        0.5,
+        -2.6
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.06,
+        1.9
+      ],
+      "material": "copper",
+      "role": "Routes instruction-TLB miss refills to and from the page-table walker.",
+      "connections": [
+        "itlb",
+        "ptw"
+      ]
+    },
+    {
+      "id": "bus_dtlb_ptw",
+      "name": "Copper bus — D-TLB to page-table walker",
+      "shape": "cylinder",
+      "position": [
+        0.55,
+        0.5,
+        -2.6
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.06,
+        1.9
+      ],
+      "material": "copper",
+      "role": "Routes data-TLB miss refills to and from the page-table walker.",
+      "connections": [
+        "dtlb",
+        "ptw"
+      ]
+    },
+    {
+      "id": "bus_execute_fpu",
+      "name": "Copper bus — Execute to FPU",
+      "shape": "cylinder",
+      "position": [
+        -0.7,
+        0.6,
+        1.45
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.06,
+        1.3
+      ],
+      "material": "copper",
+      "role": "Decoupled bus dispatching floating-point operations from Execute into the FPU FMA datapath at its unpack stage.",
+      "connections": [
+        "execute_stage",
+        "fpu_unpack"
+      ]
+    },
+    {
+      "id": "bus_writeback_rocc",
+      "name": "Copper bus — Writeback to RoCC port",
+      "shape": "cylinder",
+      "position": [
+        4,
+        0.7,
+        -1.4
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.08,
+        1.2
+      ],
+      "material": "copper",
+      "role": "Commit-path bus connecting the Writeback stage to the RoCC coprocessor port for accelerator instruction dispatch and result return.",
+      "connections": [
+        "writeback_stage",
+        "rocc_port"
+      ]
+    }
+  ]
+}

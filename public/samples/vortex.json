@@ -1,0 +1,1126 @@
+{
+  "machine_name": "Vortex RISC-V GPGPU",
+  "assembly_instructions": "Open block diagram of the Vortex SIMT GPGPU micro-architecture — no enclosing chassis so every functional block is visible. The model is an abstract architectural diagram, not a physically-scaled die: 1 world unit ≈ one logic block, with the silicon die rendered as a flat 0.3 m plate at y=0 measuring 13.6×10.2 m. Build order: lay the die_plate, then mount the PCIe/host interface at the −X edge and the memory interface at the +X edge, drop the device-wide L3 cache between them, place the two cluster substrates in +Z and −Z, populate each with three RISC-V SIMT cores and a per-cluster L2 cache, then run the copper bus members host→L3→L2 and L3→memory. Each cluster's cores are wired together by a cluster interconnect rail. One core in cluster 0 (core_c0_0) is shown EXPANDED: two steel riser posts lift its internal datapath off the die onto an exploded-view tray (explode_platform) floating directly above the socket. On the tray the warp scheduler, IPDOM divergence stack and barrier unit form the front-end column; they feed instruction fetch and decode, which feed the register file. The register file fans out to four integer SIMD ALU lanes and four floating-point SIMD ALU lanes, all of which retire through a writeback/commit stage back into the register file; a load/store unit issues memory traffic to the per-core L1 cache, with the shared-memory/scratchpad block aft of the register file. A second core (core_c0_1) is shown with its lid removed, exposing just its warp scheduler and register file to confirm every core instances the same datapath. The four un-opened cores keep a brushed-steel package lid; core_c0_0 and core_c0_1 have their lids removed, which is exactly what marks them as the exploded and cutaway views. Every exploded block is linked back to core_c0_0 through the risers and tray in the connection graph.",
+  "metadata": {
+    "reference": "https://github.com/vortexgpgpu/vortex",
+    "domain": "computer-architecture",
+    "thumbnail_camera": [
+      8.8,
+      9.1,
+      8.8
+    ],
+    "info": {
+      "japanese_name": "ボルテックス RISC-V GPGPU",
+      "english_name": "Vortex RISC-V GPGPU",
+      "summary": "Vortex is a full-stack open-source RISC-V GPGPU developed at Georgia Tech, extending the RISC-V ISA with a handful of instructions to support a configurable SIMT execution model. It scales from a single core to a multi-cluster die and runs OpenCL kernels.",
+      "description": "Vortex implements a SIMT (Single-Instruction Multiple-Thread) GPU on top of a stock RISC-V scalar pipeline (RV32IMF / RV64). The ISA is extended with roughly six control instructions — tmc (thread-mask control), wspawn (warp spawn), split/join (branch divergence), bar (barrier) and predication — so each core can run multiple warps of multiple threads in lockstep. Branch divergence is handled by an IPDOM (immediate post-dominator) reconvergence stack that pushes and pops thread masks. Each core has a private L1 cache; cores are grouped into clusters that share an L2 cache, and all clusters share a device-wide L3 cache backed by the memory interface.",
+      "description2": "The whole design is parameterized at elaboration time — number of clusters, cores per cluster, warps per core, threads per warp, and ALU/FPU lane width are all configurable. Vortex has been prototyped on Intel Arria 10 and Stratix 10 FPGAs and targets ASIC flows, with an OpenCL 1.2 software stack provided through the PoCL compiler. It is one of the few openly available GPGPUs with a complete hardware-plus-software stack.",
+      "operator": "Georgia Institute of Technology",
+      "contractor": "Vortex research group, Hyesoon Kim Lab (Georgia Tech)",
+      "contract_date": "2019 (initial public release)",
+      "contract_value": "Open source — freely available on GitHub",
+      "status": "Actively developed",
+      "facts": [
+        {
+          "label": "ISA base",
+          "value": "RISC-V RV32IMF / RV64"
+        },
+        {
+          "label": "Custom instructions",
+          "value": "~6 (tmc, wspawn, split, join, bar, pred)"
+        },
+        {
+          "label": "Execution model",
+          "value": "SIMT — 2 clusters × 3 cores, 8 SIMD lanes/core"
+        },
+        {
+          "label": "Divergence handling",
+          "value": "IPDOM reconvergence stack"
+        },
+        {
+          "label": "Cache hierarchy",
+          "value": "L1 per core, L2 per cluster, L3 per device"
+        },
+        {
+          "label": "Execute stage",
+          "value": "Integer ALU + FPU + LSU lanes, then writeback/commit"
+        },
+        {
+          "label": "Programming API",
+          "value": "OpenCL 1.2 via PoCL"
+        },
+        {
+          "label": "FPGA targets",
+          "value": "Intel Arria 10, Stratix 10"
+        },
+        {
+          "label": "Scalability",
+          "value": "1 core to multi-cluster many-core die"
+        },
+        {
+          "label": "Modelled scale",
+          "value": "47 blocks on a 13.6 × 10.2 m abstract die plate"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Vortex GPGPU — GitHub repository",
+          "url": "https://github.com/vortexgpgpu/vortex"
+        },
+        {
+          "title": "Vortex project page (Georgia Tech)",
+          "url": "https://vortex.cc.gatech.edu/"
+        },
+        {
+          "title": "Vortex: Extending the RISC-V ISA for GPGPU and 3D-Graphics (MICRO 2021)",
+          "url": "https://dl.acm.org/doi/10.1145/3466752.3480128"
+        }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "die_plate",
+      "name": "Silicon Die Substrate",
+      "shape": "box",
+      "position": [
+        0,
+        0.15,
+        0
+      ],
+      "size": [
+        13.6,
+        0.3,
+        10.2
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Root substrate of the GPGPU die that carries every cluster, cache and interface block.",
+      "connections": [
+        "pcie_host_interface",
+        "memory_interface",
+        "l3_cache",
+        "cluster0_substrate",
+        "cluster1_substrate",
+        "bus_host_l3",
+        "bus_mem_l3",
+        "bus_l3_l2c0",
+        "bus_l3_l2c1"
+      ]
+    },
+    {
+      "id": "pcie_host_interface",
+      "name": "Host / PCIe Interface",
+      "shape": "box",
+      "position": [
+        -5.95,
+        0.9,
+        0
+      ],
+      "size": [
+        1.19,
+        1.2,
+        3.4
+      ],
+      "material": "brass / copper",
+      "role": "Receives compute kernels and data from the host CPU over PCIe and dispatches them onto the die.",
+      "connections": [
+        "die_plate",
+        "bus_host_l3"
+      ]
+    },
+    {
+      "id": "memory_interface",
+      "name": "Memory Interface / DRAM Controller",
+      "shape": "box",
+      "position": [
+        6.205,
+        1,
+        0
+      ],
+      "size": [
+        0.85,
+        1.4,
+        5.1
+      ],
+      "material": "brushed steel",
+      "role": "Drives external DRAM and serves all L3 cache misses for the whole device.",
+      "connections": [
+        "die_plate",
+        "bus_mem_l3"
+      ]
+    },
+    {
+      "id": "l3_cache",
+      "name": "L3 Cache (Device-Wide)",
+      "shape": "box",
+      "position": [
+        3.825,
+        0.75,
+        0
+      ],
+      "size": [
+        1.87,
+        0.9,
+        5.95
+      ],
+      "material": "glass display",
+      "role": "Last-level cache shared by every cluster, sitting between the L2 caches and the memory interface.",
+      "connections": [
+        "die_plate",
+        "bus_host_l3",
+        "bus_mem_l3",
+        "bus_l3_l2c0",
+        "bus_l3_l2c1"
+      ]
+    },
+    {
+      "id": "cluster0_substrate",
+      "name": "Cluster 0 Substrate",
+      "shape": "box",
+      "position": [
+        -0.425,
+        0.375,
+        2.89
+      ],
+      "size": [
+        8.5,
+        0.15,
+        3.06
+      ],
+      "material": "black composite",
+      "role": "Groups three SIMT cores and their shared L2 cache into the first compute cluster.",
+      "connections": [
+        "die_plate",
+        "core_c0_0",
+        "core_c0_1",
+        "core_c0_2",
+        "l2_cache_c0",
+        "bus_cluster0_interconnect"
+      ]
+    },
+    {
+      "id": "cluster1_substrate",
+      "name": "Cluster 1 Substrate",
+      "shape": "box",
+      "position": [
+        -0.425,
+        0.375,
+        -2.89
+      ],
+      "size": [
+        8.5,
+        0.15,
+        3.06
+      ],
+      "material": "black composite",
+      "role": "Groups three SIMT cores and their shared L2 cache into the second compute cluster.",
+      "connections": [
+        "die_plate",
+        "core_c1_0",
+        "core_c1_1",
+        "core_c1_2",
+        "l2_cache_c1",
+        "bus_cluster1_interconnect"
+      ]
+    },
+    {
+      "id": "l2_cache_c0",
+      "name": "L2 Cache — Cluster 0",
+      "shape": "box",
+      "position": [
+        3.23,
+        0.8,
+        2.89
+      ],
+      "size": [
+        1.02,
+        0.7,
+        2.38
+      ],
+      "material": "glass display",
+      "role": "Shared cache for the three cores of cluster 0, backed by the device L3 cache.",
+      "connections": [
+        "cluster0_substrate",
+        "bus_l3_l2c0",
+        "bus_cluster0_interconnect"
+      ]
+    },
+    {
+      "id": "l2_cache_c1",
+      "name": "L2 Cache — Cluster 1",
+      "shape": "box",
+      "position": [
+        3.23,
+        0.8,
+        -2.89
+      ],
+      "size": [
+        1.02,
+        0.7,
+        2.38
+      ],
+      "material": "glass display",
+      "role": "Shared cache for the three cores of cluster 1, backed by the device L3 cache.",
+      "connections": [
+        "cluster1_substrate",
+        "bus_l3_l2c1",
+        "bus_cluster1_interconnect"
+      ]
+    },
+    {
+      "id": "core_c0_0",
+      "name": "SIMT Core 0 — Cluster 0 (expanded)",
+      "shape": "box",
+      "position": [
+        -3.23,
+        0.85,
+        2.89
+      ],
+      "size": [
+        1.53,
+        0.8,
+        2.21
+      ],
+      "material": "dark anodized aluminum",
+      "role": "First RISC-V SIMT core of cluster 0; its lid is removed and two riser posts lift its internal datapath onto the exploded-view tray directly above this socket.",
+      "connections": [
+        "cluster0_substrate",
+        "bus_cluster0_interconnect",
+        "riser_post_a",
+        "riser_post_b",
+        "warp_scheduler"
+      ]
+    },
+    {
+      "id": "core_c0_1",
+      "name": "SIMT Core 1 — Cluster 0 (lid removed)",
+      "shape": "box",
+      "position": [
+        -1.105,
+        0.85,
+        2.89
+      ],
+      "size": [
+        1.53,
+        0.8,
+        2.21
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second RISC-V SIMT core of cluster 0, shown with its lid removed so its warp scheduler and register file are visible — proof every core shares the expanded core's datapath.",
+      "connections": [
+        "cluster0_substrate",
+        "bus_cluster0_interconnect",
+        "scheduler_c0_1",
+        "regfile_c0_1"
+      ]
+    },
+    {
+      "id": "scheduler_c0_1",
+      "name": "Warp Scheduler — Core 1",
+      "shape": "box",
+      "position": [
+        -1.105,
+        1.45,
+        3.4
+      ],
+      "size": [
+        0.6,
+        0.4,
+        0.6
+      ],
+      "material": "white composite",
+      "role": "Warp scheduler of core 1, exposed with the core lid removed to show that every Vortex core shares the front-end micro-architecture of the expanded core.",
+      "connections": [
+        "core_c0_1",
+        "regfile_c0_1"
+      ]
+    },
+    {
+      "id": "regfile_c0_1",
+      "name": "Register File — Core 1",
+      "shape": "box",
+      "position": [
+        -1.105,
+        1.45,
+        2.4
+      ],
+      "size": [
+        0.6,
+        0.4,
+        0.6
+      ],
+      "material": "brass / copper",
+      "role": "Register file of core 1, exposed alongside its scheduler to confirm all six cores are instances of the same SIMT datapath.",
+      "connections": [
+        "core_c0_1"
+      ]
+    },
+    {
+      "id": "core_c0_2",
+      "name": "SIMT Core 2 — Cluster 0",
+      "shape": "box",
+      "position": [
+        1.02,
+        0.85,
+        2.89
+      ],
+      "size": [
+        1.53,
+        0.8,
+        2.21
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Third RISC-V SIMT core of cluster 0; a sealed package whose internals replicate the expanded core_c0_0 datapath.",
+      "connections": [
+        "cluster0_substrate",
+        "bus_cluster0_interconnect",
+        "lid_core_c0_2"
+      ]
+    },
+    {
+      "id": "core_c1_0",
+      "name": "SIMT Core 0 — Cluster 1",
+      "shape": "box",
+      "position": [
+        -3.23,
+        0.85,
+        -2.89
+      ],
+      "size": [
+        1.53,
+        0.8,
+        2.21
+      ],
+      "material": "dark anodized aluminum",
+      "role": "First RISC-V SIMT core of cluster 1; a sealed package identical in micro-architecture to the expanded core.",
+      "connections": [
+        "cluster1_substrate",
+        "bus_cluster1_interconnect",
+        "lid_core_c1_0"
+      ]
+    },
+    {
+      "id": "core_c1_1",
+      "name": "SIMT Core 1 — Cluster 1",
+      "shape": "box",
+      "position": [
+        -1.105,
+        0.85,
+        -2.89
+      ],
+      "size": [
+        1.53,
+        0.8,
+        2.21
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second RISC-V SIMT core of cluster 1; a sealed package executing its own warps independently.",
+      "connections": [
+        "cluster1_substrate",
+        "bus_cluster1_interconnect",
+        "lid_core_c1_1"
+      ]
+    },
+    {
+      "id": "core_c1_2",
+      "name": "SIMT Core 2 — Cluster 1",
+      "shape": "box",
+      "position": [
+        1.02,
+        0.85,
+        -2.89
+      ],
+      "size": [
+        1.53,
+        0.8,
+        2.21
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Third RISC-V SIMT core of cluster 1; a sealed package executing its own warps independently.",
+      "connections": [
+        "cluster1_substrate",
+        "bus_cluster1_interconnect",
+        "lid_core_c1_2"
+      ]
+    },
+    {
+      "id": "lid_core_c0_2",
+      "name": "Core Package Lid — Core 2, Cluster 0",
+      "shape": "box",
+      "position": [
+        1.02,
+        1.3,
+        2.89
+      ],
+      "size": [
+        1.4,
+        0.1,
+        2.05
+      ],
+      "material": "brushed steel",
+      "role": "Sealed metal package lid of core_c0_2; its presence here, versus its absence on core_c0_0 and core_c0_1, is what visually marks those two as the exploded and cutaway views.",
+      "connections": [
+        "core_c0_2"
+      ]
+    },
+    {
+      "id": "lid_core_c1_0",
+      "name": "Core Package Lid — Core 0, Cluster 1",
+      "shape": "box",
+      "position": [
+        -3.23,
+        1.3,
+        -2.89
+      ],
+      "size": [
+        1.4,
+        0.1,
+        2.05
+      ],
+      "material": "brushed steel",
+      "role": "Sealed metal package lid of core_c1_0, identical to the lid removed from the expanded and cutaway cores of cluster 0.",
+      "connections": [
+        "core_c1_0"
+      ]
+    },
+    {
+      "id": "lid_core_c1_1",
+      "name": "Core Package Lid — Core 1, Cluster 1",
+      "shape": "box",
+      "position": [
+        -1.105,
+        1.3,
+        -2.89
+      ],
+      "size": [
+        1.4,
+        0.1,
+        2.05
+      ],
+      "material": "brushed steel",
+      "role": "Sealed metal package lid of core_c1_1, covering an internal datapath that replicates the expanded core.",
+      "connections": [
+        "core_c1_1"
+      ]
+    },
+    {
+      "id": "lid_core_c1_2",
+      "name": "Core Package Lid — Core 2, Cluster 1",
+      "shape": "box",
+      "position": [
+        1.02,
+        1.3,
+        -2.89
+      ],
+      "size": [
+        1.4,
+        0.1,
+        2.05
+      ],
+      "material": "brushed steel",
+      "role": "Sealed metal package lid of core_c1_2, covering an internal datapath that replicates the expanded core.",
+      "connections": [
+        "core_c1_2"
+      ]
+    },
+    {
+      "id": "riser_post_a",
+      "name": "Exploded-View Riser Post A",
+      "shape": "cylinder",
+      "position": [
+        -3.74,
+        2.045,
+        2.38
+      ],
+      "size": [
+        0.07,
+        1.59
+      ],
+      "material": "brushed steel",
+      "role": "Exploded-view connector lifting core_c0_0 off the die to its tray above (role: exploded-view riser, not a physical part).",
+      "connections": [
+        "core_c0_0",
+        "explode_platform"
+      ]
+    },
+    {
+      "id": "riser_post_b",
+      "name": "Exploded-View Riser Post B",
+      "shape": "cylinder",
+      "position": [
+        -2.72,
+        2.045,
+        3.4
+      ],
+      "size": [
+        0.07,
+        1.59
+      ],
+      "material": "brushed steel",
+      "role": "Second exploded-view connector linking core_c0_0 on the die to its lifted internal datapath above (role: exploded-view riser).",
+      "connections": [
+        "core_c0_0",
+        "explode_platform"
+      ]
+    },
+    {
+      "id": "explode_platform",
+      "name": "Exploded-View Tray",
+      "shape": "box",
+      "position": [
+        -2.645,
+        2.9,
+        2.975
+      ],
+      "size": [
+        5.44,
+        0.12,
+        4.76
+      ],
+      "material": "white composite",
+      "role": "Exploded-view tray that holds the lifted internals of core_c0_0 clear of the die so every pipeline block is visible (role: exploded view, not a physical part).",
+      "connections": [
+        "riser_post_a",
+        "riser_post_b",
+        "warp_scheduler",
+        "ipdom_stack",
+        "barrier_unit",
+        "instr_fetch",
+        "instr_decode",
+        "register_file",
+        "int_alu_lane_0",
+        "int_alu_lane_1",
+        "int_alu_lane_2",
+        "int_alu_lane_3",
+        "fp_alu_lane_0",
+        "fp_alu_lane_1",
+        "fp_alu_lane_2",
+        "fp_alu_lane_3",
+        "load_store_unit",
+        "writeback_commit",
+        "l1_cache",
+        "shared_memory_scratchpad"
+      ]
+    },
+    {
+      "id": "warp_scheduler",
+      "name": "Warp Scheduler",
+      "shape": "box",
+      "position": [
+        -4.77,
+        3.26,
+        3.91
+      ],
+      "size": [
+        0.85,
+        0.6,
+        1.02
+      ],
+      "material": "white composite",
+      "role": "Selects a ready warp each cycle and issues its thread mask into the front-end of the SIMT pipeline.",
+      "connections": [
+        "explode_platform",
+        "ipdom_stack",
+        "barrier_unit",
+        "instr_fetch"
+      ]
+    },
+    {
+      "id": "ipdom_stack",
+      "name": "IPDOM Reconvergence Stack",
+      "shape": "box",
+      "position": [
+        -4.77,
+        3.26,
+        2.72
+      ],
+      "size": [
+        0.68,
+        0.6,
+        0.85
+      ],
+      "material": "white composite",
+      "role": "Pushes and pops thread masks at split/join instructions to handle branch divergence within a warp.",
+      "connections": [
+        "warp_scheduler"
+      ]
+    },
+    {
+      "id": "barrier_unit",
+      "name": "Barrier Unit",
+      "shape": "box",
+      "position": [
+        -4.77,
+        3.26,
+        1.615
+      ],
+      "size": [
+        0.68,
+        0.6,
+        0.85
+      ],
+      "material": "white composite",
+      "role": "Executes the bar instruction — stalls warps at a synchronization point until every warp in the group has arrived.",
+      "connections": [
+        "warp_scheduler"
+      ]
+    },
+    {
+      "id": "instr_fetch",
+      "name": "Instruction Fetch",
+      "shape": "box",
+      "position": [
+        -3.75,
+        3.26,
+        3.91
+      ],
+      "size": [
+        0.85,
+        0.6,
+        1.02
+      ],
+      "material": "white composite",
+      "role": "Fetches the next instruction for the scheduled warp from the instruction cache.",
+      "connections": [
+        "warp_scheduler",
+        "instr_decode"
+      ]
+    },
+    {
+      "id": "instr_decode",
+      "name": "Instruction Decode",
+      "shape": "box",
+      "position": [
+        -3.75,
+        3.26,
+        2.72
+      ],
+      "size": [
+        0.85,
+        0.6,
+        1.02
+      ],
+      "material": "white composite",
+      "role": "Decodes the RISC-V instruction, including the custom SIMT control opcodes, and resolves register operands.",
+      "connections": [
+        "instr_fetch",
+        "register_file"
+      ]
+    },
+    {
+      "id": "register_file",
+      "name": "Register File (per-warp GPRs)",
+      "shape": "box",
+      "position": [
+        -2.73,
+        3.31,
+        2.975
+      ],
+      "size": [
+        0.85,
+        0.7,
+        2.38
+      ],
+      "material": "brass / copper",
+      "role": "Holds the general-purpose registers for every thread of every resident warp and feeds the SIMD ALU lanes.",
+      "connections": [
+        "instr_decode",
+        "int_alu_lane_0",
+        "int_alu_lane_1",
+        "int_alu_lane_2",
+        "int_alu_lane_3",
+        "fp_alu_lane_0",
+        "fp_alu_lane_1",
+        "fp_alu_lane_2",
+        "fp_alu_lane_3",
+        "load_store_unit"
+      ]
+    },
+    {
+      "id": "int_alu_lane_0",
+      "name": "Integer SIMD ALU Lane 0",
+      "shape": "box",
+      "position": [
+        -1.795,
+        3.235,
+        4.25
+      ],
+      "size": [
+        0.595,
+        0.55,
+        0.595
+      ],
+      "material": "brushed steel",
+      "role": "Executes integer arithmetic for thread 0 of the warp in lockstep with the other integer lanes.",
+      "connections": [
+        "register_file",
+        "writeback_commit"
+      ]
+    },
+    {
+      "id": "int_alu_lane_1",
+      "name": "Integer SIMD ALU Lane 1",
+      "shape": "box",
+      "position": [
+        -1.795,
+        3.235,
+        3.57
+      ],
+      "size": [
+        0.595,
+        0.55,
+        0.595
+      ],
+      "material": "brushed steel",
+      "role": "Executes integer arithmetic for thread 1 of the warp in lockstep with the other integer lanes.",
+      "connections": [
+        "register_file",
+        "writeback_commit"
+      ]
+    },
+    {
+      "id": "int_alu_lane_2",
+      "name": "Integer SIMD ALU Lane 2",
+      "shape": "box",
+      "position": [
+        -1.795,
+        3.235,
+        2.89
+      ],
+      "size": [
+        0.595,
+        0.55,
+        0.595
+      ],
+      "material": "brushed steel",
+      "role": "Executes integer arithmetic for thread 2 of the warp in lockstep with the other integer lanes.",
+      "connections": [
+        "register_file",
+        "writeback_commit"
+      ]
+    },
+    {
+      "id": "int_alu_lane_3",
+      "name": "Integer SIMD ALU Lane 3",
+      "shape": "box",
+      "position": [
+        -1.795,
+        3.235,
+        2.21
+      ],
+      "size": [
+        0.595,
+        0.55,
+        0.595
+      ],
+      "material": "brushed steel",
+      "role": "Executes integer arithmetic for thread 3 of the warp in lockstep with the other integer lanes.",
+      "connections": [
+        "register_file",
+        "writeback_commit"
+      ]
+    },
+    {
+      "id": "fp_alu_lane_0",
+      "name": "Floating-Point SIMD ALU Lane 0",
+      "shape": "box",
+      "position": [
+        -1.115,
+        3.31,
+        4.25
+      ],
+      "size": [
+        0.595,
+        0.7,
+        0.595
+      ],
+      "material": "carbon fiber",
+      "role": "Executes floating-point arithmetic for thread 0 of the warp in lockstep with the other FP lanes.",
+      "connections": [
+        "register_file",
+        "writeback_commit"
+      ]
+    },
+    {
+      "id": "fp_alu_lane_1",
+      "name": "Floating-Point SIMD ALU Lane 1",
+      "shape": "box",
+      "position": [
+        -1.115,
+        3.31,
+        3.57
+      ],
+      "size": [
+        0.595,
+        0.7,
+        0.595
+      ],
+      "material": "carbon fiber",
+      "role": "Executes floating-point arithmetic for thread 1 of the warp in lockstep with the other FP lanes.",
+      "connections": [
+        "register_file",
+        "writeback_commit"
+      ]
+    },
+    {
+      "id": "fp_alu_lane_2",
+      "name": "Floating-Point SIMD ALU Lane 2",
+      "shape": "box",
+      "position": [
+        -1.115,
+        3.31,
+        2.89
+      ],
+      "size": [
+        0.595,
+        0.7,
+        0.595
+      ],
+      "material": "carbon fiber",
+      "role": "Executes floating-point arithmetic for thread 2 of the warp in lockstep with the other FP lanes.",
+      "connections": [
+        "register_file",
+        "writeback_commit"
+      ]
+    },
+    {
+      "id": "fp_alu_lane_3",
+      "name": "Floating-Point SIMD ALU Lane 3",
+      "shape": "box",
+      "position": [
+        -1.115,
+        3.31,
+        2.21
+      ],
+      "size": [
+        0.595,
+        0.7,
+        0.595
+      ],
+      "material": "carbon fiber",
+      "role": "Executes floating-point arithmetic for thread 3 of the warp in lockstep with the other FP lanes.",
+      "connections": [
+        "register_file",
+        "writeback_commit"
+      ]
+    },
+    {
+      "id": "load_store_unit",
+      "name": "Load / Store Unit",
+      "shape": "box",
+      "position": [
+        -0.435,
+        3.26,
+        3.91
+      ],
+      "size": [
+        0.68,
+        0.6,
+        0.85
+      ],
+      "material": "brushed steel",
+      "role": "Generates memory addresses for the warp's threads and issues coalesced loads and stores to the per-core L1 cache.",
+      "connections": [
+        "register_file",
+        "l1_cache"
+      ]
+    },
+    {
+      "id": "writeback_commit",
+      "name": "Writeback / Commit Stage",
+      "shape": "box",
+      "position": [
+        -0.435,
+        3.26,
+        2.38
+      ],
+      "size": [
+        0.765,
+        0.6,
+        1.19
+      ],
+      "material": "white composite",
+      "role": "Collects results from all eight SIMD lanes and retires them into the register file, completing each warp instruction.",
+      "connections": [
+        "register_file"
+      ]
+    },
+    {
+      "id": "l1_cache",
+      "name": "L1 Cache (per core)",
+      "shape": "box",
+      "position": [
+        -2.73,
+        3.26,
+        4.76
+      ],
+      "size": [
+        1.02,
+        0.6,
+        0.765
+      ],
+      "material": "glass display",
+      "role": "Private data/instruction cache of this core, serving loads and stores from the LSU and forwarding misses to the cluster L2.",
+      "connections": [
+        "load_store_unit",
+        "shared_memory_scratchpad"
+      ]
+    },
+    {
+      "id": "shared_memory_scratchpad",
+      "name": "Shared Memory / Scratchpad",
+      "shape": "box",
+      "position": [
+        -2.73,
+        3.26,
+        1.19
+      ],
+      "size": [
+        1.02,
+        0.6,
+        0.765
+      ],
+      "material": "glass display",
+      "role": "Low-latency software-managed scratchpad shared by all threads of the core for inter-thread communication.",
+      "connections": [
+        "l1_cache"
+      ]
+    },
+    {
+      "id": "bus_host_l3",
+      "name": "Host-to-L3 Bus",
+      "shape": "box",
+      "position": [
+        -1.0625,
+        0.42,
+        0
+      ],
+      "size": [
+        9.775,
+        0.15,
+        0.425
+      ],
+      "material": "brass / copper",
+      "role": "Carries kernel data from the PCIe host interface to the device-wide L3 cache.",
+      "connections": [
+        "die_plate",
+        "pcie_host_interface",
+        "l3_cache"
+      ]
+    },
+    {
+      "id": "bus_mem_l3",
+      "name": "L3-to-Memory Bus",
+      "shape": "box",
+      "position": [
+        5.015,
+        0.42,
+        0
+      ],
+      "size": [
+        2.38,
+        0.15,
+        0.51
+      ],
+      "material": "brass / copper",
+      "role": "Connects the L3 cache to the external memory interface for last-level miss traffic.",
+      "connections": [
+        "die_plate",
+        "l3_cache",
+        "memory_interface"
+      ]
+    },
+    {
+      "id": "bus_l3_l2c0",
+      "name": "L3-to-L2 Bus (Cluster 0)",
+      "shape": "box",
+      "position": [
+        3.485,
+        0.42,
+        1.445
+      ],
+      "size": [
+        0.425,
+        0.15,
+        2.89
+      ],
+      "material": "brass / copper",
+      "role": "Interconnect link feeding the cluster 0 L2 cache from the device L3 cache.",
+      "connections": [
+        "die_plate",
+        "l3_cache",
+        "l2_cache_c0"
+      ]
+    },
+    {
+      "id": "bus_l3_l2c1",
+      "name": "L3-to-L2 Bus (Cluster 1)",
+      "shape": "box",
+      "position": [
+        3.485,
+        0.42,
+        -1.445
+      ],
+      "size": [
+        0.425,
+        0.15,
+        2.89
+      ],
+      "material": "brass / copper",
+      "role": "Interconnect link feeding the cluster 1 L2 cache from the device L3 cache.",
+      "connections": [
+        "die_plate",
+        "l3_cache",
+        "l2_cache_c1"
+      ]
+    },
+    {
+      "id": "bus_cluster0_interconnect",
+      "name": "Cluster 0 Interconnect Rail",
+      "shape": "box",
+      "position": [
+        -0.5525,
+        0.55,
+        1.7
+      ],
+      "size": [
+        8.075,
+        0.15,
+        0.34
+      ],
+      "material": "brass / copper",
+      "role": "On-cluster bus tying the three cluster 0 cores to their shared L2 cache.",
+      "connections": [
+        "cluster0_substrate",
+        "l2_cache_c0",
+        "core_c0_0",
+        "core_c0_1",
+        "core_c0_2"
+      ]
+    },
+    {
+      "id": "bus_cluster1_interconnect",
+      "name": "Cluster 1 Interconnect Rail",
+      "shape": "box",
+      "position": [
+        -0.5525,
+        0.55,
+        -1.7
+      ],
+      "size": [
+        8.075,
+        0.15,
+        0.34
+      ],
+      "material": "brass / copper",
+      "role": "On-cluster bus tying the three cluster 1 cores to their shared L2 cache.",
+      "connections": [
+        "cluster1_substrate",
+        "l2_cache_c1",
+        "core_c1_0",
+        "core_c1_1",
+        "core_c1_2"
+      ]
+    }
+  ]
+}
