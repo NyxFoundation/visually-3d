@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # self-improve — recursively self-improve a visually-3d scene, with VLM visual
-# feedback. Driven by the Codex CLI.
+# feedback. Driven by either the Codex CLI or the Claude CLI.
 #
 # Invoked through the Makefile:
 #     make self-improve <name.json> [max-iterations]
@@ -8,8 +8,8 @@
 #
 # Each iteration:
 #   1. renders the current scene to a 2x2 contact-sheet PNG (offscreen, no GPU);
-#   2. runs `codex exec` with that PNG attached, so the model critiques the
-#      scene *visually* as well as from the JSON, then returns an improved scene;
+#   2. runs the model with that render, so it critiques the scene *visually*
+#      as well as from the JSON, then returns an improved scene;
 #   3. validates and writes the improved scene back;
 #   4. repeats until the model reports "converged", the rubric score stops
 #      rising, or max-iterations is reached (default 4).
@@ -19,7 +19,11 @@
 # .self-improve/<scene>-<timestamp>/ so the whole trial-and-error history is
 # auditable. That directory is git-ignored but accumulates locally.
 #
-# Env: CODEX_BIN overrides the Codex CLI executable (default: codex).
+# Env:
+#   DRIVER        codex | claude — which CLI drives the loop (default: codex)
+#   CODEX_BIN     Codex CLI executable  (default: codex)
+#   CLAUDE_BIN    Claude CLI executable (default: claude)
+#   CLAUDE_MODEL  model alias for the Claude driver (default: opus)
 
 set -eu
 
@@ -29,7 +33,10 @@ RENDER="$ROOT/scripts/render-scene.mjs"
 APPLY="$ROOT/scripts/self-improve-apply.mjs"
 SAMPLES_DIR="$ROOT/public/samples"
 MAX_ITERS="${2:-4}"
+DRIVER="${DRIVER:-codex}"
 CODEX_BIN="${CODEX_BIN:-codex}"
+CLAUDE_BIN="${CLAUDE_BIN:-claude}"
+CLAUDE_MODEL="${CLAUDE_MODEL:-opus}"
 
 die() { echo "self-improve: $*" >&2; exit 1; }
 
@@ -37,8 +44,12 @@ die() { echo "self-improve: $*" >&2; exit 1; }
 [ -f "$PROMPT_FILE" ] || die "missing prompt file: $PROMPT_FILE"
 [ -f "$RENDER" ] || die "missing renderer: $RENDER"
 [ -f "$APPLY" ] || die "missing helper: $APPLY"
-command -v "$CODEX_BIN" >/dev/null 2>&1 || die "Codex CLI '$CODEX_BIN' not on PATH"
 command -v node >/dev/null 2>&1 || die "node not on PATH"
+case "$DRIVER" in
+  codex)  command -v "$CODEX_BIN"  >/dev/null 2>&1 || die "Codex CLI '$CODEX_BIN' not on PATH" ;;
+  claude) command -v "$CLAUDE_BIN" >/dev/null 2>&1 || die "Claude CLI '$CLAUDE_BIN' not on PATH" ;;
+  *)      die "DRIVER must be 'codex' or 'claude', got '$DRIVER'" ;;
+esac
 
 # Accept either a bare sample name or an explicit path.
 case "$1" in
@@ -62,7 +73,7 @@ say() { echo "$@"; echo "$@" >> "$RUN_LOG"; }
 
 say "self-improve: $TARGET"
 say "             history -> $RUN_DIR"
-say "             driver   -> $CODEX_BIN (visual feedback enabled)"
+say "             driver   -> $DRIVER (visual feedback enabled)"
 say "             up to $MAX_ITERS iteration(s)"
 
 i=1
@@ -99,23 +110,64 @@ while [ "$i" -le "$MAX_ITERS" ]; do
     echo '```'
   } > "$PROMPT_TXT"
 
-  # 3. run Codex with the render attached. --json streams every event — the
-  #    model's full reasoning/thinking trace — to a JSONL file; --output-last-
-  #    message captures the clean final answer for the validator.
+  # Claude has no --image flag; point it at the render so it Reads it itself.
+  if [ "$DRIVER" = "claude" ]; then
+    {
+      echo
+      echo "## Rendered view — read this file before critiquing"
+      echo
+      echo "The 2x2 ISO/front/side/top contact-sheet render of the current"
+      echo "scene is saved at:"
+      echo
+      echo "    $RENDER_PNG"
+      echo
+      echo "Use the Read tool to open that PNG now and inspect it visually."
+      echo "It is the image this prompt refers to as the attached render."
+    } >> "$PROMPT_TXT"
+  fi
+
+  # 3. run the model with the render. Both drivers stream every event — the
+  #    full reasoning/thinking trace — to a JSONL file, and leave the clean
+  #    final answer in $MESSAGE for the validator.
   MESSAGE="$RUN_DIR/iter-$ii-message.txt"
   EVENTS="$RUN_DIR/iter-$ii-events.jsonl"
-  CODEX_ERR="$RUN_DIR/iter-$ii-codex.err"
-  if ! "$CODEX_BIN" exec \
-        --json \
-        --sandbox read-only \
-        --skip-git-repo-check \
-        --image "$RENDER_PNG" \
-        --output-last-message "$MESSAGE" \
-        "$(cat "$PROMPT_TXT")" > "$EVENTS" 2> "$CODEX_ERR"; then
-    die "Codex CLI failed on iteration $i — see $CODEX_ERR and $EVENTS"
+  MODEL_ERR="$RUN_DIR/iter-$ii-$DRIVER.err"
+  if [ "$DRIVER" = "codex" ]; then
+    if ! "$CODEX_BIN" exec \
+          --json \
+          --sandbox read-only \
+          --skip-git-repo-check \
+          --image "$RENDER_PNG" \
+          --output-last-message "$MESSAGE" \
+          "$(cat "$PROMPT_TXT")" > "$EVENTS" 2> "$MODEL_ERR"; then
+      die "Codex CLI failed on iteration $i — see $MODEL_ERR and $EVENTS"
+    fi
+  else
+    # Claude reads the render PNG itself (Read tool). stream-json carries the
+    # thinking trace; the trailing "result" event holds the final answer.
+    if ! "$CLAUDE_BIN" -p "$(cat "$PROMPT_TXT")" \
+          --model "$CLAUDE_MODEL" \
+          --tools Read \
+          --permission-mode acceptEdits \
+          --output-format stream-json --verbose \
+          > "$EVENTS" 2> "$MODEL_ERR"; then
+      die "Claude CLI failed on iteration $i — see $MODEL_ERR and $EVENTS"
+    fi
+    node -e '
+      const fs = require("fs");
+      const lines = fs.readFileSync(process.argv[1], "utf8").trim().split("\n");
+      let result = "";
+      for (const line of lines) {
+        try {
+          const o = JSON.parse(line);
+          if (o.type === "result" && typeof o.result === "string") result = o.result;
+        } catch { /* skip non-JSON lines */ }
+      }
+      fs.writeFileSync(process.argv[2], result);
+    ' "$EVENTS" "$MESSAGE"
   fi
-  [ -s "$MESSAGE" ] || die "Codex produced no final message on iteration $i — see $EVENTS"
-  say "  codex done (thinking trace: $(basename "$EVENTS"), $(wc -l < "$EVENTS" | tr -d ' ') events)"
+  [ -s "$MESSAGE" ] || die "$DRIVER produced no final message on iteration $i — see $EVENTS"
+  say "  $DRIVER done (thinking trace: $(basename "$EVENTS"), $(wc -l < "$EVENTS" | tr -d ' ') events)"
 
   # 4. validate + apply the returned scene; exit code drives the loop.
   APPLY_LOG="$RUN_DIR/iter-$ii-apply.log"
@@ -130,7 +182,7 @@ while [ "$i" -le "$MAX_ITERS" ]; do
     0)  ;;
     10) say ""; say "self-improve: model reports convergence — stopping."; break ;;
     20) say ""; say "self-improve: no further gain — stopping."; break ;;
-    *)  die "could not apply iteration $i (see $MESSAGE and $CODEX_LOG)" ;;
+    *)  die "could not apply iteration $i (see $MESSAGE and $EVENTS)" ;;
   esac
 
   i=$((i + 1))
