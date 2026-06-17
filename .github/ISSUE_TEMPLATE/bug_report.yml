@@ -1,0 +1,72 @@
+name: 🐛 Bug report
+description: Something isn't working as expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report! Please fill in as much as you can — it makes fixes much faster.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, and what you expected instead.
+      placeholder: When I run `visually create "…"`, it …
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The exact command(s) and prompt you used.
+      placeholder: |
+        1. `visually create "Apollo CSM"`
+        2. …
+      render: shell
+    validations:
+      required: true
+  - type: dropdown
+    id: command
+    attributes:
+      label: Which command?
+      options:
+        - serve (the GUI)
+        - create
+        - improve
+        - check
+        - upload
+        - other / not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: driver
+    attributes:
+      label: Which CLI driver?
+      options:
+        - Claude CLI
+        - Codex CLI
+        - N/A (gallery only)
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / error output
+      description: Paste the terminal output or browser console error. For `improve`, the relevant run dir is under `~/.visually-3d/runs/`.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: visually-3d version
+      description: "Output of `visually-3d --help` header, or your installed npm version."
+      placeholder: "0.3.0"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Node version (`node -v`), and CLI version (`claude --version` / `codex --version`).
+      placeholder: "macOS 14.5, Node 20.11, claude 1.x"
+    validations:
+      required: true

@@ -53,8 +53,13 @@
     "cli"
   ],
   "license": "MIT",
+  "author": "NyxFoundation",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NyxFoundation/visually-3d.git"
+  },
+  "homepage": "https://github.com/NyxFoundation/visually-3d#readme",
+  "bugs": {
+    "url": "https://github.com/NyxFoundation/visually-3d/issues"
   }
 }

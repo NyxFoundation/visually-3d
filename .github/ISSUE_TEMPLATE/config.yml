@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & ideas
+    url: https://github.com/NyxFoundation/visually-3d/discussions
+    about: Ask a question or float an idea in Discussions before filing an issue.
+  - name: 📦 Contribute a sample scene
+    url: https://github.com/NyxFoundation/visually-3d#contributing
+    about: Generated something cool? Run `visually upload <scene>` to open a PR.
