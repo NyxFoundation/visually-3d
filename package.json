@@ -1,6 +1,6 @@
 {
   "name": "visually-3d",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "Interactive 3D machinery visualization. Run `npx visually-3d` to open a local GUI that speaks to your Claude CLI.",
   "type": "module",
   "bin": {

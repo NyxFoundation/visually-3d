@@ -6,6 +6,35 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-06-17
+
+### Added
+
+- **Auto-detected generation modes** (`server/modes.js`): `create` now picks a
+  mode — `hardware`, `algorithm`, or `architecture` — from the subject and
+  swaps the persona, quality bar, material vocabulary and modelling strategy
+  accordingly. Override with `--mode`.
+- **Live reasoning + full run logs**: `create` streams the model's thinking as
+  it works (stream-json) and writes every run — prompt, raw stream, reasoning
+  transcript, scene, and metadata — to `~/.visually-3d/runs/create-<id>-<stamp>/`.
+- **Built-in refinement**: after generating a draft, `create` runs the visual
+  self-improvement loop ≥3× by default (`--refine N` / `--no-refine`).
+- **Cross-run memory** (`lib/history.js`): `improve` seeds its first iteration
+  with the unfinished gaps from prior `create`/`improve` runs of the same scene,
+  so it continues the trial-and-error instead of restarting cold.
+- New CPU / GPU gallery sample: **CFNTT NTT FPGA accelerator** (TCHES) —
+  conflict-free radix-2/4 Number Theoretic Transform engine.
+
+### Fixed
+
+- `improve`'s visual critique was effectively blind: it ran with
+  `--permission-mode acceptEdits`, which would not let Claude read the
+  contact-sheet render under `~/.visually-3d/runs` (outside the cwd). It now
+  uses `bypassPermissions` (still restricted to `--tools Read`) so the critique
+  is grounded in what the scene actually looks like.
+- `slugify` now falls back to a content hash for names with no ASCII (e.g.
+  Japanese), so subjects no longer all collapse to the id `scene`.
+
 ## [0.9.1] - 2026-06-17
 
 ### Fixed
