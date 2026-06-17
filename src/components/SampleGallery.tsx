@@ -25,11 +25,63 @@ type SampleGalleryProps = {
 
 type CardState = 'idle' | 'visible' | 'loaded' | 'error';
 
-// Browsers cap concurrent WebGL contexts (Safari ≈ 8, Chrome 16). With one main
-// viewer plus a thumbnail per card, scrolling the gallery quickly exceeds that
-// cap and the oldest context — the main viewer — gets evicted, whiting it out.
-// So keep observing each card's visibility and unmount the thumbnail <Canvas>
-// when the card scrolls back off-screen.
+// Browsers cap concurrent WebGL contexts (mobile Safari ≈ 8, Chrome ≈ 16). One
+// live <Canvas> per thumbnail blows past that as you scroll, and the browser
+// evicts the oldest context — usually the main viewer — leaving it (or the new
+// thumbnails) blank-white. Unmounting off-screen cards alone is not enough on
+// mobile: context teardown lags behind a fast scroll. So we also hard-cap how
+// many thumbnail canvases may be live at once with a tiny global pool. Cards
+// that can't get a slot show a static poster instead of forcing a new context.
+// Lower on phones — both to stay under the smaller context cap and to spare the
+// GPU from too many simultaneous auto-rotating canvases.
+const MAX_THUMBNAIL_CANVASES =
+  typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches ? 3 : 6;
+let liveThumbnails = 0;
+const slotWaiters = new Set<() => void>();
+
+function acquireThumbnailSlot(): boolean {
+  if (liveThumbnails >= MAX_THUMBNAIL_CANVASES) return false;
+  liveThumbnails += 1;
+  return true;
+}
+function releaseThumbnailSlot(): void {
+  liveThumbnails = Math.max(0, liveThumbnails - 1);
+  const next = slotWaiters.values().next().value as (() => void) | undefined;
+  if (next) {
+    slotWaiters.delete(next);
+    next();
+  }
+}
+
+// Grant a thumbnail WebGL slot while `want` is true, capped globally. Returns
+// whether this card currently holds a slot; releases it on unmount / when the
+// card scrolls away.
+function useThumbnailSlot(want: boolean): boolean {
+  const [granted, setGranted] = useState(false);
+  const heldRef = useRef(false);
+  useEffect(() => {
+    if (!want) return undefined;
+    const grab = () => {
+      if (acquireThumbnailSlot()) {
+        heldRef.current = true;
+        setGranted(true);
+        return true;
+      }
+      return false;
+    };
+    const waiter = () => { grab(); };
+    if (!grab()) slotWaiters.add(waiter);
+    return () => {
+      slotWaiters.delete(waiter);
+      if (heldRef.current) {
+        heldRef.current = false;
+        setGranted(false);
+        releaseThumbnailSlot();
+      }
+    };
+  }, [want]);
+  return granted && want;
+}
 
 export const SampleGallery: React.FC<SampleGalleryProps> = ({ samples, categories, activeId, onSelect }) => {
   const [query, setQuery] = useState('');
@@ -154,6 +206,11 @@ const SampleCard: React.FC<{
     if (scene) onSelect(sample, scene);
   };
 
+  // Only mount a thumbnail <Canvas> if a global WebGL slot is free (see pool
+  // above) — otherwise the gallery exhausts the browser's context cap and the
+  // main viewer whites out.
+  const hasSlot = useThumbnailSlot(state === 'loaded' && !!scene && inView);
+
   return (
     <button
       ref={ref}
@@ -165,10 +222,14 @@ const SampleCard: React.FC<{
       aria-pressed={active}
     >
       <div className="gallery__thumb">
-        {state === 'loaded' && scene && inView ? (
-          <LazyViewer scene={scene} compact maxDpr={1.25} />
-        ) : state === 'error' ? (
+        {state === 'error' ? (
           <div className="gallery__thumb-fallback">failed to load</div>
+        ) : hasSlot && scene ? (
+          <LazyViewer scene={scene} compact maxDpr={1.25} />
+        ) : state === 'loaded' ? (
+          // Loaded, but waiting for a free WebGL slot — show a static accent
+          // poster rather than a blank/white canvas.
+          <div className="gallery__thumb-poster" aria-hidden />
         ) : (
           <div className="gallery__thumb-fallback">
             <span className="gallery__spinner" aria-hidden />

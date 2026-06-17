@@ -988,6 +988,15 @@ button, input {
   text-transform: uppercase;
 }
 
+/* Shown when a card is loaded but no WebGL slot is free (cap reached). A calm
+   accent-tinted poster instead of a blank/white canvas. */
+.gallery__thumb-poster {
+  height: 100%;
+  background:
+    radial-gradient(120% 100% at 70% 0%, color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 60%),
+    linear-gradient(160deg, #11151c 0%, #0b0d12 100%);
+}
+
 .gallery__spinner {
   display: inline-block;
   width: 18px;

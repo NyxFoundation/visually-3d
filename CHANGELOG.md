@@ -6,6 +6,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-06-17
+
+### Fixed
+
+- **Mobile gallery white-out**: each sample thumbnail mounted its own live
+  WebGL `<Canvas>`, so scrolling the gallery exceeded the browser's concurrent
+  context cap (mobile Safari ≈ 8) and the oldest context — the main viewer —
+  got evicted and rendered blank-white. Concurrent thumbnail canvases are now
+  hard-capped by a small global pool (3 on phones, 6 on desktop), keeping the
+  total well under the cap; cards beyond the cap show a static accent poster
+  instead of a blank canvas, and slots are released as cards scroll off-screen.
+
 ## [0.10.0] - 2026-06-17
 
 ### Added
