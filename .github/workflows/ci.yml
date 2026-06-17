@@ -10,12 +10,12 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  build-test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        node: [18, 20, 22]
+        node: [20, 22]
     name: build + smoke (node ${{ matrix.node }})
     steps:
       - uses: actions/checkout@v4
@@ -32,6 +32,30 @@ jobs:
         run: npm run build
 
       - name: Smoke test
+        run: npm run smoke
+
+  # The build toolchain (Vite) needs Node 20+, but the published package runs on
+  # Node 18 (engines: ">=18"). Build on 20, then run the smoke test on 18
+  # against the prebuilt dist to verify that runtime promise.
+  runtime-node18:
+    runs-on: ubuntu-latest
+    name: runtime smoke (node 18)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Smoke test on Node 18
         run: npm run smoke
 
   package:

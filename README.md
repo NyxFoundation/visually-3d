@@ -68,7 +68,7 @@ No telemetry. No backend. No accounts. The sample gallery works even with no CLI
 
 ## Prerequisites
 
-- **Node.js 18+**
+- **Node.js 18+** to run the package (building from source needs **Node 20+**, a Vite requirement).
 - **[Claude CLI](https://docs.claude.com/en/docs/claude-code)** (or **[Codex CLI](https://github.com/openai/codex)**) on your `$PATH` to generate or refine scenes — the gallery works without it.
 - **[GitHub CLI](https://cli.github.com)** (`gh`) only if you want to `upload` scenes via pull request.
 
