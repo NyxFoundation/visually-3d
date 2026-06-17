@@ -71,6 +71,14 @@ mkdir -p "$RUN_DIR"
 cp "$TARGET" "$RUN_DIR/iter-00.json"
 RUN_LOG="$RUN_DIR/run.log"
 
+# Cross-run memory: if a seed reflection distilled from prior create/improve
+# runs was provided, preload it as last-review.json so iteration 1 carries it
+# forward (the loop already injects last-review.json as "Carried-over
+# reflection"). This makes improve *continue* the trial-and-error, not restart.
+if [ -n "${VISUALLY_SEED_REVIEW:-}" ] && [ -f "$VISUALLY_SEED_REVIEW" ]; then
+  cp "$VISUALLY_SEED_REVIEW" "$RUN_DIR/last-review.json"
+fi
+
 # say: echo to console and append to the run log.
 say() { echo "$@"; echo "$@" >> "$RUN_LOG"; }
 

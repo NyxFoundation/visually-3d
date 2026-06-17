@@ -53,12 +53,25 @@ const hex = (h) => [
   parseInt(h.slice(3, 5), 16),
   parseInt(h.slice(5, 7), 16),
 ];
+const isWood = (m) =>
+  /\b(wood|timber|unpainted|camphor|kusunoki|zelkova|keyaki|paulownia|kiri|cypress|hinoki|cedar|sugi|pine|matsu|oak|walnut|teak)\b/.test(m);
+
 const materialColor = (material, shape) => {
   const m = (material || '').toLowerCase();
   if (m.includes('glass') || m.includes('display')) return hex('#46b7ff');
   if (m.includes('carbon')) return hex('#1c2128');
   if (m.includes('brass')) return hex('#d4a657');
   if (m.includes('copper')) return hex('#b87333');
+  if (m.includes('bronze')) return hex('#8c7853');
+  if (m.includes('gold') || m.includes('kinpaku') || m.includes('gilt') || m.includes('gilded')) return hex('#d4af37');
+  if (m.includes('vermillion') || m.includes('vermilion') || (m.includes('lacquer') && m.includes('red'))) return hex('#b3331f');
+  if (m.includes('lacquer') || m.includes('urushi')) return hex(m.includes('black') ? '#15110f' : '#3a1410');
+  if (m.includes('keyaki') || m.includes('zelkova')) return hex('#a9743f');
+  if (m.includes('cedar') || m.includes('sugi')) return hex('#b06a44');
+  if (m.includes('paulownia') || m.includes('kiri')) return hex('#d8c9a8');
+  if (m.includes('cypress') || m.includes('hinoki')) return hex('#e0c89a');
+  if (m.includes('walnut')) return hex('#5c4329');
+  if (isWood(m)) return hex('#c8a06a');
   if (m.includes('fiberglass')) return hex('#e8e8ea');
   if (m.includes('concrete')) return hex('#6e737b');
   if (m.includes('white')) return hex('#f0f0f2');

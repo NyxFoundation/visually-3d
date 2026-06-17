@@ -41,6 +41,18 @@ as defects to fix.
 
 ---
 
+## Mode-awareness (read `metadata.mode` first)
+
+This scene was generated in one of three modes; respect it — do **not** "fix" a
+non-hardware scene by forcing it into the mechanical-engineering mould.
+
+- **hardware** (default): everything below applies as written.
+- **architecture**: judge the structural system (columns/beams/slabs/roof,
+  facade rhythm) and materials (concrete/steel/timber/glass), not "subsystems".
+- **algorithm**: judge dataflow legibility and that color encodes role; blocks
+  are abstract, materials are semantic, "buildability" means a CS student could
+  rebuild the algorithm.
+
 ## The standard you are improving toward
 
 A finished scene must pass **two acceptance tests**. Improve until both pass.
@@ -134,8 +146,8 @@ Score the scene you are *emitting*, not the one you received.
 | **Annotation depth** | 5 | Every `role` explains function in one concrete sentence; `facts[]` has 6–10 numeric entries; `sources[]` has 2–4 real citations. |
 | **Self-consistency** | 5 | Connection graph is rooted at the main structural part, every non-root part connects, no dangling/duplicate ids, no NaN/Infinity/zero sizes. |
 
-A 10-part scene cannot score above ~50 — recognizable machines need
-**20–40 parts**. Add the iconic sub-features the current scene is missing.
+A 10-part scene cannot score above ~50 — recognizable machines and buildings
+need **20–40 parts**. Add the iconic sub-features the current scene is missing.
 
 ---
 

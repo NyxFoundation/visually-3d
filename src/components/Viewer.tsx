@@ -5,12 +5,29 @@ import * as THREE from 'three';
 import { Connections } from './Connections';
 import type { Part, SceneDescriptor } from '../types';
 
+// Wood species + craft finishes (craft/architecture modes). Checked before the
+// generic metal fallbacks so "keyaki"/"urushi"/"kinpaku" map to warm tones, not grey.
+const isWood = (m: string) =>
+  /\b(wood|timber|unpainted|camphor|kusunoki|zelkova|keyaki|paulownia|kiri|cypress|hinoki|cedar|sugi|pine|matsu|oak|walnut|teak)\b/.test(m);
+
 const materialColor = (material: string, shape: Part['shape']): string => {
   const lower = material.toLowerCase();
   if (lower.includes('glass') || lower.includes('display')) return '#46b7ff';
   if (lower.includes('carbon')) return '#0f1115';
   if (lower.includes('brass')) return '#d4a657';
   if (lower.includes('copper')) return '#b87333';
+  if (lower.includes('bronze')) return '#8c7853';
+  if (lower.includes('gold') || lower.includes('kinpaku') || lower.includes('gilt') || lower.includes('gilded')) return '#d4af37';
+  // Lacquer (urushi): vermillion (朱) vs black (黒) finishes.
+  if (lower.includes('vermillion') || lower.includes('vermilion') || (lower.includes('lacquer') && lower.includes('red'))) return '#b3331f';
+  if (lower.includes('lacquer') || lower.includes('urushi')) return lower.includes('black') ? '#15110f' : '#3a1410';
+  // Wood species → warm tones keyed to the species.
+  if (lower.includes('keyaki') || lower.includes('zelkova')) return '#a9743f';
+  if (lower.includes('cedar') || lower.includes('sugi')) return '#b06a44';
+  if (lower.includes('paulownia') || lower.includes('kiri')) return '#d8c9a8';
+  if (lower.includes('cypress') || lower.includes('hinoki')) return '#e0c89a';
+  if (lower.includes('walnut')) return '#5c4329';
+  if (isWood(lower)) return '#c8a06a';
   if (lower.includes('fiberglass')) return '#e8e8ea';
   if (lower.includes('concrete')) return '#6e737b';
   if (lower.includes('white')) return '#f0f0f2';
@@ -25,7 +42,11 @@ const materialPhysical = (material: string) => {
   if (lower.includes('rubber')) return { metalness: 0.0, roughness: 0.95 };
   if (lower.includes('glass') || lower.includes('display')) return { metalness: 0.15, roughness: 0.15 };
   if (lower.includes('carbon')) return { metalness: 0.35, roughness: 0.55 };
-  if (lower.includes('brass') || lower.includes('copper')) return { metalness: 0.9, roughness: 0.35 };
+  if (lower.includes('gold') || lower.includes('kinpaku') || lower.includes('gilt') || lower.includes('gilded')) return { metalness: 0.95, roughness: 0.3 };
+  if (lower.includes('brass') || lower.includes('copper') || lower.includes('bronze')) return { metalness: 0.9, roughness: 0.35 };
+  // Lacquer is the one glossy "wood" finish — low roughness so it catches highlights.
+  if (lower.includes('lacquer') || lower.includes('urushi')) return { metalness: 0.1, roughness: 0.12 };
+  if (isWood(lower)) return { metalness: 0.0, roughness: 0.72 };
   if (lower.includes('brushed')) return { metalness: 0.8, roughness: 0.45 };
   if (lower.includes('anodized') || lower.includes('aluminum')) return { metalness: 0.7, roughness: 0.4 };
   if (lower.includes('steel') || lower.includes('forged')) return { metalness: 0.85, roughness: 0.35 };

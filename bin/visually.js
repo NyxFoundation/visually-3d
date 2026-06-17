@@ -15,13 +15,19 @@ const HELP = `visually-3d — interactive 3D machinery visualization, driven by 
 Usage:
   visually [serve] [--no-open]            start the local GUI (default)
   visually create "<machine name>"        generate a new scene
-       [--hint <text>] [--url <url>] [--driver claude|codex] [--id <id>] [--force]
+       [--hint <text>] [--url <url>] [--mode hardware|algorithm|architecture]
+       [--refine N | --no-refine] [--driver claude|codex] [--id <id>] [--force]
   visually improve <scene> [iters]        recursively self-improve a scene
        [--driver codex|claude] [--model <m>]
   visually check <scene> [--png]          inspect a scene (browser, or PNG contact sheet)
        [--out <file.png>] [--no-open]
   visually upload <scene>                 open a PR adding the scene to the gallery
        [--repo owner/name] [--title <t>] [--dry-run]
+
+Mode is auto-detected from the subject (override with --mode). After generating,
+create runs ≥3 visual self-improvement loops (--no-refine to skip). Every
+create/improve run streams the model's reasoning live and is logged under
+~/.visually-3d/runs/.
 
 Scenes created locally live under ~/.visually-3d/scenes (override with $VISUALLY_HOME).
 `;
