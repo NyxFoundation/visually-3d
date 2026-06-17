@@ -458,6 +458,25 @@ try {
 }
 
 const world = buildScene(scene);
+
+// Single-view mode (VISUALLY_VIEW=iso|front|side|top): render one large,
+// label-free panel — used for hero/gallery imagery. Default stays the 2x2
+// contact sheet used by the self-improve visual critique.
+const SINGLE = (process.env.VISUALLY_VIEW || '').toUpperCase();
+if (SINGLE) {
+  if (!VIEWS[SINGLE]) {
+    console.error(`render-scene: unknown VISUALLY_VIEW "${SINGLE}" (iso|front|side|top)`);
+    process.exit(1);
+  }
+  const p = renderPanel(world, VIEWS[SINGLE], '', panel);
+  writeFileSync(outPath, encodePNG(panel, panel, p));
+  console.log(
+    `render-scene: ${scene.parts ? scene.parts.length : 0} parts, ` +
+      `${world.soup.length} triangles -> ${outPath} (${panel}x${panel}, ${SINGLE})`,
+  );
+  process.exit(0);
+}
+
 const sheetW = panel * 2 + gap * 3;
 const sheetH = panel * 2 + gap * 3;
 const sheet = makeBuffer(sheetW, sheetH, BG);

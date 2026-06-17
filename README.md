@@ -1,81 +1,156 @@
+<div align="center">
+
 # visually-3d
 
-Interactive 3D machinery visualization, driven by your local Claude CLI.
+### Describe a machine — get an inspectable 3D model in your browser.
+
+**Powered entirely by the Claude (or Codex) CLI you already have. No API keys. No cloud. No accounts.**
+
+[![npm](https://img.shields.io/npm/v/visually-3d?color=cb3837&logo=npm)](https://www.npmjs.com/package/visually-3d)
+[![node](https://img.shields.io/badge/node-%E2%89%A518-3c873a?logo=node.js&logoColor=white)](https://nodejs.org)
+[![three.js](https://img.shields.io/badge/three.js-r181-000000?logo=three.js)](https://threejs.org)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](#license)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
 ```bash
 npx visually-3d
 ```
 
-That's it — it opens a browser window at `http://localhost:3131`. Type a machine name or paste a URL; `visually` runs `claude -p` locally and renders the result as an inspectable 3D scene. If you haven't installed or authenticated the Claude CLI, the sample gallery still works.
+<br/>
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/assets/quadcopter.png" width="210"/><br/><sub><b>Quadcopter UAV</b></sub></td>
+    <td align="center"><img src="docs/assets/apollo-csm.png" width="210"/><br/><sub><b>Apollo Command/Service Module</b></sub></td>
+    <td align="center"><img src="docs/assets/eh216-s.png" width="210"/><br/><sub><b>EHang 216-S eVTOL</b></sub></td>
+    <td align="center"><img src="docs/assets/tabby-evo.png" width="210"/><br/><sub><b>Tabby EVO open EV platform</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/assets/openhand-model-t.png" width="210"/><br/><sub><b>OpenHand robotic actuator</b></sub></td>
+    <td align="center"><img src="docs/assets/prusa-i3-mk3s.png" width="210"/><br/><sub><b>Prusa i3 MK3S 3D printer</b></sub></td>
+    <td align="center"><img src="docs/assets/wind-turbine-50kw.png" width="210"/><br/><sub><b>50&nbsp;kW wind turbine</b></sub></td>
+    <td align="center"><img src="docs/assets/xiangshan.png" width="210"/><br/><sub><b>XiangShan RISC-V floorplan</b></sub></td>
+  </tr>
+</table>
+
+<sub>Every model above started as a single text prompt, was refined by the tool's self-improvement loop, then explored live in the browser.<br/>These are exact offscreen renders of the generated scenes — <a href="public/samples">browse the source JSON →</a></sub>
+
+<!--
+  📹 Maintainers: drop a screen-recording of the live WebGL viewer here for the
+  full "wow". Record the browser at http://localhost:3131, save it as
+  docs/assets/demo.gif, and uncomment:
+  <p><img src="docs/assets/demo.gif" width="760" alt="Live viewer demo"/></p>
+-->
+
+</div>
+
+---
+
+## What it does
+
+Type a machine name (or paste a URL) and `visually` asks **your local Claude CLI** to reason about the machine like a mechanical engineer and emit a structured scene of parts — shapes, positions, materials, roles, and how they connect. The result renders instantly as an **inspectable** [react-three-fiber](https://github.com/pmndrs/react-three-fiber) scene: orbit around it, click a part to read what it is, trace its connections.
+
+Then keep going:
+
+- **Refine it** — a recursive self-improvement loop renders the scene offscreen, lets the model critique its own work *visually* as well as structurally, and writes back a better version, scoring each pass until it converges.
+- **Check it** — open it in the browser, or render a headless contact-sheet PNG for a quick look or for CI.
+- **Share it** — open a pull request adding your scene to the public gallery, using your own GitHub login.
 
 ## Why local?
 
-No API keys handled by this tool. Analysis uses whatever `claude` you already have in `$PATH`, using whatever subscription / OAuth you've already set up for it. The Node process only:
+This tool never handles an API key. All model calls go through whatever `claude` (or `codex`) is already on your `$PATH`, using the subscription / OAuth you've already set up. The Node process only:
 
-- serves the built React frontend from `dist/`
-- spawns `claude -p "<prompt>"` as a subprocess and streams stdout/stderr back to the browser over SSE
+- serves the built React frontend, and
+- spawns `claude -p "<prompt>"` as a subprocess, streaming its output back to the browser over SSE.
 
-No telemetry, no cloud, no accounts.
+No telemetry. No backend. No accounts. The sample gallery works even with no CLI installed.
 
 ## Prerequisites
 
-- Node.js 18+
-- Claude CLI on your `$PATH` if you want to generate new scenes (gallery works without it)
-
-Verify:
-
-```bash
-claude --version
-```
-
-## Install + run
-
-### One-shot (recommended)
+- **Node.js 18+**
+- **[Claude CLI](https://docs.claude.com/en/docs/claude-code)** (or **[Codex CLI](https://github.com/openai/codex)**) on your `$PATH` to generate or refine scenes — the gallery works without it.
+- **[GitHub CLI](https://cli.github.com)** (`gh`) only if you want to `upload` scenes via pull request.
 
 ```bash
-npx visually-3d
+claude --version    # verify your CLI is installed + authenticated
 ```
 
-### Persistent install
+## Quick start
+
+```bash
+npx visually-3d                      # opens http://localhost:3131
+```
+
+or install it:
 
 ```bash
 npm install -g visually-3d
 visually-3d
 ```
 
-### From source
+Use `--no-open` (or `VISUALLY_NO_OPEN=1`) to skip auto-opening the browser, and `PORT=…` to change the default `3131` (it probes the next 15 ports if one's taken).
+
+## CLI
+
+`visually-3d` is a small set of subcommands. With no subcommand it starts the GUI.
 
 ```bash
-git clone https://github.com/NyxFoundation/visually.git
-cd visually
-npm install
-npm run build
-npm start
+visually create "Apollo CSM"      # generate a new scene from a text prompt
+visually check apollo-csm         # open it in the browser to inspect
+visually check apollo-csm --png   # …or render a headless 2×2 contact-sheet PNG
+visually improve apollo-csm 5     # recursively self-improve it (up to 5 passes)
+visually upload apollo-csm        # open a PR adding it to the samples gallery
+visually serve                    # the GUI (default when no subcommand)
 ```
 
-Use `--no-open` (or set `VISUALLY_NO_OPEN=1`) to skip auto-opening the browser. Set `PORT=…` to override the default `3131` (the server probes the next 15 ports if something's already bound).
+Scenes you create live in a workspace at **`~/.visually-3d/scenes/`** (override with `$VISUALLY_HOME`). They show up in the gallery automatically — no rebuild needed.
 
-## Architecture
+<details>
+<summary><b>Command reference</b></summary>
 
-```
-visually/
-├── bin/visually.js        Node HTTP server: static + /api/health + /api/analyze/stream
-├── server/analyst.js      Spawns `claude -p`, streams SSE, extracts JSON
-├── src/                   React + Three.js frontend
-├── public/
-│   └── samples/*.json     Pre-baked showcase scenes
-├── dist/                  Built frontend (shipped with the npm package)
-└── wrangler.toml          Optional Cloudflare Workers deploy for the gallery-only static demo
+### `create` — generate
+
+```bash
+visually create "<machine name>" [--hint <text>] [--url <url>] \
+                                 [--driver claude|codex] [--id <id>] [--force]
 ```
 
-Request flow when you submit a machine:
+Runs your local `claude -p` (or `codex exec` with `--driver codex`), validates the output against the scene schema, and writes `~/.visually-3d/scenes/<id>.json`.
+
+### `improve` — recursive self-improvement
+
+```bash
+visually improve <scene> [iterations] [--driver codex|claude] [--model <m>]
+```
+
+Each pass renders the scene to an offscreen contact-sheet PNG, has the model critique it **visually** *and* from the JSON, then writes back an improved scene — stopping on convergence, a score plateau, or the iteration cap (default 4). The full per-iteration history (prompt, render, thinking trace, before/after) is kept under `~/.visually-3d/runs/`.
+
+### `check` — quick local inspection
+
+```bash
+visually check <scene>                            # launch the GUI
+visually check <scene> --png [--out file.png]     # headless render, no GPU
+```
+
+### `upload` — contribute to the gallery
+
+```bash
+visually upload <scene> [--repo owner/name] [--title <t>] [--dry-run]
+```
+
+Uses your own `gh` auth to fork the repo (if needed), add the scene under `public/samples/`, register it in `index.json`, and open a pull request. `--dry-run` prepares the commit locally without pushing.
+
+</details>
+
+## How it works
 
 ```
-Browser → POST /api/analyze/stream        (same origin, no CORS)
-        → Node server spawns `claude -p <prompt>`
-        → SSE events: log / result / error
-        → React renders the final MachineSceneDescriptor JSON
+Browser ──POST /api/analyze/stream──▶ Node server ──spawn──▶ claude -p "<prompt>"
+        ◀──── SSE: log / result / error ────────────────────── stdout/stderr
+        ──▶ React + three.js renders the MachineSceneDescriptor
 ```
+
+The self-improvement loop closes a second feedback path: a dependency-free, GPU-free rasterizer (`scripts/render-scene.mjs`) turns a scene into a contact-sheet image so the model can *see* what it built — opaque faces mean a part buried inside a box is genuinely hidden in the render, which is exactly what makes "if you can't see it, the scene is hiding it" a usable critique.
 
 ## Scene schema
 
@@ -100,33 +175,78 @@ Every scene is a [`MachineSceneDescriptor`](./docs/schema.json):
 }
 ```
 
-Add a showcase: drop a JSON file under `public/samples/`, register it in `public/samples/index.json`, rebuild.
+## Project layout
 
-## Deploy the gallery to Cloudflare Workers
-
-The static bundle (gallery only — no server, no Claude CLI) deploys as a Workers Static Assets site:
-
-```bash
-npx wrangler login          # one-time
-npm run deploy              # builds + publishes dist/ to the "visually-3d" Worker
+```
+visually-3d/
+├── bin/visually.js        CLI dispatcher (serve / create / improve / check / upload)
+├── lib/                   Subcommands + shared scene/workspace helpers
+│   ├── serve.js           HTTP server: static + /api + workspace-merged /samples
+│   ├── create.js          Generate a scene via the local Claude/Codex CLI
+│   ├── improve.js         Drive the recursive self-improve loop
+│   ├── check.js           Browser / headless-PNG inspection
+│   ├── upload.js          Fork + PR a scene to the gallery via `gh`
+│   ├── scene.js           Schema validation, JSON extraction, index derivation
+│   └── paths.js           Package paths + ~/.visually-3d workspace resolution
+├── server/analyst.js      System prompt, `claude -p` spawn + SSE, JSON extraction
+├── scripts/               Offscreen renderer + self-improve loop (shipped)
+├── prompts/self-improve.md  Self-improvement rubric/instructions
+├── src/                   React + three.js frontend
+├── public/samples/*.json  Showcase scenes (built into dist/)
+└── dist/                  Built frontend (shipped with the npm package)
 ```
 
-The Worker is created on first deploy using `wrangler.toml`; no dashboard setup is required. It'll be reachable at `https://visually-3d.<your-subdomain>.workers.dev`.
-
-The deployed version detects the absence of `/api/health` and hides the Analyze input automatically.
-
-## Dev loop
+## Develop from source
 
 ```bash
-# Terminal 1: CLI server (serves built /api endpoints)
-npm run build && npm start
-
-# Terminal 2: Vite dev server — hot-reloads /src, proxies /api → :3131
-npm run dev
+git clone https://github.com/NyxFoundation/visually-3d.git
+cd visually-3d
+npm install        # or: bun install
+npm run build      # required before `serve` (builds dist/)
 ```
 
-Open `http://localhost:5173` for the Vite dev experience, or `http://localhost:3131` to test the exact production path.
+Then run any of:
+
+```bash
+node bin/visually.js serve            # or any subcommand
+node bin/visually.js create "Drone"
+npm run serve                          # alias for `serve`
+npm run cli -- create "Drone"          # pass subcommand args after `--`
+npm link && visually-3d serve          # use the real global command
+```
+
+`create`, `improve` and `check --png` don't need a build — only the browser GUI (`serve` / `check`) requires `dist/`.
+
+Hot-reloading frontend dev loop:
+
+```bash
+npm run build && npm start   # terminal 1: production server on :3131
+npm run dev                  # terminal 2: Vite on :5173, proxies /api → :3131
+```
+
+## Deploy the gallery (optional)
+
+The static bundle (gallery only — no server, no CLI) deploys to Cloudflare Workers:
+
+```bash
+npx wrangler login
+npm run deploy               # builds + publishes dist/ to the "visually-3d" Worker
+```
+
+The deployed build detects the absence of `/api/health` and hides the Analyze input automatically.
+
+## Contributing
+
+PRs are welcome — especially **new sample scenes**. The easiest path:
+
+```bash
+visually create "<your machine>"
+visually improve <id>
+visually upload <id>            # opens the PR for you
+```
+
+…or by hand: drop a JSON file under `public/samples/`, register it in `public/samples/index.json`, and open a PR.
 
 ## License
 
-MIT.
+[MIT](#license) © NyxFoundation
