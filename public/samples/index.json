@@ -283,6 +283,14 @@
       "path": "/samples/miaow.json",
       "accent": "#fda4af",
       "category": "silicon"
+    },
+    {
+      "id": "ntt-fpga",
+      "title": "CFNTT NTT Accelerator",
+      "subtitle": "Conflict-free radix-2/4 Number Theoretic Transform FPGA accelerator for lattice PQC / FHE polynomial multiplication (TCHES)",
+      "path": "/samples/ntt-fpga.json",
+      "accent": "#fcd34d",
+      "category": "silicon"
     }
   ]
 }
