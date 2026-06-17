@@ -154,12 +154,15 @@ while [ "$i" -le "$MAX_ITERS" ]; do
       die "Codex CLI failed on iteration $i — see $MODEL_ERR and $EVENTS"
     fi
   else
-    # Claude reads the render PNG itself (Read tool). stream-json carries the
-    # thinking trace; the trailing "result" event holds the final answer.
+    # Claude reads the render PNG itself (Read tool). bypassPermissions (not
+    # acceptEdits) is required so it can actually read the PNG under the runs
+    # dir (outside cwd); otherwise the visual critique is blind. --tools Read
+    # keeps it restricted to reading only. stream-json carries the thinking
+    # trace; the trailing "result" event holds the final answer.
     if ! "$CLAUDE_BIN" -p "$(cat "$PROMPT_TXT")" \
           --model "$CLAUDE_MODEL" \
           --tools Read \
-          --permission-mode acceptEdits \
+          --permission-mode bypassPermissions \
           --output-format stream-json --verbose \
           > "$EVENTS" 2> "$MODEL_ERR"; then
       die "Claude CLI failed on iteration $i — see $MODEL_ERR and $EVENTS"
