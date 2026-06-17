@@ -63,6 +63,25 @@ GUI does. See the [README](README.md#develop-from-source) for the full dev loop.
 Use the [issue templates](https://github.com/NyxFoundation/visually-3d/issues/new/choose).
 For security issues, see [SECURITY.md](SECURITY.md) — please don't open a public issue.
 
+## Releasing (maintainers)
+
+Publishing is automated by [`.github/workflows/publish.yml`](.github/workflows/publish.yml).
+One-time setup: add an `NPM_TOKEN` repository secret (an npm
+[granular/automation token](https://docs.npmjs.com/creating-and-viewing-access-tokens)
+with publish rights). Then for each release:
+
+```bash
+# 1. bump the version + update CHANGELOG.md, commit
+npm version 0.9.1 -m "release: v%s"   # updates package.json and creates a tag
+# 2. push the commit and the tag
+git push && git push --tags
+```
+
+Pushing the `vX.Y.Z` tag triggers CI to build, smoke-test, verify the tag
+matches `package.json`, and run `npm publish` with provenance. You can also run
+the workflow manually from the Actions tab. Locally, `npm run smoke` runs the
+same login-free checks CI does.
+
 ## License
 
 By contributing, you agree that your contributions are licensed under the

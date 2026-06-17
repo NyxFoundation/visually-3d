@@ -1,6 +1,6 @@
 {
   "name": "visually-3d",
-  "version": "0.3.0",
+  "version": "0.9.0",
   "description": "Interactive 3D machinery visualization. Run `npx visually-3d` to open a local GUI that speaks to your Claude CLI.",
   "type": "module",
   "bin": {
@@ -28,7 +28,12 @@
     "serve": "node bin/visually.js serve",
     "cli": "node bin/visually.js",
     "deploy": "npm run build && npx wrangler deploy",
+    "smoke": "node test/smoke.mjs",
     "prepack": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "dependencies": {},
   "devDependencies": {

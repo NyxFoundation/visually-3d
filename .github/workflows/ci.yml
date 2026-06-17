@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20, 22]
+    name: build + smoke (node ${{ matrix.node }})
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Smoke test
+        run: npm run smoke
+
+  package:
+    runs-on: ubuntu-latest
+    name: verify npm tarball
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Pack and inspect contents
+        run: |
+          npm pack
+          tar -tzf visually-3d-*.tgz | sort > files.txt
+          echo "── tarball contents ──"; cat files.txt
+          for required in \
+            package/bin/visually.js \
+            package/lib/serve.js \
+            package/lib/upload.js \
+            package/scripts/render-scene.mjs \
+            package/dist/index.html \
+            package/LICENSE; do
+            grep -qx "$required" files.txt || { echo "::error::missing $required in tarball"; exit 1; }
+          done
+          if grep -q '^package/test/' files.txt; then
+            echo "::error::test/ must not ship in the npm package"; exit 1
+          fi
+          echo "tarball OK"

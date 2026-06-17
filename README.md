@@ -7,6 +7,7 @@
 **Powered entirely by the Claude (or Codex) CLI you already have. No API keys. No cloud. No accounts.**
 
 [![npm](https://img.shields.io/npm/v/visually-3d?color=cb3837&logo=npm)](https://www.npmjs.com/package/visually-3d)
+[![CI](https://github.com/NyxFoundation/visually-3d/actions/workflows/ci.yml/badge.svg)](https://github.com/NyxFoundation/visually-3d/actions/workflows/ci.yml)
 [![node](https://img.shields.io/badge/node-%E2%89%A518-3c873a?logo=node.js&logoColor=white)](https://nodejs.org)
 [![three.js](https://img.shields.io/badge/three.js-r181-000000?logo=three.js)](https://threejs.org)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](#license)

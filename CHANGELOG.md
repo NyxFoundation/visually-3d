@@ -6,6 +6,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-06-17
+
+First public release on npm — a `1.0.0` release candidate. Carries all of the
+0.3.0 CLI work below, plus release tooling.
+
+### Added
+
+- **Automated CI** (`.github/workflows/ci.yml`): build + smoke test on Node 18,
+  20, and 22, and a job that packs the tarball and asserts its contents.
+- **Automated publish** (`.github/workflows/publish.yml`): pushing a `vX.Y.Z`
+  tag builds, smoke-tests, verifies the tag matches `package.json`, and runs
+  `npm publish` with [provenance](https://docs.npmjs.com/generating-provenance-statements).
+- **Smoke test** (`npm run smoke`): login-free checks — CLI help, schema
+  validation of every bundled sample, the offscreen renderer, and the server's
+  health + gallery endpoints.
+- `publishConfig` (`access: public`, `provenance: true`).
+
 ## [0.3.0] - 2026-06-17
 
 ### Added
@@ -45,6 +62,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   CLI to generate inspectable 3D machine scenes, a sample gallery, the
   offscreen renderer, and the recursive self-improvement loop.
 
-[Unreleased]: https://github.com/NyxFoundation/visually-3d/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/NyxFoundation/visually-3d/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/NyxFoundation/visually-3d/compare/v0.3.0...v0.9.0
 [0.3.0]: https://github.com/NyxFoundation/visually-3d/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/NyxFoundation/visually-3d/releases/tag/v0.2.0
