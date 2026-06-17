@@ -6,6 +6,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-06-17
+
+### Fixed
+
+- `create`/`analyze` with an image (or other binary) `--url` crashed with
+  "args[1] must be a string without null bytes": the binary body was read as
+  text and its NUL bytes poisoned the subprocess argument. Non-text URLs are
+  now detected by content-type and skipped with a note, and all prompt text is
+  sanitized of control characters.
+- When both a machine name and a `--url` were given, the machine name was
+  dropped. `buildPrompt` now includes both — important when the URL is an image
+  the model can't read and the name is the only usable signal.
+
 ## [0.9.0] - 2026-06-17
 
 First public release on npm — a `1.0.0` release candidate. Carries all of the
@@ -62,7 +75,8 @@ First public release on npm — a `1.0.0` release candidate. Carries all of the
   CLI to generate inspectable 3D machine scenes, a sample gallery, the
   offscreen renderer, and the recursive self-improvement loop.
 
-[Unreleased]: https://github.com/NyxFoundation/visually-3d/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/NyxFoundation/visually-3d/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/NyxFoundation/visually-3d/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/NyxFoundation/visually-3d/compare/v0.3.0...v0.9.0
 [0.3.0]: https://github.com/NyxFoundation/visually-3d/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/NyxFoundation/visually-3d/releases/tag/v0.2.0

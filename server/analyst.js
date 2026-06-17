@@ -247,24 +247,39 @@ async function fetchUrlContent(url) {
     const res = await fetch(url, { signal: controller.signal, redirect: 'follow' });
     clearTimeout(timeout);
     if (!res.ok) return `Could not fetch URL content for ${url}: HTTP ${res.status}`;
+    // Only extract text from textual responses. Reading a binary body (e.g. an
+    // image) as text yields garbage with NUL bytes, which later crashes the
+    // subprocess call (args may not contain null bytes).
+    const type = (res.headers.get('content-type') || '').toLowerCase();
+    if (!/^text\/|application\/(json|xml|xhtml|ld\+json|rss\+xml|atom\+xml)/.test(type)) {
+      return `The URL is non-text content (${type || 'unknown type'}) — most likely an image. ` +
+        `No text could be extracted; rely on the machine name and your own knowledge.`;
+    }
     const text = await res.text();
-    return text.slice(0, 12000);
+    return sanitizeText(text).slice(0, 12000);
   } catch (err) {
     return `Could not fetch URL content for ${url}: ${err.message}`;
   }
 }
 
+// Strip NUL and other C0 control characters (keeping tab/newline/CR) so the
+// prompt is always a clean string safe to pass as a subprocess argument.
+function sanitizeText(s) {
+  return String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+}
+
 export async function buildPrompt({ url, machineName }) {
-  let context;
+  const sections = [];
+  if (machineName) sections.push(`Machine name: ${machineName}`);
   if (url) {
     const content = await fetchUrlContent(url);
-    context = `URL: ${url}\nFetched content excerpt:\n${content}\n`;
-  } else if (machineName) {
-    context = `Machine name: ${machineName}\n`;
-  } else {
+    sections.push(`Reference URL: ${url}\nFetched content excerpt:\n${content}`);
+  }
+  if (sections.length === 0) {
     throw new Error('Either url or machineName must be provided');
   }
-  return `${SYSTEM_PROMPT}\n\n${context}\nGenerate the MachineSceneDescriptor JSON now. Return JSON only.`;
+  const prompt = `${SYSTEM_PROMPT}\n\n${sections.join('\n\n')}\n\nGenerate the MachineSceneDescriptor JSON now. Return JSON only.`;
+  return sanitizeText(prompt);
 }
 
 function extractJSON(text) {

@@ -11,6 +11,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateScene } from '../lib/scene.js';
+import { buildPrompt } from '../server/analyst.js';
 
 const exec = promisify(execFile);
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -59,6 +60,16 @@ await step('Every bundled sample validates against the schema', async () => {
     if (!existsSync(p)) throw new Error(`index.json references missing file: ${s.path}`);
   }
   ok(`${files.length} samples valid + index.json consistent`);
+});
+
+await step('buildPrompt yields a clean, control-char-free string', async () => {
+  const prompt = await buildPrompt({ machineName: 'Test Machine' });
+  if (!prompt.includes('Test Machine')) throw new Error('machine name missing from prompt');
+  // No NUL/C0 control chars except tab/newline/CR (regression: binary URL bodies).
+  if (/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/.test(prompt)) {
+    throw new Error('prompt contains control/NUL bytes');
+  }
+  ok('prompt is clean');
 });
 
 await step('Offscreen renderer produces a PNG', async () => {
