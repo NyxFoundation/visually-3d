@@ -83,9 +83,6 @@ export function DetailPage({ id, samples, liveScene, samplesLoaded }: DetailPage
           </div>
           {description ? <p className="studio__desc">{description}</p> : null}
         </div>
-        <div className="studio__bar-right">
-          <span className="badge badge--count">{scene.parts.length} parts</span>
-        </div>
       </header>
 
       <SceneStudio id={id} fallbackScene={scene} />

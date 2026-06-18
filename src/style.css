@@ -977,6 +977,13 @@ button, input {
   touch-action: auto;
 }
 
+.gallery__thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .gallery__thumb-fallback {
   display: flex;
   align-items: center;
@@ -1517,8 +1524,7 @@ a.gallery__card { text-decoration: none; color: inherit; display: flex; flex-dir
 .studio__info { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--text-dim); cursor: pointer; flex: 0 0 auto; }
 .studio__info:hover { color: var(--accent); border-color: var(--accent); }
 .studio__info--active { color: var(--accent); border-color: var(--accent); background: rgba(88, 166, 255, 0.12); }
-.studio__desc { margin: 0; color: var(--text-dim); font-size: 0.85rem; line-height: 1.45; max-width: 90ch; }
-.studio__bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.studio__desc { margin: 0; color: var(--text-dim); font-size: 0.85rem; line-height: 1.45; }
 
 .studio { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 12px 14px calc(14px + var(--safe-bottom)); }
 
