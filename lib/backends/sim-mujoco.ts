@@ -14,6 +14,7 @@ import { execFile } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Backend, VerifyResult } from '../types.js';
+import { classifyFailure } from './python-smt.js';
 
 const exec = promisify(execFile);
 
@@ -78,22 +79,23 @@ Keep it deterministic and finish within ~60s.`;
 
   async verify(script: string, dir: string): Promise<VerifyResult> {
     const r = await resolveRunner();
-    if (!r) return { pass: false, ran: false, stderr: 'no mujoco runner available' };
+    if (!r) return { pass: false, ran: false, kind: 'no-runner', stderr: 'no mujoco runner available' };
     if (typeof script !== 'string' || !script.trim()) {
-      return { pass: false, ran: false, stderr: 'no script produced' };
+      return { pass: false, ran: false, kind: 'no-script', stderr: 'no script produced' };
     }
     const file = path.join(dir, 'check.py');
     writeFileSync(file, script);
     try {
       const { stdout, stderr } = await exec(r.bin, [...r.pre, file],
         { timeout: 180000, maxBuffer: 32 * 1024 * 1024 });
-      return { pass: stdout.includes('VERIFIED'), ran: true, stdout, stderr, code: 0 };
+      const pass = stdout.includes('VERIFIED');
+      return { pass, ran: true, kind: pass ? 'pass' : 'fail', stdout, stderr, code: 0 };
     } catch (err) {
-      const e = err as { stdout?: string; stderr?: string; message?: string; code?: number };
-      return {
-        pass: false, ran: true,
-        stdout: e.stdout || '', stderr: e.stderr || e.message || '', code: e.code ?? 1,
-      };
+      const e = err as { stdout?: string; stderr?: string; message?: string; code?: number; killed?: boolean; signal?: string | null };
+      const stdout = e.stdout || '';
+      const stderr = e.stderr || e.message || '';
+      const kind = classifyFailure(e, stdout, stderr);
+      return { pass: false, ran: kind === 'fail', kind, stdout, stderr, code: e.code ?? 1 };
     }
   },
 };

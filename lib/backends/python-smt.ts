@@ -18,9 +18,29 @@ import { promisify } from 'node:util';
 import { execFile } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
-import type { Backend, VerifyResult } from '../types.js';
+import type { Backend, VerifyKind, VerifyResult } from '../types.js';
 
 const exec = promisify(execFile);
+
+// Classify a non-zero run into a HARNESS error (the check never produced a
+// verdict) vs a semantic FAIL (it ran and reported a real counterexample). Pure
+// so it is unit-testable. `killed`/SIGTERM is execFile's timeout signature.
+export function classifyFailure(
+  err: { killed?: boolean; signal?: string | null; message?: string },
+  stdout: string,
+  stderr: string,
+): VerifyKind {
+  const out = `${stdout}\n${stderr}`;
+  if (err.killed || err.signal === 'SIGTERM' || /timed out|ETIMEDOUT/i.test(err.message || '')) {
+    return 'timeout';
+  }
+  if (/\b(SyntaxError|IndentationError|TabError)\b/.test(out)) return 'syntax';
+  // A clean self-check failure prints a "FAIL:" counterexample and exits 1.
+  if (/\bFAIL\b/.test(stdout)) return 'fail';
+  // An uncaught Python exception (traceback) is a broken check, not a verdict.
+  if (/Traceback \(most recent call last\)/.test(stderr)) return 'error';
+  return 'fail';
+}
 
 type Runner = { bin: string; pre: string[] };
 
@@ -76,22 +96,24 @@ It must be deterministic and finish within ~60s.`;
   // Write the script and run it; pass = it printed VERIFIED and exited 0.
   async verify(script: string, dir: string): Promise<VerifyResult> {
     const r = await resolveRunner();
-    if (!r) return { pass: false, ran: false, stderr: 'no python+z3 runner available' };
+    if (!r) return { pass: false, ran: false, kind: 'no-runner', stderr: 'no python+z3 runner available' };
     if (typeof script !== 'string' || !script.trim()) {
-      return { pass: false, ran: false, stderr: 'no script produced' };
+      return { pass: false, ran: false, kind: 'no-script', stderr: 'no script produced' };
     }
     const file = path.join(dir, 'check.py');
     writeFileSync(file, script);
     try {
       const { stdout, stderr } = await exec(r.bin, [...r.pre, file],
         { timeout: 180000, maxBuffer: 32 * 1024 * 1024 });
-      return { pass: stdout.includes('VERIFIED'), ran: true, stdout, stderr, code: 0 };
+      const pass = stdout.includes('VERIFIED');
+      return { pass, ran: true, kind: pass ? 'pass' : 'fail', stdout, stderr, code: 0 };
     } catch (err) {
-      const e = err as { stdout?: string; stderr?: string; message?: string; code?: number };
-      return {
-        pass: false, ran: true,
-        stdout: e.stdout || '', stderr: e.stderr || e.message || '', code: e.code ?? 1,
-      };
+      const e = err as { stdout?: string; stderr?: string; message?: string; code?: number; killed?: boolean; signal?: string | null };
+      const stdout = e.stdout || '';
+      const stderr = e.stderr || e.message || '';
+      const kind = classifyFailure(e, stdout, stderr);
+      // Only a clean "FAIL" verdict means the check actually ran to a decision.
+      return { pass: false, ran: kind === 'fail', kind, stdout, stderr, code: e.code ?? 1 };
     }
   },
 };

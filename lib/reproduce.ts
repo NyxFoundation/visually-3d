@@ -20,6 +20,7 @@ import path from 'node:path';
 import { resolveScene, sceneIdFromPath, runDir as makeRunDir, ensureWorkspace } from './paths.js';
 import { runClaudeStreaming } from './runner.js';
 import { extractScene } from './scene.js';
+import { repairArithmeticClaims } from './arith-audit.js';
 import { getBackend, selectBackend } from './backends/index.js';
 import { saveImpl, implDir } from './impls.js';
 import type { Availability } from './types.js';
@@ -255,6 +256,28 @@ Return ONLY this JSON, no fences, no prose:
 }`;
 }
 
+// A check that fails to RUN (syntax error, uncaught exception) carries no
+// semantic signal — counting it as "the implementation is wrong" is what let a
+// codegen typo (e.g. an invalid hex literal) silently halve a round's
+// self-check score. Ask the model to repair ONLY what stops it running, once.
+function fixHarnessPrompt(lang: { label: string; fence: string }, script: string, kind: string, stderr: string): string {
+  return `The ${lang.label} self-checking program below failed to RUN because of a
+${kind} error — NOT a logic failure. Fix ONLY what prevents it from executing.
+Do NOT change the verification logic or the implementation's behavior. It must
+still print exactly "VERIFIED" and exit 0 on success, or "FAIL: <reason and a
+concrete counterexample>" and exit 1 on mismatch.
+
+ERROR:
+${(stderr || '').slice(0, 1500)}
+
+PROGRAM:
+\`\`\`${lang.fence}
+${script}
+\`\`\`
+
+Return ONLY the corrected program in ONE fenced ${lang.fence} code block.`;
+}
+
 async function runAgent(
   prompt: string,
   model: string | undefined,
@@ -283,6 +306,21 @@ export async function reproduce(argv: string[]): Promise<any> {
   const id = sceneIdFromPath(target);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const scene: any = JSON.parse(readFileSync(target, 'utf8'));
+
+  // Arithmetic guard (the verifier's geom must be sound): before the engineers
+  // ever read the spec, repair any fully-numeric derived constant that is
+  // arithmetically wrong (e.g. a bad modular inverse). Otherwise a false fact in
+  // the spec forces every faithful impl to either fail the self-check or
+  // "diverge" — the loop could never reach a passing self-check. See arith-audit.
+  let specRepairs: { path: string; claim: string; before: string; after: string }[] = [];
+  {
+    const audit = repairArithmeticClaims(scene);
+    if (audit.repairs.length) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      Object.assign(scene, audit.value as any);
+      specRepairs = audit.repairs;
+    }
+  }
   const mode: string = scene.metadata?.mode || 'hardware';
   const n = opts.n !== undefined && Number.isFinite(opts.n) && opts.n > 0 ? Math.min(opts.n, 4) : 2;
 
@@ -308,6 +346,10 @@ export async function reproduce(argv: string[]): Promise<any> {
   const how = opts.backend ? 'forced' : (scene.metadata?.backend ? 'from scene' : 'auto-selected');
   console.log(`  verify backend: ${backend.label} (${how}) — ${avail.ok ? `enabled (${avail.runner})` : `off (${avail.reason})`}`);
   console.log(`  run log → ${runDir}`);
+  if (specRepairs.length) {
+    console.log(`  ⚠ arithmetic guard corrected ${specRepairs.length} false constant(s) in the spec before reimplementation:`);
+    for (const r of specRepairs) console.log(`      · ${r.path}: "${r.before}" → "${r.after}"`);
+  }
   console.log('  reimplementing from the spec alone…');
 
   const perspectives = [
@@ -334,6 +376,7 @@ export async function reproduce(argv: string[]): Promise<any> {
   // facts `amend` must write back into the spec, so the loop closes on hard
   // evidence, not only the judge's opinion.
   let verifiedCount = 0;
+  let harnessErrors = 0; // checks that never produced a verdict (syntax/timeout/…)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const verifyFindings: any[] = [];
   for (let i = 0; i < impls.length; i++) {
@@ -344,28 +387,55 @@ export async function reproduce(argv: string[]): Promise<any> {
     }
     let verdict = '';
     if (avail.ok && im && typeof im.script === 'string') {
-      const res = await backend.verify(im.script, runDir);
-      im._verify = { pass: res.pass, ran: res.ran };
-      const log = `pass=${res.pass} ran=${res.ran}\n--- stdout ---\n${res.stdout || ''}\n--- stderr ---\n${(res.stderr || '').slice(0, 4000)}`;
+      let res = await backend.verify(im.script, runDir);
+      // ⑤ Harness recovery: a syntax/exception failure produced no verdict.
+      // Repair it once so a codegen typo doesn't masquerade as a wrong impl.
+      if (res.kind === 'syntax' || res.kind === 'error') {
+        console.log(`  impl ${i + 1}: self-check ${res.kind} error — attempting one harness repair…`);
+        try {
+          const { text } = await runClaudeStreaming({
+            prompt: fixHarnessPrompt(lang, im.script, res.kind, res.stderr || ''),
+            model: opts.model, quiet: true,
+          });
+          const fixed = deescapeIfNeeded(extractFencedCode(text));
+          if (fixed && fixed.trim()) {
+            const res2 = await backend.verify(fixed, runDir);
+            if (res2.kind === 'pass' || res2.kind === 'fail') {
+              res = res2; im.script = fixed; im.implementation = fixed;
+              // Keep the on-disk artifact consistent with what actually ran.
+              writeFileSync(path.join(runDir, `impl-${i + 1}.${ext}`), fixed);
+            }
+          }
+        } catch { /* keep the original (harness) result */ }
+      }
+      const kind = res.kind ?? (res.pass ? 'pass' : res.ran ? 'fail' : 'error');
+      im._verify = { pass: res.pass, ran: res.ran, kind };
+      const log = `pass=${res.pass} ran=${res.ran} kind=${kind}\n--- stdout ---\n${res.stdout || ''}\n--- stderr ---\n${(res.stderr || '').slice(0, 4000)}`;
       im._verifyLog = log;
       writeFileSync(path.join(runDir, `impl-${i + 1}-verify.txt`), log);
       if (res.pass) verifiedCount++;
+      else if (kind !== 'fail') harnessErrors++;
       // The actionable signal a failing self-check carries: the "FAIL: …" line
-      // (a concrete counterexample) the backend was instructed to print.
+      // (a concrete counterexample) the backend was instructed to print. A
+      // harness error is NOT a counterexample — don't feed it to amend as if
+      // the spec were wrong.
       const out = `${res.stdout || ''}\n${res.stderr || ''}`;
       const fail = out.split('\n').find((l) => /\bFAIL\b|counterexample|mismatch|assert/i.test(l));
       verifyFindings.push({
-        impl: i + 1, pass: res.pass, ran: res.ran,
+        impl: i + 1, pass: res.pass, ran: res.ran, kind,
         confidence: im?.confidence ?? null,
-        counterexample: res.pass ? null : (fail ? fail.trim().slice(0, 400) : null),
+        counterexample: res.pass || kind !== 'fail' ? null : (fail ? fail.trim().slice(0, 400) : null),
       });
-      verdict = ` | self-verify: ${res.pass ? 'PASS ✓' : (res.ran ? 'FAIL' : 'did not run')}`;
+      const lbl = res.pass ? 'PASS ✓' : (kind === 'fail' ? 'FAIL' : `did not run (${kind})`);
+      verdict = ` | self-verify: ${lbl}`;
     }
     console.log(`  impl ${i + 1}: confidence ${im?.confidence ?? '?'}, ` +
       `${(im?.guessed || []).length} guesses, ${(im?.underspecified || []).length} underspecified${verdict}`);
   }
   if (avail.ok) {
-    console.log(`  executable self-verification: ${verifiedCount}/${impls.length} implementations passed`);
+    const ran = impls.length - harnessErrors;
+    console.log(`  executable self-verification: ${verifiedCount}/${impls.length} implementations passed` +
+      (harnessErrors ? ` (${harnessErrors} did not run — harness error; ${verifiedCount}/${ran} of those that ran)` : ''));
   }
 
   console.log('  judging reproducibility + fidelity…');
@@ -373,8 +443,17 @@ export async function reproduce(argv: string[]): Promise<any> {
     path.join(runDir, 'report.raw.txt'));
   report.backend = backend.id;
   report.executable_verification = avail.ok
-    ? { enabled: true, passed: verifiedCount, total: impls.length }
+    ? {
+        enabled: true,
+        passed: verifiedCount,
+        total: impls.length,
+        ran: impls.length - harnessErrors, // checks that reached a verdict
+        harness_errors: harnessErrors, // syntax/timeout/exception — not semantic
+      }
     : { enabled: false, reason: avail.reason };
+  // Surface any false constants the arithmetic guard had to repair, so the loop
+  // (and a human) can see the spec carried a self-inconsistent value.
+  if (specRepairs.length) report.spec_repairs = specRepairs;
   // Hand the loop everything `amend` needs to write facts back into the spec:
   // what each implementer had to guess + the verifier's counterexamples. Keeps
   // refine from re-reading run files; works for every mode/backend.

@@ -75,9 +75,16 @@ export type Availability =
   | { ok: true; runner: string }
   | { ok: false; reason: string };
 
+// How a verification attempt ended. `pass`/`fail` mean the self-check actually
+// RAN and reached a verdict (semantic signal); the rest are HARNESS failures —
+// the generated check never produced a verdict, so they must not be conflated
+// with "the implementation is wrong".
+export type VerifyKind = 'pass' | 'fail' | 'syntax' | 'timeout' | 'error' | 'no-script' | 'no-runner';
+
 export interface VerifyResult {
   pass: boolean;
   ran: boolean;
+  kind?: VerifyKind;
   stdout?: string;
   stderr?: string;
   code?: number;
