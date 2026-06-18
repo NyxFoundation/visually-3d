@@ -17,14 +17,17 @@ import path from 'node:path';
 import { buildPrompt, detectMode } from '../server/analyst.js';
 import { MODE_IDS, modeLabel } from '../server/modes.js';
 import { runClaudeStreaming } from './runner.js';
-import { improve } from './improve.js';
+import { refine } from './refine.js';
 import { extractScene, validateScene, slugify } from './scene.js';
+import { selectBackend, getBackend } from './backends/index.js';
 import { ensureWorkspace, scenePath, runDir as makeRunDir } from './paths.js';
 
-// Minimum built-in refinement loops: a one-shot generation is a first draft,
-// not a finished scene. Like `improve`, create then runs the visual recursive
-// self-improvement loop (render → VLM critique → rewrite) at least this many
-// times before handing back. Override with --refine N, disable with --no-refine.
+// Minimum built-in refinement rounds: a one-shot generation is a first draft,
+// not a finished scene. create then runs the full closed loop (`refine`):
+// each round does visual self-improvement → reproduce (auto-picked backend) →
+// amend (fold verification findings back into the spec), so a created scene is
+// both convincing AND reproducible. Override with --refine N, skip with
+// --no-refine.
 const MIN_REFINE = 3;
 
 const exec = promisify(execFile);
@@ -134,10 +137,20 @@ export async function create(argv: string[]): Promise<string> {
   // Stamp the mode into metadata so the gallery/UI can show it.
   scene.metadata = scene.metadata || {};
   if (!scene.metadata.mode) scene.metadata.mode = mode;
+  // The --url is the source/reference — record it so the fidelity check has a
+  // ground truth and the gallery can link it.
+  if (opts.url && !scene.metadata.reference) scene.metadata.reference = opts.url;
+  // Decide the verification substrate now, at creation, from the subject itself:
+  // a CPU/GPU/FPGA/ASIC or any digital-compute design → SMT; a physical machine
+  // → physics sim. Stamped so it's visible and stable; still overridable later
+  // with --backend, and reproduce re-derives it if a scene lacks it.
+  if (!scene.metadata.backend) scene.metadata.backend = selectBackend(scene);
+  const backendLabel = getBackend(scene.metadata.backend).label;
+  console.log(`  verify backend: ${backendLabel} (auto-selected for this subject)`);
 
   const errors = validateScene(scene);
   const meta = {
-    id, name, mode, driver: opts.driver,
+    id, name, mode, backend: scene.metadata.backend, driver: opts.driver,
     model: opts.model || process.env.CLAUDE_MODEL || 'opus',
     url: opts.url || null, hint: opts.hint || null,
     parts: Array.isArray(scene.parts) ? scene.parts.length : 0,
@@ -156,27 +169,29 @@ export async function create(argv: string[]): Promise<string> {
 
   console.log(`\n  ✓ draft ${id} → ${out} (${scene.parts.length} parts, mode=${modeLabel(mode)})`);
 
-  // Built-in visual self-improvement: a draft is not a finished scene. Run the
-  // recursive render→critique→rewrite loop at least MIN_REFINE times. It picks
-  // up this create run's reasoning as cross-run memory (see lib/history.js).
-  const refineN = opts.refine === undefined ? MIN_REFINE : Math.max(0, opts.refine | 0);
-  if (refineN > 0) {
-    console.log(`\n  refining: ${refineN} visual self-improvement loop(s) (render → critique → rewrite)…`);
+  // Built-in closed-loop refinement: a draft is not a finished scene. Run the
+  // full `refine` loop at least MIN_REFINE rounds — each round does visual
+  // self-improvement → reproduce (auto-picked backend) → amend — so the scene is
+  // both convincing and reproducible. It picks up this create run's reasoning as
+  // cross-run memory (see lib/history.js).
+  const rounds = opts.refine === undefined ? MIN_REFINE : Math.max(0, opts.refine | 0);
+  if (rounds > 0) {
+    console.log(`\n  refining: ${rounds} closed-loop round(s) — improve → reproduce → amend…`);
     console.log(`  (skip with --no-refine; the draft above is already saved)\n`);
     try {
-      const improveArgs = [id, String(refineN)];
-      if (opts.driver) improveArgs.push('--driver', opts.driver);
-      if (opts.model) improveArgs.push('--model', opts.model);
-      await improve(improveArgs);
+      const refineArgs = [id, '--rounds', String(rounds)];
+      if (opts.driver) refineArgs.push('--driver', opts.driver);
+      if (opts.model) refineArgs.push('--model', opts.model);
+      await refine(refineArgs);
     } catch (err) {
       console.log(`\n  ⚠ refinement loop stopped: ${(err as Error).message}`);
-      console.log(`     the draft scene is intact; re-run: visually improve ${id}`);
+      console.log(`     the draft scene is intact; re-run: visually refine ${id}`);
     }
   }
 
   console.log('\n  next:');
   console.log(`    visually check ${id}            # open it in the browser`);
-  console.log(`    visually improve ${id}          # refine further (continues from this run's memory)`);
+  console.log(`    visually refine ${id}           # another closed-loop round (improve → reproduce → amend)`);
   console.log(`    visually upload ${id}           # open a PR to the samples gallery`);
   return out;
 }

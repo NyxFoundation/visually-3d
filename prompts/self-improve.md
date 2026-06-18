@@ -156,12 +156,20 @@ need **20–40 parts**. Add the iconic sub-features the current scene is missing
 - **Schema.** The `scene` must be a valid `MachineSceneDescriptor`:
   `{ machine_name, assembly_instructions?, metadata?, parts[] }`; each part is
   `{ id, name, shape, position[3], rotation?[3], size[], material, role,
-  connections?[] }`. Keep engineering fields (`compute_profile`, `algorithm`,
-  …) only if the input scene used them.
+  connections?[], spec? }`. Keep engineering fields (`compute_profile`,
+  `algorithm`, …) only if the input scene used them.
+- **Preserve the functional spec.** A part may carry a `spec` block
+  (`params`/`widths`/`ports`/`ops`/`fsm`/`notes`), and there may be a top-level
+  `metadata.spec`. These hold *verified* facts about what the system does (they
+  are written by the reproducibility loop). **Never drop or weaken them.** Carry
+  every `spec` field through unchanged, and make your `role`/`facts`/annotations
+  *consistent* with them — the geometry is the visualization of this spec.
 - **No regression.** Never delete a correct, informative part to raise a
   number. Part count and information should rise or hold across iterations.
 - **Keep identity.** Same machine, same `machine_name`, same domain. You are
-  refining a model, not replacing it.
+  refining a model, not replacing it. Carry `metadata.mode`,
+  `metadata.reference`, `metadata.backend`, `metadata.info`, `metadata.spec` and
+  `thumbnail_camera` through unchanged — they are set once and must survive.
 - **Validity.** No `NaN`, `Infinity`, or `≤ 0` sizes. Positions are finite.
   Every `connections` id must exist.
 

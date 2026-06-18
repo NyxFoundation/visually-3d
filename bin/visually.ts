@@ -22,21 +22,25 @@ Usage:
        [--driver codex|claude] [--model <m>]
   visually reproduce <scene>              measure if the scene is a reproducible
        [--n 2] [--model <m>]              spec: AI reverse-implements it (Verilog/
-                                          Python) from the descriptor alone and
+       [--backend <id>] [--no-verify]     Python) from the descriptor alone and
                                           scores what's missing to rebuild it
-  visually refine <scene>                 unified 3D ⇄ implementation loop: runs
-       [--rounds 3] [--visual 90]         improve + reproduce each round until the
-       [--repro 80] [--iters 2]           visual score and reproducibility both
-                                          clear their thresholds (or max rounds)
+  visually amend <scene>                  fold reproduce's findings back into the
+       [--n 2] [--model <m>]              scene's functional spec (parts[].spec /
+       [--backend <id>] [--no-verify]     metadata.spec) so it becomes reproducible
+  visually refine <scene>                 closed 3D ⇄ implementation loop: each
+       [--rounds 3] [--visual 90]         round runs improve → reproduce → amend
+       [--repro 80] [--iters 2]           until the visual score and reproducibility
+       [--backend <id>] [--no-amend]      both clear their thresholds (or max rounds)
   visually check <scene> [--png]          inspect a scene (browser, or PNG contact sheet)
        [--out <file.png>] [--no-open]
   visually upload <scene>                 open a PR adding the scene to the gallery
        [--repo owner/name] [--title <t>] [--dry-run]
 
-Mode is auto-detected from the subject (override with --mode). After generating,
-create runs ≥3 visual self-improvement loops (--no-refine to skip). Every
-create/improve run streams the model's reasoning live and is logged under
-~/.visually-3d/runs/.
+Mode is auto-detected from the subject (override with --mode), and the
+verification backend is auto-selected from what the subject IS (digital/compute
+→ SMT, physical machine → sim). After generating, create runs ≥3 closed-loop
+rounds (improve → reproduce → amend; --no-refine to skip). Every run streams the
+model's reasoning live and is logged under ~/.visually-3d/runs/.
 
 Scenes created locally live under ~/.visually-3d/scenes (override with $VISUALLY_HOME).
 `;
@@ -67,6 +71,8 @@ async function main() {
       return (await import('../lib/improve.js')).improve(rest);
     case 'reproduce':
       return (await import('../lib/reproduce.js')).reproduce(rest);
+    case 'amend':
+      return (await import('../lib/amend.js')).amend(rest);
     case 'refine':
       return (await import('../lib/refine.js')).refine(rest);
     case 'check':
