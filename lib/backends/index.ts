@@ -19,10 +19,11 @@
 //   - verilog-sim — iverilog/verilator against a golden testbench.
 //   - cbmc        — SAT-based bounded model checking of C/Verilog.
 
+import type { Backend } from '../types.js';
 import { pythonSmtBackend } from './python-smt.js';
 import { simMujocoBackend } from './sim-mujoco.js';
 
-const REGISTRY = {
+const REGISTRY: Record<string, Backend> = {
   [pythonSmtBackend.id]: pythonSmtBackend, // algorithms / circuits → proof / SMT
   [simMujocoBackend.id]: simMujocoBackend, // robots / 3D printers / machines → physics sim
 };
@@ -32,11 +33,11 @@ export const DEFAULT_BACKEND = 'python-smt';
 // Pick the natural verification substrate for a generation mode: algorithms get
 // SMT/execution; physical machines (hardware/architecture) get physics sim.
 // Always overridable with --backend.
-export function defaultBackendFor(mode) {
+export function defaultBackendFor(mode: string): string {
   return mode === 'algorithm' ? 'python-smt' : 'sim';
 }
 
-export function getBackend(id = DEFAULT_BACKEND) {
+export function getBackend(id: string = DEFAULT_BACKEND): Backend {
   const backend = REGISTRY[id];
   if (!backend) {
     throw new Error(`unknown backend "${id}" (available: ${Object.keys(REGISTRY).join(', ')})`);
@@ -44,6 +45,6 @@ export function getBackend(id = DEFAULT_BACKEND) {
   return backend;
 }
 
-export function listBackends() {
+export function listBackends(): string[] {
   return Object.keys(REGISTRY);
 }

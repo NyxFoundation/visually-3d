@@ -13,12 +13,15 @@ import { promisify } from 'node:util';
 import { execFile } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
+import type { Backend, VerifyResult } from '../types.js';
 
 const exec = promisify(execFile);
 
-let cachedRunner;
+type Runner = { bin: string; pre: string[] };
 
-async function probe(bin, pre) {
+let cachedRunner: Runner | null | undefined;
+
+async function probe(bin: string, pre: string[]): Promise<Runner | null> {
   try {
     await exec(bin, [...pre, '-c', 'import mujoco'], { timeout: 180000 });
     return { bin, pre };
@@ -27,7 +30,7 @@ async function probe(bin, pre) {
   }
 }
 
-async function resolveRunner() {
+async function resolveRunner(): Promise<Runner | null> {
   if (cachedRunner !== undefined) return cachedRunner;
   cachedRunner =
     (await probe('python3', [])) ||
@@ -36,7 +39,7 @@ async function resolveRunner() {
   return cachedRunner;
 }
 
-export const simMujocoBackend = {
+export const simMujocoBackend: Backend = {
   id: 'sim',
   label: 'MuJoCo (physics sim)',
   language: 'python',
@@ -73,7 +76,7 @@ script (stdlib + mujoco only) that BUILDS and SIMULATES the machine:
 Keep it deterministic and finish within ~60s.`;
   },
 
-  async verify(script, dir) {
+  async verify(script: string, dir: string): Promise<VerifyResult> {
     const r = await resolveRunner();
     if (!r) return { pass: false, ran: false, stderr: 'no mujoco runner available' };
     if (typeof script !== 'string' || !script.trim()) {
@@ -86,9 +89,10 @@ Keep it deterministic and finish within ~60s.`;
         { timeout: 180000, maxBuffer: 32 * 1024 * 1024 });
       return { pass: stdout.includes('VERIFIED'), ran: true, stdout, stderr, code: 0 };
     } catch (err) {
+      const e = err as { stdout?: string; stderr?: string; message?: string; code?: number };
       return {
         pass: false, ran: true,
-        stdout: err.stdout || '', stderr: err.stderr || err.message, code: err.code ?? 1,
+        stdout: e.stdout || '', stderr: e.stderr || e.message || '', code: e.code ?? 1,
       };
     }
   },

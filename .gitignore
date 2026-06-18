@@ -15,3 +15,6 @@ __pycache__/
 /lib/types.js
 /lib/paths.js
 /server/modes.js
+/lib/backends/index.js
+/lib/backends/python-smt.js
+/lib/backends/sim-mujoco.js
