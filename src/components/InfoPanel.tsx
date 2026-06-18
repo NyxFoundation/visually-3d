@@ -36,9 +36,6 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({ scene, open, onClose }) =>
     >
       <div className="info-panel__header">
         <div>
-          {info?.japanese_name ? (
-            <p className="info-panel__jp">{info.japanese_name}</p>
-          ) : null}
           <h2>{info?.english_name ?? scene.machine_name}</h2>
         </div>
         <button onClick={onClose} aria-label="Close information">×</button>

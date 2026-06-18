@@ -64,7 +64,7 @@ export function DetailPage({ id, samples, liveScene, samplesLoaded }: DetailPage
   // differs, sources) — only offered when there's something beyond the blurb.
   const hasDetails = Boolean(
     scene.metadata?.reference ||
-    (info && (info.japanese_name || info.operator || info.contractor || info.contract_date
+    (info && (info.operator || info.contractor || info.contract_date
       || info.contract_value || info.status || info.facts?.length || info.comparisons?.length || info.sources?.length)),
   );
 
