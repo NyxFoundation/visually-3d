@@ -9,18 +9,26 @@
 // Everything is also appended verbatim to stream.jsonl, and a human-readable
 // thinking+answer transcript to reasoning.log.
 
-import { spawn } from 'node:child_process';
+import { spawn, type ChildProcess } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
 
-const dim = (s) => `\x1b[2m${s}\x1b[0m`;
-const cyan = (s) => `\x1b[36m${s}\x1b[0m`;
+const dim = (s: string): string => `\x1b[2m${s}\x1b[0m`;
+const cyan = (s: string): string => `\x1b[36m${s}\x1b[0m`;
+
+export interface RunResult {
+  text: string;
+  hadResult: boolean;
+}
+
+export interface RunOptions {
+  prompt: string;
+  model?: string;
+  runDir?: string;
+  quiet?: boolean;
+}
 
 // Run claude in streaming mode. Returns { text, hadResult }.
-//   prompt   the full prompt string
-//   model    model alias (opus/sonnet/…)
-//   runDir   directory to write stream.jsonl + reasoning.log into (optional)
-//   quiet    suppress live console echo (logs still written)
-export function runClaudeStreaming({ prompt, model, runDir, quiet = false }) {
+export function runClaudeStreaming({ prompt, model, runDir, quiet = false }: RunOptions): Promise<RunResult> {
   const bin = process.env.CLAUDE_BIN || 'claude';
   const args = [
     '-p', prompt,
@@ -34,29 +42,30 @@ export function runClaudeStreaming({ prompt, model, runDir, quiet = false }) {
   const streamLog = runDir ? createWriteStream(`${runDir}/stream.jsonl`, { flags: 'a' }) : null;
   const reasonLog = runDir ? createWriteStream(`${runDir}/reasoning.log`, { flags: 'a' }) : null;
 
-  return new Promise((resolve, reject) => {
-    let proc;
+  return new Promise<RunResult>((resolve, reject) => {
+    let proc: ChildProcess;
     try {
       proc = spawn(bin, args, { stdio: ['ignore', 'pipe', 'pipe'] });
     } catch (err) {
-      reject(new Error(`failed to spawn ${bin}: ${err.message}`));
+      reject(new Error(`failed to spawn ${bin}: ${(err as Error).message}`));
       return;
     }
 
     let lineBuf = '';
     let textAcc = '';
-    let resultText = null;
-    let section = null; // 'thinking' | 'text' | null — for console section headers
+    let resultText: string | null = null;
+    let section: 'thinking' | 'text' | null = null;
     let stderr = '';
 
-    const enterSection = (s) => {
+    const enterSection = (s: 'thinking' | 'text'): void => {
       if (section === s) return;
       section = s;
       if (!quiet) process.stdout.write(`\n${cyan(s === 'thinking' ? '⟲ thinking' : '✎ writing scene')}\n`);
       if (reasonLog) reasonLog.write(`\n\n### ${s}\n`);
     };
 
-    const handleEvent = (evt) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleEvent = (evt: any): void => {
       // Stream deltas (partial messages).
       if (evt.type === 'stream_event' && evt.event?.type === 'content_block_delta') {
         const d = evt.event.delta || {};
@@ -78,7 +87,7 @@ export function runClaudeStreaming({ prompt, model, runDir, quiet = false }) {
       }
     };
 
-    proc.stdout.on('data', (chunk) => {
+    proc.stdout?.on('data', (chunk: Buffer) => {
       const text = chunk.toString();
       streamLog?.write(text);
       lineBuf += text;
@@ -91,19 +100,19 @@ export function runClaudeStreaming({ prompt, model, runDir, quiet = false }) {
       }
     });
 
-    proc.stderr.on('data', (chunk) => {
+    proc.stderr?.on('data', (chunk: Buffer) => {
       stderr += chunk.toString();
       streamLog?.write(chunk.toString());
     });
 
-    proc.on('error', (err) => {
+    proc.on('error', (err: Error & { code?: string }) => {
       const msg = err.code === 'ENOENT'
         ? `${bin} not found. Install the Claude CLI and run its login flow first.`
         : `failed to spawn ${bin}: ${err.message}`;
       reject(new Error(msg));
     });
 
-    proc.on('close', (code) => {
+    proc.on('close', (code: number | null) => {
       streamLog?.end();
       reasonLog?.end();
       if (code !== 0) {

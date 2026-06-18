@@ -18,3 +18,5 @@ __pycache__/
 /lib/backends/index.js
 /lib/backends/python-smt.js
 /lib/backends/sim-mujoco.js
+/lib/history.js
+/lib/runner.js

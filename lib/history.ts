@@ -10,15 +10,18 @@ import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { RUNS_DIR } from './paths.js';
 
-function readJson(p) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readJson(p: string): any {
   try { return JSON.parse(readFileSync(p, 'utf8')); } catch { return null; }
 }
 
+type RunDir = { full: string; name: string; mtime: number };
+
 // Run dirs for scene <id>: improve runs are "<id>-<stamp>", create runs are
 // "create-<id>-<stamp>". Returned newest-first by mtime.
-function priorRunDirs(id) {
+function priorRunDirs(id: string): RunDir[] {
   if (!existsSync(RUNS_DIR)) return [];
-  const dirs = [];
+  const dirs: RunDir[] = [];
   for (const name of readdirSync(RUNS_DIR)) {
     if (name === `create-${id}` || name.startsWith(`create-${id}-`) ||
         name === id || name.startsWith(`${id}-`)) {
@@ -34,14 +37,21 @@ function priorRunDirs(id) {
 // Returns a seed reflection object (or null if there's no prior history):
 //   { source, mode, prior_remaining_gaps: [...], notes: [...] }
 // Shaped to drop straight into the loop's "Carried-over reflection" block.
-export function collectPriorReflection(id) {
+export type PriorReflection = {
+  source: string;
+  mode?: string;
+  prior_remaining_gaps: string[];
+  notes: string[];
+};
+
+export function collectPriorReflection(id: string): PriorReflection | null {
   const dirs = priorRunDirs(id);
   if (!dirs.length) return null;
 
-  const gaps = [];
-  const notes = [];
-  let mode;
-  const sources = [];
+  const gaps: string[] = [];
+  const notes: string[] = [];
+  let mode: string | undefined;
+  const sources: string[] = [];
 
   for (const { full, name } of dirs) {
     // Latest review from a prior improve run → its unfinished gaps.
