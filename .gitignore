@@ -20,3 +20,4 @@ __pycache__/
 /lib/backends/sim-mujoco.js
 /lib/history.js
 /lib/runner.js
+/server/analyst.js
