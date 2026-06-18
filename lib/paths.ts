@@ -10,9 +10,9 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const here = path.dirname(fileURLToPath(import.meta.url));
 
-export const PKG_ROOT = path.join(__dirname, '..');
+export const PKG_ROOT = path.join(here, '..');
 export const DIST = path.join(PKG_ROOT, 'dist');
 export const SCRIPTS = path.join(PKG_ROOT, 'scripts');
 export const PROMPTS = path.join(PKG_ROOT, 'prompts');
@@ -23,12 +23,12 @@ export const VISUALLY_HOME =
 export const SCENES_DIR = path.join(VISUALLY_HOME, 'scenes');
 export const RUNS_DIR = path.join(VISUALLY_HOME, 'runs');
 
-export function ensureWorkspace() {
+export function ensureWorkspace(): void {
   fs.mkdirSync(SCENES_DIR, { recursive: true });
   fs.mkdirSync(RUNS_DIR, { recursive: true });
 }
 
-export function scenePath(id) {
+export function scenePath(id: string): string {
   return path.join(SCENES_DIR, `${id}.json`);
 }
 
@@ -36,7 +36,7 @@ export function scenePath(id) {
 // Accepts a bare id ("quadcopter"), a workspace filename, or an explicit
 // path. Falls back to the bundled gallery so `improve`/`check`/`upload` work
 // on shipped samples too.
-export function resolveScene(ref) {
+export function resolveScene(ref: string | null | undefined): string | null {
   if (!ref) return null;
   if (ref.includes('/') || ref.includes(path.sep) || ref.endsWith('.json')) {
     const p = path.resolve(ref);
@@ -50,6 +50,6 @@ export function resolveScene(ref) {
   return null;
 }
 
-export function sceneIdFromPath(p) {
+export function sceneIdFromPath(p: string): string {
   return path.basename(p).replace(/\.json$/, '');
 }

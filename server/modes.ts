@@ -11,6 +11,8 @@
 // Modes: hardware | algorithm | architecture. The mode is auto-detected from
 // the subject text and can be forced with `--mode`.
 
+import type { Mode } from '../lib/types.js';
+
 // ── shared spine ────────────────────────────────────────────────────────────
 
 const OUTPUT_CONTRACT = `# Output contract
@@ -260,11 +262,11 @@ const SIGNALS = {
   // hardware has no positive list — it is the default when nothing else scores.
 };
 
-export function detectMode(text) {
+export function detectMode(text: string): Mode {
   const t = String(text || '').toLowerCase();
-  let best = 'hardware';
+  let best: Mode = 'hardware';
   let bestScore = 0;
-  for (const mode of ['architecture', 'algorithm']) {
+  for (const mode of ['architecture', 'algorithm'] as const) {
     let score = 0;
     for (const kw of SIGNALS[mode]) {
       if (t.includes(kw.toLowerCase())) score++;
@@ -279,13 +281,13 @@ export function detectMode(text) {
 
 export const MODE_IDS = Object.keys(MODES);
 
-export function modeLabel(mode) {
-  return (MODES[mode] || MODES.hardware).label;
+export function modeLabel(mode: string): string {
+  return (MODES[mode as keyof typeof MODES] ?? MODES.hardware).label;
 }
 
 // Assemble the full system prompt for a mode.
-export function buildSystemPrompt(mode = 'hardware') {
-  const m = MODES[mode] || MODES.hardware;
+export function buildSystemPrompt(mode: string = 'hardware'): string {
+  const m = MODES[mode as keyof typeof MODES] ?? MODES.hardware;
   const sections = [
     m.persona,
     OUTPUT_CONTRACT,
