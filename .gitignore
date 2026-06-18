@@ -21,3 +21,4 @@ __pycache__/
 /lib/history.js
 /lib/runner.js
 /server/analyst.js
+/lib/improve.js

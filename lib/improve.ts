@@ -11,8 +11,15 @@ import path from 'node:path';
 import { resolveScene, sceneIdFromPath, SCRIPTS, RUNS_DIR, ensureWorkspace } from './paths.js';
 import { collectPriorReflection } from './history.js';
 
-function parseArgs(argv) {
-  const opts = { positional: [] };
+interface ImproveOpts {
+  positional: string[];
+  driver?: string;
+  model?: string;
+  noMemory?: boolean;
+}
+
+function parseArgs(argv: string[]): ImproveOpts {
+  const opts: ImproveOpts = { positional: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--driver') opts.driver = argv[++i];
@@ -24,7 +31,7 @@ function parseArgs(argv) {
   return opts;
 }
 
-export async function improve(argv) {
+export async function improve(argv: string[]): Promise<void> {
   const opts = parseArgs(argv);
   const ref = opts.positional[0];
   const iters = opts.positional[1] || '4';
@@ -39,7 +46,7 @@ export async function improve(argv) {
   if (!existsSync(script)) throw new Error(`self-improve script not found at ${script}`);
 
   ensureWorkspace();
-  const env = {
+  const env: NodeJS.ProcessEnv = {
     ...process.env,
     DRIVER: opts.driver || process.env.DRIVER || 'claude',
     VISUALLY_RUNS_DIR: RUNS_DIR,
@@ -62,10 +69,10 @@ export async function improve(argv) {
     }
   }
 
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const child = spawn('sh', [script, target, iters], { stdio: 'inherit', env });
     child.on('error', reject);
-    child.on('close', (code) => {
+    child.on('close', (code: number | null) => {
       if (code === 0) resolve();
       else reject(new Error(`self-improve exited with code ${code}`));
     });
