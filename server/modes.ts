@@ -27,7 +27,6 @@ Return ONLY a JSON object with this shape — no markdown, no prose:
     "mode": string,                   // the generation mode you used: hardware | algorithm | architecture
     "thumbnail_camera": [x, y, z],    // world-space camera position (see camera rules)
     "info": {
-      "japanese_name": string,
       "english_name": string,
       "summary": string,              // 1-2 sentences
       "description": string,          // 1-2 paragraphs with concrete specifics
@@ -94,8 +93,7 @@ The vertical offset must be ≥ horizontal_distance × 0.18, or the view whites 
 const METADATA = `# Metadata content
 
 Fill metadata.info properly — it is surfaced in the UI:
-- **japanese_name / english_name**: common names in both languages. If the
-  subject is Japanese, lead with the Japanese name.
+- **english_name**: the common English name of the subject.
 - **summary** (1-2 sentences): what it is and why it matters.
 - **description** (1-2 paragraphs): concrete specifics that make it *this* one.
 - **facts**: 6-10 rows of { label, value } — numbers, not adjectives.
