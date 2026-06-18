@@ -20,7 +20,7 @@ import path from 'node:path';
 import { resolveScene, sceneIdFromPath, runDir as makeRunDir, ensureWorkspace } from './paths.js';
 import { runClaudeStreaming } from './runner.js';
 import { extractScene } from './scene.js';
-import { getBackend, defaultBackendFor } from './backends/index.js';
+import { getBackend, selectBackend } from './backends/index.js';
 import { saveImpl, implDir } from './impls.js';
 import type { Availability } from './types.js';
 
@@ -52,21 +52,40 @@ function stamp(): string {
   return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
 }
 
-const langFor = (mode: string): string => (mode === 'algorithm' ? 'runnable Python' : 'synthesizable Verilog');
+// The implementation language the reimplementer should target. When a
+// verification backend is active it DICTATES the language (the self-check runs
+// in it), so the prompt must not tell the engineer "Verilog" while the backend
+// demands a Python script. With no backend, fall back to the mode default.
+function implLang(mode: string, backendLanguage: string | null): { label: string; fence: string } {
+  if (backendLanguage) {
+    return backendLanguage === 'python'
+      ? { label: 'runnable Python', fence: 'python' }
+      : { label: `synthesizable ${backendLanguage}`, fence: backendLanguage };
+  }
+  return mode === 'algorithm'
+    ? { label: 'runnable Python', fence: 'python' }
+    : { label: 'synthesizable Verilog', fence: 'verilog' };
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function reimplementerPrompt(scene: any, mode: string, perspective: string, backendInstructions: string | null): string {
+function reimplementerPrompt(scene: any, perspective: string, backendInstructions: string | null, lang: { label: string; fence: string }): string {
   return `You are REVERSE-IMPLEMENTING a system from a SPEC ALONE. You do NOT have the
 original paper, datasheet, RTL, or source code — only the JSON spec below. Your
 job is to test whether the spec is complete enough to reproduce the real system.
 
 The spec is a "scene descriptor". Its fields shape / position / size / rotation
 / material are 3D-RENDERING DECORATION — IGNORE them entirely. Implement only
-from: machine_name, each part's name + role, the connections graph, any
-parameters/behavioral fields, and metadata.info.
+from: machine_name, each part's name + role, the connections graph, and the
+FUNCTIONAL SPEC fields — \`spec\` on each part and \`metadata.spec\` at the top
+level (params, widths, ports, ops, fsm, notes) — plus metadata.info.
+
+The \`spec\` fields are AUTHORITATIVE: when a part's \`spec\` gives a width, a
+parameter value, an operation, a port direction, or an FSM, use it verbatim and
+do NOT count it as a guess. Only treat as guessed/underspecified what \`spec\`
+(and the rest of the descriptor) does NOT pin down.
 
 Subject: ${scene.machine_name}
-Implementation target: ${langFor(mode)}.
+Implementation target: ${lang.label}.
 Reviewer perspective: ${perspective}
 
 SPEC (the only thing you may use):
@@ -75,7 +94,7 @@ ${JSON.stringify({ machine_name: scene.machine_name, assembly_instructions: scen
 \`\`\`
 
 Do this:
-1. Implement the system as ${langFor(mode)}, as completely as the spec allows —
+1. Implement the system as ${lang.label}, as completely as the spec allows —
    modules/functions, interfaces, datapaths, control, parameters, wiring.
 2. Be brutally honest: every time the spec did NOT give you something you NEEDED
    — a bit width, a port, an exact operation/equation, a parameter value, a
@@ -87,14 +106,14 @@ Return your answer in exactly two parts:
 
 PART 1 — a JSON object (metadata only), first, no markdown fence around it:
 {
-  "language": "${backendInstructions ? 'python' : (mode === 'algorithm' ? 'python' : 'verilog')}",
+  "language": "${lang.fence}",
   "guessed": ["<the thing you had to guess> -> <the value/behavior you assumed>", ...],
   "underspecified": ["<concrete info the spec should have contained but didn't>", ...],
   "confidence": <0-100, how confident this matches the REAL system>
 }
 
 PART 2 — ${backendInstructions ? 'the runnable self-checking program' : 'your full implementation'} in ONE fenced code block (this is run verbatim, so put REAL newlines, not "\\n"):
-\`\`\`${backendInstructions ? 'python' : (mode === 'algorithm' ? 'python' : 'verilog')}
+\`\`\`${lang.fence}
 <code here>
 \`\`\``;
 }
@@ -140,7 +159,7 @@ export function parseImpl(text: string): any {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function judgePrompt(scene: any, mode: string, impls: any[]): string {
+function judgePrompt(scene: any, langLabel: string, impls: any[]): string {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const summaries = impls.map((im: any, i: number) => `### Implementation ${i + 1} (confidence ${im?.confidence ?? '?'})
 guessed: ${JSON.stringify(im?.guessed ?? [])}
@@ -148,30 +167,71 @@ underspecified: ${JSON.stringify(im?.underspecified ?? [])}
 code (first 1500 chars):
 ${String(im?.implementation ?? '').slice(0, 1500)}`).join('\n\n');
 
-  return `You are assessing whether a system's SPEC is enough to REPRODUCE it. ${impls.length}
-engineers independently reverse-implemented it from the SAME spec alone (in
-${langFor(mode)}). Below is the spec, then each independent implementation with
-the implementer's own notes on what they had to guess.
+  // The REFERENCE (the paper/datasheet the scene depicts) is the ground truth
+  // for FIDELITY: not "does the impl work" but "is it the SAME system the source
+  // describes". Pulled from metadata so the judge can compare claimed params and
+  // named properties against what the implementations actually did.
+  const reference = JSON.stringify({
+    reference: scene.metadata?.reference,
+    domain: scene.metadata?.domain,
+    info: scene.metadata?.info,
+    spec: scene.metadata?.spec,
+  }, null, 1).slice(0, 6000);
+
+  return `You are assessing two DIFFERENT things about a system's SPEC and the
+${impls.length} implementations independently reverse-implemented from it alone
+(in ${langLabel}):
+
+  A. REPRODUCIBILITY — is the spec complete enough to rebuild the system at all?
+  B. FIDELITY — do the implementations match the SPECIFIC system in the
+     REFERENCE (the paper/datasheet), not merely "a correct one"? Many distinct
+     correct implementations exist; fidelity asks whether THIS one is the one the
+     source actually describes — same parameters, same named properties, same
+     architecture. Judge this with your own expertise (an LLM-as-judge call); you
+     do not need to run anything.
 
 Subject: ${scene.machine_name}
 
-SPEC:
+REFERENCE (ground truth for FIDELITY — the source this system comes from):
 \`\`\`json
-${JSON.stringify({ machine_name: scene.machine_name, assembly_instructions: scene.assembly_instructions, parts: scene.parts }, null, 1).slice(0, 9000)}
+${reference}
+\`\`\`
+
+SPEC (what the engineers were given):
+\`\`\`json
+${JSON.stringify({ machine_name: scene.machine_name, assembly_instructions: scene.assembly_instructions, metadata: { spec: scene.metadata?.spec }, parts: scene.parts }, null, 1).slice(0, 9000)}
 \`\`\`
 
 INDEPENDENT IMPLEMENTATIONS:
 ${summaries}
 
-Assess:
+Assess REPRODUCIBILITY:
 - reproducibility 0-100: could a competent engineer rebuild the SAME system
-  (same behavior, same interfaces, same parameters) from the spec ALONE, with no
-  guessing? 100 = fully specified down to widths/ops/params; low = the
-  implementers had to invent the substance.
-- Where the ${impls.length} independent implementations DIVERGE, the spec is
-  ambiguous — list those divergences.
-- List the concrete missing fields the spec should have carried so it would be
-  reproducible. Be specific and structural.
+  (same behavior, interfaces, parameters) from the spec ALONE, no guessing?
+- Where the ${impls.length} implementations DIVERGE, the spec is ambiguous.
+- List the concrete missing fields the spec should have carried.
+
+Note: each part may carry a \`spec\` block (params/widths/ports/ops/fsm/notes)
+and there may be a top-level \`metadata.spec\`. Anything pinned down there is
+SPECIFIED — do not list it as missing. For every missing field, set \`where\` to
+the exact part \`id\` (so it can be written into that part's \`spec\`), or
+"global" for a system-level fact (→ \`metadata.spec\`).
+
+Assess FIDELITY against the REFERENCE:
+- parameter_fidelity: for each parameter the reference pins down or implies
+  (e.g. modulus, transform size, bit-widths, parallelism, reduction algorithm),
+  compare the value the implementations used. Mark match true/false; if the
+  reference itself does not state it, set reference_value to "unstated".
+- property_checks: for each NAMED property/claim the reference makes (e.g. a
+  "conflict-free" mapping, no bit-reversal, a quantified resource saving, a
+  round-trip/inverse identity), judge whether the implementations actually
+  exhibit it: "satisfied" | "violated" | "unverifiable" (and why).
+- structural_findings: where the implementations' ARCHITECTURE diverges from the
+  structure the reference describes (topology, datapath ordering, scheduling),
+  even if the I/O behavior would still be correct.
+- fidelity 0-100: how faithfully, overall, the implementations reproduce the
+  SPECIFIC system in the reference (100 = same params + properties + structure;
+  low = merely a generic correct version, or wrong params/structure).
 
 Return ONLY this JSON, no fences, no prose:
 {
@@ -179,9 +239,19 @@ Return ONLY this JSON, no fences, no prose:
   "verdict": "reproducible" | "ambiguous" | "underspecified",
   "divergences": ["<where independent impls differ → which detail the spec left open>", ...],
   "missing_fields": [
-    { "item": "<specific missing info>", "kind": "port|width|param|operation|connection|dtype|shape|control|timing", "where": "<which part/node or 'global'>" }
+    { "item": "<specific missing info>", "kind": "port|width|param|operation|connection|dtype|shape|control|timing", "where": "<part id, or 'global'>" }
   ],
-  "summary": "<2-3 sentences: the single biggest reason this is or isn't reproducible>"
+  "fidelity": <0-100>,
+  "fidelity_report": {
+    "parameter_fidelity": [
+      { "param": "<name>", "reference_value": "<from source, or 'unstated'>", "impl_value": "<what the impls used>", "match": true|false, "where": "<part id or 'global'>" }
+    ],
+    "property_checks": [
+      { "property": "<named claim from the reference>", "status": "satisfied|violated|unverifiable", "evidence": "<one line>", "where": "<part id or 'global'>" }
+    ],
+    "structural_findings": ["<architectural divergence from the reference's described structure>", ...]
+  },
+  "summary": "<2-3 sentences: the biggest reproducibility gap AND the biggest fidelity gap>"
 }`;
 }
 
@@ -221,17 +291,22 @@ export async function reproduce(argv: string[]): Promise<any> {
   mkdirSync(runDir, { recursive: true });
   writeFileSync(path.join(runDir, 'spec.json'), JSON.stringify(scene, null, 2));
 
-  // Resolve the (optional, pluggable) executable-verification backend: SMT for
-  // algorithms, physics sim for machines, overridable with --backend.
-  const backend = getBackend(opts.backend || defaultBackendFor(mode));
+  // Resolve the executable-verification backend automatically from the scene:
+  // a CPU/GPU/FPGA/ASIC or any digital-compute design → SMT; a physical machine
+  // → physics sim. `--backend` still forces a choice; selectBackend() also
+  // honors an explicit metadata.backend override. No manual mode needed.
+  const backendId = opts.backend || selectBackend(scene);
+  const backend = getBackend(backendId);
   const avail: Availability = opts.noVerify
     ? { ok: false, reason: 'disabled via --no-verify' }
     : await backend.available();
   const backendInstructions = avail.ok ? backend.implementInstructions() : null;
+  const lang = implLang(mode, avail.ok ? backend.language : null);
 
   console.log(`visually reproduce: ${id} (mode=${mode}) — ${n} independent reimplementations`);
-  console.log(`  target language: ${langFor(mode)}`);
-  console.log(`  verify backend: ${backend.label} — ${avail.ok ? `enabled (${avail.runner})` : `off (${avail.reason})`}`);
+  console.log(`  target language: ${lang.label}`);
+  const how = opts.backend ? 'forced' : (scene.metadata?.backend ? 'from scene' : 'auto-selected');
+  console.log(`  verify backend: ${backend.label} (${how}) — ${avail.ok ? `enabled (${avail.runner})` : `off (${avail.reason})`}`);
   console.log(`  run log → ${runDir}`);
   console.log('  reimplementing from the spec alone…');
 
@@ -245,7 +320,7 @@ export async function reproduce(argv: string[]): Promise<any> {
   const impls = await Promise.all(
     Array.from({ length: n }, (_, i) =>
       runAgent(
-        reimplementerPrompt(scene, mode, perspectives[i % perspectives.length], backendInstructions),
+        reimplementerPrompt(scene, perspectives[i % perspectives.length], backendInstructions, lang),
         opts.model,
         path.join(runDir, `impl-${i + 1}.txt`),
         parseImpl,
@@ -255,7 +330,12 @@ export async function reproduce(argv: string[]): Promise<any> {
 
   // Executable verification: actually run each implementation's self-check
   // through the backend (real ground truth, not just the judge's opinion).
+  // We keep the counterexamples a failing check prints: those are exactly the
+  // facts `amend` must write back into the spec, so the loop closes on hard
+  // evidence, not only the judge's opinion.
   let verifiedCount = 0;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const verifyFindings: any[] = [];
   for (let i = 0; i < impls.length; i++) {
     const im = impls[i];
     const ext = (im?.language === 'python') ? 'py' : 'v';
@@ -270,6 +350,15 @@ export async function reproduce(argv: string[]): Promise<any> {
       im._verifyLog = log;
       writeFileSync(path.join(runDir, `impl-${i + 1}-verify.txt`), log);
       if (res.pass) verifiedCount++;
+      // The actionable signal a failing self-check carries: the "FAIL: …" line
+      // (a concrete counterexample) the backend was instructed to print.
+      const out = `${res.stdout || ''}\n${res.stderr || ''}`;
+      const fail = out.split('\n').find((l) => /\bFAIL\b|counterexample|mismatch|assert/i.test(l));
+      verifyFindings.push({
+        impl: i + 1, pass: res.pass, ran: res.ran,
+        confidence: im?.confidence ?? null,
+        counterexample: res.pass ? null : (fail ? fail.trim().slice(0, 400) : null),
+      });
       verdict = ` | self-verify: ${res.pass ? 'PASS ✓' : (res.ran ? 'FAIL' : 'did not run')}`;
     }
     console.log(`  impl ${i + 1}: confidence ${im?.confidence ?? '?'}, ` +
@@ -279,13 +368,19 @@ export async function reproduce(argv: string[]): Promise<any> {
     console.log(`  executable self-verification: ${verifiedCount}/${impls.length} implementations passed`);
   }
 
-  console.log('  judging reproducibility…');
-  const report = await runAgent(judgePrompt(scene, mode, impls), opts.model,
+  console.log('  judging reproducibility + fidelity…');
+  const report = await runAgent(judgePrompt(scene, lang.label, impls), opts.model,
     path.join(runDir, 'report.raw.txt'));
   report.backend = backend.id;
   report.executable_verification = avail.ok
     ? { enabled: true, passed: verifiedCount, total: impls.length }
     : { enabled: false, reason: avail.reason };
+  // Hand the loop everything `amend` needs to write facts back into the spec:
+  // what each implementer had to guess + the verifier's counterexamples. Keeps
+  // refine from re-reading run files; works for every mode/backend.
+  report.verify_findings = verifyFindings;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  report.guessed = (impls as any[]).flatMap((im) => im?.guessed || []).slice(0, 24);
   writeFileSync(path.join(runDir, 'report.json'), JSON.stringify(report, null, 2));
 
   // Persist the best implementation as this scene's canonical impl, so the web
@@ -313,6 +408,7 @@ export async function reproduce(argv: string[]): Promise<any> {
         backend: backend.id,
         confidence: best.confidence,
         reproducibility: report.reproducibility,
+        fidelity: Number.isFinite(Number(report.fidelity)) ? Number(report.fidelity) : undefined,
         verdict: report.verdict,
         verified: best._verify ?? null,
         savedAt: new Date().toISOString(),
@@ -326,7 +422,7 @@ export async function reproduce(argv: string[]): Promise<any> {
   if (avail.ok) {
     console.log(`  ── executable self-verification: ${verifiedCount}/${impls.length} passed (${backend.label})`);
   }
-  console.log(`  ── reproducibility: ${report.reproducibility ?? '?'}/100  (${report.verdict ?? '?'})`);
+  console.log(`  ── reproducibility: ${report.reproducibility ?? '?'}/100  (${report.verdict ?? '?'})  ·  fidelity: ${report.fidelity ?? '?'}/100`);
   if (report.summary) console.log(`  ${report.summary}`);
   if ((report.divergences || []).length) {
     console.log('\n  divergences (spec ambiguity — independent impls differ):');
@@ -337,6 +433,24 @@ export async function reproduce(argv: string[]): Promise<any> {
     for (const m of report.missing_fields.slice(0, 12)) {
       console.log(`    · [${m.kind}] ${m.item}${m.where ? `  (${m.where})` : ''}`);
     }
+  }
+  // Fidelity to the source (the "is it truly as in the paper?" axis).
+  const fr = report.fidelity_report || {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const paramMiss = (fr.parameter_fidelity || []).filter((p: any) => p && p.match === false);
+  if (paramMiss.length) {
+    console.log('\n  parameter fidelity (impl value ≠ what the source specifies):');
+    for (const p of paramMiss.slice(0, 8)) console.log(`    · ${p.param}: source=${p.reference_value} vs impl=${p.impl_value}${p.where ? `  (${p.where})` : ''}`);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const propBad = (fr.property_checks || []).filter((p: any) => p && p.status !== 'satisfied');
+  if (propBad.length) {
+    console.log('\n  property checks (named claims from the source):');
+    for (const p of propBad.slice(0, 8)) console.log(`    · [${p.status}] ${p.property}${p.evidence ? ` — ${p.evidence}` : ''}`);
+  }
+  if ((fr.structural_findings || []).length) {
+    console.log('\n  structural findings (architecture vs the source):');
+    for (const s of fr.structural_findings.slice(0, 8)) console.log(`    · ${s}`);
   }
   console.log(`\n  full report + each implementation → ${runDir}`);
   return report;
