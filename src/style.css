@@ -1474,8 +1474,8 @@ a.gallery__card { text-decoration: none; color: inherit; display: flex; flex-dir
 .rev__v { font-weight: 700; color: var(--accent); }
 .rev__src { font-size: 0.78rem; color: var(--text-dim); text-transform: capitalize; }
 .rev__why, .rev__what { border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
-.rev__label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-.rev__toggle { display: flex; gap: 4px; }
+.rev__label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); display: flex; align-items: center; justify-content: flex-start; gap: 5px; margin-bottom: 8px; }
+.rev__toggle { display: flex; gap: 4px; margin-left: auto; }
 .rev__critique { margin: 0; font-size: 0.82rem; line-height: 1.5; }
 .rev__gaps { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .rev__gap { font-size: 0.7rem; color: #e3b341; border: 1px solid rgba(210, 153, 34, 0.4); border-radius: 999px; padding: 1px 8px; }
@@ -1505,40 +1505,56 @@ a.gallery__card { text-decoration: none; color: inherit; display: flex; flex-dir
 .studio-page { min-height: 100dvh; display: flex; flex-direction: column; }
 
 .studio__bar {
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: flex-start; gap: 14px;
   padding: calc(12px + var(--safe-top)) 18px 12px;
   border-bottom: 1px solid var(--border);
 }
-.studio__back { color: var(--accent); text-decoration: none; font-size: 0.85rem; white-space: nowrap; }
+.studio__back { color: var(--accent); text-decoration: none; font-size: 0.85rem; white-space: nowrap; margin-top: 4px; }
 .studio__back:hover { text-decoration: underline; }
+.studio__titlewrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.studio__titlerow { display: flex; align-items: center; gap: 8px; }
 .studio__name { margin: 0; font-size: clamp(1.05rem, 3vw, 1.4rem); letter-spacing: -0.01em; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.studio__bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.studio__info { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--text-dim); cursor: pointer; flex: 0 0 auto; }
+.studio__info:hover { color: var(--accent); border-color: var(--accent); }
+.studio__info--active { color: var(--accent); border-color: var(--accent); background: rgba(88, 166, 255, 0.12); }
+.studio__desc { margin: 0; color: var(--text-dim); font-size: 0.85rem; line-height: 1.45; max-width: 90ch; }
+.studio__bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; margin-top: 4px; }
 
 .studio { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 12px 14px calc(14px + var(--safe-bottom)); }
 
-.studio__toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
-.studio__toolbar-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); margin-right: 4px; }
+.ic { display: inline-block; vertical-align: -0.15em; flex: 0 0 auto; }
 
-.studio__panes { display: grid; grid-template-columns: 1fr; gap: 12px; }
-@media (min-width: 900px) {
-  .studio__panes[data-cols="2"] { grid-template-columns: 1fr 1fr; }
-  .studio__panes[data-cols="3"] { grid-template-columns: 1.25fr 1fr 1fr; }
-}
+/* Panes flow as a flex row (wrap to a column on narrow); hiding one just drops
+   it from the flow and the rest grow to fill — collapsed panes become slim bars. */
+.studio__panes { display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 900px) { .studio__panes { flex-direction: row; align-items: stretch; } }
+.studio__pane { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg-elev); }
+
 /* A single focused pane gets more height to read/inspect in. */
 .studio__panes[data-cols="1"] .studio__viewer,
 .studio__panes[data-cols="1"] .studio__shot,
 .studio__panes[data-cols="1"] .studio__impl { height: 60vh; }
-.studio__pane { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg-elev); min-width: 0; }
+
 .studio__pane-head {
-  display: flex; align-items: center; justify-content: flex-start; gap: 6px;
+  display: flex; align-items: center; gap: 6px;
   padding: 8px 11px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
   color: var(--text-dim); border-bottom: 1px solid var(--border);
 }
-.studio__pane-head .studio__at { margin-left: auto; }
+.studio__head-l { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.studio__head-r { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; }
 .studio__at { color: var(--accent); font-weight: 700; letter-spacing: 0; }
-.rev__ico { font-size: 1.1em; line-height: 1; letter-spacing: 0; }
-.studio__toggle { display: inline-flex; align-items: center; gap: 4px; }
-.studio__toggle:not(.rd__chip--active) { opacity: 0.5; }
+.studio__eye { display: inline-flex; padding: 2px; background: none; border: none; color: var(--text-dim); cursor: pointer; border-radius: 4px; }
+.studio__eye:hover { color: var(--text); background: rgba(255, 255, 255, 0.06); }
+
+/* Hidden pane → slim clickable bar (vertical on wide, short row on narrow). */
+.studio__collapsed {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  flex: 0 0 auto; padding: 10px;
+  background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text-dim); cursor: pointer;
+}
+.studio__collapsed:hover { color: var(--text); border-color: var(--accent); }
+@media (min-width: 900px) { .studio__collapsed { flex-direction: column; width: 46px; } }
 .studio__viewer { position: relative; height: 44vh; min-height: 300px; }
 .studio__shot { height: 44vh; min-height: 300px; display: flex; align-items: center; justify-content: center; padding: 10px; background: #0a0d13; }
 .studio__shot img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 4px; }

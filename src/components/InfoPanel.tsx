@@ -40,20 +40,9 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({ scene, open, onClose }) =>
             <p className="info-panel__jp">{info.japanese_name}</p>
           ) : null}
           <h2>{info?.english_name ?? scene.machine_name}</h2>
-          {info?.summary ? <p className="info-panel__summary">{info.summary}</p> : null}
         </div>
         <button onClick={onClose} aria-label="Close information">×</button>
       </div>
-
-      {info?.description || scene.assembly_instructions ? (
-        <details className="info-panel__section info-panel__details" open>
-          <summary>
-            <h3>About</h3>
-            <span className="info-panel__chevron" aria-hidden>▸</span>
-          </summary>
-          <p>{info?.description ?? scene.assembly_instructions}</p>
-        </details>
-      ) : null}
 
       {info &&
       (info.operator ||

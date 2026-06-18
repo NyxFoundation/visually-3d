@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { InfoPanel } from '../components/InfoPanel';
 import { SceneStudio } from '../components/SceneStudio';
+import { Icon } from '../components/Icon';
 import { GALLERY_HREF, LIVE_ID } from '../router';
 import type { SampleEntry, SceneDescriptor } from '../types';
 
@@ -56,20 +57,34 @@ export function DetailPage({ id, samples, liveScene, samplesLoaded }: DetailPage
   }
 
   const scene = load.scene;
-  const hasInfo = Boolean(scene.metadata?.info || scene.assembly_instructions || scene.metadata?.reference);
+  const info = scene.metadata?.info;
+  // The short DESCRIPTION shown under the title.
+  const description = info?.description ?? info?.summary ?? scene.assembly_instructions ?? '';
+  // The "more detailed" info that lives behind the info button (facts, how it
+  // differs, sources) — only offered when there's something beyond the blurb.
+  const hasDetails = Boolean(
+    scene.metadata?.reference ||
+    (info && (info.japanese_name || info.operator || info.contractor || info.contract_date
+      || info.contract_value || info.status || info.facts?.length || info.comparisons?.length || info.sources?.length)),
+  );
 
   return (
     <main className="studio-page">
       <header className="studio__bar">
         <a className="studio__back" href={GALLERY_HREF}>← gallery</a>
-        <h1 className="studio__name">{scene.machine_name}</h1>
+        <div className="studio__titlewrap">
+          <div className="studio__titlerow">
+            <h1 className="studio__name">{scene.machine_name}</h1>
+            {hasDetails ? (
+              <button type="button" className={`studio__info${infoOpen ? ' studio__info--active' : ''}`} onClick={() => setInfoOpen((p) => !p)} aria-expanded={infoOpen} aria-label="More details" title="More details">
+                <Icon name="info" size={16} />
+              </button>
+            ) : null}
+          </div>
+          {description ? <p className="studio__desc">{description}</p> : null}
+        </div>
         <div className="studio__bar-right">
           <span className="badge badge--count">{scene.parts.length} parts</span>
-          {hasInfo ? (
-            <button type="button" className={`badge badge--info${infoOpen ? ' badge--active' : ''}`} onClick={() => setInfoOpen((p) => !p)} aria-expanded={infoOpen}>
-              <span className="badge__icon" aria-hidden>i</span><span>info</span>
-            </button>
-          ) : null}
         </div>
       </header>
 
