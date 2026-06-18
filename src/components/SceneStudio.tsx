@@ -9,6 +9,9 @@ import type {
 
 type SceneStudioProps = { id: string; fallbackScene: SceneDescriptor };
 
+// At-a-glance icons for each pane / readout section.
+const ICON = { model: '🧊', shot: '🖼️', impl: '💻', reasoning: '💭', changes: '✏️' } as const;
+
 function fileUrl(id: string, ref: FileRef): string {
   return `/api/runs/${encodeURIComponent(id)}/${encodeURIComponent(ref.runId)}/file?path=${encodeURIComponent(ref.file)}`;
 }
@@ -107,14 +110,14 @@ function FrameReadout({ url }: { url: string }) {
   return (
     <div className="studio__readout-grid">
       <div className="studio__reason">
-        <div className="rev__label">reasoning</div>
+        <div className="rev__label"><span className="rev__ico" aria-hidden>{ICON.reasoning}</span> reasoning</div>
         {detail.reasoning.text ? <p className="rev__critique">{detail.reasoning.text}</p> : <p className="impl-panel__hint">no reasoning recorded for this frame.</p>}
         {detail.reasoning.verdict ? <div className="rd__row"><span className="rd__stat">{detail.reasoning.verdict}</span></div> : null}
         {detail.reasoning.gaps?.length ? <div className="rev__gaps">{detail.reasoning.gaps.map((g, i) => <span key={i} className="rev__gap">{g}</span>)}</div> : null}
       </div>
       <div className="studio__changes">
         <div className="rev__label">
-          changes <span className="diff__muted">· {isScene ? 'scene' : 'implementation'}</span>
+          <span className="rev__ico" aria-hidden>{ICON.changes}</span> changes <span className="diff__muted">· {isScene ? 'scene' : 'implementation'}</span>
           {isScene ? (
             <span className="rev__toggle">
               <button className={`rd__chip${mode === 'structural' ? ' rd__chip--active' : ''}`} onClick={() => setMode('structural')}>structural</button>
@@ -135,6 +138,9 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
   const [frame, setFrame] = useState(0);
   const [selectedPart, setSelectedPart] = useState<Part | null>(null);
   const [partOpen, setPartOpen] = useState(false);
+  // Which of the three panes are shown. The grid reflows to the visible count
+  // (hide two → one big column to focus on, e.g., the implementation).
+  const [show, setShow] = useState({ model: true, shot: true, impl: true });
   const loadedRef = useRef(false);
 
   useEffect(() => {
@@ -199,30 +205,54 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
 
   const set = (f: number) => setFrame(Math.max(0, Math.min(n - 1, f)));
 
+  const visibleCount = Number(show.model) + Number(show.shot) + Number(show.impl);
+  const toggle = (k: 'model' | 'shot' | 'impl') => setShow((s) => {
+    const next = { ...s, [k]: !s[k] };
+    return next.model || next.shot || next.impl ? next : s; // keep at least one
+  });
+  const panes: Array<['model' | 'shot' | 'impl', string]> = [
+    ['model', '3D model'], ['shot', 'screenshot'], ['impl', 'implementation'],
+  ];
+
   return (
     <div className="studio">
-      <div className="studio__panes">
-        <section className="studio__pane">
-          <div className="studio__pane-head">3D model{rev ? <span className="studio__at">v{rev.version}</span> : null}</div>
-          <div className="studio__viewer"><SceneViewer url={sceneUrl} fallback={fallbackScene} selectedPartId={selectedPart?.id} onPartSelect={onPartSelect} /></div>
-        </section>
-        <section className="studio__pane">
-          <div className="studio__pane-head">screenshot{rev ? <span className="studio__at">v{rev.version}</span> : null}</div>
-          <div className="studio__shot">{renderUrl ? <img src={renderUrl} alt="render" /> : <span className="impl-panel__hint">no render at this version</span>}</div>
-        </section>
-        <section className="studio__pane">
-          <div className="studio__pane-head">
-            implementation
-            {implVersion != null ? <span className="studio__at">v{implVersion}</span> : null}
-            {verif && impl?.pass != null ? <span className={`rd__verdict rd__verdict--${impl.pass ? 'pass' : 'fail'}`}>{impl.pass ? 'PASS ✓' : 'FAIL'}</span> : null}
-          </div>
-          <div className="studio__impl">
-            {implStale ? (
-              <div className="studio__stale">⚠ generated from v{implVersion}; the scene is now v{rev?.version}. Re-run <code>visually reproduce</code> (or <code>refine</code>) to regenerate.</div>
-            ) : null}
-            {implUrl ? <CodeFile key={implUrl} url={implUrl} lang={impl?.lang} /> : <span className="impl-panel__hint">not implemented yet at this point — run <code>visually reproduce</code>.</span>}
-          </div>
-        </section>
+      <div className="studio__toolbar">
+        <span className="studio__toolbar-label">panes</span>
+        {panes.map(([k, label]) => (
+          <button key={k} className={`rd__chip studio__toggle${show[k] ? ' rd__chip--active' : ''}`} aria-pressed={show[k]} onClick={() => toggle(k)}>
+            <span className="rev__ico" aria-hidden>{ICON[k]}</span> {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="studio__panes" data-cols={visibleCount}>
+        {show.model ? (
+          <section className="studio__pane">
+            <div className="studio__pane-head"><span className="rev__ico" aria-hidden>{ICON.model}</span> 3D model{rev ? <span className="studio__at">v{rev.version}</span> : null}</div>
+            <div className="studio__viewer"><SceneViewer url={sceneUrl} fallback={fallbackScene} selectedPartId={selectedPart?.id} onPartSelect={onPartSelect} /></div>
+          </section>
+        ) : null}
+        {show.shot ? (
+          <section className="studio__pane">
+            <div className="studio__pane-head"><span className="rev__ico" aria-hidden>{ICON.shot}</span> screenshot{rev ? <span className="studio__at">v{rev.version}</span> : null}</div>
+            <div className="studio__shot">{renderUrl ? <img src={renderUrl} alt="render" /> : <span className="impl-panel__hint">no render at this version</span>}</div>
+          </section>
+        ) : null}
+        {show.impl ? (
+          <section className="studio__pane">
+            <div className="studio__pane-head">
+              <span className="rev__ico" aria-hidden>{ICON.impl}</span> implementation
+              {implVersion != null ? <span className="studio__at">v{implVersion}</span> : null}
+              {verif && impl?.pass != null ? <span className={`rd__verdict rd__verdict--${impl.pass ? 'pass' : 'fail'}`}>{impl.pass ? 'PASS ✓' : 'FAIL'}</span> : null}
+            </div>
+            <div className="studio__impl">
+              {implStale ? (
+                <div className="studio__stale">⚠ generated from v{implVersion}; the scene is now v{rev?.version}. Re-run <code>visually reproduce</code> (or <code>refine</code>) to regenerate.</div>
+              ) : null}
+              {implUrl ? <CodeFile key={implUrl} url={implUrl} lang={impl?.lang} /> : <span className="impl-panel__hint">not implemented yet at this point — run <code>visually reproduce</code>.</span>}
+            </div>
+          </section>
+        ) : null}
       </div>
 
       <div className="studio__readout">

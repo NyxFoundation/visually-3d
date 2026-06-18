@@ -1516,15 +1516,29 @@ a.gallery__card { text-decoration: none; color: inherit; display: flex; flex-dir
 
 .studio { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 12px 14px calc(14px + var(--safe-bottom)); }
 
+.studio__toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.studio__toolbar-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); margin-right: 4px; }
+
 .studio__panes { display: grid; grid-template-columns: 1fr; gap: 12px; }
-@media (min-width: 900px) { .studio__panes { grid-template-columns: 1.25fr 1fr 1fr; } }
+@media (min-width: 900px) {
+  .studio__panes[data-cols="2"] { grid-template-columns: 1fr 1fr; }
+  .studio__panes[data-cols="3"] { grid-template-columns: 1.25fr 1fr 1fr; }
+}
+/* A single focused pane gets more height to read/inspect in. */
+.studio__panes[data-cols="1"] .studio__viewer,
+.studio__panes[data-cols="1"] .studio__shot,
+.studio__panes[data-cols="1"] .studio__impl { height: 60vh; }
 .studio__pane { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg-elev); min-width: 0; }
 .studio__pane-head {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  display: flex; align-items: center; justify-content: flex-start; gap: 6px;
   padding: 8px 11px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
   color: var(--text-dim); border-bottom: 1px solid var(--border);
 }
+.studio__pane-head .studio__at { margin-left: auto; }
 .studio__at { color: var(--accent); font-weight: 700; letter-spacing: 0; }
+.rev__ico { font-size: 1.1em; line-height: 1; letter-spacing: 0; }
+.studio__toggle { display: inline-flex; align-items: center; gap: 4px; }
+.studio__toggle:not(.rd__chip--active) { opacity: 0.5; }
 .studio__viewer { position: relative; height: 44vh; min-height: 300px; }
 .studio__shot { height: 44vh; min-height: 300px; display: flex; align-items: center; justify-content: center; padding: 10px; background: #0a0d13; }
 .studio__shot img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 4px; }
