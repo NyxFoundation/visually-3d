@@ -7,11 +7,11 @@
 // watch the loop run with its reasoning streaming live. "Continue existing"
 // improves/reproduces a saved scene; "Create new" starts from a name/URL.
 //
-// Written in plain JS with htm (JSX-like, no build step) so it runs directly on
-// Node like the rest of lib/.
+// Written with htm (JSX-like, no build step) so the template markup stays
+// build-free; the surrounding component logic is fully typed.
 
 import process from 'node:process';
-import { spawn } from 'node:child_process';
+import { spawn, type ChildProcess } from 'node:child_process';
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,14 +22,22 @@ import TextInput from 'ink-text-input';
 import htm from 'htm';
 import { SCENES_DIR, ensureWorkspace } from '../paths.js';
 
-const html = htm.bind(React.createElement);
+// htm template markup is opaque to the type-checker (the tag receives `any`
+// values), so component *props* below carry the real contracts. htm's default
+// export resolves to a namespace under NodeNext, so we name its `bind` shape.
+const htmFactory = htm as unknown as {
+  bind: (
+    h: typeof React.createElement,
+  ) => (strings: TemplateStringsArray, ...values: unknown[]) => React.ReactElement;
+};
+const html = htmFactory.bind(React.createElement);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BIN = path.join(__dirname, '..', '..', 'bin', 'visually.js');
 
 // eslint-disable-next-line no-control-regex
-const stripAnsi = (s) => s.replace(/\u001b\[[0-9;]*m/g, '');
+const stripAnsi = (s: string): string => s.replace(/\[[0-9;]*m/g, '');
 
-function listScenes() {
+function listScenes(): string[] {
   try {
     return readdirSync(SCENES_DIR)
       .filter((f) => f.endsWith('.json') && f !== 'index.json')
@@ -41,28 +49,28 @@ function listScenes() {
 }
 
 // ── runner: spawn a subcommand and stream its output into a log pane ─────────
-function Runner({ args, onBack }) {
-  const [lines, setLines] = useState(['starting…']);
+function Runner({ args, onBack }: { args: string[]; onBack: () => void }) {
+  const [lines, setLines] = useState<string[]>(['starting…']);
   const [running, setRunning] = useState(true);
-  const [code, setCode] = useState(null);
-  const procRef = useRef(null);
+  const [code, setCode] = useState<number | null>(null);
+  const procRef = useRef<ChildProcess | null>(null);
   const bufRef = useRef('');
 
   useEffect(() => {
     const proc = spawn(process.execPath, [BIN, ...args], { stdio: ['ignore', 'pipe', 'pipe'] });
     procRef.current = proc;
-    const onData = (buf) => {
+    const onData = (buf: Buffer) => {
       bufRef.current = (bufRef.current + stripAnsi(buf.toString())).slice(-65536);
       setLines(bufRef.current.split('\n').slice(-400));
     };
-    proc.stdout.on('data', onData);
-    proc.stderr.on('data', onData);
-    proc.on('error', (e) => { onData(Buffer.from(`\nspawn error: ${e.message}\n`)); setRunning(false); setCode(1); });
-    proc.on('close', (c) => { setRunning(false); setCode(c); });
+    proc.stdout?.on('data', onData);
+    proc.stderr?.on('data', onData);
+    proc.on('error', (e: Error) => { onData(Buffer.from(`\nspawn error: ${e.message}\n`)); setRunning(false); setCode(1); });
+    proc.on('close', (c: number | null) => { setRunning(false); setCode(c); });
     return () => { try { proc.kill('SIGTERM'); } catch { /* gone */ } };
   }, []);
 
-  useInput((input) => {
+  useInput((input: string) => {
     if (running && (input === 'x')) { try { procRef.current?.kill('SIGTERM'); } catch { /* gone */ } }
     if (!running && (input === 'b')) onBack();
   });
@@ -85,7 +93,7 @@ function Runner({ args, onBack }) {
 }
 
 // ── screens ──────────────────────────────────────────────────────────────────
-function Menu({ onPick }) {
+function Menu({ onPick }: { onPick: (value: string) => void }) {
   const items = [
     { label: '✦  Create new scene', value: 'create' },
     { label: '↻  Continue existing  (improve / reproduce)', value: 'scenes' },
@@ -94,15 +102,15 @@ function Menu({ onPick }) {
   return html`
     <${Box} flexDirection="column">
       <${Text} dimColor>What do you want to do?</${Text}>
-      <${Box} marginTop=${1}><${SelectInput} items=${items} onSelect=${(it) => onPick(it.value)} /></${Box}>
+      <${Box} marginTop=${1}><${SelectInput} items=${items} onSelect=${(it: { value: string }) => onPick(it.value)} /></${Box}>
     </${Box}>`;
 }
 
-function CreateForm({ onStart, onBack }) {
+function CreateForm({ onStart, onBack }: { onStart: (name: string, url: string) => void; onBack: () => void }) {
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [field, setField] = useState(0);
-  useInput((input, key) => { if (key.escape) onBack(); });
+  useInput((_input: string, key: { escape: boolean }) => { if (key.escape) onBack(); });
   if (field === 0) {
     return html`
       <${Box} flexDirection="column">
@@ -119,9 +127,9 @@ function CreateForm({ onStart, onBack }) {
     </${Box}>`;
 }
 
-function SceneList({ onPick, onBack }) {
+function SceneList({ onPick, onBack }: { onPick: (id: string) => void; onBack: () => void }) {
   const scenes = listScenes();
-  useInput((input, key) => { if (key.escape) onBack(); });
+  useInput((_input: string, key: { escape: boolean }) => { if (key.escape) onBack(); });
   if (!scenes.length) {
     return html`
       <${Box} flexDirection="column">
@@ -133,14 +141,14 @@ function SceneList({ onPick, onBack }) {
   return html`
     <${Box} flexDirection="column">
       <${Text}>Pick a scene:</${Text}>
-      <${SelectInput} items=${items} onSelect=${(it) => onPick(it.value)} />
+      <${SelectInput} items=${items} onSelect=${(it: { value: string }) => onPick(it.value)} />
       <${Text} dimColor>Esc to go back</${Text}>
     </${Box}>`;
 }
 
-function SceneAction({ id, onRun, onBack }) {
-  useInput((input, key) => { if (key.escape) onBack(); });
-  const items = [
+function SceneAction({ id, onRun, onBack }: { id: string; onRun: (args: string[]) => void; onBack: () => void }) {
+  useInput((_input: string, key: { escape: boolean }) => { if (key.escape) onBack(); });
+  const items: { label: string; value: string[] | 'back' }[] = [
     { label: 'Improve   — visual self-improvement loop', value: ['improve', id] },
     { label: 'Reproduce — implement + verify from the scene', value: ['reproduce', id] },
     { label: 'Back', value: 'back' },
@@ -148,29 +156,29 @@ function SceneAction({ id, onRun, onBack }) {
   return html`
     <${Box} flexDirection="column">
       <${Text}>Scene: <${Text} color="cyan" bold>${id}</${Text}></${Text}>
-      <${Box} marginTop=${1}><${SelectInput} items=${items} onSelect=${(it) => (it.value === 'back' ? onBack() : onRun(it.value))} /></${Box}>
+      <${Box} marginTop=${1}><${SelectInput} items=${items} onSelect=${(it: { value: string[] | 'back' }) => (it.value === 'back' ? onBack() : onRun(it.value))} /></${Box}>
     </${Box}>`;
 }
 
 function App() {
   const { exit } = useApp();
   const [screen, setScreen] = useState('menu');
-  const [runArgs, setRunArgs] = useState(null);
-  const [picked, setPicked] = useState(null);
+  const [runArgs, setRunArgs] = useState<string[] | null>(null);
+  const [picked, setPicked] = useState<string | null>(null);
 
-  useInput((input) => { if (input === 'q' && screen !== 'running') exit(); });
+  useInput((input: string) => { if (input === 'q' && screen !== 'running') exit(); });
 
-  let body;
+  let body: React.ReactNode;
   if (screen === 'menu') {
-    body = html`<${Menu} onPick=${(v) => (v === 'quit' ? exit() : setScreen(v))} />`;
+    body = html`<${Menu} onPick=${(v: string) => (v === 'quit' ? exit() : setScreen(v))} />`;
   } else if (screen === 'create') {
     body = html`<${CreateForm} onBack=${() => setScreen('menu')}
-      onStart=${(name, url) => { setRunArgs(['create', name, ...(url ? ['--url', url] : [])]); setScreen('running'); }} />`;
+      onStart=${(name: string, url: string) => { setRunArgs(['create', name, ...(url ? ['--url', url] : [])]); setScreen('running'); }} />`;
   } else if (screen === 'scenes') {
-    body = html`<${SceneList} onBack=${() => setScreen('menu')} onPick=${(id) => { setPicked(id); setScreen('sceneAction'); }} />`;
+    body = html`<${SceneList} onBack=${() => setScreen('menu')} onPick=${(id: string) => { setPicked(id); setScreen('sceneAction'); }} />`;
   } else if (screen === 'sceneAction') {
     body = html`<${SceneAction} id=${picked} onBack=${() => setScreen('scenes')}
-      onRun=${(args) => { setRunArgs(args); setScreen('running'); }} />`;
+      onRun=${(args: string[]) => { setRunArgs(args); setScreen('running'); }} />`;
   } else if (screen === 'running') {
     body = html`<${Runner} args=${runArgs} onBack=${() => setScreen('menu')} />`;
   }
@@ -182,12 +190,12 @@ function App() {
     </${Box}>`;
 }
 
-export async function runTui() {
+export async function runTui(): Promise<void> {
   ensureWorkspace();
   if (!process.stdout.isTTY) {
     throw new Error('the TUI needs an interactive terminal (no TTY detected). Use a subcommand like `visually create …` instead.');
   }
-  const instance = render(html`<${App} />`);
+  const instance = render(html`<${App} />` as React.ReactElement);
   await instance.waitUntilExit();
 }
 

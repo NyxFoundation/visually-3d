@@ -74,7 +74,7 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error(`\nvisually: ${err.message}\n`);
+main().catch((err: unknown) => {
+  console.error(`\nvisually: ${(err as Error).message}\n`);
   process.exit(1);
 });
