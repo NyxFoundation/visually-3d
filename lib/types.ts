@@ -6,6 +6,31 @@ export type Mode = 'hardware' | 'algorithm' | 'architecture';
 export type Shape =
   | 'box' | 'cylinder' | 'sphere' | 'cone' | 'torus' | 'capsule' | 'complex';
 
+// ── functional spec substrate (lib/amend) ────────────────────────────────────
+// The mode-agnostic "genome" that carries what a part actually DOES, distinct
+// from how it looks. Geometry (shape/position/size) is the visualization; this
+// is the verifiable behavior. `reproduce` reads it as authoritative truth and
+// `amend` writes verification-discovered facts back into it, which is what lets
+// the reproducibility score climb across a `refine` loop. Every field is
+// optional and free-form per mode (widths/ops for a circuit, load/span for a
+// building, torque/tolerance for a machine), so it generalizes across modes.
+export interface PortSpec {
+  name: string;
+  dir?: 'in' | 'out' | 'inout';
+  width?: number;
+  [key: string]: unknown;
+}
+
+export interface PartSpec {
+  params?: Record<string, number | string | boolean>;
+  widths?: Record<string, number>;
+  ports?: PortSpec[];
+  ops?: string[];
+  fsm?: string[];
+  notes?: string;
+  [key: string]: unknown;
+}
+
 export interface Part {
   id: string;
   name: string;
@@ -16,6 +41,9 @@ export interface Part {
   material: string;
   role: string;
   connections?: string[];
+  // The functional spec for this part: what it computes / how it behaves,
+  // filled in by `amend` from verification findings. Geometry stays decoration.
+  spec?: PartSpec;
   // generation/engineering modes attach extra fields (compute_profile, …).
   [key: string]: unknown;
 }
@@ -26,6 +54,12 @@ export interface SceneMetadata {
   domain?: string;
   thumbnail_camera?: [number, number, number];
   info?: Record<string, unknown>;
+  // System-level functional spec (clocking, handshake, FSM, global params) that
+  // belongs to no single part. Same role as Part.spec, one level up.
+  spec?: PartSpec;
+  // Optional override of the verification substrate for this scene, regardless
+  // of mode — lets a circuit-flavored hardware scene route to SMT, etc.
+  backend?: string;
   [key: string]: unknown;
 }
 
@@ -78,6 +112,7 @@ export interface StoredImplMeta {
   backend: string;
   confidence?: number;
   reproducibility?: number;
+  fidelity?: number;
   verdict?: string;
   verified: { pass: boolean; ran: boolean } | null;
   savedAt: string;

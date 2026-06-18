@@ -16,6 +16,26 @@ const finite = (n: unknown): n is number => typeof n === 'number' && Number.isFi
 // SceneDescriptor (or a thrown error) out. validateScene() below stays as the
 // lenient, message-collecting check used by create/upload/smoke.
 const Triple = z.tuple([z.number(), z.number(), z.number()]);
+
+// The functional spec substrate (see types.ts → PartSpec). Kept deliberately
+// permissive — every field optional, `.loose()` so a mode can attach its own
+// keys — because its job is to *carry* whatever verification discovers, not to
+// constrain it. It must never reject a scene that lacks it (back-compat) nor one
+// that over-specifies it (forward-compat as `amend` learns new fields).
+const PortSchema = z.object({
+  name: z.string().min(1),
+  dir: z.string().optional(),
+  width: z.number().optional(),
+}).loose();
+export const PartSpecSchema = z.object({
+  params: z.record(z.string(), z.unknown()).optional(),
+  widths: z.record(z.string(), z.number()).optional(),
+  ports: z.array(PortSchema).optional(),
+  ops: z.array(z.string()).optional(),
+  fsm: z.array(z.string()).optional(),
+  notes: z.string().optional(),
+}).loose();
+
 const PartSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
@@ -26,6 +46,7 @@ const PartSchema = z.object({
   material: z.string().min(1),
   role: z.string().min(1),
   connections: z.array(z.string()).optional(),
+  spec: PartSpecSchema.optional(),
 }).loose();
 
 export const SceneSchema = z.object({
@@ -111,6 +132,35 @@ export function validateScene(scene: unknown): string[] {
     ids.add(p.id);
   });
   return errors;
+}
+
+// How much functional spec a scene carries — the mode-agnostic measure of the
+// "genome" that `reproduce` reads and `amend` fills in. `refine` prints this so
+// the spec substrate growing is visible alongside the reproducibility score
+// (they should move together: more covered fields → more reproducible spec).
+export function specCoverage(
+  scene: Partial<SceneDescriptor> | null | undefined,
+): { parts: number; covered: number; keys: number } {
+  const countKeys = (spec: unknown): number => {
+    if (!spec || typeof spec !== 'object' || Array.isArray(spec)) return 0;
+    let n = 0;
+    for (const v of Object.values(spec as Record<string, unknown>)) {
+      if (v == null) continue;
+      if (Array.isArray(v)) n += v.length;
+      else if (typeof v === 'object') n += Object.keys(v as object).length;
+      else n += 1;
+    }
+    return n;
+  };
+  const parts = Array.isArray(scene?.parts) ? (scene.parts as { spec?: unknown }[]) : [];
+  let covered = 0;
+  let keys = countKeys((scene?.metadata as { spec?: unknown } | undefined)?.spec);
+  for (const p of parts) {
+    const k = countKeys(p?.spec);
+    if (k > 0) covered += 1;
+    keys += k;
+  }
+  return { parts: parts.length, covered, keys };
 }
 
 // djb2 → 6 hex chars; stable id fallback for names with no ASCII to slugify
