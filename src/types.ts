@@ -280,16 +280,17 @@ export interface StructuralDiff {
   meta: FieldChange[];
 }
 
-export interface RevisionDetail {
+export interface FrameDetail {
+  kind: 'revision' | 'verification';
   key: string;
-  version: number;
+  version: number | null;
   startedAt: string;
-  source: string;
+  label: string;
   score: number | null;
   delta: number | null;
-  render: FileRef | null;
-  trace: FileRef | null;
-  reasoning: { critique?: string; remainingGaps?: string[]; verdict?: string };
-  diff: StructuralDiff;
+  reasoning: { text?: string; gaps?: string[]; verdict?: string };
+  changeKind: 'scene' | 'impl';
+  structural: StructuralDiff | null;
   rawDiff: string;
+  lang?: string;
 }

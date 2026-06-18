@@ -1,5 +1,5 @@
-import React, { Suspense, useMemo } from 'react';
-import { Canvas } from '@react-three/fiber';
+import React, { Suspense, useEffect, useMemo } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Grid, Environment, ContactShadows, PerspectiveCamera, RoundedBox } from '@react-three/drei';
 import * as THREE from 'three';
 import { Connections } from './Connections';
@@ -270,6 +270,7 @@ export const Viewer: React.FC<ViewerProps> = ({
           <Environment preset="city" environmentIntensity={0.35} />
         </Suspense>
 
+        <Invalidate dep={scene} />
         <group>
           {scene.parts.map((part) => (
             <ScenePart
@@ -324,6 +325,15 @@ export const Viewer: React.FC<ViewerProps> = ({
       </Canvas>
     </div>
   );
+};
+
+// With frameloop="demand" the canvas only repaints on demand. When the scene
+// descriptor is swapped (e.g. scrubbing the studio timeline), force one frame so
+// the 3D actually carries forward to the new version.
+const Invalidate: React.FC<{ dep: unknown }> = ({ dep }) => {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => { invalidate(); }, [dep, invalidate]);
+  return null;
 };
 
 const AutoRotate: React.FC<{ center: THREE.Vector3; distance: number }> = ({ center, distance }) => (

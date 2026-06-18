@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 process.env.VISUALLY_HOME = mkdtempSync(path.join(os.tmpdir(), 'vh-'));
-const { listTimeline, getRevisionDetail } = await import('../lib/revisions.js');
+const { listTimeline, getFrameDetail } = await import('../lib/revisions.js');
 const { runDir } = await import('../lib/paths.js');
 
 function seed() {
@@ -21,7 +21,9 @@ function seed() {
 
   const repro = runDir('printer', 'reproduce', '20260101-120000');
   mkdirSync(repro, { recursive: true });
-  writeFileSync(path.join(repro, 'report.json'), JSON.stringify({ reproducibility: 71, verdict: 'ambiguous', executable_verification: { enabled: true, passed: 1, total: 2 } }));
+  writeFileSync(path.join(repro, 'report.json'), JSON.stringify({ reproducibility: 71, verdict: 'ambiguous', summary: 'spec omits bit widths', missing_fields: [{ kind: 'width', item: 'bus width' }], executable_verification: { enabled: true, passed: 1, total: 2 } }));
+  writeFileSync(path.join(repro, 'impl-1.py'), 'def run():\n    return 1\n');
+  writeFileSync(path.join(repro, 'impl-1-verify.txt'), 'pass=true ran=true');
 }
 
 test('timeline interleaves numbered revisions with verification markers', () => {
@@ -36,18 +38,27 @@ test('timeline interleaves numbered revisions with verification markers', () => 
   assert.equal(t[2].kind, 'verification'); assert.equal(t[2].reproducibility, 71);
 });
 
-test('revision detail pairs reasoning with a structural + raw diff', () => {
-  const d = getRevisionDetail('printer', 'improve-20260101-110000:1');
-  assert.equal(d.version, 1);
-  assert.equal(d.reasoning.critique, 'switch to aluminium');
-  assert.deepEqual(d.reasoning.remainingGaps, ['cables']);
-  assert.deepEqual(d.diff.added.map((p) => p.id), ['bed']);
-  const frame = d.diff.changed.find((c) => c.id === 'frame');
+test('revision frame: reasoning + scene (structural) change', () => {
+  const d = getFrameDetail('printer', 'improve-20260101-110000:1');
+  assert.equal(d.kind, 'revision');
+  assert.equal(d.changeKind, 'scene');
+  assert.equal(d.reasoning.text, 'switch to aluminium');
+  assert.deepEqual(d.reasoning.gaps, ['cables']);
+  assert.deepEqual(d.structural.added.map((p) => p.id), ['bed']);
+  const frame = d.structural.changed.find((c) => c.id === 'frame');
   assert.deepEqual(frame.fields.find((f) => f.field === 'material'), { field: 'material', before: 'steel', after: 'aluminum' });
-  assert.equal(d.diff.initial, false);
   assert.ok(d.rawDiff.includes('- ') || d.rawDiff.includes('+ '));
 });
 
-test('unknown revision key returns null', () => {
-  assert.equal(getRevisionDetail('printer', 'nope:9'), null);
+test('verification frame: reasoning + impl (code) change', () => {
+  const d = getFrameDetail('printer', 'reproduce-20260101-120000:v');
+  assert.equal(d.kind, 'verification');
+  assert.equal(d.changeKind, 'impl');
+  assert.equal(d.score, 71); // reproducibility
+  assert.equal(d.structural, null);
+  assert.ok(d.rawDiff.length > 0); // first verification → all-added code diff
+});
+
+test('unknown frame key returns null', () => {
+  assert.equal(getFrameDetail('printer', 'nope:9'), null);
 });

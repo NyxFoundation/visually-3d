@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { LazyViewer } from './LazyViewer';
 import { PartInfo } from './PartInfo';
+import { Code } from './Code';
 import type {
-  FieldChange, FileRef, Part, PartChange, RevisionDetail, RevisionEntry,
+  FieldChange, FileRef, FrameDetail, Part, PartChange, RevisionEntry,
   SceneDescriptor, StructuralDiff, TimelineEntry, VerificationEntry,
 } from '../types';
 
@@ -52,20 +53,19 @@ function SceneViewer({ url, fallback, selectedPartId, onPartSelect }: {
   return <LazyViewer scene={scene} selectedPartId={selectedPartId} onPartSelect={onPartSelect} />;
 }
 
-// Fetch + show a text file (impl code, LLM trace), keyed by url upstream.
-function FileText({ url, json }: { url: string; json?: boolean }) {
-  const [text, setText] = useState<string | null>(null);
+// Fetch the implementation source and render it syntax-highlighted. Keyed by
+// url upstream so it remounts (and refetches) when the carried-forward impl
+// changes.
+function CodeFile({ url, lang }: { url: string; lang?: string }) {
+  const [code, setCode] = useState<string | null>(null);
   useEffect(() => {
     let cancelled = false;
-    fetch(url).then((r) => r.text()).then((raw) => {
-      if (cancelled) return;
-      let body = raw;
-      if (json) { try { body = JSON.stringify(JSON.parse(raw), null, 2); } catch { /* raw */ } }
-      setText(body);
-    }).catch(() => { if (!cancelled) setText('(failed to load)'); });
+    fetch(url).then((r) => r.text()).then((raw) => { if (!cancelled) setCode(raw); })
+      .catch(() => { if (!cancelled) setCode('(failed to load)'); });
     return () => { cancelled = true; };
-  }, [url, json]);
-  return <pre className="studio__code">{text ?? 'loading…'}</pre>;
+  }, [url]);
+  if (code == null) return <pre className="studio__code">loading…</pre>;
+  return <Code code={code} lang={lang} />;
 }
 
 function StructuralDiffView({ diff }: { diff: StructuralDiff }) {
@@ -88,50 +88,43 @@ function RawDiffView({ raw }: { raw: string }) {
   return <pre className="diff__raw">{raw.split('\n').map((l, i) => <div key={i} className={l.startsWith('+ ') ? 'diff__raw-add' : l.startsWith('- ') ? 'diff__raw-del' : 'diff__raw-ctx'}>{l || ' '}</div>)}</pre>;
 }
 
-// Readout for a revision frame: the LLM's reasoning + the descriptor diff.
-function RevisionReadout({ url }: { url: string }) {
-  const [detail, setDetail] = useState<RevisionDetail | 'loading' | 'error'>('loading');
+// One readout for EVERY frame: REASONING (why) beside CHANGES (what). A scene
+// frame's change is the descriptor diff; a verification frame's change is the
+// implementation code diff. Same shape either way, so the layout never shifts.
+function FrameReadout({ url }: { url: string }) {
+  const [detail, setDetail] = useState<FrameDetail | 'loading' | 'error'>('loading');
   const [mode, setMode] = useState<'structural' | 'raw'>('structural');
   useEffect(() => {
     let cancelled = false;
-    fetch(url).then((r) => (r.ok ? (r.json() as Promise<RevisionDetail>) : Promise.reject(r)))
+    fetch(url).then((r) => (r.ok ? (r.json() as Promise<FrameDetail>) : Promise.reject(r)))
       .then((d) => { if (!cancelled) setDetail(d); }).catch(() => { if (!cancelled) setDetail('error'); });
     return () => { cancelled = true; };
   }, [url]);
   if (detail === 'loading') return <p className="impl-panel__hint">loading…</p>;
   if (detail === 'error') return <p className="impl-panel__hint">couldn’t load.</p>;
+
+  const isScene = detail.changeKind === 'scene';
   return (
     <div className="studio__readout-grid">
       <div className="studio__reason">
         <div className="rev__label">reasoning</div>
-        {detail.reasoning.critique ? <p className="rev__critique">{detail.reasoning.critique}</p> : <p className="impl-panel__hint">{detail.diff.initial ? 'initial version.' : 'no critique recorded.'}</p>}
-        {detail.reasoning.remainingGaps?.length ? <div className="rev__gaps">{detail.reasoning.remainingGaps.map((g, i) => <span key={i} className="rev__gap">{g}</span>)}</div> : null}
+        {detail.reasoning.text ? <p className="rev__critique">{detail.reasoning.text}</p> : <p className="impl-panel__hint">no reasoning recorded for this frame.</p>}
+        {detail.reasoning.verdict ? <div className="rd__row"><span className="rd__stat">{detail.reasoning.verdict}</span></div> : null}
+        {detail.reasoning.gaps?.length ? <div className="rev__gaps">{detail.reasoning.gaps.map((g, i) => <span key={i} className="rev__gap">{g}</span>)}</div> : null}
       </div>
       <div className="studio__changes">
-        <div className="rev__label">changes<span className="rev__toggle">
-          <button className={`rd__chip${mode === 'structural' ? ' rd__chip--active' : ''}`} onClick={() => setMode('structural')}>structural</button>
-          <button className={`rd__chip${mode === 'raw' ? ' rd__chip--active' : ''}`} onClick={() => setMode('raw')}>raw</button>
-        </span></div>
-        {mode === 'structural' ? <StructuralDiffView diff={detail.diff} /> : <RawDiffView raw={detail.rawDiff} />}
-      </div>
-    </div>
-  );
-}
-
-function VerificationReadout({ entry }: { entry: VerificationEntry }) {
-  return (
-    <div className="studio__readout-grid">
-      <div className="studio__reason">
-        <div className="rev__label">verification</div>
-        <div className="rd__row">
-          {entry.reproducibility != null ? <span className="rd__stat">reproducibility <b>{entry.reproducibility}</b>/100</span> : null}
-          {entry.verdict ? <span className="rd__stat">{entry.verdict}</span> : null}
-          {entry.verify ? <span className="rd__stat">self-check {entry.verify.passed}/{entry.verify.total}</span> : null}
+        <div className="rev__label">
+          changes <span className="diff__muted">· {isScene ? 'scene' : 'implementation'}</span>
+          {isScene ? (
+            <span className="rev__toggle">
+              <button className={`rd__chip${mode === 'structural' ? ' rd__chip--active' : ''}`} onClick={() => setMode('structural')}>structural</button>
+              <button className={`rd__chip${mode === 'raw' ? ' rd__chip--active' : ''}`} onClick={() => setMode('raw')}>raw</button>
+            </span>
+          ) : null}
         </div>
-      </div>
-      <div className="studio__changes">
-        <div className="rev__label">implementations</div>
-        <div className="rd__row">{entry.impls.map((im) => <span key={im.n} className={`rd__chip${im.pass === false ? ' rd__chip--verify' : ''}`}>impl {im.n} {im.pass == null ? '' : im.pass ? '✓' : '✗'}</span>)}</div>
+        {isScene && detail.structural && mode === 'structural'
+          ? <StructuralDiffView diff={detail.structural} />
+          : <RawDiffView raw={detail.rawDiff} />}
       </div>
     </div>
   );
@@ -193,7 +186,16 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
   const sceneUrl = rev ? fileUrl(id, rev.scene) : null;
   const renderUrl = renderRef ? fileUrl(id, renderRef) : null;
   const implUrl = verif && impl ? fileUrl(id, { runId: verif.runId, file: impl.codeFile }) : null;
-  const detailUrl = entry.kind === 'revision' ? `/api/revisions?scene=${encodeURIComponent(id)}&rev=${encodeURIComponent(entry.key)}` : null;
+
+  // The implementation is generated from the scene as it was at its reproduce
+  // run. If the scene was refined *after* that (a newer revision sits between
+  // the verification and the cursor), the impl no longer matches what's on
+  // screen — flag it so it's clear a re-run is needed.
+  const verIdx = verif ? frames.indexOf(verif) : -1;
+  const revIdx = rev ? frames.indexOf(rev) : -1;
+  const implVersion = verif ? (latestRevision(frames, verIdx)?.version ?? null) : null;
+  const implStale = verif != null && rev != null && verIdx < revIdx;
+  const frameUrl = `/api/revisions?scene=${encodeURIComponent(id)}&rev=${encodeURIComponent(entry.key)}`;
 
   const set = (f: number) => setFrame(Math.max(0, Math.min(n - 1, f)));
 
@@ -209,13 +211,22 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
           <div className="studio__shot">{renderUrl ? <img src={renderUrl} alt="render" /> : <span className="impl-panel__hint">no render at this version</span>}</div>
         </section>
         <section className="studio__pane">
-          <div className="studio__pane-head">implementation{verif ? <span className={`rd__verdict rd__verdict--${impl?.pass ? 'pass' : 'fail'}`}>{impl?.pass == null ? '' : impl.pass ? 'PASS ✓' : 'FAIL'}</span> : null}</div>
-          <div className="studio__impl">{implUrl ? <FileText key={implUrl} url={implUrl} /> : <span className="impl-panel__hint">not implemented yet at this point — run <code>visually reproduce</code>.</span>}</div>
+          <div className="studio__pane-head">
+            implementation
+            {implVersion != null ? <span className="studio__at">v{implVersion}</span> : null}
+            {verif && impl?.pass != null ? <span className={`rd__verdict rd__verdict--${impl.pass ? 'pass' : 'fail'}`}>{impl.pass ? 'PASS ✓' : 'FAIL'}</span> : null}
+          </div>
+          <div className="studio__impl">
+            {implStale ? (
+              <div className="studio__stale">⚠ generated from v{implVersion}; the scene is now v{rev?.version}. Re-run <code>visually reproduce</code> (or <code>refine</code>) to regenerate.</div>
+            ) : null}
+            {implUrl ? <CodeFile key={implUrl} url={implUrl} lang={impl?.lang} /> : <span className="impl-panel__hint">not implemented yet at this point — run <code>visually reproduce</code>.</span>}
+          </div>
         </section>
       </div>
 
       <div className="studio__readout">
-        {detailUrl ? <RevisionReadout key={detailUrl} url={detailUrl} /> : entry.kind === 'verification' ? <VerificationReadout entry={entry} /> : null}
+        <FrameReadout key={frameUrl} url={frameUrl} />
       </div>
 
       <div className="studio__transport">

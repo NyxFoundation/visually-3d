@@ -197,16 +197,21 @@ export interface StructuralDiff {
   meta: FieldChange[];
 }
 
-export interface RevisionDetail {
+// Unified per-frame detail. Every frame — a scene revision OR a verification —
+// is shown the same way: a REASONING half (why) and a CHANGES half (what). For
+// a revision the change is the descriptor diff (the 3D/screenshot moves); for a
+// verification it's the implementation code diff.
+export interface FrameDetail {
+  kind: 'revision' | 'verification';
   key: string;
-  version: number;
+  version: number | null;
   startedAt: string;
-  source: string;
-  score: number | null;
+  label: string; // 'created' | 'refined' | 'verification'
+  score: number | null; // visual rubric (revision) or reproducibility (verification)
   delta: number | null;
-  render: FileRef | null;
-  trace: FileRef | null; // events.jsonl (full LLM thinking trace)
-  reasoning: { critique?: string; remainingGaps?: string[]; verdict?: string };
-  diff: StructuralDiff;
-  rawDiff: string; // unified line diff of the pretty-printed scene JSON
+  reasoning: { text?: string; gaps?: string[]; verdict?: string };
+  changeKind: 'scene' | 'impl';
+  structural: StructuralDiff | null; // present when changeKind === 'scene'
+  rawDiff: string; // descriptor diff (scene) or code diff (impl), unified line format
+  lang?: string; // impl language hint for the code diff
 }

@@ -59,6 +59,7 @@
     "eslint": "^10.5.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.6.0",
+    "highlight.js": "^11.11.1",
     "ink-testing-library": "^4.0.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",

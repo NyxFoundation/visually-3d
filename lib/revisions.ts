@@ -8,12 +8,12 @@
 // the structural diff of the scene descriptor (what actually changed), the way
 // a git commit shows message + diff.
 
-import { readdirSync, statSync, existsSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { sceneRunsDir } from './paths.js';
 import { splitRunId, stampToIso, readJson, verifyPass } from './runs.js';
 import type {
-  FieldChange, PartChange, PartRef, RevisionDetail, RevisionEntry,
+  FieldChange, FrameDetail, PartChange, PartRef, RevisionEntry,
   RunImplHighlight, StructuralDiff, TimelineEntry, VerificationEntry,
 } from './types.js';
 
@@ -234,7 +234,11 @@ export function listTimeline(id: string): TimelineEntry[] {
   return items.map((it) => it.entry);
 }
 
-export function getRevisionDetail(id: string, key: string): RevisionDetail | null {
+const pretty = (s: unknown) => JSON.stringify(s ?? {}, null, 2);
+
+// A revision frame: REASONING = the iter's critique; CHANGES = the descriptor
+// diff (which is what moved the 3D / screenshot).
+function revisionDetail(id: string, key: string): FrameDetail | null {
   const nodes = buildRevisions(scanRuns(id));
   const idx = nodes.findIndex((n) => n.key === key);
   if (idx === -1) return null;
@@ -246,7 +250,6 @@ export function getRevisionDetail(id: string, key: string): RevisionDetail | nul
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const prevScene = prev ? readJson(path.join(prev.dir, prev.sceneFile)) as any : null;
 
-  const pretty = (s: unknown) => JSON.stringify(s ?? {}, null, 2);
   const rawDiff = prev
     ? unifiedDiff(pretty(prevScene), pretty(thisScene))
     : pretty(thisScene).split('\n').map((l) => `+ ${l}`).join('\n');
@@ -254,24 +257,80 @@ export function getRevisionDetail(id: string, key: string): RevisionDetail | nul
   const review = node.reviewFile ? (readJson(path.join(node.dir, node.reviewFile)) as
     { critique?: unknown; remaining_gaps?: unknown; verdict?: unknown; total?: unknown } | null) : null;
   const score = num(review?.total);
-  const prevReview = prev?.reviewFile ? (readJson(path.join(prev.dir, prev.reviewFile)) as { total?: unknown } | null) : null;
-  const prevScore = num(prevReview?.total);
+  const prevScore = prev?.reviewFile ? num((readJson(path.join(prev.dir, prev.reviewFile)) as { total?: unknown } | null)?.total) : null;
 
   return {
+    kind: 'revision',
     key: node.key,
     version: idx,
     startedAt: stampToIso(node.stamp),
-    source: node.source,
+    label: node.source,
     score,
     delta: score != null && prevScore != null ? score - prevScore : null,
-    render: node.render ? { runId: node.runId, file: node.render } : null,
-    trace: node.traceFile ? { runId: node.runId, file: node.traceFile } : null,
     reasoning: {
-      critique: typeof review?.critique === 'string' ? review.critique : undefined,
-      remainingGaps: Array.isArray(review?.remaining_gaps) ? review.remaining_gaps.map(String) : undefined,
+      text: typeof review?.critique === 'string' ? review.critique : undefined,
+      gaps: Array.isArray(review?.remaining_gaps) ? review.remaining_gaps.map(String) : undefined,
       verdict: typeof review?.verdict === 'string' ? review.verdict : undefined,
     },
-    diff: structuralDiff(prevScene ?? {}, thisScene ?? {}, !prev),
+    changeKind: 'scene',
+    structural: structuralDiff(prevScene ?? {}, thisScene ?? {}, !prev),
     rawDiff,
   };
+}
+
+function bestImplOf(r: RawRun): { file: string; lang: string } | null {
+  const impls = verificationFor(r).impls;
+  const im = impls.find((i) => i.pass === true) ?? impls[0];
+  return im ? { file: im.codeFile, lang: im.lang } : null;
+}
+
+function readText(dir: string, file: string): string {
+  try { return readFileSync(path.join(dir, file), 'utf8'); } catch { return ''; }
+}
+
+// A verification frame: REASONING = the judge's summary + verdict + the missing
+// fields it found; CHANGES = the diff of this run's best implementation against
+// the previous verification's (the impl is what moved here).
+function verificationDetail(id: string, key: string): FrameDetail | null {
+  const runId = key.slice(0, key.length - 2); // strip ":v"
+  const runs = scanRuns(id).filter((r) => r.type === 'reproduce').sort((a, b) => (a.stamp < b.stamp ? -1 : a.stamp > b.stamp ? 1 : 0));
+  const idx = runs.findIndex((r) => r.runId === runId);
+  if (idx === -1) return null;
+  const r = runs[idx];
+  const v = verificationFor(r);
+
+  const best = bestImplOf(r);
+  const code = best ? readText(r.dir, best.file) : '';
+  const prev = idx > 0 ? runs[idx - 1] : null;
+  const prevBest = prev ? bestImplOf(prev) : null;
+  const prevCode = prev && prevBest ? readText(prev.dir, prevBest.file) : '';
+  const rawDiff = prev
+    ? unifiedDiff(prevCode, code)
+    : code.split('\n').map((l) => `+ ${l}`).join('\n');
+
+  const report = (r.files.includes('report.json') ? readJson(path.join(r.dir, 'report.json')) : null) as
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    { summary?: unknown; missing_fields?: any[] } | null;
+  const gaps = Array.isArray(report?.missing_fields)
+    ? report.missing_fields.slice(0, 12).map((m) => (m && typeof m === 'object' ? `${m.kind ? `[${m.kind}] ` : ''}${m.item ?? ''}`.trim() : String(m)))
+    : undefined;
+
+  return {
+    kind: 'verification',
+    key,
+    version: null,
+    startedAt: stampToIso(r.stamp),
+    label: 'verification',
+    score: v.reproducibility,
+    delta: null,
+    reasoning: { text: typeof report?.summary === 'string' ? report.summary : undefined, gaps, verdict: v.verdict },
+    changeKind: 'impl',
+    structural: null,
+    rawDiff,
+    lang: best?.lang,
+  };
+}
+
+export function getFrameDetail(id: string, key: string): FrameDetail | null {
+  return key.endsWith(':v') ? verificationDetail(id, key) : revisionDetail(id, key);
 }

@@ -1553,3 +1553,11 @@ a.gallery__card { text-decoration: none; color: inherit; display: flex; flex-dir
 .studio__nohist { position: absolute; left: 16px; right: 16px; bottom: 16px; margin: 0; text-align: center; color: var(--text-dim); font-size: 0.82rem; }
 .studio__nohist code { color: var(--accent); }
 .studio__loading { flex: 1; display: grid; place-items: center; }
+
+/* Studio: staleness banner, code highlight bg, stable readout height. */
+.studio__stale { margin: 8px; padding: 8px 10px; font-size: 0.76rem; color: #e3b341; background: rgba(210, 153, 34, 0.08); border: 1px solid rgba(210, 153, 34, 0.4); border-radius: 6px; }
+.studio__stale code { color: var(--accent); }
+.studio__readout { min-height: 168px; }
+/* let the pane background show through highlight.js's theme block */
+.studio__code.hljs { background: transparent; padding: 10px 12px; }
+.studio__code code { background: transparent; font-family: inherit; }

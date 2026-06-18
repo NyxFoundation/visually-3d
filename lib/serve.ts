@@ -14,7 +14,7 @@ import { DIST, BUNDLED_SAMPLES, SCENES_DIR, ensureWorkspace } from './paths.js';
 import { readImpl } from './impls.js';
 import { getBackend } from './backends/index.js';
 import { listRunsForScene, getRunDetail, resolveArtifact } from './runs.js';
-import { listTimeline, getRevisionDetail } from './revisions.js';
+import { listTimeline, getFrameDetail } from './revisions.js';
 import type { GalleryEntry } from './types.js';
 
 const MAX_PORT_TRIES = 15;
@@ -252,8 +252,8 @@ function handleRevisions(res: http.ServerResponse, url: URL): void {
   if (!scene) { sendJson(res, 400, { error: 'scene query param required' }); return; }
   const rev = url.searchParams.get('rev');
   if (rev) {
-    const detail = getRevisionDetail(scene, rev);
-    if (!detail) { sendJson(res, 404, { error: 'no such revision' }); return; }
+    const detail = getFrameDetail(scene, rev);
+    if (!detail) { sendJson(res, 404, { error: 'no such frame' }); return; }
     sendJson(res, 200, detail);
     return;
   }
