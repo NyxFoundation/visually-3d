@@ -178,3 +178,39 @@ export interface StoredImpl {
   code: string;
   verifyLog?: string;
 }
+
+// ── run history (served at /api/runs) ────────────────────────────────────────
+export type RunType = 'create' | 'improve' | 'reproduce' | 'unknown';
+
+export interface RunArtifact {
+  kind: string;
+  label: string;
+  file: string;
+  iter?: number;
+}
+
+export interface RunIteration {
+  n: number;
+  render?: string;
+  scene?: string;
+  log?: string;
+  review?: string;
+  score?: number;
+}
+
+export interface RunSummary {
+  id: string;
+  runId: string;
+  type: RunType;
+  stamp: string;
+  startedAt: string;
+  mtimeMs: number;
+  status: string;
+  score: number | null;
+  iterations: number;
+}
+
+export interface RunDetail extends RunSummary {
+  iters: RunIteration[];
+  artifacts: RunArtifact[];
+}

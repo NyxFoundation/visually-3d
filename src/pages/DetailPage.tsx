@@ -3,6 +3,7 @@ import { LazyViewer } from '../components/LazyViewer';
 import { PartInfo } from '../components/PartInfo';
 import { InfoPanel } from '../components/InfoPanel';
 import { ImplPanel } from '../components/ImplPanel';
+import { HistoryPanel } from '../components/HistoryPanel';
 import { GALLERY_HREF, LIVE_ID } from '../router';
 import type { Part, SampleEntry, SceneDescriptor } from '../types';
 
@@ -27,6 +28,7 @@ export function DetailPage({ id, samples, liveScene, samplesLoaded, backendOnlin
   const [panelOpen, setPanelOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   // The app shell remounts this component per id (key={id}), so transient state
   // starts fresh on navigation — no manual reset effect needed.
@@ -97,6 +99,16 @@ export function DetailPage({ id, samples, liveScene, samplesLoaded, backendOnlin
               <span className="badge__icon" aria-hidden>{'</>'}</span>
               <span>code</span>
             </button>
+            <button
+              type="button"
+              className={`badge badge--info${historyOpen ? ' badge--active' : ''}`}
+              onClick={() => setHistoryOpen((prev) => !prev)}
+              aria-expanded={historyOpen}
+              title="Browse create / improve / reproduce run history"
+            >
+              <span className="badge__icon" aria-hidden>⏱</span>
+              <span>history</span>
+            </button>
             {hasInfo ? (
               <button
                 type="button"
@@ -116,6 +128,7 @@ export function DetailPage({ id, samples, liveScene, samplesLoaded, backendOnlin
         <PartInfo part={selectedPart} open={panelOpen && !!selectedPart} onClose={() => setPanelOpen(false)} />
         <InfoPanel scene={scene} open={infoOpen} onClose={() => setInfoOpen(false)} />
         <ImplPanel id={id} backendOnline={backendOnline} open={codeOpen} onClose={() => setCodeOpen(false)} />
+        <HistoryPanel id={id} open={historyOpen} onClose={() => setHistoryOpen(false)} />
       </div>
     </main>
   );
