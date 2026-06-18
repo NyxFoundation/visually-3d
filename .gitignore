@@ -27,6 +27,7 @@ __pycache__/
 /lib/check.js
 /lib/create.js
 /lib/reproduce.js
+/lib/amend.js
 /bin/visually.js
 /lib/tui/app.js
 /lib/impls.js
