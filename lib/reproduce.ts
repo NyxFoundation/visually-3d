@@ -21,9 +21,18 @@ import { resolveScene, sceneIdFromPath, RUNS_DIR, ensureWorkspace } from './path
 import { runClaudeStreaming } from './runner.js';
 import { extractScene } from './scene.js';
 import { getBackend, defaultBackendFor } from './backends/index.js';
+import type { Availability } from './types.js';
 
-function parseArgs(argv) {
-  const opts = { positional: [] };
+interface ReproduceOpts {
+  positional: string[];
+  model?: string;
+  n?: number;
+  backend?: string;
+  noVerify?: boolean;
+}
+
+function parseArgs(argv: string[]): ReproduceOpts {
+  const opts: ReproduceOpts = { positional: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--model') opts.model = argv[++i];
@@ -36,15 +45,16 @@ function parseArgs(argv) {
   return opts;
 }
 
-function stamp() {
+function stamp(): string {
   const d = new Date();
-  const p = (n) => String(n).padStart(2, '0');
+  const p = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
 }
 
-const langFor = (mode) => (mode === 'algorithm' ? 'runnable Python' : 'synthesizable Verilog');
+const langFor = (mode: string): string => (mode === 'algorithm' ? 'runnable Python' : 'synthesizable Verilog');
 
-function reimplementerPrompt(scene, mode, perspective, backendInstructions) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function reimplementerPrompt(scene: any, mode: string, perspective: string, backendInstructions: string | null): string {
   return `You are REVERSE-IMPLEMENTING a system from a SPEC ALONE. You do NOT have the
 original paper, datasheet, RTL, or source code — only the JSON spec below. Your
 job is to test whether the spec is complete enough to reproduce the real system.
@@ -90,10 +100,10 @@ PART 2 — ${backendInstructions ? 'the runnable self-checking program' : 'your 
 
 // Pull the program out of a fenced code block (robust against the model
 // embedding a whole program inside a JSON string, which mangles newlines).
-export function extractFencedCode(text) {
+export function extractFencedCode(text: string): string | null {
   const re = /```[a-zA-Z0-9_+-]*\n([\s\S]*?)```/g;
-  const blocks = [];
-  let m;
+  const blocks: string[] = [];
+  let m: RegExpExecArray | null;
   while ((m = re.exec(text)) !== null) blocks.push(m[1]);
   if (!blocks.length) return null;
   // Prefer the longest block that isn't the metadata JSON.
@@ -104,7 +114,7 @@ export function extractFencedCode(text) {
 
 // Last-resort: a program that arrived as a JSON string with literal "\n" instead
 // of real newlines won't run — un-escape it.
-export function deescapeIfNeeded(s) {
+export function deescapeIfNeeded(s: string | null): string | null {
   if (typeof s !== 'string') return s;
   const real = (s.match(/\n/g) || []).length;
   const lit = (s.match(/\\n/g) || []).length;
@@ -116,8 +126,10 @@ export function deescapeIfNeeded(s) {
 }
 
 // Parse a reimplementer response: metadata JSON + the program from a fenced block.
-export function parseImpl(text) {
-  let meta = {};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function parseImpl(text: string): any {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let meta: any = {};
   try { meta = extractScene(text); } catch { /* maybe metadata absent */ }
   let script = extractFencedCode(text);
   if (!script && typeof meta.script === 'string') script = meta.script;
@@ -126,8 +138,10 @@ export function parseImpl(text) {
   return { ...meta, script, implementation: script || meta.implementation };
 }
 
-function judgePrompt(scene, mode, impls) {
-  const summaries = impls.map((im, i) => `### Implementation ${i + 1} (confidence ${im?.confidence ?? '?'})
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function judgePrompt(scene: any, mode: string, impls: any[]): string {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const summaries = impls.map((im: any, i: number) => `### Implementation ${i + 1} (confidence ${im?.confidence ?? '?'})
 guessed: ${JSON.stringify(im?.guessed ?? [])}
 underspecified: ${JSON.stringify(im?.underspecified ?? [])}
 code (first 1500 chars):
@@ -170,17 +184,25 @@ Return ONLY this JSON, no fences, no prose:
 }`;
 }
 
-async function runAgent(prompt, model, logFile, parser = extractScene) {
+async function runAgent(
+  prompt: string,
+  model: string | undefined,
+  logFile: string | null,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  parser: (text: string) => any = extractScene,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Promise<any> {
   const { text } = await runClaudeStreaming({ prompt, model, quiet: true });
   if (logFile) writeFileSync(logFile, text);
   try {
     return parser(text);
   } catch (err) {
-    return { _parseError: err.message, _raw: text.slice(0, 400) };
+    return { _parseError: (err as Error).message, _raw: text.slice(0, 400) };
   }
 }
 
-export async function reproduce(argv) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function reproduce(argv: string[]): Promise<any> {
   const opts = parseArgs(argv);
   const ref = opts.positional[0];
   if (!ref) throw new Error('usage: visually reproduce <scene> [--n 2] [--model <m>]');
@@ -188,9 +210,10 @@ export async function reproduce(argv) {
   if (!target) throw new Error(`no such scene: ${ref}`);
 
   const id = sceneIdFromPath(target);
-  const scene = JSON.parse(readFileSync(target, 'utf8'));
-  const mode = scene.metadata?.mode || 'hardware';
-  const n = Number.isFinite(opts.n) && opts.n > 0 ? Math.min(opts.n, 4) : 2;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const scene: any = JSON.parse(readFileSync(target, 'utf8'));
+  const mode: string = scene.metadata?.mode || 'hardware';
+  const n = opts.n !== undefined && Number.isFinite(opts.n) && opts.n > 0 ? Math.min(opts.n, 4) : 2;
 
   ensureWorkspace();
   const runDir = path.join(RUNS_DIR, `reproduce-${id}-${stamp()}`);
@@ -200,7 +223,9 @@ export async function reproduce(argv) {
   // Resolve the (optional, pluggable) executable-verification backend: SMT for
   // algorithms, physics sim for machines, overridable with --backend.
   const backend = getBackend(opts.backend || defaultBackendFor(mode));
-  const avail = opts.noVerify ? { ok: false, reason: 'disabled via --no-verify' } : await backend.available();
+  const avail: Availability = opts.noVerify
+    ? { ok: false, reason: 'disabled via --no-verify' }
+    : await backend.available();
   const backendInstructions = avail.ok ? backend.implementInstructions() : null;
 
   console.log(`visually reproduce: ${id} (mode=${mode}) — ${n} independent reimplementations`);
