@@ -159,7 +159,12 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
     if (loadedRef.current) return;
     loadedRef.current = true;
     let cancelled = false;
-    fetch(`/api/revisions?scene=${encodeURIComponent(id)}`)
+    // Time-box the request: if there's no backend (e.g. `vite dev` without the
+    // `serve` proxy target up), the /api proxy can hang — fall back to the
+    // no-history studio instead of spinning forever.
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
+    fetch(`/api/revisions?scene=${encodeURIComponent(id)}`, { signal: ctrl.signal })
       .then((r) => (r.ok ? (r.json() as Promise<{ entries: TimelineEntry[] }>) : Promise.reject(r)))
       .then((d) => {
         if (cancelled) return;
@@ -168,8 +173,9 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
         // No history → default to 3D + screenshot only (no implementation yet).
         if (d.entries.length === 0) setShow({ model: true, shot: true, impl: false });
       })
-      .catch(() => { if (!cancelled) setFrames([]); });
-    return () => { cancelled = true; };
+      .catch(() => { if (!cancelled) setFrames([]); })
+      .finally(() => clearTimeout(timer));
+    return () => { cancelled = true; ctrl.abort(); clearTimeout(timer); };
   }, [id]);
 
   const n = frames?.length ?? 0;
