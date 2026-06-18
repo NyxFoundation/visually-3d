@@ -56,16 +56,25 @@ export async function improve(argv: string[]): Promise<void> {
   // Cross-run memory: seed iteration 1 with the unfinished gaps from prior
   // create/improve runs of this scene, so the loop continues the trial-and-
   // error instead of restarting cold. (--no-memory opts out.)
+  //
+  // A caller (e.g. `refine`) may inject its own seed via VISUALLY_SEED_REVIEW —
+  // honor it as-is rather than overwriting with local history, so the visual
+  // pass can carry forward the reproducibility findings from the prior round.
   if (!opts.noMemory) {
-    const id = sceneIdFromPath(target);
-    const seed = collectPriorReflection(id);
-    if (seed) {
-      const tmp = mkdtempSync(path.join(os.tmpdir(), 'visually-seed-'));
-      const seedPath = path.join(tmp, 'seed-review.json');
-      writeFileSync(seedPath, JSON.stringify(seed, null, 2));
-      env.VISUALLY_SEED_REVIEW = seedPath;
-      const n = (seed.prior_remaining_gaps || []).length;
-      console.log(`visually improve: seeding from prior runs (${seed.source}) — ${n} carried-over gap(s)`);
+    const injected = process.env.VISUALLY_SEED_REVIEW;
+    if (injected && existsSync(injected)) {
+      console.log('visually improve: seeding from caller-provided reflection (refine loop)');
+    } else {
+      const id = sceneIdFromPath(target);
+      const seed = collectPriorReflection(id);
+      if (seed) {
+        const tmp = mkdtempSync(path.join(os.tmpdir(), 'visually-seed-'));
+        const seedPath = path.join(tmp, 'seed-review.json');
+        writeFileSync(seedPath, JSON.stringify(seed, null, 2));
+        env.VISUALLY_SEED_REVIEW = seedPath;
+        const n = (seed.prior_remaining_gaps || []).length;
+        console.log(`visually improve: seeding from prior runs (${seed.source}) — ${n} carried-over gap(s)`);
+      }
     }
   }
 
