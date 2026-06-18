@@ -3,7 +3,11 @@ import assert from 'node:assert/strict';
 import { mkdtempSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { getBackend, listBackends, defaultBackendFor, DEFAULT_BACKEND } from '../lib/backends/index.js';
+import { getBackend, listBackends, defaultBackendFor, selectBackend, DEFAULT_BACKEND } from '../lib/backends/index.js';
+
+const hw = (machine_name, extra = {}) => ({
+  machine_name, metadata: { mode: 'hardware' }, parts: [], ...extra,
+});
 
 test('registry contains the python-smt and sim backends', () => {
   assert.deepEqual(listBackends().sort(), ['python-smt', 'sim']);
@@ -14,6 +18,34 @@ test('defaultBackendFor maps mode → substrate', () => {
   assert.equal(defaultBackendFor('algorithm'), 'python-smt');
   assert.equal(defaultBackendFor('hardware'), 'sim');
   assert.equal(defaultBackendFor('architecture'), 'sim');
+});
+
+test('selectBackend auto-routes digital/compute hardware → SMT', () => {
+  assert.equal(selectBackend(hw('CFNTT Radix-2/4 NTT Accelerator (FPGA)')), 'python-smt');
+  assert.equal(selectBackend(hw('RISC-V 5-stage pipeline CPU')), 'python-smt');
+  assert.equal(selectBackend(hw('Systolic GEMM GPU tensor core')), 'python-smt');
+  assert.equal(selectBackend(hw('AES-256 crypto ASIC')), 'python-smt');
+});
+
+test('selectBackend auto-routes physical machines → sim', () => {
+  assert.equal(selectBackend(hw('Prusa i3 MK3S 3D printer')), 'sim');
+  assert.equal(selectBackend(hw('6-axis industrial robot arm')), 'sim');
+  assert.equal(selectBackend(hw('Wind turbine gearbox')), 'sim');
+});
+
+test('selectBackend uses domain/info text, not just the title', () => {
+  const s = hw('CFNTT core', { metadata: { mode: 'hardware', domain: 'cryptographic-hardware', info: { summary: 'an FPGA NTT butterfly datapath with BRAM banks' } } });
+  assert.equal(selectBackend(s), 'python-smt');
+});
+
+test('selectBackend: explicit override and mode take precedence', () => {
+  assert.equal(selectBackend(hw('robot arm', { metadata: { mode: 'hardware', backend: 'python-smt' } })), 'python-smt');
+  assert.equal(selectBackend({ machine_name: 'DeepSeek MoE attention', metadata: { mode: 'algorithm' }, parts: [] }), 'python-smt');
+  assert.equal(selectBackend({ machine_name: '清水寺 本堂', metadata: { mode: 'architecture' }, parts: [] }), 'sim');
+});
+
+test('selectBackend falls back to sim for unclassifiable hardware', () => {
+  assert.equal(selectBackend(hw('mysterious contraption')), 'sim');
 });
 
 test('getBackend throws on an unknown backend', () => {
