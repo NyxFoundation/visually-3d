@@ -1,8 +1,7 @@
 import React, { Suspense, useEffect, useMemo } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, Grid, Environment, ContactShadows, PerspectiveCamera, RoundedBox } from '@react-three/drei';
+import { OrbitControls, Environment, ContactShadows, PerspectiveCamera, RoundedBox } from '@react-three/drei';
 import * as THREE from 'three';
-import { Connections } from './Connections';
 import type { Part, SceneDescriptor } from '../types';
 
 // Wood species + craft finishes (craft/architecture modes). Checked before the
@@ -75,7 +74,7 @@ const ScenePart: React.FC<{
   const material = (
     <meshStandardMaterial
       color={selected ? '#ffdd55' : color}
-      metalness={physical.metalness}
+      metalness={physical.metalness * 0.6}
       roughness={physical.roughness}
       emissive={selected ? '#ffaa00' : '#000000'}
       emissiveIntensity={selected ? 0.55 : 0}
@@ -239,21 +238,29 @@ export const Viewer: React.FC<ViewerProps> = ({
   }, [scene, bounds]);
 
   const interactive = !compact;
+  // Render at the device's pixel ratio (capped at 2) so the canvas is as crisp
+  // as the static screenshots, instead of the old 1.75 cap that looked soft on
+  // retina displays.
+  const dprRange = useMemo<[number, number]>(
+    () => (compact ? [1, maxDpr] : [1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 2 : 2, 2)]),
+    [compact, maxDpr],
+  );
 
   return (
     <div className="viewer" aria-label={`3D view of ${scene.machine_name}`}>
       <Canvas
+        flat
         shadows={!compact}
-        dpr={[1, maxDpr]}
+        dpr={dprRange}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
         frameloop={compact ? 'always' : 'demand'}
       >
         <PerspectiveCamera makeDefault position={cameraPos} fov={compact ? 38 : 45} near={0.1} far={200} />
         <color attach="background" args={[compact ? '#0b0d12' : '#0d1117']} />
-        <ambientLight intensity={0.35} />
+        <ambientLight intensity={0.4} />
         <directionalLight
           position={[bounds.center.x + 8, bounds.center.y + 12, bounds.center.z + 6]}
-          intensity={1.15}
+          intensity={1.5}
           castShadow={!compact}
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
@@ -267,7 +274,7 @@ export const Viewer: React.FC<ViewerProps> = ({
         <pointLight position={[bounds.center.x - 8, bounds.center.y + 4, bounds.center.z - 8]} intensity={0.35} />
 
         <Suspense fallback={null}>
-          <Environment preset="city" environmentIntensity={0.35} />
+          <Environment preset="city" environmentIntensity={0.5} />
         </Suspense>
 
         <Invalidate dep={scene} />
@@ -282,30 +289,15 @@ export const Viewer: React.FC<ViewerProps> = ({
             />
           ))}
         </group>
-        <Connections parts={scene.parts} selectedPartId={selectedPartId} />
 
         {!compact ? (
-          <>
-            <ContactShadows
-              position={[bounds.center.x, 0, bounds.center.z]}
-              opacity={0.5}
-              scale={Math.max(bounds.radius * 4, 10)}
-              blur={2.4}
-              far={bounds.radius * 3}
-            />
-            <Grid
-              args={[60, 60]}
-              cellSize={1}
-              cellThickness={0.6}
-              sectionSize={5}
-              sectionThickness={1}
-              sectionColor="#30363d"
-              cellColor="#1f242c"
-              fadeDistance={Math.max(bounds.radius * 6, 30)}
-              fadeStrength={1.8}
-              infiniteGrid
-            />
-          </>
+          <ContactShadows
+            position={[bounds.center.x, 0, bounds.center.z]}
+            opacity={0.5}
+            scale={Math.max(bounds.radius * 4, 10)}
+            blur={2.4}
+            far={bounds.radius * 3}
+          />
         ) : null}
 
         {interactive ? (
