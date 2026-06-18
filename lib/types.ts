@@ -67,3 +67,25 @@ export interface GalleryEntry {
   category: string;
   source: string;
 }
+
+// ── persisted implementations (lib/impls) ────────────────────────────────────
+// The canonical implementation distilled from a `reproduce` run for one scene.
+export interface StoredImplMeta {
+  id: string;
+  mode: string;
+  language: string;
+  ext: string;
+  backend: string;
+  confidence?: number;
+  reproducibility?: number;
+  verdict?: string;
+  verified: { pass: boolean; ran: boolean } | null;
+  savedAt: string;
+  runDir: string;
+}
+
+export interface StoredImpl {
+  meta: StoredImplMeta;
+  code: string;
+  verifyLog?: string;
+}

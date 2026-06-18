@@ -1244,3 +1244,91 @@ a.gallery__card { text-decoration: none; color: inherit; display: flex; flex-dir
   padding: 8px 14px;
 }
 .detail-back:hover { border-color: var(--accent); }
+
+/* ── Implementation panel (detail page: source ⇄ 3D + live test demo) ─────── */
+.badge--active { border-color: var(--accent); color: var(--accent); }
+
+.impl-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(540px, 92vw);
+  display: flex;
+  flex-direction: column;
+  background: rgba(13, 17, 23, 0.96);
+  border-left: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  transform: translateX(100%);
+  transition: transform 0.22s ease;
+  z-index: 30;
+}
+.impl-panel--open { transform: translateX(0); }
+
+.impl-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.impl-panel__head strong { font-size: 0.95rem; }
+.impl-panel__tags { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+.impl-panel__tag {
+  font-size: 0.72rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 8px;
+  color: var(--text-dim);
+}
+.impl-panel__tag--pass { border-color: rgba(35, 134, 54, 0.6); color: #7ee787; }
+.impl-panel__tag--fail { border-color: rgba(248, 81, 73, 0.5); color: #ff7b72; }
+.impl-panel__close {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.impl-panel__close:hover { color: var(--text); }
+
+.impl-panel__body { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+.impl-panel__hint { color: var(--text-dim); font-size: 0.85rem; margin: 0; }
+.impl-panel__hint code { color: var(--accent); }
+
+.impl-panel__code {
+  margin: 0;
+  padding: 12px;
+  background: #0a0d13;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  white-space: pre;
+  color: #c9d1d9;
+}
+
+.impl-panel__run { display: flex; align-items: center; gap: 10px; }
+.impl-panel__verdict { font-size: 0.85rem; font-weight: 600; }
+.impl-panel__verdict--pass { color: #7ee787; }
+.impl-panel__verdict--fail { color: #ff7b72; }
+
+.impl-panel__output {
+  margin: 0;
+  padding: 10px 12px;
+  background: #0a0d13;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  color: var(--text-dim);
+}
+
+@media (max-width: 768px) {
+  .impl-panel { width: 100vw; }
+}

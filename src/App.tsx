@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GalleryPage, type AnalyzeController } from './pages/GalleryPage';
 import { DetailPage } from './pages/DetailPage';
 import { LIVE_ID, hrefForDetail, navigate, useRoute } from './router';
+import { parseSseChunk } from './sse';
 import type { SampleCategory, SampleEntry, SceneDescriptor } from './types';
 
 type LogEntry = {
@@ -10,21 +11,6 @@ type LogEntry = {
 };
 
 type BackendStatus = 'probing' | 'available' | 'unavailable';
-
-function parseSseChunk(buffer: string, onEvent: (event: string, data: string) => void): string {
-  const events = buffer.split('\n\n');
-  const remainder = events.pop() ?? '';
-  for (const rawEvent of events) {
-    let eventName = 'message';
-    const dataLines: string[] = [];
-    for (const line of rawEvent.split('\n')) {
-      if (line.startsWith('event:')) eventName = line.slice(6).trim();
-      if (line.startsWith('data:')) dataLines.push(line.slice(5).trimStart());
-    }
-    if (dataLines.length > 0) onEvent(eventName, dataLines.join('\n'));
-  }
-  return remainder;
-}
 
 function App() {
   const route = useRoute();
@@ -128,7 +114,7 @@ function App() {
   }), [backend, isLoading, error, logText, handleAnalyze]);
 
   if (route.name === 'detail') {
-    return <DetailPage key={route.id} id={route.id} samples={samples} liveScene={liveScene} samplesLoaded={samplesLoaded} />;
+    return <DetailPage key={route.id} id={route.id} samples={samples} liveScene={liveScene} samplesLoaded={samplesLoaded} backendOnline={backend === 'available'} />;
   }
   return <GalleryPage samples={samples} categories={categories} analyze={analyze} />;
 }

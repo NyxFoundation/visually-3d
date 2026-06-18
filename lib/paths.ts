@@ -22,10 +22,15 @@ export const VISUALLY_HOME =
   process.env.VISUALLY_HOME || path.join(os.homedir(), '.visually-3d');
 export const SCENES_DIR = path.join(VISUALLY_HOME, 'scenes');
 export const RUNS_DIR = path.join(VISUALLY_HOME, 'runs');
+// Canonical per-scene implementations distilled from `reproduce` runs: the
+// chosen source + its recorded verification, keyed by scene id. The detail
+// page reads these to show "source ⇄ 3D" and to re-run the tests live.
+export const IMPLS_DIR = path.join(VISUALLY_HOME, 'impls');
 
 export function ensureWorkspace(): void {
   fs.mkdirSync(SCENES_DIR, { recursive: true });
   fs.mkdirSync(RUNS_DIR, { recursive: true });
+  fs.mkdirSync(IMPLS_DIR, { recursive: true });
 }
 
 export function scenePath(id: string): string {

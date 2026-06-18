@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { LazyViewer } from '../components/LazyViewer';
 import { PartInfo } from '../components/PartInfo';
 import { InfoPanel } from '../components/InfoPanel';
+import { ImplPanel } from '../components/ImplPanel';
 import { GALLERY_HREF, LIVE_ID } from '../router';
 import type { Part, SampleEntry, SceneDescriptor } from '../types';
 
@@ -10,6 +11,7 @@ type DetailPageProps = {
   samples: SampleEntry[];
   liveScene: SceneDescriptor | null;
   samplesLoaded: boolean;
+  backendOnline: boolean;
 };
 
 type LoadState =
@@ -17,13 +19,14 @@ type LoadState =
   | { status: 'ready'; scene: SceneDescriptor }
   | { status: 'missing' };
 
-export function DetailPage({ id, samples, liveScene, samplesLoaded }: DetailPageProps) {
+export function DetailPage({ id, samples, liveScene, samplesLoaded, backendOnline }: DetailPageProps) {
   const sample = useMemo(() => samples.find((s) => s.id === id), [samples, id]);
   const [fetched, setFetched] = useState<SceneDescriptor | null>(null);
   const [fetchFailed, setFetchFailed] = useState(false);
   const [selectedPart, setSelectedPart] = useState<Part | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [codeOpen, setCodeOpen] = useState(false);
 
   // The app shell remounts this component per id (key={id}), so transient state
   // starts fresh on navigation — no manual reset effect needed.
@@ -84,6 +87,16 @@ export function DetailPage({ id, samples, liveScene, samplesLoaded }: DetailPage
             </div>
           </div>
           <div className="hero__badges">
+            <button
+              type="button"
+              className={`badge badge--info${codeOpen ? ' badge--active' : ''}`}
+              onClick={() => setCodeOpen((prev) => !prev)}
+              aria-expanded={codeOpen}
+              title="Show the implementation source and run its tests"
+            >
+              <span className="badge__icon" aria-hidden>{'</>'}</span>
+              <span>code</span>
+            </button>
             {hasInfo ? (
               <button
                 type="button"
@@ -102,6 +115,7 @@ export function DetailPage({ id, samples, liveScene, samplesLoaded }: DetailPage
 
         <PartInfo part={selectedPart} open={panelOpen && !!selectedPart} onClose={() => setPanelOpen(false)} />
         <InfoPanel scene={scene} open={infoOpen} onClose={() => setInfoOpen(false)} />
+        <ImplPanel id={id} backendOnline={backendOnline} open={codeOpen} onClose={() => setCodeOpen(false)} />
       </div>
     </main>
   );

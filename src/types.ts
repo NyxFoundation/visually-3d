@@ -157,3 +157,24 @@ export interface SampleCategory {
   id: string;
   label: string;
 }
+
+// ── persisted implementation (served at /api/impl/<id>) ──────────────────────
+export interface StoredImplMeta {
+  id: string;
+  mode: string;
+  language: string;
+  ext: string;
+  backend: string;
+  confidence?: number;
+  reproducibility?: number;
+  verdict?: string;
+  verified: { pass: boolean; ran: boolean } | null;
+  savedAt: string;
+  runDir: string;
+}
+
+export interface StoredImpl {
+  meta: StoredImplMeta;
+  code: string;
+  verifyLog?: string;
+}

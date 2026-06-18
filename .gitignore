@@ -29,3 +29,4 @@ __pycache__/
 /lib/reproduce.js
 /bin/visually.js
 /lib/tui/app.js
+/lib/impls.js

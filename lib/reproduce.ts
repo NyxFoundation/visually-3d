@@ -21,6 +21,7 @@ import { resolveScene, sceneIdFromPath, RUNS_DIR, ensureWorkspace } from './path
 import { runClaudeStreaming } from './runner.js';
 import { extractScene } from './scene.js';
 import { getBackend, defaultBackendFor } from './backends/index.js';
+import { saveImpl, implDir } from './impls.js';
 import type { Availability } from './types.js';
 
 interface ReproduceOpts {
@@ -265,8 +266,9 @@ export async function reproduce(argv: string[]): Promise<any> {
     if (avail.ok && im && typeof im.script === 'string') {
       const res = await backend.verify(im.script, runDir);
       im._verify = { pass: res.pass, ran: res.ran };
-      writeFileSync(path.join(runDir, `impl-${i + 1}-verify.txt`),
-        `pass=${res.pass} ran=${res.ran}\n--- stdout ---\n${res.stdout || ''}\n--- stderr ---\n${(res.stderr || '').slice(0, 4000)}`);
+      const log = `pass=${res.pass} ran=${res.ran}\n--- stdout ---\n${res.stdout || ''}\n--- stderr ---\n${(res.stderr || '').slice(0, 4000)}`;
+      im._verifyLog = log;
+      writeFileSync(path.join(runDir, `impl-${i + 1}-verify.txt`), log);
       if (res.pass) verifiedCount++;
       verdict = ` | self-verify: ${res.pass ? 'PASS ✓' : (res.ran ? 'FAIL' : 'did not run')}`;
     }
@@ -285,6 +287,40 @@ export async function reproduce(argv: string[]): Promise<any> {
     ? { enabled: true, passed: verifiedCount, total: impls.length }
     : { enabled: false, reason: avail.reason };
   writeFileSync(path.join(runDir, 'report.json'), JSON.stringify(report, null, 2));
+
+  // Persist the best implementation as this scene's canonical impl, so the web
+  // detail page can show source ⇄ 3D and re-run the tests. "Best" = verified
+  // first (a passing self-check beats opinion), then highest confidence.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const candidates = (impls as any[]).filter((im) => typeof im?.script === 'string' && im.script.length > 0);
+  candidates.sort((a, b) => {
+    const pa = a._verify?.pass ? 1 : 0;
+    const pb = b._verify?.pass ? 1 : 0;
+    if (pa !== pb) return pb - pa;
+    return (b.confidence ?? 0) - (a.confidence ?? 0);
+  });
+  const best = candidates[0];
+  if (best) {
+    const language: string = best.language || (mode === 'algorithm' ? 'python' : 'verilog');
+    saveImpl(id, {
+      code: best.script,
+      verifyLog: best._verifyLog,
+      meta: {
+        id,
+        mode,
+        language,
+        ext: language === 'python' ? 'py' : 'v',
+        backend: backend.id,
+        confidence: best.confidence,
+        reproducibility: report.reproducibility,
+        verdict: report.verdict,
+        verified: best._verify ?? null,
+        savedAt: new Date().toISOString(),
+        runDir,
+      },
+    });
+    console.log(`  ✓ saved canonical implementation → ${implDir(id)}`);
+  }
 
   console.log('');
   if (avail.ok) {

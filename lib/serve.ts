@@ -5,10 +5,14 @@
 
 import http from 'node:http';
 import fsp from 'node:fs/promises';
+import { mkdtempSync, rmSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { streamAnalyze, claudeAvailable, buildPrompt } from '../server/analyst.js';
 import { DIST, BUNDLED_SAMPLES, SCENES_DIR, ensureWorkspace } from './paths.js';
+import { readImpl } from './impls.js';
+import { getBackend } from './backends/index.js';
 import type { GalleryEntry } from './types.js';
 
 const MAX_PORT_TRIES = 15;
@@ -149,6 +153,52 @@ async function serveStatic(res: http.ServerResponse, reqPath: string): Promise<v
   }
 }
 
+// GET /api/impl/<id> — the canonical implementation persisted by `reproduce`:
+// its source, language/backend metadata, and the recorded verification.
+function handleImplGet(res: http.ServerResponse, id: string): void {
+  const impl = readImpl(id);
+  if (!impl) {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', MIME['.json']);
+    res.end(JSON.stringify({ error: 'no implementation for this scene' }));
+    return;
+  }
+  res.setHeader('Content-Type', MIME['.json']);
+  res.end(JSON.stringify(impl));
+}
+
+// POST /api/impl/<id>/verify — re-run the stored implementation's self-check
+// through its backend, live, streaming the result over SSE. This is the
+// "demo test execution" the detail page drives.
+async function handleImplVerify(res: http.ServerResponse, id: string): Promise<void> {
+  const write = sseWriter(res);
+  const impl = readImpl(id);
+  if (!impl) {
+    write('error', { message: `no implementation for "${id}"` });
+    res.end();
+    return;
+  }
+  const backend = getBackend(impl.meta.backend);
+  const avail = await backend.available();
+  if (!avail.ok) {
+    write('error', { message: `${backend.label} unavailable: ${avail.reason}` });
+    res.end();
+    return;
+  }
+  write('status', { message: `running ${backend.label} (${avail.runner})…` });
+  const tmp = mkdtempSync(path.join(os.tmpdir(), 'visually-verify-'));
+  try {
+    const result = await backend.verify(impl.code, tmp);
+    write('output', { stdout: result.stdout ?? '', stderr: (result.stderr ?? '').slice(0, 8000) });
+    write('result', { pass: result.pass, ran: result.ran, backend: backend.id });
+  } catch (err) {
+    write('error', { message: (err as Error).message });
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+    res.end();
+  }
+}
+
 async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
   const pathname = url.pathname;
@@ -194,6 +244,18 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   if (pathname.startsWith('/samples/') && pathname.endsWith('.json')) {
     const served = await serveSample(res, pathname.slice('/samples/'.length));
     if (served) return;
+  }
+
+  if (pathname.startsWith('/api/impl/')) {
+    const rest = pathname.slice('/api/impl/'.length);
+    if (rest.endsWith('/verify') && req.method === 'POST') {
+      await handleImplVerify(res, decodeURIComponent(rest.slice(0, -'/verify'.length)));
+      return;
+    }
+    if (req.method === 'GET' && rest && !rest.includes('/')) {
+      handleImplGet(res, decodeURIComponent(rest));
+      return;
+    }
   }
 
   if (pathname.startsWith('/api/')) {
