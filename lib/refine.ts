@@ -26,6 +26,7 @@ import { reproduce } from './reproduce.js';
 import { amendScene, hasFindings } from './amend.js';
 import { latestVisualScore } from './history.js';
 import { specCoverage } from './scene.js';
+import { repairArithmeticClaims } from './arith-audit.js';
 import { resolveScene, sceneIdFromPath } from './paths.js';
 
 interface RefineOpts {
@@ -117,6 +118,15 @@ export async function refine(argv: string[]): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let lastReport: any = null;
 
+  // ④ Ratchet: keep the highest-scoring scene seen, so a round that regresses
+  // (reproducibility dropped, self-check broke) never leaves the canonical scene
+  // worse than the best round already achieved. A passing self-check dominates
+  // the raw reproducibility number. Mirrors the program-archive idea in
+  // evolutionary self-improvement (FunSearch / AlphaEvolve / Darwin Gödel
+  // Machine): only the best individual survives selection.
+  let best: { score: number; snapshot: string; round: number; visual: number | null; repro: number | null } | null = null;
+  let roundScore: number | null = null; // the most recent round's score (for the end-of-loop ratchet)
+
   for (let round = 1; round <= maxRounds; round++) {
     console.log(`\n════════ refine round ${round}/${maxRounds} ════════`);
 
@@ -148,6 +158,12 @@ export async function refine(argv: string[]): Promise<void> {
       }
     }
     visual = latestVisualScore(id);
+
+    // Snapshot the scene exactly as it is about to be SCORED (post-visual,
+    // pre-verify). This is the version `reproduce` measures, so it is the unit
+    // the ratchet keeps or rolls back to.
+    let scoredSnapshot = '';
+    try { scoredSnapshot = readFileSync(target, 'utf8'); } catch { /* ignore */ }
 
     // 2. Implementation verification.
     console.log(`\n▶ implementation verification…`);
@@ -207,9 +223,42 @@ export async function refine(argv: string[]): Promise<void> {
       console.log(`\n✓ refine: thresholds met after ${round} round(s) — the scene is both convincing and reproducible.`);
       return;
     }
+
+    // ④ Ratchet: remember the best-scoring SCORED scene (a clean self-check
+    // outweighs the raw reproducibility number). We don't roll back mid-loop —
+    // each round keeps building, but the end-of-loop restore below guarantees we
+    // never finish worse than the best round actually measured.
+    if (report && scoredSnapshot) {
+      roundScore = (verifyOk ? 1000 : 0) + (repro ?? 0);
+      if (!best || roundScore > best.score) {
+        best = { score: roundScore, snapshot: scoredSnapshot, round, visual, repro };
+        console.log(`  ↑ new best (round ${round}): repro ${repro ?? '?'}, self-check ${verifyEnabled ? (verifyPass ? 'pass' : 'fail') : 'n/a'}`);
+      }
+    }
   }
 
+  // Don't END worse than the best round. If the final round regressed versus an
+  // earlier one, restore that best (measured) scene; otherwise keep the latest
+  // scene — its amend growth is the natural continuation, not a regression.
   console.log(`\n△ refine: reached ${maxRounds} round(s) without clearing every threshold.`);
-  console.log(`  best — visual ${visual ?? '?'}/${visualGoal}, reproducibility ${repro ?? '?'}/${reproGoal}.`);
+  if (best && roundScore != null && roundScore < best.score) {
+    writeSceneSanitized(target, best.snapshot);
+    console.log(`  final round regressed — kept the best round (${best.round}): visual ${best.visual ?? '?'}/${visualGoal}, reproducibility ${best.repro ?? '?'}/${reproGoal}.`);
+  } else {
+    console.log(`  best — visual ${visual ?? '?'}/${visualGoal}, reproducibility ${repro ?? '?'}/${reproGoal}.`);
+  }
   console.log(`  re-run with more rounds (--rounds N) or inspect: visually check ${id}`);
+}
+
+// Write a scene snapshot back to disk, repairing any false numeric constant on
+// the way out — so a ratchet rollback/restore can never re-commit one.
+function writeSceneSanitized(target: string, sceneJson: string): void {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const obj: any = JSON.parse(sceneJson);
+    const { value } = repairArithmeticClaims(obj);
+    writeFileSync(target, JSON.stringify(value, null, 2) + '\n');
+  } catch {
+    writeFileSync(target, sceneJson);
+  }
 }
