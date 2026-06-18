@@ -154,7 +154,13 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
     let cancelled = false;
     fetch(`/api/revisions?scene=${encodeURIComponent(id)}`)
       .then((r) => (r.ok ? (r.json() as Promise<{ entries: TimelineEntry[] }>) : Promise.reject(r)))
-      .then((d) => { if (!cancelled) { setFrames(d.entries); setFrame(Math.max(0, d.entries.length - 1)); } })
+      .then((d) => {
+        if (cancelled) return;
+        setFrames(d.entries);
+        setFrame(Math.max(0, d.entries.length - 1));
+        // No history → default to 3D + screenshot only (no implementation yet).
+        if (d.entries.length === 0) setShow({ model: true, shot: true, impl: false });
+      })
       .catch(() => { if (!cancelled) setFrames([]); });
     return () => { cancelled = true; };
   }, [id]);
@@ -175,23 +181,16 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
 
   const onPartSelect = (p: Part) => { setSelectedPart(p); setPartOpen(true); };
 
-  // No history (bundled samples, freshly-analyzed live scenes) → just the 3D.
-  if (frames !== null && frames.length === 0) {
-    return (
-      <div className="studio__single">
-        <SceneViewer url={null} fallback={fallbackScene} selectedPartId={selectedPart?.id} onPartSelect={onPartSelect} />
-        <PartInfo part={selectedPart} open={partOpen && !!selectedPart} onClose={() => setPartOpen(false)} />
-        <p className="studio__nohist">No revision history yet — generate or <code>visually refine</code> this scene to scrub its evolution.</p>
-      </div>
-    );
-  }
   if (frames === null) return <div className="studio__loading"><span className="gallery__spinner" aria-hidden /></div>;
 
-  const cur = Math.min(frame, n - 1);
-  const entry = frames[cur];
-  const rev = latestRevision(frames, cur);
-  const renderRef = latestRender(frames, cur);
-  const verif = latestVerification(frames, cur);
+  // Samples without history still use the studio layout — just the 3D (and an
+  // empty screenshot/impl); the readout + transport stay empty.
+  const hasHistory = n > 0;
+  const cur = hasHistory ? Math.min(frame, n - 1) : 0;
+  const entry = hasHistory ? frames[cur] : null;
+  const rev = hasHistory ? latestRevision(frames, cur) : null;
+  const renderRef = hasHistory ? latestRender(frames, cur) : null;
+  const verif = hasHistory ? latestVerification(frames, cur) : null;
   const impl = verif?.impls.find((i) => i.pass === true) ?? verif?.impls[0] ?? null;
 
   const sceneUrl = rev ? fileUrl(id, rev.scene) : null;
@@ -206,7 +205,7 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
   const revIdx = rev ? frames.indexOf(rev) : -1;
   const implVersion = verif ? (latestRevision(frames, verIdx)?.version ?? null) : null;
   const implStale = verif != null && rev != null && verIdx < revIdx;
-  const frameUrl = `/api/revisions?scene=${encodeURIComponent(id)}&rev=${encodeURIComponent(entry.key)}`;
+  const frameUrl = entry ? `/api/revisions?scene=${encodeURIComponent(id)}&rev=${encodeURIComponent(entry.key)}` : null;
 
   const set = (f: number) => setFrame(Math.max(0, Math.min(n - 1, f)));
 
@@ -267,34 +266,37 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
       </div>
 
       <div className="studio__readout">
-        <FrameReadout key={frameUrl} url={frameUrl} />
+        {frameUrl ? <FrameReadout key={frameUrl} url={frameUrl} />
+          : <p className="impl-panel__hint">No revision history yet — run <code>visually refine {id}</code> to record reasoning, diffs and screenshots here.</p>}
       </div>
 
-      <div className="studio__transport">
-        <div className="studio__controls">
-          <button className="studio__btn" onClick={() => set(0)} aria-label="first" disabled={cur === 0}>⏮</button>
-          <button className="studio__btn" onClick={() => set(cur - 1)} aria-label="back" disabled={cur === 0}>◀</button>
-          <input className="studio__slider" type="range" min={0} max={n - 1} step={1} value={cur} onChange={(e) => set(Number(e.target.value))} aria-label="timeline" />
-          <button className="studio__btn" onClick={() => set(cur + 1)} aria-label="forward" disabled={cur === n - 1}>▶</button>
-          <button className="studio__btn" onClick={() => set(n - 1)} aria-label="latest" disabled={cur === n - 1}>⏭</button>
+      {hasHistory && entry ? (
+        <div className="studio__transport">
+          <div className="studio__controls">
+            <button className="studio__btn" onClick={() => set(0)} aria-label="first" disabled={cur === 0}>⏮</button>
+            <button className="studio__btn" onClick={() => set(cur - 1)} aria-label="back" disabled={cur === 0}>◀</button>
+            <input className="studio__slider" type="range" min={0} max={n - 1} step={1} value={cur} onChange={(e) => set(Number(e.target.value))} aria-label="timeline" />
+            <button className="studio__btn" onClick={() => set(cur + 1)} aria-label="forward" disabled={cur === n - 1}>▶</button>
+            <button className="studio__btn" onClick={() => set(n - 1)} aria-label="latest" disabled={cur === n - 1}>⏭</button>
+          </div>
+          <div className="studio__ticks">
+            {frames.map((e, i) => (
+              <button
+                key={e.key}
+                className={`studio__tick studio__tick--${e.kind}${i === cur ? ' studio__tick--active' : ''}`}
+                onClick={() => set(i)}
+                title={`${e.kind === 'revision' ? `v${e.version} · ${e.source}` : 'verification'} · ${e.startedAt.replace('T', ' ')}`}
+              >
+                {e.kind === 'revision' ? `v${e.version}` : '⚙'}
+              </button>
+            ))}
+          </div>
+          <div className="studio__frameinfo">
+            {entry.kind === 'revision' ? <><span className="studio__v">v{entry.version}</span> {entry.score != null ? <span className="tl__score">{entry.score}</span> : null} {entry.delta != null && entry.delta !== 0 ? <span className={`rd__delta rd__delta--${entry.delta > 0 ? 'up' : 'down'}`}>{entry.delta > 0 ? `+${entry.delta}` : entry.delta}</span> : null} <span className="history__when">{entry.startedAt.replace('T', ' ')}</span></>
+              : <><span className="studio__v">⚙ verification</span> <span className="history__when">{entry.startedAt.replace('T', ' ')}</span></>}
+          </div>
         </div>
-        <div className="studio__ticks">
-          {frames.map((e, i) => (
-            <button
-              key={e.key}
-              className={`studio__tick studio__tick--${e.kind}${i === cur ? ' studio__tick--active' : ''}`}
-              onClick={() => set(i)}
-              title={`${e.kind === 'revision' ? `v${e.version} · ${e.source}` : 'verification'} · ${e.startedAt.replace('T', ' ')}`}
-            >
-              {e.kind === 'revision' ? `v${e.version}` : '⚙'}
-            </button>
-          ))}
-        </div>
-        <div className="studio__frameinfo">
-          {entry.kind === 'revision' ? <><span className="studio__v">v{entry.version}</span> {entry.score != null ? <span className="tl__score">{entry.score}</span> : null} {entry.delta != null && entry.delta !== 0 ? <span className={`rd__delta rd__delta--${entry.delta > 0 ? 'up' : 'down'}`}>{entry.delta > 0 ? `+${entry.delta}` : entry.delta}</span> : null} <span className="history__when">{entry.startedAt.replace('T', ' ')}</span></>
-            : <><span className="studio__v">⚙ verification</span> <span className="history__when">{entry.startedAt.replace('T', ' ')}</span></>}
-        </div>
-      </div>
+      ) : null}
 
       <PartInfo part={selectedPart} open={partOpen && !!selectedPart} onClose={() => setPartOpen(false)} />
     </div>
