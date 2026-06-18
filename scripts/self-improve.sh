@@ -66,7 +66,8 @@ STAMP="$(date +%Y%m%d-%H%M%S)"
 # Run histories default to the repo's git-ignored .self-improve/, but a
 # globally-installed package dir may be read-only, so honor $VISUALLY_RUNS_DIR.
 RUNS_BASE="${VISUALLY_RUNS_DIR:-$ROOT/.self-improve}"
-RUN_DIR="$RUNS_BASE/$(basename "$TARGET" .json)-$STAMP"
+# Per-scene tree: runs/<id>/improve-<stamp>/ (grouped with create/reproduce).
+RUN_DIR="$RUNS_BASE/$(basename "$TARGET" .json)/improve-$STAMP"
 mkdir -p "$RUN_DIR"
 cp "$TARGET" "$RUN_DIR/iter-00.json"
 RUN_LOG="$RUN_DIR/run.log"

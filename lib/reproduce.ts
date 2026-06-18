@@ -17,7 +17,7 @@
 
 import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { resolveScene, sceneIdFromPath, RUNS_DIR, ensureWorkspace } from './paths.js';
+import { resolveScene, sceneIdFromPath, runDir as makeRunDir, ensureWorkspace } from './paths.js';
 import { runClaudeStreaming } from './runner.js';
 import { extractScene } from './scene.js';
 import { getBackend, defaultBackendFor } from './backends/index.js';
@@ -217,7 +217,7 @@ export async function reproduce(argv: string[]): Promise<any> {
   const n = opts.n !== undefined && Number.isFinite(opts.n) && opts.n > 0 ? Math.min(opts.n, 4) : 2;
 
   ensureWorkspace();
-  const runDir = path.join(RUNS_DIR, `reproduce-${id}-${stamp()}`);
+  const runDir = makeRunDir(id, 'reproduce', stamp());
   mkdirSync(runDir, { recursive: true });
   writeFileSync(path.join(runDir, 'spec.json'), JSON.stringify(scene, null, 2));
 

@@ -8,7 +8,7 @@
 
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
-import { RUNS_DIR } from './paths.js';
+import { sceneRunsDir } from './paths.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function readJson(p: string): any {
@@ -17,19 +17,17 @@ function readJson(p: string): any {
 
 type RunDir = { full: string; name: string; mtime: number };
 
-// Run dirs for scene <id>: improve runs are "<id>-<stamp>", create runs are
-// "create-<id>-<stamp>". Returned newest-first by mtime.
+// Run dirs for scene <id>: all of a scene's runs live under runs/<id>/ as
+// "<type>-<stamp>" subdirs. Returned newest-first by mtime.
 function priorRunDirs(id: string): RunDir[] {
-  if (!existsSync(RUNS_DIR)) return [];
+  const base = sceneRunsDir(id);
+  if (!existsSync(base)) return [];
   const dirs: RunDir[] = [];
-  for (const name of readdirSync(RUNS_DIR)) {
-    if (name === `create-${id}` || name.startsWith(`create-${id}-`) ||
-        name === id || name.startsWith(`${id}-`)) {
-      const full = path.join(RUNS_DIR, name);
-      try {
-        if (statSync(full).isDirectory()) dirs.push({ full, name, mtime: statSync(full).mtimeMs });
-      } catch { /* skip */ }
-    }
+  for (const name of readdirSync(base)) {
+    const full = path.join(base, name);
+    try {
+      if (statSync(full).isDirectory()) dirs.push({ full, name, mtime: statSync(full).mtimeMs });
+    } catch { /* skip */ }
   }
   return dirs.sort((a, b) => b.mtime - a.mtime);
 }

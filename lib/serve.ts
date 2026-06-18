@@ -13,6 +13,7 @@ import { streamAnalyze, claudeAvailable, buildPrompt } from '../server/analyst.j
 import { DIST, BUNDLED_SAMPLES, SCENES_DIR, ensureWorkspace } from './paths.js';
 import { readImpl } from './impls.js';
 import { getBackend } from './backends/index.js';
+import { listRunsForScene, getRunDetail, resolveArtifact } from './runs.js';
 import type { GalleryEntry } from './types.js';
 
 const MAX_PORT_TRIES = 15;
@@ -199,6 +200,50 @@ async function handleImplVerify(res: http.ServerResponse, id: string): Promise<v
   }
 }
 
+function sendJson(res: http.ServerResponse, status: number, body: unknown): void {
+  res.statusCode = status;
+  res.setHeader('Content-Type', MIME['.json']);
+  res.end(JSON.stringify(body));
+}
+
+// Run history index (lib/runs): list a scene's runs, a run's normalized detail,
+// and serve individual artifacts (renders, scene versions, LLM logs) jailed to
+// the run dir.
+async function handleRuns(req: http.IncomingMessage, res: http.ServerResponse, url: URL): Promise<boolean> {
+  const parts = url.pathname.split('/').filter(Boolean); // ['api','runs', ...]
+  if (req.method !== 'GET') return false;
+
+  if (parts.length === 2) {
+    const scene = url.searchParams.get('scene');
+    if (!scene) { sendJson(res, 400, { error: 'scene query param required' }); return true; }
+    sendJson(res, 200, { runs: listRunsForScene(scene) });
+    return true;
+  }
+
+  const id = decodeURIComponent(parts[2] ?? '');
+  const runId = decodeURIComponent(parts[3] ?? '');
+  if (!id || !runId) return false;
+
+  if (parts.length === 4) {
+    const detail = getRunDetail(id, runId);
+    if (!detail) { sendJson(res, 404, { error: 'no such run' }); return true; }
+    sendJson(res, 200, detail);
+    return true;
+  }
+
+  if (parts.length === 5 && parts[4] === 'file') {
+    const rel = url.searchParams.get('path') ?? '';
+    const abs = resolveArtifact(id, runId, rel);
+    if (!abs) { sendJson(res, 404, { error: 'no such artifact' }); return true; }
+    const ext = path.extname(abs).toLowerCase();
+    res.setHeader('Content-Type', MIME[ext] ?? 'text/plain; charset=utf-8');
+    res.end(await fsp.readFile(abs));
+    return true;
+  }
+
+  return false;
+}
+
 async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
   const pathname = url.pathname;
@@ -244,6 +289,10 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   if (pathname.startsWith('/samples/') && pathname.endsWith('.json')) {
     const served = await serveSample(res, pathname.slice('/samples/'.length));
     if (served) return;
+  }
+
+  if (pathname === '/api/runs' || pathname.startsWith('/api/runs/')) {
+    if (await handleRuns(req, res, url)) return;
   }
 
   if (pathname.startsWith('/api/impl/')) {

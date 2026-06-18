@@ -19,7 +19,7 @@ import { MODE_IDS, modeLabel } from '../server/modes.js';
 import { runClaudeStreaming } from './runner.js';
 import { improve } from './improve.js';
 import { extractScene, validateScene, slugify } from './scene.js';
-import { ensureWorkspace, scenePath, RUNS_DIR } from './paths.js';
+import { ensureWorkspace, scenePath, runDir as makeRunDir } from './paths.js';
 
 // Minimum built-in refinement loops: a one-shot generation is a first draft,
 // not a finished scene. Like `improve`, create then runs the visual recursive
@@ -106,8 +106,9 @@ export async function create(argv: string[]): Promise<string> {
   }
   const mode = opts.mode || detectMode(`${name || ''} ${opts.hint || ''} ${opts.url || ''}`);
 
-  // Per-run log directory: everything about this generation lands here.
-  const runDir = path.join(RUNS_DIR, `create-${id}-${stamp()}`);
+  // Per-run log directory: everything about this generation lands here,
+  // under runs/<id>/create-<stamp>/.
+  const runDir = makeRunDir(id, 'create', stamp());
   mkdirSync(runDir, { recursive: true });
 
   const t0 = Date.now();

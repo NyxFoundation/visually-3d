@@ -31,6 +31,53 @@ export function ensureWorkspace(): void {
   fs.mkdirSync(SCENES_DIR, { recursive: true });
   fs.mkdirSync(RUNS_DIR, { recursive: true });
   fs.mkdirSync(IMPLS_DIR, { recursive: true });
+  migrateLegacyRuns();
+}
+
+// All runs for a scene live under runs/<id>/ (one folder per scene), each run a
+// "<type>-<stamp>" subdir. Groups create/improve/reproduce history together and
+// avoids the id prefix-collision the old flat layout had.
+export function sceneRunsDir(id: string): string {
+  return path.join(RUNS_DIR, id);
+}
+
+export function runDir(id: string, type: string, stamp: string): string {
+  return path.join(RUNS_DIR, id, `${type}-${stamp}`);
+}
+
+// Trailing run stamp: YYYYMMDD-HHMMSS.
+const RUN_STAMP_RE = /-(\d{8}-\d{6})$/;
+
+// One-time, idempotent, non-destructive migration of legacy *flat* run dirs
+// (create-<id>-<stamp>, reproduce-<id>-<stamp>, and bare <id>-<stamp> for
+// improve) into the per-scene tree runs/<id>/<type>-<stamp>. Only moves; never
+// overwrites an existing destination. A scene-id dir (no trailing stamp) is
+// skipped, so re-runs are no-ops once everything is migrated.
+export function migrateLegacyRuns(): void {
+  let entries: string[];
+  try { entries = fs.readdirSync(RUNS_DIR); } catch { return; }
+  for (const name of entries) {
+    const m = RUN_STAMP_RE.exec(name);
+    if (!m) continue; // not a stamped legacy run (e.g. an already-migrated <id> dir)
+    const full = path.join(RUNS_DIR, name);
+    try { if (!fs.statSync(full).isDirectory()) continue; } catch { continue; }
+
+    const stamp = m[1];
+    const base = name.slice(0, name.length - stamp.length - 1); // strip "-<stamp>"
+    let type: string;
+    let id: string;
+    if (base.startsWith('create-')) { type = 'create'; id = base.slice('create-'.length); }
+    else if (base.startsWith('reproduce-')) { type = 'reproduce'; id = base.slice('reproduce-'.length); }
+    else { type = 'improve'; id = base; }
+    if (!id) continue;
+
+    const dest = runDir(id, type, stamp);
+    if (fs.existsSync(dest)) continue; // already migrated / collision — leave it
+    try {
+      fs.mkdirSync(path.join(RUNS_DIR, id), { recursive: true });
+      fs.renameSync(full, dest);
+    } catch { /* non-fatal: leave the legacy dir in place */ }
+  }
 }
 
 export function scenePath(id: string): string {
