@@ -6,6 +6,49 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-06-18
+
+### Added
+
+- **Time-scrubbed scene studio**: the detail page is now one synchronized,
+  scrubbable view of a scene's evolution — 3D model, screenshot and
+  implementation side by side, driven by a transport bar (⏮ ◀ slider ▶ ⏭ and
+  ←/→ keys). Every frame pairs the LLM's REASONING with the CHANGES (a per-part
+  structural diff for scene revisions, a code diff for verifications), with
+  syntax highlighting and per-pane hide/show.
+- **Unified run history**: all of a scene's create / improve / reproduce runs
+  are consolidated under `runs/<id>/` and exposed as one chronological revision
+  timeline (`/api/revisions`, `/api/runs`). `upload` contributes a curated
+  history with the sample; a clone/install browses it via a bundled fallback.
+- **`reproduce` + composable verification backends**: reverse-implements a scene
+  from its spec and verifies it (`python-smt` via Z3, `sim` via MuJoCo).
+- **`refine`**: a unified loop that runs visual self-improvement and
+  implementation verification until both thresholds clear.
+- **Gallery**: category-grouped showcase with per-id pages (hash router) and
+  static pre-rendered screenshot thumbnails (no live WebGL). Contact-sheet
+  screenshots ship per sample; workspace scenes render thumbnails/sheets on the
+  fly and cache them.
+- **TUI**: view (browser) / refine / push (PR) paths per scene.
+
+### Changed
+
+- Internals migrated to **TypeScript-strict** with **type-aware ESLint**
+  (headline `no-floating-promises`), gated in CI.
+- The live 3D viewer now matches the screenshot look (device-resolution
+  rendering, flat tonemapping, no grid, no translucent connectors).
+- Gallery landing title is **VISUALLY**.
+
+### Removed
+
+- The gallery Analyze bar / realtime-LLM path, and the auto-generated
+  `metadata.info.japanese_name`.
+
+### Fixed
+
+- Pin `react`/`react-dom` to the same version (a mismatch blank-screened the
+  app). Detail page no longer spins forever when the `/api` proxy target is down
+  under `vite dev`.
+
 ## [0.10.1] - 2026-06-17
 
 ### Fixed
@@ -116,7 +159,8 @@ First public release on npm — a `1.0.0` release candidate. Carries all of the
   CLI to generate inspectable 3D machine scenes, a sample gallery, the
   offscreen renderer, and the recursive self-improvement loop.
 
-[Unreleased]: https://github.com/NyxFoundation/visually-3d/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/NyxFoundation/visually-3d/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/NyxFoundation/visually-3d/compare/v0.10.1...v0.11.0
 [0.9.1]: https://github.com/NyxFoundation/visually-3d/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/NyxFoundation/visually-3d/compare/v0.3.0...v0.9.0
 [0.3.0]: https://github.com/NyxFoundation/visually-3d/compare/v0.2.0...v0.3.0
