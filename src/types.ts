@@ -142,3 +142,18 @@ export const MOCK_SCENE: SceneDescriptor = {
     },
   ],
 };
+
+// ── gallery index (served at /samples/index.json) ────────────────────────────
+export interface SampleEntry {
+  id: string;
+  title: string;
+  subtitle: string;
+  path: string;
+  accent: string;
+  category?: string;
+}
+
+export interface SampleCategory {
+  id: string;
+  label: string;
+}

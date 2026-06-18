@@ -1172,3 +1172,75 @@ button, input {
   }
   .gallery__spinner { animation: none; }
 }
+
+/* ── Showcase (gallery landing, category sections) ───────────────────────── */
+.showcase {
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: calc(32px + var(--safe-top)) 20px calc(48px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.showcase__hero { display: flex; flex-direction: column; gap: 6px; }
+.showcase__hero h1 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.4rem); letter-spacing: -0.02em; }
+.showcase__hero p { margin: 0; color: var(--text-dim); }
+
+.showcase__analyze { display: flex; flex-direction: column; gap: 10px; }
+.showcase__analyze .analyze-bar { position: static; }
+
+.showcase__section { display: flex; flex-direction: column; gap: 14px; }
+.showcase__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.showcase__title span {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 8px;
+  letter-spacing: 0;
+}
+
+.showcase .gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+/* The gallery card is now an <a>; keep it visually identical to the button. */
+a.gallery__card { text-decoration: none; color: inherit; display: flex; flex-direction: column; }
+
+/* ── Detail page chrome ──────────────────────────────────────────────────── */
+.detail-back__arrow { font-size: 1.1rem; line-height: 1; color: var(--text); }
+.menu-toggle .detail-back__arrow { display: block; }
+
+.detail-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--text-dim);
+}
+.detail-back {
+  color: var(--accent);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+.detail-back:hover { border-color: var(--accent); }

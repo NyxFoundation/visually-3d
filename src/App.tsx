@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
-import { PartInfo } from './components/PartInfo';
-import { InfoPanel } from './components/InfoPanel';
-import { LazyViewer } from './components/LazyViewer';
-import { SampleGallery, type SampleCategory, type SampleEntry } from './components/SampleGallery';
-import { MOCK_SCENE, type Part, type SceneDescriptor } from './types';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { GalleryPage, type AnalyzeController } from './pages/GalleryPage';
+import { DetailPage } from './pages/DetailPage';
+import { LIVE_ID, hrefForDetail, navigate, useRoute } from './router';
+import type { SampleCategory, SampleEntry, SceneDescriptor } from './types';
 
 type LogEntry = {
   stream: 'system' | 'stdout' | 'stderr' | 'client';
@@ -28,22 +27,16 @@ function parseSseChunk(buffer: string, onEvent: (event: string, data: string) =>
 }
 
 function App() {
-  const [input, setInput] = useState('Electromagnetic interference situation awareness device');
-  const [scene, setScene] = useState<SceneDescriptor>(MOCK_SCENE);
-  const [activeSampleId, setActiveSampleId] = useState<string | undefined>();
-  const [selectedPart, setSelectedPart] = useState<Part | null>(null);
+  const route = useRoute();
   const [samples, setSamples] = useState<SampleEntry[]>([]);
   const [categories, setCategories] = useState<SampleCategory[]>([]);
+  const [samplesLoaded, setSamplesLoaded] = useState(false);
   const [backend, setBackend] = useState<BackendStatus>('probing');
-  const [logs, setLogs] = useState<LogEntry[]>([
-    { stream: 'system', message: 'Ready.' },
-  ]);
+
+  const [liveScene, setLiveScene] = useState<SceneDescriptor | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showLogs, setShowLogs] = useState(false);
-  const [panelOpen, setPanelOpen] = useState(false);
-  const [infoOpen, setInfoOpen] = useState(false);
-  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [logs, setLogs] = useState<LogEntry[]>([{ stream: 'system', message: 'Ready.' }]);
 
   const appendLog = (entry: LogEntry) => setLogs((prev) => [...prev.slice(-300), entry]);
 
@@ -53,72 +46,29 @@ function App() {
     const timeout = setTimeout(() => controller.abort(), 1500);
     fetch('/api/health', { signal: controller.signal })
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then(() => {
-        if (!cancelled) setBackend('available');
-      })
-      .catch(() => {
-        if (!cancelled) setBackend('unavailable');
-      })
+      .then(() => { if (!cancelled) setBackend('available'); })
+      .catch(() => { if (!cancelled) setBackend('unavailable'); })
       .finally(() => clearTimeout(timeout));
-    return () => {
-      cancelled = true;
-      controller.abort();
-      clearTimeout(timeout);
-    };
+    return () => { cancelled = true; controller.abort(); clearTimeout(timeout); };
   }, []);
 
   useEffect(() => {
     let cancelled = false;
     fetch('/samples/index.json')
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then((data: { samples: SampleEntry[]; categories?: SampleCategory[] }) => {
+      .then((data: { samples?: SampleEntry[]; categories?: SampleCategory[] }) => {
         if (cancelled) return;
         setSamples(data.samples ?? []);
         setCategories(data.categories ?? []);
       })
-      .catch(() => {
-        if (!cancelled) {
-          setSamples([]);
-          setCategories([]);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
+      .catch(() => { if (!cancelled) { setSamples([]); setCategories([]); } })
+      .finally(() => { if (!cancelled) setSamplesLoaded(true); });
+    return () => { cancelled = true; };
   }, []);
 
-  useEffect(() => {
-    if (samples.length === 0) return;
-    if (scene !== MOCK_SCENE) return;
-    const first = samples[0];
-    fetch(first.path)
-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then((data: SceneDescriptor) => {
-        setScene(data);
-        setActiveSampleId(first.id);
-      })
-      .catch(() => undefined);
-  }, [samples, scene]);
-
-  const handleSampleSelect = (sample: SampleEntry, sampleScene: SceneDescriptor) => {
-    setScene(sampleScene);
-    setActiveSampleId(sample.id);
-    setSelectedPart(null);
-    setInfoOpen(false);
-    setGalleryOpen(false);
-    setError(null);
-    appendLog({ stream: 'system', message: `Loaded sample: ${sample.title}` });
-  };
-
-  const handlePartSelect = (part: Part) => {
-    setSelectedPart(part);
-    setPanelOpen(true);
-  };
-
-  const handleAnalyze = async () => {
-    const value = input.trim();
-    if (!value) return;
-
+  const handleAnalyze = useCallback(async (raw: string) => {
+    const value = raw.trim();
+    if (!value || isLoading) return;
     setIsLoading(true);
     setError(null);
     setLogs([{ stream: 'client', message: `Submitting: ${value}` }]);
@@ -130,26 +80,21 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
-
-      if (!response.ok || !response.body) {
-        throw new Error(`Backend returned HTTP ${response.status}`);
-      }
+      if (!response.ok || !response.body) throw new Error(`Backend returned HTTP ${response.status}`);
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
 
       const onEvent = (eventName: string, data: string) => {
-        const payload = JSON.parse(data);
+        const payload = JSON.parse(data) as { stream?: LogEntry['stream']; message?: string; data?: SceneDescriptor };
         if (eventName === 'log') {
           appendLog({ stream: payload.stream ?? 'system', message: payload.message ?? '' });
-        } else if (eventName === 'result') {
-          const nextScene = payload.data as SceneDescriptor;
-          setScene(nextScene);
-          setActiveSampleId(undefined);
-          setSelectedPart(null);
-          setInfoOpen(false);
+        } else if (eventName === 'result' && payload.data) {
+          const nextScene = payload.data;
+          setLiveScene(nextScene);
           appendLog({ stream: 'system', message: `Rendered ${nextScene.parts.length} parts.` });
+          navigate(hrefForDetail(LIVE_ID));
         } else if (eventName === 'error') {
           const message = payload.message ?? 'Unknown stream error';
           setError(message);
@@ -170,126 +115,22 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isLoading]);
 
-  const showAnalyzeUI = backend === 'available';
   const logText = useMemo(() => logs.map((entry) => `[${entry.stream}] ${entry.message}`).join('\n'), [logs]);
-  const hasInfo = useMemo(() => {
-    const info = scene.metadata?.info;
-    return Boolean(
-      info || scene.assembly_instructions || scene.metadata?.reference,
-    );
-  }, [scene]);
 
-  return (
-    <main className="app-shell">
-      <div className="stage">
-        <LazyViewer scene={scene} selectedPartId={selectedPart?.id} onPartSelect={handlePartSelect} />
+  const analyze: AnalyzeController = useMemo(() => ({
+    available: backend === 'available',
+    isLoading,
+    error,
+    logText,
+    run: (value: string) => { void handleAnalyze(value); },
+  }), [backend, isLoading, error, logText, handleAnalyze]);
 
-        <header className="hero" aria-label="Current machine">
-          <div className="hero__group">
-            {samples.length > 0 ? (
-              <button
-                type="button"
-                className={`menu-toggle${galleryOpen ? ' menu-toggle--open' : ''}`}
-                onClick={() => setGalleryOpen((prev) => !prev)}
-                aria-label={galleryOpen ? 'Close samples drawer' : 'Open samples drawer'}
-                aria-expanded={galleryOpen}
-                aria-controls="gallery-drawer"
-              >
-                <span className="menu-toggle__icon" aria-hidden>
-                  <span /><span /><span />
-                </span>
-              </button>
-            ) : null}
-            <div className="hero__title">
-              <span className="hero__eyebrow">Visually</span>
-              <h1>{scene.machine_name}</h1>
-            </div>
-          </div>
-          <div className="hero__badges">
-            {hasInfo ? (
-              <button
-                type="button"
-                className="badge badge--info"
-                onClick={() => setInfoOpen((prev) => !prev)}
-                aria-expanded={infoOpen}
-                aria-controls="info-panel"
-                title="Show sources and basic info"
-              >
-                <span className="badge__icon" aria-hidden>i</span>
-                <span>info</span>
-              </button>
-            ) : null}
-            <span className={`badge badge--${backend}`}>
-              {backend === 'probing' ? 'probing backend…' : backend === 'available' ? 'local backend online' : 'gallery-only mode'}
-            </span>
-            <span className="badge badge--count">{scene.parts.length} parts</span>
-          </div>
-        </header>
-
-        {showAnalyzeUI ? (
-          <section className="analyze-bar">
-            <input
-              className="analyze-bar__input"
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              onKeyDown={(event) => { if (event.key === 'Enter') void handleAnalyze(); }}
-              placeholder="Machine name or URL…"
-              aria-label="Machine name or URL"
-            />
-            <button className="analyze-bar__button" onClick={() => void handleAnalyze()} disabled={isLoading}>
-              {isLoading ? 'Analyzing…' : 'Analyze'}
-            </button>
-          </section>
-        ) : null}
-
-        {showAnalyzeUI ? (
-          <button
-            className={`log-toggle${showLogs ? ' log-toggle--open' : ''}`}
-            onClick={() => setShowLogs((prev) => !prev)}
-            aria-expanded={showLogs}
-            aria-controls="log-console"
-          >
-            {showLogs ? 'hide logs' : 'show logs'}
-          </button>
-        ) : null}
-
-        {showAnalyzeUI && showLogs ? (
-          <section id="log-console" className="log-console">
-            <header>
-              <strong>Claude CLI stream</strong>
-              <span>{isLoading ? 'running' : 'idle'}</span>
-            </header>
-            <pre>{logText}</pre>
-          </section>
-        ) : null}
-
-        {error ? <div className="error-toast">{error}</div> : null}
-
-        <PartInfo part={selectedPart} open={panelOpen && !!selectedPart} onClose={() => setPanelOpen(false)} />
-        <InfoPanel scene={scene} open={infoOpen} onClose={() => setInfoOpen(false)} />
-
-        {samples.length > 0 ? (
-          <>
-            <div
-              className={`gallery-drawer__scrim${galleryOpen ? ' gallery-drawer__scrim--open' : ''}`}
-              onClick={() => setGalleryOpen(false)}
-              aria-hidden
-            />
-            <aside
-              id="gallery-drawer"
-              className={`gallery-drawer${galleryOpen ? ' gallery-drawer--open' : ''}`}
-              aria-hidden={!galleryOpen}
-              aria-label="Sample machines"
-            >
-              <SampleGallery samples={samples} categories={categories} activeId={activeSampleId} onSelect={handleSampleSelect} />
-            </aside>
-          </>
-        ) : null}
-      </div>
-    </main>
-  );
+  if (route.name === 'detail') {
+    return <DetailPage key={route.id} id={route.id} samples={samples} liveScene={liveScene} samplesLoaded={samplesLoaded} />;
+  }
+  return <GalleryPage samples={samples} categories={categories} analyze={analyze} />;
 }
 
 export default App;
