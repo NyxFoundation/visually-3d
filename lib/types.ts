@@ -167,6 +167,7 @@ export interface RevisionEntry {
   iter: number;
   score: number | null;
   delta: number | null;
+  scene: FileRef; // the scene snapshot at this version (for re-rendering the 3D)
   render: FileRef | null;
   hasReasoning: boolean;
 }

@@ -220,6 +220,7 @@ export function listTimeline(id: string): TimelineEntry[] {
         version: idx, source: nd.source, iter: nd.iter,
         score: scores[idx],
         delta: idx > 0 && scores[idx] != null && scores[idx - 1] != null ? (scores[idx]! - scores[idx - 1]!) : null,
+        scene: { runId: nd.runId, file: nd.sceneFile },
         render: nd.render ? { runId: nd.runId, file: nd.render } : null,
         hasReasoning: !!nd.reviewFile,
       },

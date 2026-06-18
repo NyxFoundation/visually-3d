@@ -31,6 +31,8 @@ test('timeline interleaves numbered revisions with verification markers', () => 
   assert.equal(t[0].kind, 'revision'); assert.equal(t[0].version, 0); assert.equal(t[0].source, 'created');
   assert.equal(t[1].kind, 'revision'); assert.equal(t[1].version, 1); assert.equal(t[1].score, 80);
   assert.equal(t[1].render.file, 'iter-01-render.png');
+  assert.equal(t[1].scene.file, 'iter-01.json');
+  assert.equal(t[0].scene.file, 'scene.json');
   assert.equal(t[2].kind, 'verification'); assert.equal(t[2].reproducibility, 71);
 });
 

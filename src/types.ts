@@ -250,6 +250,7 @@ export interface RevisionEntry {
   iter: number;
   score: number | null;
   delta: number | null;
+  scene: FileRef;
   render: FileRef | null;
   hasReasoning: boolean;
 }
