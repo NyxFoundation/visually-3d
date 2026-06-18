@@ -236,3 +236,59 @@ export interface RunDetail extends RunSummary {
   artifacts: RunArtifact[];
   highlights: RunHighlights;
 }
+
+// ── revision timeline (served at /api/revisions) ─────────────────────────────
+export interface FileRef { runId: string; file: string; }
+
+export interface RevisionEntry {
+  kind: 'revision';
+  key: string;
+  runId: string;
+  startedAt: string;
+  version: number;
+  source: 'created' | 'baseline' | 'refined';
+  iter: number;
+  score: number | null;
+  delta: number | null;
+  render: FileRef | null;
+  hasReasoning: boolean;
+}
+
+export interface VerificationEntry {
+  kind: 'verification';
+  key: string;
+  runId: string;
+  startedAt: string;
+  reproducibility: number | null;
+  verdict?: string;
+  verify?: { passed: number; total: number };
+  impls: RunImplHighlight[];
+}
+
+export type TimelineEntry = RevisionEntry | VerificationEntry;
+
+export interface FieldChange { field: string; before?: unknown; after?: unknown; }
+export interface PartRef { id: string; name?: string; shape?: string; }
+export interface PartChange { id: string; name?: string; fields: FieldChange[]; }
+
+export interface StructuralDiff {
+  initial: boolean;
+  added: PartRef[];
+  removed: PartRef[];
+  changed: PartChange[];
+  meta: FieldChange[];
+}
+
+export interface RevisionDetail {
+  key: string;
+  version: number;
+  startedAt: string;
+  source: string;
+  score: number | null;
+  delta: number | null;
+  render: FileRef | null;
+  trace: FileRef | null;
+  reasoning: { critique?: string; remainingGaps?: string[]; verdict?: string };
+  diff: StructuralDiff;
+  rawDiff: string;
+}
