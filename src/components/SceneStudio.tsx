@@ -76,6 +76,13 @@ function CodeFile({ url, lang }: { url: string; lang?: string }) {
   return <Code code={code} lang={lang} />;
 }
 
+// Screenshot image with a graceful fallback (e.g. a live scene with no render).
+function ShotImg({ url }: { url: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return <span className="impl-panel__hint">no screenshot for this scene</span>;
+  return <img src={url} alt="screenshot" onError={() => setFailed(true)} />;
+}
+
 function StructuralDiffView({ diff }: { diff: StructuralDiff }) {
   const empty = !diff.added.length && !diff.removed.length && !diff.changed.length && !diff.meta.length;
   if (empty) return <p className="impl-panel__hint">no descriptor change.</p>;
@@ -194,7 +201,9 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
   const impl = verif?.impls.find((i) => i.pass === true) ?? verif?.impls[0] ?? null;
 
   const sceneUrl = rev ? fileUrl(id, rev.scene) : null;
-  const renderUrl = renderRef ? fileUrl(id, renderRef) : null;
+  // The screenshot at the cursor — the history render, else the scene's static
+  // contact sheet (bundled for samples, rendered on the fly for workspace scenes).
+  const renderUrl = renderRef ? fileUrl(id, renderRef) : `/samples/${encodeURIComponent(id)}.sheet.png`;
   const implUrl = verif && impl ? fileUrl(id, { runId: verif.runId, file: impl.codeFile }) : null;
 
   // The implementation is generated from the scene as it was at its reproduce
@@ -246,7 +255,7 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
         {show.shot ? (
           <section className="studio__pane">
             {head('shot', rev ? <span className="studio__at">v{rev.version}</span> : null)}
-            <div className="studio__shot">{renderUrl ? <img src={renderUrl} alt="render" /> : <span className="impl-panel__hint">no render at this version</span>}</div>
+            <div className="studio__shot"><ShotImg key={renderUrl} url={renderUrl} /></div>
           </section>
         ) : collapsed('shot')}
         {show.impl ? (

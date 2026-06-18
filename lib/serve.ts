@@ -5,12 +5,13 @@
 
 import http from 'node:http';
 import fsp from 'node:fs/promises';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, existsSync, statSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { streamAnalyze, claudeAvailable, buildPrompt } from '../server/analyst.js';
-import { DIST, BUNDLED_SAMPLES, SCENES_DIR, ensureWorkspace } from './paths.js';
+import { DIST, BUNDLED_SAMPLES, SCENES_DIR, SCRIPTS, THUMBS_DIR, ensureWorkspace, resolveScene } from './paths.js';
 import { readImpl } from './impls.js';
 import { getBackend } from './backends/index.js';
 import { listRunsForScene, getRunDetail, resolveArtifact } from './runs.js';
@@ -260,6 +261,46 @@ function handleRevisions(res: http.ServerResponse, url: URL): void {
   sendJson(res, 200, { entries: listTimeline(scene) });
 }
 
+const exec = promisify(execFile);
+
+// Resolve a sample image: "<id>.png" = single-ISO thumbnail, "<id>.sheet.png" =
+// 2x2 contact sheet. Bundled samples ship a static PNG; a workspace scene with
+// no static image is rendered on the fly (pure-Node rasterizer) and cached,
+// keyed by the scene's mtime so it refreshes when the scene changes.
+async function resolveSampleImage(file: string): Promise<string | null> {
+  if (file.includes('/') || file.includes('..') || file.includes('\0')) return null;
+  const sheet = file.endsWith('.sheet.png');
+  const id = file.replace(/\.(sheet\.)?png$/, '');
+  if (!/^[a-zA-Z0-9_-]+$/.test(id)) return null;
+
+  const bundled = path.join(BUNDLED_SAMPLES, file);
+  if (existsSync(bundled)) return bundled;
+
+  const sceneFile = resolveScene(id);
+  if (!sceneFile) return null;
+  const cache = path.join(THUMBS_DIR, file);
+  try {
+    if (existsSync(cache) && statSync(cache).mtimeMs >= statSync(sceneFile).mtimeMs) return cache;
+  } catch { /* fall through to render */ }
+
+  const renderer = path.join(SCRIPTS, 'render-scene.mjs');
+  const env = sheet ? process.env : { ...process.env, VISUALLY_VIEW: 'iso' };
+  try {
+    await exec('node', [renderer, sceneFile, cache, sheet ? '420' : '512'], { env, timeout: 30000, maxBuffer: 16 * 1024 * 1024 });
+    return existsSync(cache) ? cache : null;
+  } catch {
+    return null;
+  }
+}
+
+async function handleSampleImage(res: http.ServerResponse, file: string): Promise<boolean> {
+  const img = await resolveSampleImage(file);
+  if (!img) return false;
+  res.setHeader('Content-Type', MIME['.png']);
+  res.end(await fsp.readFile(img));
+  return true;
+}
+
 async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
   const pathname = url.pathname;
@@ -305,6 +346,10 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   if (pathname.startsWith('/samples/') && pathname.endsWith('.json')) {
     const served = await serveSample(res, pathname.slice('/samples/'.length));
     if (served) return;
+  }
+
+  if (pathname.startsWith('/samples/') && pathname.endsWith('.png')) {
+    if (await handleSampleImage(res, pathname.slice('/samples/'.length))) return;
   }
 
   if (pathname === '/api/revisions' && req.method === 'GET') {

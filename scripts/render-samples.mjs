@@ -21,17 +21,22 @@ const files = readdirSync(samplesDir).filter((f) => f.endsWith('.json') && f !==
 let made = 0;
 for (const f of files) {
   const id = f.replace(/\.json$/, '');
-  const out = path.join(samplesDir, `${id}.png`);
-  if (!force && existsSync(out)) continue;
-  try {
-    execFileSync('node', [renderer, path.join(samplesDir, f), out, SIZE], {
-      env: { ...process.env, VISUALLY_VIEW: 'iso' },
-      stdio: 'pipe',
-    });
-    made++;
-    console.log(`  ✓ ${id}.png`);
-  } catch (err) {
-    console.error(`  ✗ ${id}: ${err.message}`);
+  const scene = path.join(samplesDir, f);
+  // <id>.png        — single ISO, the gallery thumbnail
+  // <id>.sheet.png  — 2x2 ISO/front/side/top contact sheet, the detail screenshot
+  const targets = [
+    { out: path.join(samplesDir, `${id}.png`), env: { VISUALLY_VIEW: 'iso' }, args: [SIZE] },
+    { out: path.join(samplesDir, `${id}.sheet.png`), env: {}, args: ['420'] },
+  ];
+  for (const { out, env, args } of targets) {
+    if (!force && existsSync(out)) continue;
+    try {
+      execFileSync('node', [renderer, scene, out, ...args], { env: { ...process.env, ...env }, stdio: 'pipe' });
+      made++;
+      console.log(`  ✓ ${path.basename(out)}`);
+    } catch (err) {
+      console.error(`  ✗ ${path.basename(out)}: ${err.message}`);
+    }
   }
 }
-console.log(`render-samples: ${made} thumbnail(s) generated / ${files.length} sample(s).`);
+console.log(`render-samples: ${made} image(s) generated / ${files.length} sample(s).`);

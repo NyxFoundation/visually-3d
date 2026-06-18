@@ -30,11 +30,15 @@ export const RUNS_DIR = path.join(VISUALLY_HOME, 'runs');
 // chosen source + its recorded verification, keyed by scene id. The detail
 // page reads these to show "source ⇄ 3D" and to re-run the tests live.
 export const IMPLS_DIR = path.join(VISUALLY_HOME, 'impls');
+// On-the-fly rendered thumbnails / contact sheets for workspace scenes that
+// have no bundled static image. Cached, keyed by the scene's mtime.
+export const THUMBS_DIR = path.join(VISUALLY_HOME, 'thumbs');
 
 export function ensureWorkspace(): void {
   fs.mkdirSync(SCENES_DIR, { recursive: true });
   fs.mkdirSync(RUNS_DIR, { recursive: true });
   fs.mkdirSync(IMPLS_DIR, { recursive: true });
+  fs.mkdirSync(THUMBS_DIR, { recursive: true });
   migrateLegacyRuns();
 }
 
