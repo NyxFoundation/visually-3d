@@ -22,3 +22,5 @@ __pycache__/
 /lib/runner.js
 /server/analyst.js
 /lib/improve.js
+/lib/serve.js
+/lib/upload.js

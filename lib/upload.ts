@@ -17,13 +17,21 @@ const exec = promisify(execFile);
 
 const DEFAULT_REPO = 'NyxFoundation/visually-3d';
 
-async function run(cmd, args, opts = {}) {
+async function run(cmd: string, args: string[], opts: { cwd?: string } = {}): Promise<string> {
   const { stdout } = await exec(cmd, args, { maxBuffer: 32 * 1024 * 1024, ...opts });
   return stdout.trim();
 }
 
-function parseArgs(argv) {
-  const opts = { positional: [] };
+interface UploadOpts {
+  positional: string[];
+  repo?: string;
+  title?: string;
+  message?: string;
+  dryRun?: boolean;
+}
+
+function parseArgs(argv: string[]): UploadOpts {
+  const opts: UploadOpts = { positional: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--repo') opts.repo = argv[++i];
@@ -36,7 +44,7 @@ function parseArgs(argv) {
   return opts;
 }
 
-export async function upload(argv) {
+export async function upload(argv: string[]): Promise<void> {
   const opts = parseArgs(argv);
   const ref = opts.positional[0];
   if (!ref) throw new Error('usage: visually upload <scene> [--repo owner/name] [--title <t>] [--dry-run]');
@@ -45,7 +53,8 @@ export async function upload(argv) {
   if (!target) throw new Error(`no such scene: ${ref}`);
   const id = sceneIdFromPath(target);
 
-  const scene = JSON.parse(readFileSync(target, 'utf8'));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const scene: any = JSON.parse(readFileSync(target, 'utf8'));
   const errors = validateScene(scene);
   if (errors.length) {
     throw new Error(`scene "${id}" is invalid — fix it before uploading:\n  - ${errors.join('\n  - ')}`);
@@ -90,9 +99,10 @@ export async function upload(argv) {
 
     // Register in index.json (append if absent).
     const indexPath = path.join(samplesDir, 'index.json');
-    const index = JSON.parse(readFileSync(indexPath, 'utf8'));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const index: any = JSON.parse(readFileSync(indexPath, 'utf8'));
     index.samples = index.samples || [];
-    if (!index.samples.some((s) => s.id === id)) {
+    if (!index.samples.some((s: { id: string }) => s.id === id)) {
       const { source, ...entry } = deriveIndexEntry(scene, id);
       index.samples.push(entry);
       writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');

@@ -9,10 +9,11 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { streamAnalyze, claudeAvailable, buildPrompt } from '../server/analyst.js';
 import { DIST, BUNDLED_SAMPLES, SCENES_DIR, ensureWorkspace } from './paths.js';
+import type { GalleryEntry } from './types.js';
 
 const MAX_PORT_TRIES = 15;
 
-const MIME = {
+const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'application/javascript; charset=utf-8',
   '.mjs': 'application/javascript; charset=utf-8',
@@ -29,7 +30,7 @@ const MIME = {
   '.map': 'application/json; charset=utf-8',
 };
 
-async function ensureBuilt() {
+async function ensureBuilt(): Promise<boolean> {
   try {
     await fsp.access(path.join(DIST, 'index.html'));
     return true;
@@ -41,8 +42,8 @@ async function ensureBuilt() {
   }
 }
 
-async function readBody(req, limit = 1_000_000) {
-  const chunks = [];
+async function readBody(req: http.IncomingMessage, limit = 1_000_000): Promise<string> {
+  const chunks: Buffer[] = [];
   let size = 0;
   for await (const chunk of req) {
     size += chunk.length;
@@ -52,14 +53,14 @@ async function readBody(req, limit = 1_000_000) {
   return Buffer.concat(chunks).toString('utf8');
 }
 
-function sseWriter(res) {
+function sseWriter(res: http.ServerResponse): (event: string, data: unknown) => void {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache, no-transform',
     Connection: 'keep-alive',
     'X-Accel-Buffering': 'no',
   });
-  return (event, data) => {
+  return (event: string, data: unknown) => {
     res.write(`event: ${event}\n`);
     res.write(`data: ${JSON.stringify(data)}\n\n`);
   };
@@ -68,12 +69,14 @@ function sseWriter(res) {
 // Merge the bundled gallery index with workspace scenes. Workspace entries are
 // listed first (so freshly created scenes surface at the top) and win on id.
 async function buildSamplesIndex() {
-  let base = { categories: [{ id: 'all', label: 'All' }], samples: [] };
+  type Category = { id: string; label: string };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let base: { categories: Category[]; samples: any[] } = { categories: [{ id: 'all', label: 'All' }], samples: [] };
   try {
     base = JSON.parse(await fsp.readFile(path.join(BUNDLED_SAMPLES, 'index.json'), 'utf8'));
   } catch { /* no bundled index — fine */ }
 
-  const workspaceEntries = [];
+  const workspaceEntries: GalleryEntry[] = [];
   try {
     const { deriveIndexEntry } = await import('./scene.js');
     const files = await fsp.readdir(SCENES_DIR);
@@ -102,7 +105,7 @@ async function buildSamplesIndex() {
 }
 
 // Resolve /samples/<file> from the workspace first, then the bundled gallery.
-async function serveSample(res, file) {
+async function serveSample(res: http.ServerResponse, file: string): Promise<boolean> {
   if (file.includes('/') || file.includes('..') || file.includes('\0')) {
     res.statusCode = 400; res.end('bad request'); return true;
   }
@@ -118,7 +121,7 @@ async function serveSample(res, file) {
   return false;
 }
 
-async function serveStatic(res, reqPath) {
+async function serveStatic(res: http.ServerResponse, reqPath: string): Promise<void> {
   if (reqPath.includes('\0') || reqPath.includes('..')) {
     res.statusCode = 400; res.end('bad request'); return;
   }
@@ -146,7 +149,7 @@ async function serveStatic(res, reqPath) {
   }
 }
 
-async function handleRequest(req, res) {
+async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
   const pathname = url.pathname;
 
@@ -161,13 +164,14 @@ async function handleRequest(req, res) {
   }
 
   if (pathname === '/api/analyze/stream' && req.method === 'POST') {
-    let body;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let body: any;
     try {
       body = JSON.parse(await readBody(req));
     } catch (err) {
       res.statusCode = 400;
       res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({ error: `invalid request body: ${err.message}` }));
+      res.end(JSON.stringify({ error: `invalid request body: ${(err as Error).message}` }));
       return;
     }
     const writeEvent = sseWriter(res);
@@ -175,7 +179,7 @@ async function handleRequest(req, res) {
       const prompt = await buildPrompt({ url: body.url, machineName: body.machine_name });
       await streamAnalyze(prompt, writeEvent);
     } catch (err) {
-      writeEvent('error', { message: err.message });
+      writeEvent('error', { message: (err as Error).message });
     }
     res.end();
     return;
@@ -202,8 +206,9 @@ async function handleRequest(req, res) {
   await serveStatic(res, pathname);
 }
 
-function openBrowser(url) {
-  let cmd, cmdArgs;
+function openBrowser(url: string): void {
+  let cmd: string;
+  let cmdArgs: string[];
   if (process.platform === 'darwin') { cmd = 'open'; cmdArgs = [url]; }
   else if (process.platform === 'win32') { cmd = 'cmd'; cmdArgs = ['/c', 'start', '""', url]; }
   else { cmd = 'xdg-open'; cmdArgs = [url]; }
@@ -214,12 +219,12 @@ function openBrowser(url) {
   } catch { /* user can open manually */ }
 }
 
-async function listenWithFallback(server, startPort, host = '127.0.0.1') {
+async function listenWithFallback(server: http.Server, startPort: number, host = '127.0.0.1'): Promise<number> {
   for (let offset = 0; offset < MAX_PORT_TRIES; offset++) {
     const port = startPort + offset;
     try {
-      await new Promise((resolve, reject) => {
-        const onError = (err) => { server.removeListener('listening', onListening); reject(err); };
+      await new Promise<void>((resolve, reject) => {
+        const onError = (err: Error) => { server.removeListener('listening', onListening); reject(err); };
         const onListening = () => { server.removeListener('error', onError); resolve(); };
         server.once('error', onError);
         server.once('listening', onListening);
@@ -227,14 +232,14 @@ async function listenWithFallback(server, startPort, host = '127.0.0.1') {
       });
       return port;
     } catch (err) {
-      if (err && err.code === 'EADDRINUSE') continue;
+      if (err && (err as NodeJS.ErrnoException).code === 'EADDRINUSE') continue;
       throw err;
     }
   }
   throw new Error(`No free port found between ${startPort} and ${startPort + MAX_PORT_TRIES - 1}`);
 }
 
-export async function serve(argv = []) {
+export async function serve(argv: string[] = []): Promise<void> {
   const args = new Set(argv);
   const noOpen = args.has('--no-open') || process.env.VISUALLY_NO_OPEN === '1';
   const startPort = Number(process.env.PORT ?? 3131);
