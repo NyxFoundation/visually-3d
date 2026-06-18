@@ -1,0 +1,19 @@
+{
+  "// note": "Type-checks and compiles the Node CLI (lib/server/bin) in place: foo.ts -> foo.js next to it. The web app uses tsconfig.json. Generated .js are gitignored and built in prepack.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "declaration": false,
+    "sourceMap": false,
+    "types": ["node"]
+  },
+  "include": ["lib/**/*.ts", "server/**/*.ts", "bin/**/*.ts"]
+}
