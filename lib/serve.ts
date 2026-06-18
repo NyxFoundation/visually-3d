@@ -14,6 +14,7 @@ import { DIST, BUNDLED_SAMPLES, SCENES_DIR, ensureWorkspace } from './paths.js';
 import { readImpl } from './impls.js';
 import { getBackend } from './backends/index.js';
 import { listRunsForScene, getRunDetail, resolveArtifact } from './runs.js';
+import { listTimeline, getRevisionDetail } from './revisions.js';
 import type { GalleryEntry } from './types.js';
 
 const MAX_PORT_TRIES = 15;
@@ -244,6 +245,21 @@ async function handleRuns(req: http.IncomingMessage, res: http.ServerResponse, u
   return false;
 }
 
+// Scene revision timeline. /api/revisions?scene=<id> → the chronological
+// timeline; add &rev=<key> for one revision's reasoning + structural/raw diff.
+function handleRevisions(res: http.ServerResponse, url: URL): void {
+  const scene = url.searchParams.get('scene');
+  if (!scene) { sendJson(res, 400, { error: 'scene query param required' }); return; }
+  const rev = url.searchParams.get('rev');
+  if (rev) {
+    const detail = getRevisionDetail(scene, rev);
+    if (!detail) { sendJson(res, 404, { error: 'no such revision' }); return; }
+    sendJson(res, 200, detail);
+    return;
+  }
+  sendJson(res, 200, { entries: listTimeline(scene) });
+}
+
 async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
   const pathname = url.pathname;
@@ -289,6 +305,11 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   if (pathname.startsWith('/samples/') && pathname.endsWith('.json')) {
     const served = await serveSample(res, pathname.slice('/samples/'.length));
     if (served) return;
+  }
+
+  if (pathname === '/api/revisions' && req.method === 'GET') {
+    handleRevisions(res, url);
+    return;
   }
 
   if (pathname === '/api/runs' || pathname.startsWith('/api/runs/')) {

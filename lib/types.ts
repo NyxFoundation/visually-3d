@@ -149,3 +149,63 @@ export interface RunDetail extends RunSummary {
   artifacts: RunArtifact[];
   highlights: RunHighlights;
 }
+
+// ── revision timeline (lib/revisions) ────────────────────────────────────────
+// A unified, chronological version history of a scene: create + every improve
+// iteration as numbered revisions, with reproduce runs pinned as verification
+// markers. The detail of a revision pairs the LLM's reasoning (why) with the
+// structural diff of the scene descriptor (what changed).
+export interface FileRef { runId: string; file: string; }
+
+export interface RevisionEntry {
+  kind: 'revision';
+  key: string; // "<runId>:<iter>"
+  runId: string;
+  startedAt: string;
+  version: number; // v0, v1, …
+  source: 'created' | 'baseline' | 'refined';
+  iter: number;
+  score: number | null;
+  delta: number | null;
+  render: FileRef | null;
+  hasReasoning: boolean;
+}
+
+export interface VerificationEntry {
+  kind: 'verification';
+  key: string;
+  runId: string;
+  startedAt: string;
+  reproducibility: number | null;
+  verdict?: string;
+  verify?: { passed: number; total: number };
+  impls: RunImplHighlight[];
+}
+
+export type TimelineEntry = RevisionEntry | VerificationEntry;
+
+export interface FieldChange { field: string; before: unknown; after: unknown; }
+export interface PartRef { id: string; name?: string; shape?: string; }
+export interface PartChange { id: string; name?: string; fields: FieldChange[]; }
+
+export interface StructuralDiff {
+  initial: boolean; // v0 — no predecessor
+  added: PartRef[];
+  removed: PartRef[];
+  changed: PartChange[];
+  meta: FieldChange[];
+}
+
+export interface RevisionDetail {
+  key: string;
+  version: number;
+  startedAt: string;
+  source: string;
+  score: number | null;
+  delta: number | null;
+  render: FileRef | null;
+  trace: FileRef | null; // events.jsonl (full LLM thinking trace)
+  reasoning: { critique?: string; remainingGaps?: string[]; verdict?: string };
+  diff: StructuralDiff;
+  rawDiff: string; // unified line diff of the pretty-printed scene JSON
+}

@@ -13,7 +13,7 @@ import type { RunArtifact, RunDetail, RunHighlights, RunImplHighlight, RunIterat
 
 const KNOWN_TYPES: RunType[] = ['create', 'improve', 'reproduce'];
 
-function splitRunId(runId: string): { type: RunType; stamp: string } {
+export function splitRunId(runId: string): { type: RunType; stamp: string } {
   const i = runId.indexOf('-');
   const head = i === -1 ? runId : runId.slice(0, i);
   const type = (KNOWN_TYPES as string[]).includes(head) ? (head as RunType) : 'unknown';
@@ -21,13 +21,13 @@ function splitRunId(runId: string): { type: RunType; stamp: string } {
 }
 
 // "YYYYMMDD-HHMMSS" → "YYYY-MM-DDTHH:MM:SS" (local, for display only).
-function stampToIso(stamp: string): string {
+export function stampToIso(stamp: string): string {
   const m = /^(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})$/.exec(stamp);
   if (!m) return stamp;
   return `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}`;
 }
 
-function readJson(p: string): unknown {
+export function readJson(p: string): unknown {
   try { return JSON.parse(readFileSync(p, 'utf8')); } catch { return null; }
 }
 
@@ -136,7 +136,7 @@ function scoreFor(type: RunType, dir: string, files: string[], iters: RunIterati
 }
 
 // Read the first line of a verify log: "pass=true ran=true ..." → true/false.
-function verifyPass(dir: string, file: string): boolean | null {
+export function verifyPass(dir: string, file: string): boolean | null {
   try {
     const m = /pass=(true|false)/.exec(readFileSync(path.join(dir, file), 'utf8').slice(0, 200));
     return m ? m[1] === 'true' : null;
