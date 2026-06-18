@@ -13,7 +13,7 @@ import { serve } from './serve.js';
 
 const exec = promisify(execFile);
 
-function openInOS(target) {
+function openInOS(target: string): void {
   const cmd = process.platform === 'darwin' ? 'open'
     : process.platform === 'win32' ? 'cmd'
     : 'xdg-open';
@@ -25,8 +25,15 @@ function openInOS(target) {
   } catch { /* user can open manually */ }
 }
 
-function parseArgs(argv) {
-  const opts = { positional: [] };
+interface CheckOpts {
+  positional: string[];
+  png?: boolean;
+  out?: string;
+  noOpen?: boolean;
+}
+
+function parseArgs(argv: string[]): CheckOpts {
+  const opts: CheckOpts = { positional: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--png') opts.png = true;
@@ -38,7 +45,7 @@ function parseArgs(argv) {
   return opts;
 }
 
-export async function check(argv) {
+export async function check(argv: string[]): Promise<string | undefined> {
   const opts = parseArgs(argv);
   const ref = opts.positional[0];
   if (!ref) throw new Error('usage: visually check <scene> [--png] [--out <file.png>]');

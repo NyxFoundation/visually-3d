@@ -29,8 +29,20 @@ const MIN_REFINE = 3;
 
 const exec = promisify(execFile);
 
-function parseArgs(argv) {
-  const opts = { driver: 'claude', positional: [] };
+interface CreateOpts {
+  driver: string;
+  positional: string[];
+  id?: string;
+  hint?: string;
+  url?: string;
+  model?: string;
+  mode?: string;
+  refine?: number;
+  force?: boolean;
+}
+
+function parseArgs(argv: string[]): CreateOpts {
+  const opts: CreateOpts = { driver: 'claude', positional: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--driver') opts.driver = argv[++i];
@@ -49,13 +61,13 @@ function parseArgs(argv) {
 }
 
 // ISO-ish compact timestamp for run directory names: 20260617-140530.
-function stamp() {
+function stamp(): string {
   const d = new Date();
-  const p = (n) => String(n).padStart(2, '0');
+  const p = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
 }
 
-async function runCodex(prompt, runDir) {
+async function runCodex(prompt: string, runDir: string): Promise<string> {
   const bin = process.env.CODEX_BIN || 'codex';
   const tmp = mkdtempSync(path.join(os.tmpdir(), 'visually-'));
   const out = path.join(tmp, 'msg.txt');
@@ -74,7 +86,7 @@ async function runCodex(prompt, runDir) {
   }
 }
 
-export async function create(argv) {
+export async function create(argv: string[]): Promise<string> {
   const opts = parseArgs(argv);
   const name = opts.positional.join(' ').trim();
   if (!name && !opts.url) {
@@ -107,7 +119,7 @@ export async function create(argv) {
   writeFileSync(path.join(runDir, 'prompt.txt'), prompt);
 
   // Generate the scene, streaming reasoning live (claude) or batch (codex).
-  let raw;
+  let raw: string;
   if (opts.driver === 'codex') {
     raw = await runCodex(prompt, runDir);
   } else {
@@ -116,7 +128,8 @@ export async function create(argv) {
   }
   writeFileSync(path.join(runDir, 'raw.txt'), raw);
 
-  const scene = extractScene(raw);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const scene: any = extractScene(raw);
   // Stamp the mode into metadata so the gallery/UI can show it.
   scene.metadata = scene.metadata || {};
   if (!scene.metadata.mode) scene.metadata.mode = mode;
@@ -155,7 +168,7 @@ export async function create(argv) {
       if (opts.model) improveArgs.push('--model', opts.model);
       await improve(improveArgs);
     } catch (err) {
-      console.log(`\n  ⚠ refinement loop stopped: ${err.message}`);
+      console.log(`\n  ⚠ refinement loop stopped: ${(err as Error).message}`);
       console.log(`     the draft scene is intact; re-run: visually improve ${id}`);
     }
   }

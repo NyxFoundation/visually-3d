@@ -24,3 +24,5 @@ __pycache__/
 /lib/improve.js
 /lib/serve.js
 /lib/upload.js
+/lib/check.js
+/lib/create.js
