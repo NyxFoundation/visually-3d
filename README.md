@@ -65,7 +65,7 @@ The 3D render is only half of it. A `visually-3d` scene is two things at once: a
 
 - **improve** renders the scene offscreen and lets the model critique its own work *visually* as well as structurally, then rewrites it. (A part buried inside an opaque box is genuinely hidden in the render — *if you can't see it, the scene is hiding it.*)
 - **reproduce** has N independent agents reverse-implement the system **from the spec alone**, runs each one through a backend (Z3 SMT for digital/compute subjects, MuJoCo physics for physical machines), and an LLM-judge scores two axes: **reproducibility** (could an engineer rebuild it with no guessing?) and **fidelity** (is it *this specific* paper/datasheet's system, not merely *a* working one?).
-- **amend** routes the discovered values, resolved ambiguities, and counterexamples back into the scene's spec — so the *next* reproduce reads them, the independent implementations converge, and the score climbs.
+- **amend** routes the discovered values, resolved ambiguities, and counterexamples back into the scene's spec — so the *next* reproduce reads them, the independent implementations converge, and the score climbs. It quotes the source where it can, tags each fact's provenance, and never invents architectural detail the source doesn't support.
 
 `refine` drives `improve → reproduce → amend` each round; `create` runs the same loop automatically after generating a draft, so a fresh scene is convincing *and* reproducible out of the box. Each round streams the model's reasoning live and prints `visual · repro (▲/▼) · fidelity · self-check · spec field count`:
 
@@ -74,7 +74,13 @@ The 3D render is only half of it. A `visually-3d` scene is two things at once: a
 <br/><sub><b>The TUI driving <code>visually refine ntt-fpga</code></b> — the closed 3D ⇄ implementation loop, working toward <code>visual ≥ 90 · reproducibility ≥ 80 · self-check passing</code>.</sub>
 </div>
 
-📐 **Full architecture:** [`docs/visioned-self-improvement.md`](docs/visioned-self-improvement.md) — the spec substrate, the return edge, the two verification axes, and automatic backend selection. Development history: [`docs/visioned-self-improvement-changelog.md`](docs/visioned-self-improvement-changelog.md).
+**Keeping the loop honest.** A self-improving loop is only as trustworthy as the signal it grades itself on — and here `amend` writes into the very spec the self-check measures against, so a bad write can corrupt its own grading key (we hit exactly this: a wrong modular inverse folded into the spec made every faithful implementation fail). Three guards close that gap:
+
+- **Arithmetic guard** — fully-numeric derived constants (`x = b⁻¹ mod q`, `bᵉ mod q = r`, `floor(a/b) = c`) are machine-checked and auto-corrected before they ever enter the spec, at every write/read point. No false constant survives on any path.
+- **Honest verdicts** — a self-check that fails to *run* (syntax error, timeout, crash) is a harness fault, not a wrong implementation: it's classified, repaired once, and counted separately instead of silently tanking the score.
+- **Ratchet** — each round keeps the best-scoring scene; the loop never ends worse than the best round it actually measured.
+
+📐 **Full architecture:** [`docs/visioned-self-improvement.md`](docs/visioned-self-improvement.md) — the spec substrate, the return edge, the two verification axes, and automatic backend selection. Development history: [`docs/visioned-self-improvement-changelog.md`](docs/visioned-self-improvement-changelog.md) — including the failure modes the guards above were built to prevent.
 
 ## Why local?
 
@@ -164,7 +170,7 @@ N independent agents reverse-implement the scene **from the spec alone**; each i
 visually amend <scene> [--n 2] [--backend python-smt|sim] [--no-verify] [--model <m>]
 ```
 
-Takes `reproduce`'s missing fields, divergences, counterexamples, and fidelity gaps and writes concrete values into the spec substrate (`parts[].spec` / `metadata.spec`), routing each fact to the part it belongs to. The merged scene passes the same parse/validate gate as `create` before it's committed.
+Takes `reproduce`'s missing fields, divergences, counterexamples, and fidelity gaps and writes concrete values into the spec substrate (`parts[].spec` / `metadata.spec`), routing each fact to the part it belongs to. The merged scene passes the same parse/validate gate as `create`, plus the arithmetic guard that verifies and auto-corrects any derived numeric constant, before it's committed.
 
 ### `improve` — visual-only self-improvement
 
