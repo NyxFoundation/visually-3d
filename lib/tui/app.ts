@@ -150,10 +150,9 @@ function SceneList({ onPick, onBack }: { onPick: (id: string) => void; onBack: (
 function SceneAction({ id, onRun, onBack }: { id: string; onRun: (args: string[]) => void; onBack: () => void }) {
   useInput((_input: string, key: { escape: boolean }) => { if (key.escape) onBack(); });
   const items: { label: string; value: string[] | 'back' }[] = [
-    { label: 'View      — open in the browser', value: ['check', id] },
-    { label: 'Improve   — visual self-improvement loop', value: ['improve', id] },
-    { label: 'Reproduce — implement + verify from the scene', value: ['reproduce', id] },
-    { label: 'Push      — open a PR to the gallery', value: ['upload', id] },
+    { label: 'View    — open in the browser', value: ['check', id] },
+    { label: 'Refine  — 3D ⇄ implementation loop (improve + verify)', value: ['refine', id] },
+    { label: 'Push    — open a PR to the gallery', value: ['upload', id] },
     { label: 'Back', value: 'back' },
   ];
   return html`

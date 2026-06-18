@@ -44,6 +44,18 @@ export type PriorReflection = {
   notes: string[];
 };
 
+// The most recent visual rubric score (0-100) for a scene, read from the
+// newest improve run's last-review.json. Null if the scene has never been
+// improved. Used by `refine` to threshold the visual axis of the loop.
+export function latestVisualScore(id: string): number | null {
+  for (const { full } of priorRunDirs(id)) {
+    const review = readJson(path.join(full, 'last-review.json'));
+    const total = review ? Number(review.total) : NaN;
+    if (Number.isFinite(total)) return total;
+  }
+  return null;
+}
+
 export function collectPriorReflection(id: string): PriorReflection | null {
   const dirs = priorRunDirs(id);
   if (!dirs.length) return null;
