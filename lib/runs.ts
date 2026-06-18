@@ -9,7 +9,7 @@
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { sceneRunsDir, runDir } from './paths.js';
-import type { RunArtifact, RunDetail, RunIteration, RunSummary, RunType } from './types.js';
+import type { RunArtifact, RunDetail, RunHighlights, RunImplHighlight, RunIteration, RunSummary, RunType } from './types.js';
 
 const KNOWN_TYPES: RunType[] = ['create', 'improve', 'reproduce'];
 
@@ -52,9 +52,10 @@ function improveIterations(dir: string, files: string[]): RunIteration[] {
     else if ((m = /^iter-(\d+)-review\.json$/.exec(f))) {
       const it = get(Number(m[1]));
       it.review = f;
-      const review = readJson(path.join(dir, f)) as { total?: unknown } | null;
+      const review = readJson(path.join(dir, f)) as { total?: unknown; critique?: unknown } | null;
       const total = num(review?.total);
       if (total != null) it.score = total;
+      if (typeof review?.critique === 'string') it.critique = review.critique.slice(0, 600);
     }
   }
   return [...byN.values()].sort((a, b) => a.n - b.n);
@@ -134,6 +135,57 @@ function scoreFor(type: RunType, dir: string, files: string[], iters: RunIterati
   return null;
 }
 
+// Read the first line of a verify log: "pass=true ran=true ..." → true/false.
+function verifyPass(dir: string, file: string): boolean | null {
+  try {
+    const m = /pass=(true|false)/.exec(readFileSync(path.join(dir, file), 'utf8').slice(0, 200));
+    return m ? m[1] === 'true' : null;
+  } catch { return null; }
+}
+
+function highlightsFor(type: RunType, dir: string, files: string[], iters: RunIteration[]): RunHighlights {
+  if (type === 'improve') {
+    return { scores: iters.map((it) => it.score).filter((s): s is number => s != null) };
+  }
+  if (type === 'reproduce') {
+    const report = (files.includes('report.json') ? readJson(path.join(dir, 'report.json')) : null) as
+      { reproducibility?: unknown; verdict?: unknown; executable_verification?: { passed?: unknown; total?: unknown; enabled?: unknown } } | null;
+    const impls: RunImplHighlight[] = [];
+    for (const f of files.slice().sort()) {
+      const m = /^impl-(\d+)\.(py|v)$/.exec(f);
+      if (!m) continue;
+      const n = Number(m[1]);
+      const verifyFile = files.includes(`impl-${n}-verify.txt`) ? `impl-${n}-verify.txt` : undefined;
+      const logFile = files.includes(`impl-${n}.txt`) ? `impl-${n}.txt` : undefined;
+      impls.push({
+        n,
+        lang: m[2] === 'py' ? 'python' : 'verilog',
+        pass: verifyFile ? verifyPass(dir, verifyFile) : null,
+        codeFile: f,
+        verifyFile,
+        logFile,
+      });
+    }
+    const ev = report?.executable_verification;
+    return {
+      reproducibility: num(report?.reproducibility) ?? undefined,
+      verdict: typeof report?.verdict === 'string' ? report.verdict : undefined,
+      verify: ev?.enabled ? { passed: Number(ev.passed) || 0, total: Number(ev.total) || 0 } : undefined,
+      impls,
+    };
+  }
+  if (type === 'create') {
+    const meta = (files.includes('meta.json') ? readJson(path.join(dir, 'meta.json')) : null) as
+      { parts?: unknown; valid?: unknown; mode?: unknown } | null;
+    return {
+      parts: num(meta?.parts) ?? undefined,
+      valid: typeof meta?.valid === 'boolean' ? meta.valid : undefined,
+      mode: typeof meta?.mode === 'string' ? meta.mode : undefined,
+    };
+  }
+  return {};
+}
+
 function summarize(id: string, runId: string, dir: string): RunSummary {
   const { type, stamp } = splitRunId(runId);
   let files: string[] = [];
@@ -179,10 +231,12 @@ export function getRunDetail(id: string, runId: string): RunDetail | null {
   const summary = summarize(id, runId, actual);
   let files: string[] = [];
   try { files = readdirSync(actual); } catch { /* empty */ }
+  const iters = summary.type === 'improve' ? improveIterations(actual, files) : [];
   return {
     ...summary,
-    iters: summary.type === 'improve' ? improveIterations(actual, files) : [],
+    iters,
     artifacts: artifactsFor(summary.type, actual, files),
+    highlights: highlightsFor(summary.type, actual, files, iters),
   };
 }
 

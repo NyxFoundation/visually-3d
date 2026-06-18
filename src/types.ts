@@ -196,6 +196,27 @@ export interface RunIteration {
   log?: string;
   review?: string;
   score?: number;
+  critique?: string;
+}
+
+export interface RunImplHighlight {
+  n: number;
+  lang: string;
+  pass: boolean | null;
+  codeFile: string;
+  verifyFile?: string;
+  logFile?: string;
+}
+
+export interface RunHighlights {
+  scores?: number[];
+  reproducibility?: number;
+  verdict?: string;
+  verify?: { passed: number; total: number };
+  impls?: RunImplHighlight[];
+  parts?: number;
+  valid?: boolean;
+  mode?: string;
 }
 
 export interface RunSummary {
@@ -213,4 +234,5 @@ export interface RunSummary {
 export interface RunDetail extends RunSummary {
   iters: RunIteration[];
   artifacts: RunArtifact[];
+  highlights: RunHighlights;
 }

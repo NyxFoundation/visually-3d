@@ -107,6 +107,29 @@ export interface RunIteration {
   log?: string;
   review?: string;
   score?: number;
+  critique?: string;
+}
+
+// At-a-glance, type-specific signals so the history UI can show badges (scores,
+// pass/fail, validity) without the client fetching+parsing artifact files.
+export interface RunImplHighlight {
+  n: number;
+  lang: string;
+  pass: boolean | null;
+  codeFile: string;
+  verifyFile?: string;
+  logFile?: string;
+}
+
+export interface RunHighlights {
+  scores?: number[];
+  reproducibility?: number;
+  verdict?: string;
+  verify?: { passed: number; total: number };
+  impls?: RunImplHighlight[];
+  parts?: number;
+  valid?: boolean;
+  mode?: string;
 }
 
 export interface RunSummary {
@@ -124,4 +147,5 @@ export interface RunSummary {
 export interface RunDetail extends RunSummary {
   iters: RunIteration[];
   artifacts: RunArtifact[];
+  highlights: RunHighlights;
 }

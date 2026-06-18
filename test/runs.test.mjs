@@ -40,10 +40,27 @@ test('run detail exposes iterations + artifacts; artifact path is jailed', () =>
   const detail = getRunDetail('robot', 'improve-20260101-000000');
   assert.equal(detail.type, 'improve');
   assert.equal(detail.iters[0].score, 81);
+  assert.deepEqual(detail.highlights.scores, [81]);
   assert.ok(detail.artifacts.some((a) => a.kind === 'screenshot' && a.file === 'iter-01-render.png'));
 
   assert.ok(resolveArtifact('robot', 'improve-20260101-000000', 'iter-01.json'));
   assert.equal(resolveArtifact('robot', 'improve-20260101-000000', '../../../etc/passwd'), null);
+});
+
+test('reproduce highlights expose per-impl pass/fail + report summary', () => {
+  const dir = runDir('robot', 'reproduce', '20260105-000000');
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(path.join(dir, 'report.json'), JSON.stringify({ reproducibility: 64, verdict: 'ambiguous', executable_verification: { enabled: true, passed: 1, total: 2 } }));
+  writeFileSync(path.join(dir, 'impl-1.py'), 'print(1)');
+  writeFileSync(path.join(dir, 'impl-1-verify.txt'), 'pass=true ran=true');
+  writeFileSync(path.join(dir, 'impl-2.py'), 'print(2)');
+  writeFileSync(path.join(dir, 'impl-2-verify.txt'), 'pass=false ran=true');
+
+  const h = getRunDetail('robot', 'reproduce-20260105-000000').highlights;
+  assert.equal(h.reproducibility, 64);
+  assert.equal(h.verdict, 'ambiguous');
+  assert.deepEqual(h.verify, { passed: 1, total: 2 });
+  assert.deepEqual(h.impls.map((i) => [i.n, i.pass]), [[1, true], [2, false]]);
 });
 
 test('migrateLegacyRuns moves flat dirs into the per-scene tree', () => {
