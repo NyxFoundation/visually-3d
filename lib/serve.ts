@@ -301,7 +301,9 @@ async function listenWithFallback(server: http.Server, startPort: number, host =
   throw new Error(`No free port found between ${startPort} and ${startPort + MAX_PORT_TRIES - 1}`);
 }
 
-export async function serve(argv: string[] = []): Promise<void> {
+// `openPath` deep-links the auto-opened browser to a specific client route
+// (e.g. "/#/s/<id>" for a scene's detail page). Empty = the gallery landing.
+export async function serve(argv: string[] = [], openPath = ''): Promise<void> {
   const args = new Set(argv);
   const noOpen = args.has('--no-open') || process.env.VISUALLY_NO_OPEN === '1';
   const startPort = Number(process.env.PORT ?? 3131);
@@ -325,19 +327,20 @@ export async function serve(argv: string[] = []): Promise<void> {
 
   const port = await listenWithFallback(server, startPort);
   const url = `http://localhost:${port}`;
+  const openUrl = `${url}${openPath}`;
   const hasClaude = await claudeAvailable();
 
   console.log([
     '',
     '  visually-3d — interactive 3D machinery visualization',
-    `  → ${url}`,
+    `  → ${openPath ? openUrl : url}`,
     `  → claude CLI: ${hasClaude ? 'detected' : 'NOT FOUND (gallery-only; install Claude CLI to analyze new machines)'}`,
     `  → workspace: ${SCENES_DIR}`,
     '  → Ctrl+C to stop',
     '',
   ].join('\n'));
 
-  if (!noOpen) openBrowser(url);
+  if (!noOpen) openBrowser(openUrl);
 
   const shutdown = () => {
     server.close(() => process.exit(0));

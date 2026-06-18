@@ -65,8 +65,8 @@ export async function check(argv: string[]): Promise<string | undefined> {
     return out;
   }
 
-  // No --png: launch the GUI. Freshly-created/workspace scenes are listed
-  // first in the gallery, so the scene appears at the top.
+  // No --png: launch the GUI and deep-link straight to this scene's detail
+  // page (#/s/<id>) rather than the gallery landing.
   console.log(`visually check: opening ${id} in the browser…`);
-  await serve(opts.noOpen ? ['--no-open'] : []);
+  await serve(opts.noOpen ? ['--no-open'] : [], `/#/s/${encodeURIComponent(id)}`);
 }
