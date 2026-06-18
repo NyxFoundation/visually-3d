@@ -47,6 +47,7 @@ async function fetchUrlContent(url: string): Promise<string> {
 // Strip NUL and other C0 control characters (keeping tab/newline/CR) so the
 // prompt is always a clean string safe to pass as a subprocess argument.
 function sanitizeText(s: string): string {
+  // eslint-disable-next-line no-control-regex -- intentionally stripping C0 controls
   return String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
 }
 
@@ -80,7 +81,7 @@ function extractJSON(text: string): unknown {
   try {
     return JSON.parse(text.slice(start, end));
   } catch (err) {
-    throw new Error(`Claude returned invalid JSON: ${(err as Error).message}`);
+    throw new Error(`Claude returned invalid JSON: ${(err as Error).message}`, { cause: err });
   }
 }
 

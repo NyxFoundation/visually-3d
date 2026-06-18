@@ -234,11 +234,11 @@ function App() {
               className="analyze-bar__input"
               value={input}
               onChange={(event) => setInput(event.target.value)}
-              onKeyDown={(event) => event.key === 'Enter' && handleAnalyze()}
+              onKeyDown={(event) => { if (event.key === 'Enter') void handleAnalyze(); }}
               placeholder="Machine name or URL…"
               aria-label="Machine name or URL"
             />
-            <button className="analyze-bar__button" onClick={handleAnalyze} disabled={isLoading}>
+            <button className="analyze-bar__button" onClick={() => void handleAnalyze()} disabled={isLoading}>
               {isLoading ? 'Analyzing…' : 'Analyze'}
             </button>
           </section>

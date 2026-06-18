@@ -60,7 +60,7 @@ export function extractScene(text: string): unknown {
         try {
           return JSON.parse(slice);
         } catch (e) {
-          throw new Error(`model returned invalid JSON: ${(e as Error).message}`);
+          throw new Error(`model returned invalid JSON: ${(e as Error).message}`, { cause: e });
         }
       }
     }

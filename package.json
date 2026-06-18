@@ -22,6 +22,7 @@
     "dev": "vite --host 0.0.0.0",
     "dev:proxy": "vite --host 0.0.0.0 --mode proxy",
     "build:cli": "tsc -p tsconfig.cli.json",
+    "lint": "eslint lib server bin src",
     "build": "npm run build:cli && tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "start": "node bin/visually.js",
@@ -47,6 +48,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.4.2",
     "@types/node": "^25.9.3",
@@ -54,11 +56,15 @@
     "@types/react-dom": "latest",
     "@types/three": "latest",
     "@vitejs/plugin-react": "latest",
+    "eslint": "^10.5.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.6.0",
     "ink-testing-library": "^4.0.0",
     "react": "^19.2.7",
     "react-dom": "latest",
     "three": "^0.181.2",
     "typescript": "latest",
+    "typescript-eslint": "^8.61.1",
     "vite": "latest"
   },
   "keywords": [
