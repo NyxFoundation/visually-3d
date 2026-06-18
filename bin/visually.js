@@ -13,12 +13,17 @@ import { serve } from '../lib/serve.js';
 const HELP = `visually-3d — interactive 3D machinery visualization, driven by your local Claude/Codex CLI
 
 Usage:
-  visually [serve] [--no-open]            start the local GUI (default)
+  visually                                interactive TUI control panel (in a terminal)
+  visually serve [--no-open]              start the local web GUI
   visually create "<machine name>"        generate a new scene
        [--hint <text>] [--url <url>] [--mode hardware|algorithm|architecture]
        [--refine N | --no-refine] [--driver claude|codex] [--id <id>] [--force]
   visually improve <scene> [iters]        recursively self-improve a scene
        [--driver codex|claude] [--model <m>]
+  visually reproduce <scene>              measure if the scene is a reproducible
+       [--n 2] [--model <m>]              spec: AI reverse-implements it (Verilog/
+                                          Python) from the descriptor alone and
+                                          scores what's missing to rebuild it
   visually check <scene> [--png]          inspect a scene (browser, or PNG contact sheet)
        [--out <file.png>] [--no-open]
   visually upload <scene>                 open a PR adding the scene to the gallery
@@ -35,21 +40,29 @@ Scenes created locally live under ~/.visually-3d/scenes (override with $VISUALLY
 async function main() {
   const [, , maybeCmd, ...rest] = process.argv;
 
-  // No subcommand, or a leading flag → serve (back-compat: `visually --no-open`).
+  // Bare `visually` in a terminal → interactive TUI control panel. Piped / no
+  // TTY (or a leading flag like `--no-open`) → serve, for back-compat.
   if (!maybeCmd || maybeCmd.startsWith('-')) {
     if (maybeCmd === '--help' || maybeCmd === '-h') { console.log(HELP); return; }
+    if (!maybeCmd && process.stdout.isTTY) {
+      return (await import('../lib/tui/app.js')).runTui();
+    }
     return serve(process.argv.slice(2));
   }
 
   switch (maybeCmd) {
     case 'help': case '--help': case '-h':
       console.log(HELP); return;
+    case 'tui':
+      return (await import('../lib/tui/app.js')).runTui();
     case 'serve':
       return serve(rest);
     case 'create':
       return (await import('../lib/create.js')).create(rest);
     case 'improve':
       return (await import('../lib/improve.js')).improve(rest);
+    case 'reproduce':
+      return (await import('../lib/reproduce.js')).reproduce(rest);
     case 'check':
       return (await import('../lib/check.js')).check(rest);
     case 'upload':

@@ -28,6 +28,8 @@
     "serve": "node bin/visually.js serve",
     "cli": "node bin/visually.js",
     "deploy": "npm run build && npx wrangler deploy",
+    "test": "node --test test/*.test.mjs",
+    "test:smoke": "node test/smoke.mjs",
     "smoke": "node test/smoke.mjs",
     "prepack": "npm run build"
   },
@@ -35,15 +37,24 @@
     "access": "public",
     "provenance": true
   },
-  "dependencies": {},
+  "dependencies": {
+    "htm": "^3.1.1",
+    "ink": "^7.1.0",
+    "ink-select-input": "^6.2.0",
+    "ink-text-input": "^6.0.0",
+    "react": "^19.2.7",
+    "zod": "^4.4.3"
+  },
   "devDependencies": {
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.4.2",
+    "@types/node": "^25.9.3",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@types/three": "latest",
     "@vitejs/plugin-react": "latest",
-    "react": "latest",
+    "ink-testing-library": "^4.0.0",
+    "react": "^19.2.7",
     "react-dom": "latest",
     "three": "^0.181.2",
     "typescript": "latest",
