@@ -119,3 +119,102 @@ each pass writing verified facts into the spec so the scene becomes measurably
 more reproducible. The `ntt-fpga` case that started this — stuck at 8/100 — now
 has a path to climb, because verification findings finally flow back into the
 scene.
+
+## 7. The second failure — the return edge poisoned the verifier
+
+After the loop started climbing, a fresh 3-round `refine` on `ntt-fpga` stalled
+differently: reproducibility went **42 → 68 → 52** (peaked below the 80 goal,
+then *regressed*), fidelity stuck around 55, and the self-check never cleared
+(0/2, 0/2, 1/2). Reading every run artifact (the per-round `reproduce` reports,
+`impl-*-verify.txt`, the generated `check.py`, and the `amend` snapshots) gave
+three distinct causes — see the run-log paths under *Sources* below.
+
+- **The decisive one: `amend` wrote an arithmetically FALSE derived constant into
+  the spec** — `N_inv_value: "8857 = 1024^-1 mod 12289"`, when the true inverse is
+  **12277** (`1024·8857 ≡ 286 ≠ 1`). Because the self-check measures each impl
+  *against the spec*, a false fact in the spec makes every faithful impl either
+  fail the check or "diverge" — so the self-check could never reach 2/2. The
+  generator (`amend`) and the verifier-substrate (the spec) were **entangled**:
+  the model could write its own grading key. This is textbook reward-hacking /
+  Goodhart, and it is exactly what successful self-improvement systems prevent by
+  keeping the reward signal ungameable.
+- **Harness fragility counted as semantic failure.** Round 2's impl-1 crashed on
+  `random.Random(0xCFNTT)` — an invalid Python hex literal (codegen typo) — and
+  round 1's checks died with empty output (consistent with the 180 s timeout on
+  the first *cold* `uv run --with z3-solver`). A `SyntaxError` and a timeout carry
+  **no** verdict, yet both were tallied as "the implementation is wrong".
+- **No ratchet.** The loop overwrote the scene every round and ended on the worst
+  one (52), discarding the better round-2 state.
+
+## 8. Hardening — make the verifier-substrate ungameable, and never regress
+
+The fixes, grounded in the recursive-self-improvement literature (see
+*References*):
+
+1. **Arithmetic guard (`lib/arith-audit.ts`).** A deterministic, pure
+   check-and-repair for fully-numeric self-describing claims — `x = b^-1 mod q`,
+   `b^e mod q = r`, `floor(a/b) = c`. It runs at three choke points: in `amend`
+   before a scene is committed, in `reproduce` before the engineers ever read the
+   spec, and in `refine` on any ratchet restore. A false constant therefore
+   cannot survive on any path. This is *proof-gated self-modification* in
+   miniature — the Gödel-machine principle that a change is only adopted when it
+   can be shown sound — applied to the constants `amend` folds back.
+2. **Verify-failure classification (`VerifyResult.kind`).** The backend now
+   distinguishes a real `fail` (the check ran and printed a counterexample) from
+   harness errors — `syntax` / `timeout` / `error` / `no-script` / `no-runner`.
+   `reproduce` repairs a syntax/exception-broken check **once** (regenerate, fix
+   only what stops it running) and reports `harness_errors` separately, so a
+   codegen typo no longer masquerades as a wrong impl. Harness errors are also
+   never fed back to `amend` as counterexamples. This mirrors V-STaR's stance that
+   *how* an attempt failed is signal, not noise.
+3. **Ratchet / best-keep (`refine`).** Each round scores its measured scene (a
+   clean self-check outweighs the raw reproducibility number); the best scene is
+   remembered and, if the final round regressed, restored — so the loop never
+   ends worse than the best round it actually measured. This is the
+   program-archive / selection idea from FunSearch, AlphaEvolve, and the Darwin
+   Gödel Machine: only the best individual survives.
+4. **`amend` prompt — ground in the source, don't invent (`buildAmendPrompt`).**
+   It now receives the SOURCE (paper/datasheet metadata) to QUOTE; requires every
+   derived constant be written as a verifiable expression (machine-checked,
+   auto-corrected); tags each committed fact's provenance (`[src]` / `[conv]` /
+   `[calc]`); and marks genuinely source-missing facts `[source-missing]` instead
+   of fabricating architectural detail the scene lacks. Echoes Reflexion's
+   evidence-grounded memory over confident self-narration.
+
+Deliberately deferred (the asymptote, not yet built): full *delegation* of
+constant computation (have `amend` emit only the derivation and let the backend
+compute the value), and splitting the self-check's "matches the spec" from
+"mathematically correct" beyond what the arithmetic guard already separates.
+
+## References
+
+The hardening borrows directly from prior recursive-self-improvement work:
+
+- **Gödel machine** — Schmidhuber, *Gödel Machines: Self-Referential Universal
+  Problem Solvers* (2003). Self-modify only with a proof of benefit → the
+  proof-gated arithmetic guard.
+- **STOP: Self-Taught Optimizer** — Zelikman et al., arXiv:2310.02304. A scaffold
+  improving itself against a *fixed, trustworthy* meta-utility → why the
+  measuring-stick (the spec) must not be writable by the generator.
+- **V-STaR: Training Verifiers for Self-Taught Reasoners** — Hosseini et al.,
+  arXiv:2402.06457. Use *both* correct and incorrect attempts → failures are
+  classified signal (the verify-kind split).
+- **FunSearch** — Romera-Paredes et al., *Nature* (2023) — and **AlphaEvolve**,
+  arXiv:2506.13131. An executed evaluator + a program *database* that keeps the
+  best individuals → the ratchet / best-keep.
+- **Darwin Gödel Machine** — Zhang et al., arXiv:2505.22954. Empirical-fitness
+  archive of self-improving agents → keep, don't overwrite, the best scene.
+- **Reflexion** — Shinn et al., arXiv:2303.11366 — and **Self-Refine**, Madaan et
+  al., arXiv:2303.17651. Self-critique plateaus without external grounding →
+  `amend` must read the source, and provenance must be explicit.
+
+Sources (this repo's run artifacts that diagnosed §7), under
+`$VISUALLY_HOME/runs/ntt-fpga/`:
+
+- `reproduce-20260618-{162305,164625,170631}/report.json` — the 42 → 68 → 52
+  reproducibility trajectory and self-check 0/2 → 0/2 → 1/2.
+- `reproduce-20260618-164625/impl-1.py:261` — the `0xCFNTT` codegen typo.
+- `reproduce-20260618-170631/check.py` — impl-2 hard-coding `N_INV = 12277` with
+  the comment "spec's 8857 is wrong", i.e. passing only by *disobeying* the spec.
+- `amend-20260618-165124/report.json` — the counterexample `spec 8857 != 12277`
+  that `amend` recorded but did not fix.
