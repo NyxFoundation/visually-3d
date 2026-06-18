@@ -28,6 +28,7 @@ __pycache__/
 /lib/create.js
 /lib/reproduce.js
 /lib/amend.js
+/lib/arith-audit.js
 /bin/visually.js
 /lib/tui/app.js
 /lib/impls.js

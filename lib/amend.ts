@@ -19,6 +19,7 @@ import path from 'node:path';
 import { resolveScene, sceneIdFromPath, runDir as makeRunDir, ensureWorkspace } from './paths.js';
 import { runClaudeStreaming } from './runner.js';
 import { extractScene, parseScene, validateScene, specCoverage } from './scene.js';
+import { repairArithmeticClaims } from './arith-audit.js';
 import { reproduce } from './reproduce.js';
 
 interface AmendOpts {
@@ -109,6 +110,16 @@ export function buildAmendPrompt(scene: any, report: any): string {
   const structural = (fr.structural_findings || []).map((s) => `- ${s}`).join('\n');
   const ids = parts.map((p) => p.id).join(', ');
 
+  // ① The SOURCE the scene depicts (paper/datasheet metadata). amend may QUOTE
+  // it to pin the specific system's real values, instead of inventing plausible
+  // ones — the only way to raise FIDELITY rather than just reproducibility.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const md = (scene?.metadata || {}) as any;
+  const sourceBlock = JSON.stringify(
+    { reference: md.reference, domain: md.domain, info: md.info },
+    null, 1,
+  ).slice(0, 4000);
+
   return `You are closing the loop of a "visioned self-improvement" system. A scene
 descriptor doubles as the SPEC for a real system (a circuit, an algorithm, a
 machine, a building). Independent engineers tried to rebuild the system from
@@ -126,6 +137,12 @@ THE SPEC SUBSTRATE (this is the ONLY thing you grow):
 - Keep machine_name, every part id, and all existing fields intact. You may only
   ADD/refine \`spec\` blocks, and tighten \`role\` / \`assembly_instructions\`
   prose so it stays consistent with the new spec.
+
+THE SOURCE this system comes from (paper/datasheet metadata — QUOTE it to pin
+the SPECIFIC system's real values; do NOT invent values it does not support):
+\`\`\`json
+${sourceBlock}
+\`\`\`
 
 MISSING FIELDS the spec must now carry (each says which part's spec to write):
 ${missing || '(none reported)'}
@@ -162,6 +179,23 @@ RULES for choosing values:
    \`spec.notes\`. The point is to make the bad (ambiguous) state unrepresentable.
 3. Be specific and numeric. "14-bit" → \`widths: { coeff: 14 }\`; a modulus →
    \`params: { q: 12289 }\`; an FSM → \`fsm: ["IDLE","LOAD","RUN","DRAIN"]\`.
+4. DERIVED CONSTANTS — do not trust your own mental arithmetic. For any value you
+   COMPUTE (a modular inverse, a modular power, a floor/round, a precomputed table
+   entry), WRITE IT AS A VERIFIABLE EXPRESSION the value is derived from, e.g.
+   "12277 = 1024^-1 mod 12289", "1945 = 11^6 mod 12289", "21843 = floor(2^28 / 12289)".
+   These are MACHINE-CHECKED after you answer and a wrong result is auto-corrected,
+   so an arithmetically false constant is worse than useless — get the arithmetic
+   right or leave the operands symbolic. A self-inconsistent counterexample above
+   (e.g. "spec N != computed N") MUST be fixed at its numeric source, not annotated.
+5. PROVENANCE — for each fact you commit, mark where it came from in \`spec.notes\`
+   using a tag: \`[src]\` quoted/derived from the SOURCE above, \`[conv]\` a
+   convention you chose to break a tie (not stated by the source), \`[calc]\` a
+   value you derived by computation. \`[conv]\` facts are reproducibility aids, NOT
+   claims about the real system — never present a guessed value as the source's.
+6. CEILING — if a missing field is genuinely NOT determinable from the source and
+   is NOT a free convention (it is specific architectural detail the scene simply
+   lacks), do not fabricate it. Record what is needed in \`spec.notes\` prefixed
+   \`[source-missing]\` so the gap is visible instead of papered over.
 
 Existing part ids you may target: ${ids}
 
@@ -221,6 +255,19 @@ export async function amendScene(
   // only grow the spec, never regress the model.
   if (!Array.isArray(next.parts) || next.parts.length < scene.parts.length) {
     return { applied: false, before, after: before, reason: 'amend dropped parts — discarded' };
+  }
+
+  // Arithmetic guard: the model writes CONCRETE derived constants into the spec,
+  // but nothing checked them. A wrong one (e.g. a bad modular inverse) poisons
+  // every later reproduce — the self-check can never pass while the spec asserts
+  // a false constant. Verify and repair the fully-numeric claims we can prove.
+  const audit = repairArithmeticClaims(next);
+  if (audit.repairs.length) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    next = audit.value as any;
+    for (const r of audit.repairs) {
+      console.log(`  ⚠ corrected ${r.claim} in spec (${r.path}): "${r.before}" → "${r.after}"`);
+    }
   }
 
   const after = specCoverage(next).keys;
