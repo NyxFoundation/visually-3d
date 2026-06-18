@@ -96,7 +96,8 @@ function Runner({ args, onBack }: { args: string[]; onBack: () => void }) {
 function Menu({ onPick }: { onPick: (value: string) => void }) {
   const items = [
     { label: '✦  Create new scene', value: 'create' },
-    { label: '↻  Continue existing  (improve / reproduce)', value: 'scenes' },
+    { label: '↻  Continue existing  (view / improve / reproduce / push)', value: 'scenes' },
+    { label: '◉  Open web gallery in the browser', value: 'gallery' },
     { label: '✕  Quit', value: 'quit' },
   ];
   return html`
@@ -149,8 +150,10 @@ function SceneList({ onPick, onBack }: { onPick: (id: string) => void; onBack: (
 function SceneAction({ id, onRun, onBack }: { id: string; onRun: (args: string[]) => void; onBack: () => void }) {
   useInput((_input: string, key: { escape: boolean }) => { if (key.escape) onBack(); });
   const items: { label: string; value: string[] | 'back' }[] = [
+    { label: 'View      — open in the browser', value: ['check', id] },
     { label: 'Improve   — visual self-improvement loop', value: ['improve', id] },
     { label: 'Reproduce — implement + verify from the scene', value: ['reproduce', id] },
+    { label: 'Push      — open a PR to the gallery', value: ['upload', id] },
     { label: 'Back', value: 'back' },
   ];
   return html`
@@ -170,7 +173,11 @@ function App() {
 
   let body: React.ReactNode;
   if (screen === 'menu') {
-    body = html`<${Menu} onPick=${(v: string) => (v === 'quit' ? exit() : setScreen(v))} />`;
+    body = html`<${Menu} onPick=${(v: string) => {
+      if (v === 'quit') { exit(); return; }
+      if (v === 'gallery') { setRunArgs(['serve']); setScreen('running'); return; }
+      setScreen(v);
+    }} />`;
   } else if (screen === 'create') {
     body = html`<${CreateForm} onBack=${() => setScreen('menu')}
       onStart=${(name: string, url: string) => { setRunArgs(['create', name, ...(url ? ['--url', url] : [])]); setScreen('running'); }} />`;
