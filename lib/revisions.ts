@@ -10,7 +10,7 @@
 
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
-import { sceneRunsDir } from './paths.js';
+import { resolveRunsDir } from './paths.js';
 import { splitRunId, stampToIso, readJson, verifyPass } from './runs.js';
 import type {
   FieldChange, FrameDetail, PartChange, PartRef, RevisionEntry,
@@ -39,7 +39,7 @@ function num(v: unknown): number | null {
 }
 
 function scanRuns(id: string): RawRun[] {
-  const base = sceneRunsDir(id);
+  const base = resolveRunsDir(id);
   if (!existsSync(base)) return [];
   const out: RawRun[] = [];
   for (const name of readdirSync(base)) {

@@ -17,6 +17,10 @@ export const DIST = path.join(PKG_ROOT, 'dist');
 export const SCRIPTS = path.join(PKG_ROOT, 'scripts');
 export const PROMPTS = path.join(PKG_ROOT, 'prompts');
 export const BUNDLED_SAMPLES = path.join(DIST, 'samples');
+// Run history shipped alongside the gallery samples (contributed via `upload`),
+// so a clone/install can scrub a sample's evolution without the original
+// author's workspace.
+export const BUNDLED_RUNS = path.join(BUNDLED_SAMPLES, 'runs');
 
 export const VISUALLY_HOME =
   process.env.VISUALLY_HOME || path.join(os.homedir(), '.visually-3d');
@@ -39,6 +43,17 @@ export function ensureWorkspace(): void {
 // avoids the id prefix-collision the old flat layout had.
 export function sceneRunsDir(id: string): string {
   return path.join(RUNS_DIR, id);
+}
+
+// The run-history dir to read for a scene: the user's workspace if present,
+// else the history bundled with a gallery sample. Used by the web-facing runs/
+// revisions index so contributed history is browsable from a clone.
+export function resolveRunsDir(id: string): string {
+  const ws = path.join(RUNS_DIR, id);
+  if (fs.existsSync(ws)) return ws;
+  const bundled = path.join(BUNDLED_RUNS, id);
+  if (fs.existsSync(bundled)) return bundled;
+  return ws;
 }
 
 export function runDir(id: string, type: string, stamp: string): string {

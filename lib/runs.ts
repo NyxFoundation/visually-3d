@@ -8,7 +8,7 @@
 
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
-import { sceneRunsDir, runDir } from './paths.js';
+import { resolveRunsDir } from './paths.js';
 import type { RunArtifact, RunDetail, RunHighlights, RunImplHighlight, RunIteration, RunSummary, RunType } from './types.js';
 
 const KNOWN_TYPES: RunType[] = ['create', 'improve', 'reproduce'];
@@ -210,7 +210,7 @@ function summarize(id: string, runId: string, dir: string): RunSummary {
 
 // All runs for a scene, newest first.
 export function listRunsForScene(id: string): RunSummary[] {
-  const base = sceneRunsDir(id);
+  const base = resolveRunsDir(id);
   if (!existsSync(base)) return [];
   const out: RunSummary[] = [];
   for (const name of readdirSync(base)) {
@@ -224,9 +224,7 @@ export function listRunsForScene(id: string): RunSummary[] {
 }
 
 export function getRunDetail(id: string, runId: string): RunDetail | null {
-  const dir = runDir(id, splitRunId(runId).type, splitRunId(runId).stamp);
-  // runDir() rebuilds "<type>-<stamp>"; for an 'unknown' type fall back to the raw name.
-  const actual = existsSync(dir) ? dir : path.join(sceneRunsDir(id), runId);
+  const actual = path.join(resolveRunsDir(id), runId);
   if (!existsSync(actual)) return null;
   const summary = summarize(id, runId, actual);
   let files: string[] = [];
@@ -244,7 +242,7 @@ export function getRunDetail(id: string, runId: string): RunDetail | null {
 // "..", absolute paths, or symlink-y names). Returns null if outside.
 export function resolveArtifact(id: string, runId: string, relFile: string): string | null {
   if (!relFile || relFile.includes('\0')) return null;
-  const base = path.join(sceneRunsDir(id), runId);
+  const base = path.join(resolveRunsDir(id), runId);
   const resolved = path.resolve(base, relFile);
   const baseResolved = path.resolve(base);
   if (resolved !== baseResolved && !resolved.startsWith(baseResolved + path.sep)) return null;

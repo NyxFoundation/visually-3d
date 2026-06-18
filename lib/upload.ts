@@ -7,11 +7,37 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import {
   readFileSync, writeFileSync, copyFileSync, existsSync, mkdtempSync, rmSync,
+  readdirSync, mkdirSync, statSync,
 } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { resolveScene, sceneIdFromPath } from './paths.js';
+import { resolveScene, sceneIdFromPath, RUNS_DIR } from './paths.js';
 import { validateScene, deriveIndexEntry } from './scene.js';
+
+// Ship the scrubbable evidence of a scene's evolution (renders, scene versions,
+// scores, implementations) — but not the heavy raw traces / prompts, which the
+// UI never shows and would bloat the PR.
+const HISTORY_SKIP = /(-events\.jsonl|\.err|^raw\.txt|^prompt\.txt|^reasoning\.log|report\.raw\.txt|^impl-\d+\.txt)$/;
+
+function copyHistory(id: string, samplesDir: string): number {
+  const src = path.join(RUNS_DIR, id);
+  if (!existsSync(src)) return 0;
+  const dest = path.join(samplesDir, 'runs', id);
+  let copied = 0;
+  for (const runName of readdirSync(src)) {
+    const runSrc = path.join(src, runName);
+    try { if (!statSync(runSrc).isDirectory()) continue; } catch { continue; }
+    for (const f of readdirSync(runSrc)) {
+      if (HISTORY_SKIP.test(f)) continue;
+      const fileSrc = path.join(runSrc, f);
+      try { if (!statSync(fileSrc).isFile()) continue; } catch { continue; }
+      mkdirSync(path.join(dest, runName), { recursive: true });
+      copyFileSync(fileSrc, path.join(dest, runName, f));
+      copied++;
+    }
+  }
+  return copied;
+}
 
 const exec = promisify(execFile);
 
@@ -109,6 +135,12 @@ export async function upload(argv: string[]): Promise<void> {
     } else {
       console.log(`  · ${id} already in index.json — updating scene only`);
     }
+
+    // Contribute the scene's run history too, so the gallery can scrub its
+    // evolution (renders, versions, implementations) without the author's
+    // workspace. Bundled under public/samples/runs/<id>/.
+    const historyFiles = copyHistory(id, samplesDir);
+    if (historyFiles) console.log(`  · including run history (${historyFiles} file(s)) → public/samples/runs/${id}/`);
 
     await run('git', ['add', 'public/samples'], { cwd });
     await run('git', ['-c', 'user.name=visually-3d', '-c', 'user.email=visually-3d@users.noreply.github.com',
