@@ -2,13 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { InfoPanel } from '../components/InfoPanel';
 import { SceneStudio } from '../components/SceneStudio';
 import { Icon } from '../components/Icon';
-import { GALLERY_HREF, LIVE_ID } from '../router';
+import { GALLERY_HREF } from '../router';
 import type { SampleEntry, SceneDescriptor } from '../types';
 
 type DetailPageProps = {
   id: string;
   samples: SampleEntry[];
-  liveScene: SceneDescriptor | null;
   samplesLoaded: boolean;
 };
 
@@ -17,7 +16,7 @@ type LoadState =
   | { status: 'ready'; scene: SceneDescriptor }
   | { status: 'missing' };
 
-export function DetailPage({ id, samples, liveScene, samplesLoaded }: DetailPageProps) {
+export function DetailPage({ id, samples, samplesLoaded }: DetailPageProps) {
   const sample = useMemo(() => samples.find((s) => s.id === id), [samples, id]);
   const [fetched, setFetched] = useState<SceneDescriptor | null>(null);
   const [fetchFailed, setFetchFailed] = useState(false);
@@ -26,21 +25,20 @@ export function DetailPage({ id, samples, liveScene, samplesLoaded }: DetailPage
   // The app shell remounts this component per id (key={id}), so state starts
   // fresh on navigation — no manual reset effect needed.
   useEffect(() => {
-    if (id === LIVE_ID || !sample) return;
+    if (!sample) return;
     let cancelled = false;
     fetch(sample.path)
       .then((res) => (res.ok ? (res.json() as Promise<SceneDescriptor>) : Promise.reject(res)))
       .then((data) => { if (!cancelled) setFetched(data); })
       .catch(() => { if (!cancelled) setFetchFailed(true); });
     return () => { cancelled = true; };
-  }, [id, sample]);
+  }, [sample]);
 
   const load: LoadState = useMemo(() => {
-    if (id === LIVE_ID) return liveScene ? { status: 'ready', scene: liveScene } : { status: 'missing' };
     if (fetched) return { status: 'ready', scene: fetched };
     if (fetchFailed || (samplesLoaded && !sample)) return { status: 'missing' };
     return { status: 'loading' };
-  }, [id, liveScene, fetched, fetchFailed, samplesLoaded, sample]);
+  }, [fetched, fetchFailed, samplesLoaded, sample]);
 
   if (load.status === 'missing') {
     return (
