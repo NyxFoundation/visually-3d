@@ -1500,3 +1500,56 @@ a.gallery__card { text-decoration: none; color: inherit; display: flex; flex-dir
 .diff__raw-add { color: #7ee787; }
 .diff__raw-del { color: #ff7b72; }
 .diff__raw-ctx { color: var(--text-dim); }
+
+/* ── Scene studio (time-scrubbed detail: 3D + screenshot + impl in sync) ───── */
+.studio-page { min-height: 100dvh; display: flex; flex-direction: column; }
+
+.studio__bar {
+  display: flex; align-items: center; gap: 14px;
+  padding: calc(12px + var(--safe-top)) 18px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.studio__back { color: var(--accent); text-decoration: none; font-size: 0.85rem; white-space: nowrap; }
+.studio__back:hover { text-decoration: underline; }
+.studio__name { margin: 0; font-size: clamp(1.05rem, 3vw, 1.4rem); letter-spacing: -0.01em; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.studio__bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+.studio { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 12px 14px calc(14px + var(--safe-bottom)); }
+
+.studio__panes { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 900px) { .studio__panes { grid-template-columns: 1.25fr 1fr 1fr; } }
+.studio__pane { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg-elev); min-width: 0; }
+.studio__pane-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 11px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-dim); border-bottom: 1px solid var(--border);
+}
+.studio__at { color: var(--accent); font-weight: 700; letter-spacing: 0; }
+.studio__viewer { position: relative; height: 44vh; min-height: 300px; }
+.studio__shot { height: 44vh; min-height: 300px; display: flex; align-items: center; justify-content: center; padding: 10px; background: #0a0d13; }
+.studio__shot img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 4px; }
+.studio__impl { height: 44vh; min-height: 300px; overflow: auto; }
+.studio__impl .impl-panel__hint { padding: 14px; }
+.studio__code { margin: 0; padding: 10px 12px; font-size: 0.74rem; line-height: 1.5; white-space: pre; color: #c9d1d9; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+.studio__readout { border: 1px solid var(--border); border-radius: 10px; padding: 12px; background: var(--bg-elev); }
+.studio__readout-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 900px) { .studio__readout-grid { grid-template-columns: 1fr 1fr; } }
+.studio__reason, .studio__changes { min-width: 0; }
+
+.studio__transport { position: sticky; bottom: 0; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: rgba(13, 17, 23, 0.96); backdrop-filter: blur(8px); }
+.studio__controls { display: flex; align-items: center; gap: 10px; }
+.studio__btn { width: 34px; height: 30px; background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--text); cursor: pointer; font-size: 0.85rem; }
+.studio__btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.studio__btn:disabled { opacity: 0.3; cursor: default; }
+.studio__slider { flex: 1; accent-color: var(--accent); }
+.studio__ticks { display: flex; flex-wrap: wrap; gap: 4px; }
+.studio__tick { font-size: 0.68rem; border: 1px solid var(--border); border-radius: 5px; padding: 1px 7px; background: #0a0d13; color: var(--text-dim); cursor: pointer; }
+.studio__tick--active { border-color: var(--accent); color: var(--text); background: rgba(88, 166, 255, 0.14); }
+.studio__frameinfo { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
+.studio__v { font-weight: 700; color: var(--accent); }
+
+.studio__single { position: relative; flex: 1; min-height: 62vh; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.studio__nohist { position: absolute; left: 16px; right: 16px; bottom: 16px; margin: 0; text-align: center; color: var(--text-dim); font-size: 0.82rem; }
+.studio__nohist code { color: var(--accent); }
+.studio__loading { flex: 1; display: grid; place-items: center; }

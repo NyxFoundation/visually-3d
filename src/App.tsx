@@ -114,7 +114,7 @@ function App() {
   }), [backend, isLoading, error, logText, handleAnalyze]);
 
   if (route.name === 'detail') {
-    return <DetailPage key={route.id} id={route.id} samples={samples} liveScene={liveScene} samplesLoaded={samplesLoaded} backendOnline={backend === 'available'} />;
+    return <DetailPage key={route.id} id={route.id} samples={samples} liveScene={liveScene} samplesLoaded={samplesLoaded} />;
   }
   return <GalleryPage samples={samples} categories={categories} analyze={analyze} />;
 }
