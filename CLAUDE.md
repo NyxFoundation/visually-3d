@@ -80,15 +80,18 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
   `defaultBackendFor(mode)` picks one (algorithm→python-smt, else→sim).
 - `lib/impls.ts` — canonical per-scene impl store under
   `~/.visually-3d/impls/<id>/` (`impl.<ext>` + `verify.txt` + `meta.json`).
-- `lib/evidence.ts` — source-evidence substrate (no standalone command).
-  `refine` calls `gatherEvidence()` AUTONOMOUSLY when it stalls below the
-  reproducibility goal on source-dependent gaps: it fetches the scene's source
-  (paper/datasheet URLs in `metadata.info.sources`) via the runner's web tools
-  and caches a Markdown transcription under `~/.visually-3d/evidence/<id>/`,
-  falling back to the checked-in `examples/<id>/` seed. **Invariant: evidence
-  feeds `amend` ONLY, never reproduce's reverse-implementers** — reproduce must
-  keep grading the SPEC, not the paper. This is the only tool-enabled step
-  (`runClaudeStreaming({ tools: [...] })`); the rest of the loop is tool-less.
+- `lib/evidence.ts` — accumulating, cache-first source-evidence substrate (no
+  standalone command). `refine` calls `ensureEvidence()` AUTONOMOUSLY when it
+  stalls below the reproducibility goal on source-dependent gaps. Policy:
+  reference the cache first (`~/.visually-3d/evidence/<id>/`, falling back to the
+  checked-in `examples/<id>/` seed); on a miss, fetch via the runner's web tools
+  **gap-targeted** (`summarizeGaps`), **appending** to `paper.md` (never
+  overwrite; seed `notes.md` always merged); escalate via a persistent
+  `index.json → attempts[]` log (`planEvidence`: `paper` → `refs` → exhausted),
+  never repeating a method. **Invariant: evidence feeds `amend` ONLY, never
+  reproduce's reverse-implementers** — reproduce must keep grading the SPEC, not
+  the paper. This is the only tool-enabled step (`runClaudeStreaming({ tools:
+  [...] })`); the rest of the loop is tool-less.
 - `lib/serve.ts` — static GUI server + SSE bridge to the local CLI. Endpoints:
   `/api/health`, `/api/analyze/stream`, `/samples/...`, `/api/impl/<id>`,
   `POST /api/impl/<id>/verify` (streams a live backend run).

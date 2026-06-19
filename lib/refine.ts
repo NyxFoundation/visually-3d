@@ -28,7 +28,7 @@ import { latestVisualScore } from './history.js';
 import { specCoverage } from './scene.js';
 import { repairArithmeticClaims } from './arith-audit.js';
 import { resolveScene, sceneIdFromPath } from './paths.js';
-import { gatherEvidence, loadEvidence, sceneSources, hasSourceGaps } from './evidence.js';
+import { ensureEvidence, hasSourceGaps } from './evidence.js';
 
 interface RefineOpts {
   positional: string[];
@@ -137,13 +137,12 @@ export async function refine(argv: string[]): Promise<void> {
   let visualCleared = false;
   let lastAmendApplied = false;
 
-  // Autonomous source-evidence gathering: when the loop stalls below the
-  // reproducibility goal on SOURCE-dependent gaps (facts only the real paper can
-  // settle), refine fetches the scene's source once — mid-loop, no separate
-  // command — so the very next amend can QUOTE it. Gated to a single attempt and
-  // skipped entirely when the scene cites no source or already has fetched
-  // evidence. `--no-evidence` opts out; `--evidence-refs` also searches GitHub.
-  let evidenceTried = false;
+  // Autonomous source-evidence gathering happens inside the round loop via
+  // ensureEvidence (lib/evidence.ts): when the loop stalls below the
+  // reproducibility goal on SOURCE-dependent gaps, it consults the accumulated
+  // cache and the attempt log, then fetches the primary source / escalates to
+  // reference implementations / stops when exhausted — accumulating, not
+  // overwriting. `--no-evidence` opts out; `--evidence-refs` also searches GitHub.
 
   // ④ Ratchet: keep the highest-scoring scene seen, so a round that regresses
   // (reproducibility dropped, self-check broke) never leaves the canonical scene
@@ -226,29 +225,18 @@ export async function refine(argv: string[]): Promise<void> {
     const verifyEnabled = !!ev?.enabled;
     const verifyPass = verifyEnabled ? ev.passed > 0 && ev.passed === ev.total : null;
 
-    // 2b. Autonomous evidence gathering. If we're below the reproducibility goal
-    // and the gaps are SOURCE-dependent (only the paper can settle them), fetch
-    // the source once — right here, so THIS round's amend can already quote it.
-    // Skipped when the scene cites no source or already has fetched evidence.
-    if (!opts.noEvidence && !evidenceTried && report
-      && repro != null && repro < reproGoal && hasSourceGaps(report)) {
-      let sources: { url?: string }[] = [];
-      try { sources = sceneSources(JSON.parse(readFileSync(target, 'utf8'))); } catch { /* ignore */ }
-      const alreadyFetched = loadEvidence(id).origin === 'workspace';
-      if (sources.length && !alreadyFetched) {
-        evidenceTried = true;
-        console.log(`\n▶ reproducibility ${repro} < ${reproGoal} on source-dependent gaps — gathering the source so amend can quote it…`);
-        try {
-          const evArgs = [id];
-          if (opts.model) evArgs.push('--model', opts.model);
-          if (opts.evidenceRefs) evArgs.push('--refs');
-          await gatherEvidence(evArgs);
-        } catch (err) {
-          console.log(`  ⚠ evidence gathering stopped: ${(err as Error).message}`);
-        }
-      } else {
-        // Don't re-evaluate every round when there's nothing to fetch.
-        evidenceTried = true;
+    // 2b. Autonomous evidence gathering. When we're below the reproducibility
+    // goal on SOURCE-dependent gaps (only the paper can settle them), hand off to
+    // ensureEvidence: it consults the cache / attempt log and decides whether to
+    // fetch the primary source, escalate to reference implementations, or stop
+    // (all exhausted) — accumulating into the store so THIS round's amend can
+    // already quote it. Loosely coupled: refine owns only the trigger condition.
+    if (!opts.noEvidence && report && repro != null && repro < reproGoal && hasSourceGaps(report)) {
+      console.log(`\n▶ reproducibility ${repro} < ${reproGoal} on source-dependent gaps — consulting source evidence…`);
+      try {
+        await ensureEvidence(id, { report, model: opts.model, refs: opts.evidenceRefs });
+      } catch (err) {
+        console.log(`  ⚠ evidence gathering stopped: ${(err as Error).message}`);
       }
     }
 

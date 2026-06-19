@@ -26,7 +26,7 @@ import { writeFileSync, mkdirSync, readFileSync, existsSync, readdirSync } from 
 import path from 'node:path';
 import { z } from 'zod';
 import {
-  resolveScene, sceneIdFromPath, evidenceDir, packagedExampleDir,
+  resolveScene, evidenceDir, packagedExampleDir,
   runDir as makeRunDir, ensureWorkspace,
 } from './paths.js';
 import { runClaudeStreaming } from './runner.js';
@@ -39,11 +39,22 @@ const EvidenceItemSchema = z.object({
   file: z.string(),
 }).loose();
 
+// One autonomous gathering attempt — the policy's persistent memory. Lets a
+// later round (or a later `refine` run) ESCALATE (paper → refs) instead of
+// re-fetching the same source, and stop once every method is exhausted.
+const EvidenceAttemptSchema = z.object({
+  method: z.enum(['paper', 'refs']),
+  at: z.string(),
+  gaps: z.array(z.string()).optional(),
+  bytes: z.number().optional(),
+}).loose();
+
 export const EvidenceIndexSchema = z.object({
   id: z.string(),
   fetchedAt: z.string().optional(),
   sources: z.array(z.object({ title: z.string().optional(), url: z.string().optional() }).loose()).optional(),
   items: z.array(EvidenceItemSchema).optional(),
+  attempts: z.array(EvidenceAttemptSchema).optional(),
 }).loose();
 
 export type EvidenceIndex = z.infer<typeof EvidenceIndexSchema>;
@@ -72,18 +83,25 @@ function readIfExists(file: string, cap: number): string | null {
   }
 }
 
-// Read a scene's evidence: the workspace store wins (it is the freshest, fetched
-// copy); otherwise fall back to the package's checked-in example seed.
+// Read a scene's accumulated evidence. The workspace store holds the fetched,
+// growing transcription (paper.md is appended to, never overwritten); the
+// package example ships a curated notes.md seed. We MERGE them: the workspace
+// paper wins for the transcription, but the curated notes are always carried
+// (a fetch must never drop the hand-distilled learnings). origin reflects the
+// strongest source present so callers can tell fetched from seed-only.
 export function loadEvidence(id: string): LoadedEvidence {
-  for (const [origin, dir] of [
-    ['workspace', evidenceDir(id)] as const,
-    ['examples', packagedExampleDir(id)] as const,
-  ]) {
-    const paper = readIfExists(path.join(dir, 'paper.md'), PAPER_CAP);
-    const notes = readIfExists(path.join(dir, 'notes.md'), NOTES_CAP);
-    if (paper || notes) return { id, paper, notes, origin };
-  }
-  return { id, paper: null, notes: null, origin: 'none' };
+  const ws = evidenceDir(id);
+  const ex = packagedExampleDir(id);
+  const paper = readIfExists(path.join(ws, 'paper.md'), PAPER_CAP)
+    ?? readIfExists(path.join(ex, 'paper.md'), PAPER_CAP);
+  const notes = readIfExists(path.join(ws, 'notes.md'), NOTES_CAP)
+    ?? readIfExists(path.join(ex, 'notes.md'), NOTES_CAP);
+  const origin: LoadedEvidence['origin'] =
+    existsSync(path.join(ws, 'paper.md')) ? 'workspace'
+      : (paper || notes) ? 'examples'
+        : 'none';
+  if (origin === 'none') return { id, paper: null, notes: null, origin };
+  return { id, paper, notes, origin };
 }
 
 export function hasEvidence(id: string): boolean {
@@ -146,7 +164,7 @@ export function sceneSources(scene: any): SourceRef[] {
 
 // ── the gathering prompt ─────────────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function buildEvidencePrompt(scene: any, sources: SourceRef[], opts: { refs: boolean }): string {
+export function buildEvidencePrompt(scene: any, sources: SourceRef[], opts: { refs: boolean; openGaps?: string[] }): string {
   const subject = scene?.machine_name || scene?.metadata?.info?.english_name || 'the system';
   const domain = scene?.metadata?.domain ? ` (domain: ${scene.metadata.domain})` : '';
   const summary = typeof scene?.metadata?.info?.summary === 'string'
@@ -154,6 +172,16 @@ export function buildEvidencePrompt(scene: any, sources: SourceRef[], opts: { re
   const sourceList = sources.length
     ? sources.map((s, i) => `${i + 1}. ${s.title ? `${s.title} — ` : ''}${s.url ?? '(no url)'}`).join('\n')
     : '(no sources listed in the scene)';
+
+  // Gap-targeted: tell the gatherer EXACTLY which open facts to hunt for, so each
+  // fetch accumulates the missing pieces instead of re-transcribing the abstract.
+  const gaps = (opts.openGaps || []).filter(Boolean).slice(0, 16);
+  const gapBlock = gaps.length ? `
+
+PRIORITY — the downstream loop is specifically blocked on these facts. Hunt for
+each one and, if found, transcribe it precisely; if the source genuinely does not
+state it, say so per item:
+${gaps.map((g) => `- ${g}`).join('\n')}` : '';
 
   const refsBlock = opts.refs ? `
 
@@ -175,14 +203,14 @@ faithful Markdown transcription.
 SUBJECT: ${subject}${domain}
 ${summary ? `\nScene summary (for context only — do NOT just repeat it):\n${summary}\n` : ''}
 SOURCES to fetch (the authoritative paper/datasheet for this system):
-${sourceList}
+${sourceList}${gapBlock}
 
 Do this:
 1. Fetch each source URL. If a URL is a PDF, fetch and read it. If a source is
    paywalled or unreachable, try an open mirror (arXiv / eprint / the project
    site) found via search; if still unavailable, record that explicitly.
 2. TRANSCRIBE — do not summarize away — the technical sections that PIN DOWN the
-   system, especially the parts a short abstract omits:
+   system, especially the parts a short abstract omits and the PRIORITY gaps:
    - exact parameters (sizes, moduli, bit-widths, counts, constants);
    - datapath / core equations (e.g. butterfly, reduction, the actual formulas);
    - memory organization and any addressing / bank / mapping functions;
@@ -196,23 +224,33 @@ Do this:
 
 OUTPUT: a SINGLE Markdown document and nothing else (no preamble, no closing
 remarks). Start with "# Evidence: ${subject}". Use clear section headings. This
-text is saved verbatim as the evidence file.`;
+text is saved verbatim and APPENDED to any evidence already gathered.`;
 }
 
-// ── arg parsing ──────────────────────────────────────────────────────────────
-interface EvidenceOpts { positional: string[]; model?: string; refs: boolean }
-
-function parseArgs(argv: string[]): EvidenceOpts {
-  const opts: EvidenceOpts = { positional: [], refs: false };
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-    if (a === '--model') opts.model = argv[++i];
-    else if (a === '--refs') opts.refs = true;
-    else if (a === '--no-refs') opts.refs = false;
-    else if (a.startsWith('--')) throw new Error(`unknown flag: ${a}`);
-    else opts.positional.push(a);
+// One-line, human descriptions of the SOURCE-dependent gaps a report still has —
+// fed to the gatherer as priorities and recorded with the attempt.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function summarizeGaps(report: any): string[] {
+  const out: string[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const m of (report?.missing_fields || []) as any[]) {
+    if (m?.item) out.push(`[${m.kind || 'fact'}] ${m.item}${m.where && m.where !== 'global' ? ` (part ${m.where})` : ''}`);
   }
-  return opts;
+  const fr = report?.fidelity_report || {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const p of (fr.parameter_fidelity || []) as any[]) {
+    if (p?.match === false) out.push(`parameter "${p.param}" — the source's real value (impls guessed "${p.impl_value}")`);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const p of (fr.property_checks || []) as any[]) {
+    if (p?.status && p.status !== 'satisfied') out.push(`evidence for the named property "${p.property}"`);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const s of (fr.structural_findings || []) as any[]) {
+    if (typeof s === 'string') out.push(`the source's actual structure for: ${s}`);
+  }
+  // de-dupe, keep order
+  return [...new Set(out)];
 }
 
 function stamp(): string {
@@ -221,29 +259,47 @@ function stamp(): string {
   return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
 }
 
-// CLI entry: fetch the scene's sources via the web-enabled runner and cache the
-// transcription under the workspace evidence store.
-export async function gatherEvidence(argv: string[]): Promise<void> {
-  const opts = parseArgs(argv);
-  const ref = opts.positional[0];
-  if (!ref) {
-    throw new Error('usage: visually evidence <scene> [--refs] [--model <m>]');
+// Read the workspace index (the policy's persistent memory). null if none yet.
+export function readIndex(id: string): EvidenceIndex | null {
+  try {
+    const raw = JSON.parse(readFileSync(path.join(evidenceDir(id), 'index.json'), 'utf8'));
+    return EvidenceIndexSchema.parse(raw);
+  } catch {
+    return null;
   }
-  const target = resolveScene(ref);
-  if (!target) throw new Error(`no such scene: ${ref}`);
-  const id = sceneIdFromPath(target);
+}
+
+export type EvidenceMethod = 'paper' | 'refs';
+export interface EvidencePlan { method: EvidenceMethod | null; openGaps: string[]; reason: string }
+
+// Decide, from the persistent attempt log, WHAT to gather next (or that we are
+// done). Escalation ladder: primary sources (paper) → reference implementations
+// (refs) → exhausted. Never repeats a method, so re-running `refine` advances the
+// ladder instead of re-fetching the same source.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function planEvidence(id: string, scene: any, report: any): EvidencePlan {
+  const openGaps = summarizeGaps(report);
+  const sources = sceneSources(scene);
+  if (!sources.length) return { method: null, openGaps, reason: 'the scene cites no source URL to fetch' };
+  const tried = new Set((readIndex(id)?.attempts || []).map((a) => a.method));
+  if (!tried.has('paper')) return { method: 'paper', openGaps, reason: 'no primary source fetched yet' };
+  if (!tried.has('refs')) return { method: 'refs', openGaps, reason: 'primary source did not close the gaps — widening to reference implementations' };
+  return { method: null, openGaps, reason: 'all source-gathering methods exhausted; remaining gaps are genuinely unobtainable' };
+}
+
+// Run ONE gathering pass and ACCUMULATE it: append the transcription to paper.md
+// (never overwrite) and record the attempt in index.json so the policy can
+// escalate next time. Returns how many chars were added (0 = nothing usable).
+export async function gatherEvidence(
+  id: string,
+  opts: { method: EvidenceMethod; openGaps?: string[]; refs?: boolean; model?: string },
+): Promise<{ added: number; method: EvidenceMethod; methodsDone: EvidenceMethod[] }> {
+  const target = resolveScene(id);
+  if (!target) throw new Error(`no such scene: ${id}`);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const scene: any = JSON.parse(readFileSync(target, 'utf8'));
   const sources = sceneSources(scene);
-
-  console.log(`visually evidence: ${id} — gathering source evidence (web tools enabled)`);
-  if (!sources.length) {
-    console.log('  ⚠ this scene lists no sources (metadata.info.sources / metadata.reference).');
-    console.log('    add a paper/datasheet URL to the scene first, then re-run.');
-    return;
-  }
-  console.log(`  sources: ${sources.length}${opts.refs ? '  · also searching for reference implementations' : ''}`);
-  for (const s of sources) console.log(`    · ${s.title ? `${s.title} — ` : ''}${s.url ?? ''}`);
+  const doRefs = opts.method === 'refs' || !!opts.refs;
 
   ensureWorkspace();
   const dir = evidenceDir(id);
@@ -251,38 +307,70 @@ export async function gatherEvidence(argv: string[]): Promise<void> {
   const logDir = makeRunDir(id, 'evidence', stamp());
   mkdirSync(logDir, { recursive: true });
 
-  const prompt = buildEvidencePrompt(scene, sources, { refs: opts.refs });
+  const prompt = buildEvidencePrompt(scene, sources, { refs: doRefs, openGaps: opts.openGaps });
   writeFileSync(path.join(logDir, 'prompt.txt'), prompt);
-
-  console.log('  fetching + transcribing (this can take a few minutes)…');
   const { text } = await runClaudeStreaming({
-    prompt,
-    model: opts.model,
-    runDir: logDir,
-    quiet: true,
-    tools: ['WebFetch', 'WebSearch'],
+    prompt, model: opts.model, runDir: logDir, quiet: true, tools: ['WebFetch', 'WebSearch'],
   });
   writeFileSync(path.join(logDir, 'raw.md'), text);
 
   const md = text.trim();
+  // What this pass consumed off the escalation ladder (so a paper+refs pass marks
+  // both, and the ladder doesn't re-run refs separately).
+  const methodsDone: EvidenceMethod[] = opts.method === 'refs' ? ['refs'] : (doRefs ? ['paper', 'refs'] : ['paper']);
   if (!md || md.length < 80) {
-    console.log(`  ⚠ no usable evidence returned (${md.length} chars) — see ${logDir}`);
-    return;
+    // Still record the attempt so we don't spin on a dead source every round.
+    persistAttempt(id, dir, sources, methodsDone, opts.openGaps, 0);
+    return { added: 0, method: opts.method, methodsDone };
   }
   const paperFile = path.join(dir, 'paper.md');
-  writeFileSync(paperFile, md + '\n');
-  // Validate the index at the write boundary too, so a malformed shape can never
-  // be persisted (and the loose() index-signature type is satisfied by parse).
-  const index = EvidenceIndexSchema.parse({
-    id,
-    fetchedAt: new Date().toISOString(),
-    sources,
-    items: [{ kind: 'paper', file: 'paper.md' }],
-  });
-  writeFileSync(path.join(dir, 'index.json'), JSON.stringify(index, null, 2) + '\n');
+  const prior = existsSync(paperFile) ? readFileSync(paperFile, 'utf8') : '';
+  // Accumulate: a separator header keeps each pass attributable; never overwrite.
+  const header = `## Evidence gathered ${stamp()} (method: ${methodsDone.join('+')}${(opts.openGaps || []).length ? `; targeting ${opts.openGaps?.length} gap(s)` : ''})\n\n`;
+  const body = prior
+    ? `${prior.replace(/\s+$/, '')}\n\n---\n\n${header}${md}\n`
+    : `${md}\n`;
+  writeFileSync(paperFile, body);
+  persistAttempt(id, dir, sources, methodsDone, opts.openGaps, md.length);
+  return { added: md.length, method: opts.method, methodsDone };
+}
 
-  console.log(`  ✓ evidence cached → ${paperFile} (${md.length} chars)`);
-  console.log('  re-run `visually amend` / `visually refine` — amend can now QUOTE the source.');
+function persistAttempt(
+  id: string, dir: string, sources: SourceRef[],
+  methods: EvidenceMethod[], gaps: string[] | undefined, bytes: number,
+): void {
+  const prev = readIndex(id);
+  const at = new Date().toISOString();
+  const attempts = [...(prev?.attempts || []), ...methods.map((m) => ({ method: m, at, gaps: gaps?.slice(0, 16), bytes }))];
+  const items = [...(prev?.items || [])];
+  if (!items.some((it) => it.file === 'paper.md')) items.push({ kind: 'paper', file: 'paper.md' });
+  const index = EvidenceIndexSchema.parse({ id, fetchedAt: at, sources, items, attempts });
+  writeFileSync(path.join(dir, 'index.json'), JSON.stringify(index, null, 2) + '\n');
+}
+
+// The autonomous entry point `refine` calls when it stalls. Consults the cache /
+// attempt log, decides whether (and what) to gather, and accumulates it. Loosely
+// coupled: refine never reaches into the store directly.
+export async function ensureEvidence(
+  id: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: { report: any; model?: string; refs?: boolean },
+): Promise<{ gathered: boolean; method: EvidenceMethod | null; reason: string; added?: number }> {
+  const target = resolveScene(id);
+  if (!target) return { gathered: false, method: null, reason: `no such scene: ${id}` };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const scene: any = JSON.parse(readFileSync(target, 'utf8'));
+  const plan = planEvidence(id, scene, opts.report);
+  if (!plan.method) return { gathered: false, method: null, reason: plan.reason };
+  console.log(`  ↳ ${plan.reason} → fetching (${plan.method === 'refs' ? 'GitHub reference impls' : 'primary source'}, web tools enabled)…`);
+  if (plan.openGaps.length) console.log(`    targeting ${plan.openGaps.length} open gap(s), e.g. ${plan.openGaps[0]}`);
+  const res = await gatherEvidence(id, { method: plan.method, openGaps: plan.openGaps, refs: opts.refs, model: opts.model });
+  if (res.added > 0) {
+    console.log(`  ✓ evidence accumulated (+${res.added} chars; methods so far: ${res.methodsDone.join('+')}) — amend can now quote it`);
+    return { gathered: true, method: plan.method, reason: plan.reason, added: res.added };
+  }
+  console.log('  · no usable evidence returned this pass (attempt recorded; will escalate next stall)');
+  return { gathered: false, method: plan.method, reason: 'no usable evidence returned', added: 0 };
 }
 
 // List the evidence files present for a scene (used by tests / inspection).

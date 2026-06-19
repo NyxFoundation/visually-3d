@@ -302,6 +302,33 @@ the spec's completeness — evidence enriches the spec, then reproduce grades th
 richer spec. What evidence cannot lift (synthesis-only resource/ATP/timing claims)
 is documented as out-of-scope for `python-smt` rather than counted as failure.
 
+## 12. Accumulating, cache-first evidence (autonomy + coherence)
+
+The first cut fetched once and overwrote `paper.md`. The substrate is now an
+**accumulating cache** with an explicit policy, so the loop gets more autonomous
+without losing coherence:
+
+- **Cache-first.** Gathered evidence is the default input; `amend` reads it from
+  `~/.visually-3d/evidence/<id>/` (or the `examples/<id>/` seed) and nothing is
+  re-fetched while it covers the open gaps. The curated seed `notes.md` is now
+  *merged* with a fetched `paper.md` (a fetch never drops the hand-distilled
+  learnings).
+- **Accumulate, don't overwrite.** Each pass is **appended** to `paper.md` under a
+  dated, method-tagged header, so evidence grows across rounds and across separate
+  `refine` runs.
+- **Gap-targeted.** `summarizeGaps(report)` turns the report's open
+  missing-fields / fidelity items into explicit hunting targets handed to the
+  gatherer, so each fetch goes after the specific blocked facts.
+- **Escalation ladder + stop.** A persistent `index.json → attempts[]` log drives
+  `planEvidence`: `paper` → `refs` (GitHub, secondary) → exhausted. A method is
+  never repeated; a second stall or a re-run advances the ladder rather than
+  re-fetching, and once exhausted the loop stops and leaves the residue honestly
+  `[source-missing]` instead of fetching forever.
+- **Loose coupling.** `refine` only owns the trigger (stalled below goal on
+  source gaps) and calls `ensureEvidence`; the cache, policy, and accumulation
+  live entirely in `lib/evidence.ts`. The evidence→amend-only invariant is
+  unchanged.
+
 ## References
 
 The hardening borrows directly from prior recursive-self-improvement work:
