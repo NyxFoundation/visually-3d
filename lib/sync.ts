@@ -1,17 +1,15 @@
-// `visually sync <scene>` — mirror a scene's LOCAL workspace artifacts (its
-// scene JSON, the full visualize/verify/refine run history, the gathered
-// evidence, and the canonical impl) into the repo-tracked `examples/<id>/`, so a
-// plain `git add examples && git commit && git push` carries the history as-is.
-//
-// Explicit on purpose: the loop writes to `~/.visually-3d` (outside any repo);
-// this is the deliberate step that promotes a scene's history into version
-// control. The curated `examples/<id>/notes.md` (if any) is preserved.
+// `syncScene` — mirror a scene's LOCAL workspace artifacts (its scene JSON, the
+// full visualize/verify/refine run history, the gathered evidence, and the
+// canonical impl) into the repo-tracked `examples/<id>/`, as-is. This is the
+// shared mirror step `upload` uses (direct-push in a repo checkout, or into a
+// fork clone for the PR path). The loop writes to `~/.visually-3d` (outside any
+// repo); this promotes a scene's history into version control. A curated
+// `examples/<id>/notes.md` (if any) is preserved.
 
 import { cpSync, copyFileSync, existsSync, mkdirSync, rmSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import {
-  resolveScene, sceneIdFromPath, scenePath, sceneRunsDir, evidenceDir,
-  packagedExampleDir,
+  resolveScene, scenePath, sceneRunsDir, evidenceDir, packagedExampleDir,
 } from './paths.js';
 import { implDir } from './impls.js';
 
@@ -53,33 +51,4 @@ export function syncScene(id: string, opts: { dest?: string } = {}): SyncResult 
   const evidence = mirrorDir(evidenceDir(id), path.join(dest, 'evidence'));
   const impl = mirrorDir(implDir(id), path.join(dest, 'impl'));
   return { scene, runs, evidence, impl, dest };
-}
-
-interface SyncCliOpts { positional: string[] }
-
-function parseArgs(argv: string[]): SyncCliOpts {
-  const opts: SyncCliOpts = { positional: [] };
-  for (const a of argv) {
-    if (a.startsWith('--')) throw new Error(`unknown flag: ${a}`);
-    else opts.positional.push(a);
-  }
-  return opts;
-}
-
-export async function sync(argv: string[]): Promise<void> {
-  const opts = parseArgs(argv);
-  const ref = opts.positional[0];
-  if (!ref) throw new Error('usage: visually sync <scene>   (mirror its history into examples/<id>/ for git push)');
-  const target = resolveScene(ref);
-  if (!target) throw new Error(`no such scene: ${ref}`);
-  const id = sceneIdFromPath(target);
-
-  console.log(`visually sync: ${id} — mirroring workspace history into examples/${id}/ (for git push)`);
-  const r = syncScene(id);
-  console.log(`  scene.json: ${r.scene ? 'copied' : '(none)'}`);
-  console.log(`  runs:       ${r.runs} file(s)`);
-  console.log(`  evidence:   ${r.evidence} file(s)`);
-  console.log(`  impl:       ${r.impl} file(s)`);
-  console.log(`  → ${r.dest}`);
-  console.log('\n  next: git add examples && git commit -m "samples: sync ' + id + ' history" && git push');
 }

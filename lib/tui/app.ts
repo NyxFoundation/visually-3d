@@ -154,8 +154,7 @@ function SceneAction({ id, onRun, onBack }: { id: string; onRun: (args: string[]
     { label: 'Verify    — formal check (z3/SMT or sim) + fold findings into the spec', value: ['verify', id] },
     { label: 'Refine    — the closed loop: visualize → verify, ratcheting on the best', value: ['refine', id] },
     { label: 'View      — open in the browser', value: ['check', id] },
-    { label: 'Sync      — mirror history into examples/ (for git push)', value: ['sync', id] },
-    { label: 'Push      — open a PR to the gallery', value: ['upload', id] },
+    { label: 'Upload    — publish history to examples/ (repo: push · npx: PR)', value: ['upload', id] },
     { label: 'Back', value: 'back' },
   ];
   return html`

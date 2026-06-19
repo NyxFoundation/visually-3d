@@ -36,6 +36,15 @@ test('syncScene mirrors scene + full runs (incl PNG) + evidence + impl as-is', (
   assert.equal(readFileSync(path.join(dest, 'evidence', 'paper.md'), 'utf8'), '# Evidence');
 });
 
+test('isRepoCheckout distinguishes a git checkout from an installed copy', async () => {
+  const { isRepoCheckout } = await import('../lib/upload.js');
+  const checkout = mkdtempSync(path.join(os.tmpdir(), 'vt-repo-'));
+  mkdirSync(path.join(checkout, '.git'), { recursive: true });
+  const installed = mkdtempSync(path.join(os.tmpdir(), 'vt-nm-'));
+  assert.equal(isRepoCheckout(checkout), true);
+  assert.equal(isRepoCheckout(installed), false);
+});
+
 test('syncScene preserves a curated notes.md and drops stale mirrored files', () => {
   const dest = mkdtempSync(path.join(os.tmpdir(), 'vt-sync-dest2-'));
   // a hand-authored note that must survive, plus a stale run from a prior sync

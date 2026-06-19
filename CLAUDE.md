@@ -74,10 +74,16 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
   findings into the spec (`verifyStep` = `reproduce` + `amendScene`).
 - `lib/refine.ts` — the REFINE leg: the closed loop that runs visualize → verify
   each round, with the visual-budget taper and the best-scene ratchet.
-- `lib/sync.ts` — `visually sync <id>`: mirror a scene's LOCAL workspace history
-  (scene + `runs/` + `evidence/` + impl) into the repo-tracked `examples/<id>/`
-  AS-IS, so a `git add examples && commit && push` carries it. Explicit (the loop
-  writes to `~/.visually-3d`, outside any repo); preserves a curated `notes.md`.
+- `lib/sync.ts` — `syncScene(id, {dest?})`: mirror a scene's LOCAL workspace
+  history (scene + `runs/` + `evidence/` + impl) into `examples/<id>/` AS-IS
+  (preserving a curated `notes.md`). The shared mirror step used by `upload`; no
+  standalone command.
+- `lib/upload.ts` — `visually upload <id>`: publish a scene's work into
+  `examples/<id>/`, ONE verb that branches on `isRepoCheckout()` (does `PKG_ROOT`
+  have a `.git`?): **repo checkout (dev/bun)** → mirror + commit just that path +
+  `git push origin <branch>`; **installed (npx/npm)** → fork+clone upstream, mirror
+  into its `examples/<id>/`, push a branch, open a PR (user's own `gh`). `--no-push`
+  / `--dry-run` for the dev path.
 - `lib/tui/app.ts` — Ink + htm control panel (JSX without a build step). htm
   template markup is opaque to the type-checker; put real types on component
   props, hooks, and effects.

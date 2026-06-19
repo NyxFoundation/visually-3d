@@ -30,13 +30,12 @@ Usage:
        [--repro 80] [--iters 1]           scene, until visual + reproducibility +
        [--backend <id>] [--no-amend]      self-check all clear (or max rounds).
        [--no-evidence] [--no-refs]
-  visually sync <scene>                   mirror this scene's LOCAL history (scene,
-                                          runs, evidence, impl) into examples/<id>/
-                                          so a git commit + push carries it as-is
   visually check <scene> [--png]          inspect a scene (browser, or PNG contact sheet)
        [--out <file.png>] [--no-open]
-  visually upload <scene>                 open a PR adding the scene to the gallery
-       [--repo owner/name] [--title <t>] [--dry-run]
+  visually upload <scene>                 publish the scene + its full history into
+       [--repo owner/name] [--title <t>]  examples/<id>/. In a repo checkout: mirror,
+       [--no-push] [--dry-run]            commit, push to origin. Installed (npx):
+                                          fork + open a PR. Auto-detected.
 
 Mode is auto-detected from the subject (override at creation), and the
 verification backend is auto-selected from what the subject IS (digital/compute
@@ -72,8 +71,6 @@ async function main() {
       return (await import('../lib/verify.js')).verify(rest);
     case 'refine':
       return (await import('../lib/refine.js')).refine(rest);
-    case 'sync':
-      return (await import('../lib/sync.js')).sync(rest);
     case 'check':
       return (await import('../lib/check.js')).check(rest);
     case 'upload':
