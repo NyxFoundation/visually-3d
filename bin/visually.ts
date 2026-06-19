@@ -27,14 +27,12 @@ Usage:
   visually amend <scene>                  fold reproduce's findings back into the
        [--n 2] [--model <m>]              scene's functional spec (parts[].spec /
        [--backend <id>] [--no-verify]     metadata.spec) so it becomes reproducible
-  visually evidence <scene>               fetch the scene's source (paper/datasheet)
-       [--refs] [--model <m>]             via web tools, cache it as Markdown so
-                                          amend can QUOTE it (--refs: also search
-                                          GitHub for reference implementations)
   visually refine <scene>                 closed 3D ⇄ implementation loop: each
-       [--rounds 3] [--visual 90]         round runs improve → reproduce → amend
-       [--repro 80] [--iters 1]           until the visual score and reproducibility
-       [--backend <id>] [--no-amend]      both clear their thresholds (or max rounds)
+       [--rounds 3] [--visual 90]         round runs improve → reproduce → amend.
+       [--repro 80] [--iters 1]           When it stalls below the reproducibility
+       [--backend <id>] [--no-amend]      goal on source-dependent gaps, it auto-
+       [--no-evidence] [--evidence-refs]  gathers the source (paper) via web tools
+                                          so amend can quote it (--no-evidence off)
   visually check <scene> [--png]          inspect a scene (browser, or PNG contact sheet)
        [--out <file.png>] [--no-open]
   visually upload <scene>                 open a PR adding the scene to the gallery
@@ -77,8 +75,6 @@ async function main() {
       return (await import('../lib/reproduce.js')).reproduce(rest);
     case 'amend':
       return (await import('../lib/amend.js')).amend(rest);
-    case 'evidence':
-      return (await import('../lib/evidence.js')).gatherEvidence(rest);
     case 'refine':
       return (await import('../lib/refine.js')).refine(rest);
     case 'check':

@@ -1,6 +1,8 @@
-// `visually evidence <scene>` — gather GROUND-TRUTH source evidence for a scene
-// and cache it as Markdown, so the loop can stop guessing the parts a summary
-// can't pin down.
+// Source evidence — gather GROUND-TRUTH for a scene and cache it as Markdown, so
+// the loop can stop guessing the parts a summary can't pin down. There is NO
+// standalone command: `refine` invokes `gatherEvidence()` autonomously, mid-loop,
+// the first time it stalls below the reproducibility goal on source-dependent
+// gaps (see lib/refine.ts).
 //
 // Why this exists: `reproduce` measures whether the SPEC alone is enough to
 // rebuild a system; when it isn't, `amend` writes the missing facts back. But a
@@ -96,6 +98,24 @@ export function evidenceExcerpt(ev: LoadedEvidence, limit = 18000): string {
   if (ev.notes) parts.push(`# Curated learnings (honest about what is settled vs missing)\n${ev.notes}`);
   if (ev.paper) parts.push(`# Transcribed source\n${ev.paper}`);
   return parts.join('\n\n').slice(0, limit);
+}
+
+// True when a reproduce report still shows SOURCE-DEPENDENT gaps — missing
+// fields or fidelity mismatches that only the real paper/datasheet can resolve
+// (as opposed to a self-check counterexample, which amend can fix from the
+// findings alone). This is the signal refine uses to decide, autonomously, that
+// gathering source evidence is worth it.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function hasSourceGaps(report: any): boolean {
+  if (!report || typeof report !== 'object') return false;
+  const missing = Array.isArray(report.missing_fields) ? report.missing_fields.length : 0;
+  const fr = report.fidelity_report || {};
+  const paramMiss = Array.isArray(fr.parameter_fidelity)
+    ? fr.parameter_fidelity.filter((p: { match?: unknown }) => p?.match === false).length : 0;
+  const propBad = Array.isArray(fr.property_checks)
+    ? fr.property_checks.filter((p: { status?: unknown }) => p?.status && p.status !== 'satisfied').length : 0;
+  const struct = Array.isArray(fr.structural_findings) ? fr.structural_findings.length : 0;
+  return missing + paramMiss + propBad + struct > 0;
 }
 
 // ── source extraction from a scene ───────────────────────────────────────────

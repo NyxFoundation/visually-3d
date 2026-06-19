@@ -2,9 +2,10 @@
 
 Distilled from many `refine` rounds (v1–v23). This is honest about what is
 settled, what is still missing, and what this backend simply cannot grade —
-it is NOT a transcription of the paper. To fill the gaps below with the paper's
-real values, run `visually evidence ntt-fpga` (it fetches the source and writes
-`paper.md` next to this file), then `visually amend` will quote it.
+it is NOT a transcription of the paper. `refine` will fetch the paper's real
+values autonomously when it stalls below the reproducibility goal (writing
+`paper.md` into the workspace evidence store), and `amend` then quotes it; the
+gaps below say what that fetch needs to resolve.
 
 Source: "CFNTT: A Scalable Conflict-Free NTT Multiplication Architecture"
 (IACR TCHES 2022). See `index.json` for URLs.

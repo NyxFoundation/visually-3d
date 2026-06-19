@@ -28,6 +28,7 @@ import { latestVisualScore } from './history.js';
 import { specCoverage } from './scene.js';
 import { repairArithmeticClaims } from './arith-audit.js';
 import { resolveScene, sceneIdFromPath } from './paths.js';
+import { gatherEvidence, loadEvidence, sceneSources, hasSourceGaps } from './evidence.js';
 
 interface RefineOpts {
   positional: string[];
@@ -40,6 +41,8 @@ interface RefineOpts {
   backend?: string;
   noVerify?: boolean;
   noAmend?: boolean;
+  noEvidence?: boolean;
+  evidenceRefs?: boolean;
 }
 
 function parseArgs(argv: string[]): RefineOpts {
@@ -55,6 +58,8 @@ function parseArgs(argv: string[]): RefineOpts {
     else if (a === '--backend') opts.backend = argv[++i];
     else if (a === '--no-verify') opts.noVerify = true;
     else if (a === '--no-amend') opts.noAmend = true;
+    else if (a === '--no-evidence') opts.noEvidence = true;
+    else if (a === '--evidence-refs') opts.evidenceRefs = true;
     else if (a.startsWith('--')) throw new Error(`unknown flag: ${a}`);
     else opts.positional.push(a);
   }
@@ -98,7 +103,7 @@ export async function refine(argv: string[]): Promise<void> {
   const opts = parseArgs(argv);
   const ref = opts.positional[0];
   if (!ref) {
-    throw new Error('usage: visually refine <scene> [--rounds N] [--visual 90] [--repro 80] [--iters 1] [--driver claude|codex] [--model <m>] [--backend <id>] [--no-verify] [--no-amend]');
+    throw new Error('usage: visually refine <scene> [--rounds N] [--visual 90] [--repro 80] [--iters 1] [--driver claude|codex] [--model <m>] [--backend <id>] [--no-verify] [--no-amend] [--no-evidence] [--evidence-refs]');
   }
   const target = resolveScene(ref);
   if (!target) throw new Error(`no such scene: ${ref}`);
@@ -131,6 +136,14 @@ export async function refine(argv: string[]): Promise<void> {
   // left new feedback the visual layer should catch up to.
   let visualCleared = false;
   let lastAmendApplied = false;
+
+  // Autonomous source-evidence gathering: when the loop stalls below the
+  // reproducibility goal on SOURCE-dependent gaps (facts only the real paper can
+  // settle), refine fetches the scene's source once — mid-loop, no separate
+  // command — so the very next amend can QUOTE it. Gated to a single attempt and
+  // skipped entirely when the scene cites no source or already has fetched
+  // evidence. `--no-evidence` opts out; `--evidence-refs` also searches GitHub.
+  let evidenceTried = false;
 
   // ④ Ratchet: keep the highest-scoring scene seen, so a round that regresses
   // (reproducibility dropped, self-check broke) never leaves the canonical scene
@@ -212,6 +225,32 @@ export async function refine(argv: string[]): Promise<void> {
     const ev = report?.executable_verification;
     const verifyEnabled = !!ev?.enabled;
     const verifyPass = verifyEnabled ? ev.passed > 0 && ev.passed === ev.total : null;
+
+    // 2b. Autonomous evidence gathering. If we're below the reproducibility goal
+    // and the gaps are SOURCE-dependent (only the paper can settle them), fetch
+    // the source once — right here, so THIS round's amend can already quote it.
+    // Skipped when the scene cites no source or already has fetched evidence.
+    if (!opts.noEvidence && !evidenceTried && report
+      && repro != null && repro < reproGoal && hasSourceGaps(report)) {
+      let sources: { url?: string }[] = [];
+      try { sources = sceneSources(JSON.parse(readFileSync(target, 'utf8'))); } catch { /* ignore */ }
+      const alreadyFetched = loadEvidence(id).origin === 'workspace';
+      if (sources.length && !alreadyFetched) {
+        evidenceTried = true;
+        console.log(`\n▶ reproducibility ${repro} < ${reproGoal} on source-dependent gaps — gathering the source so amend can quote it…`);
+        try {
+          const evArgs = [id];
+          if (opts.model) evArgs.push('--model', opts.model);
+          if (opts.evidenceRefs) evArgs.push('--refs');
+          await gatherEvidence(evArgs);
+        } catch (err) {
+          console.log(`  ⚠ evidence gathering stopped: ${(err as Error).message}`);
+        }
+      } else {
+        // Don't re-evaluate every round when there's nothing to fetch.
+        evidenceTried = true;
+      }
+    }
 
     // 3. The return edge: fold the findings back into the scene's spec so the
     // next round's reproduce reads verified facts and the score can climb.

@@ -277,13 +277,15 @@ different valid reconstruction → permanent divergence → reproducibility capp
 The fix is to give the loop the missing information instead of asking it to invent
 more:
 
-- **`visually evidence <scene>` (`lib/evidence.ts`).** Fetches the scene's
-  `metadata.info.sources` with web tools, transcribes the technical sections to
-  Markdown, and caches them under `~/.visually-3d/evidence/<id>/`. `--refs` also
-  searches GitHub for reference implementations, kept strictly secondary
-  (`[ref-impl]`). This is the **only tool-enabled step**; `runClaudeStreaming` now
-  takes a `tools` option, and the rest of the loop stays tool-less and
-  deterministic.
+- **Autonomous gathering inside `refine` (`lib/evidence.ts`).** There is no
+  separate command — the loop decides. The first time a round stalls below the
+  reproducibility goal on source-dependent gaps (`hasSourceGaps`), refine fetches
+  the scene's `metadata.info.sources` with web tools, transcribes the technical
+  sections to Markdown, and caches them under `~/.visually-3d/evidence/<id>/`
+  (once per loop; skipped with no source or when already fetched; `--no-evidence`
+  / `--evidence-refs` to control). This is the **only tool-enabled step**;
+  `runClaudeStreaming` now takes a `tools` option, and the rest of the loop stays
+  tool-less and deterministic.
 - **Checked-in seed (`examples/<id>/`).** Curated learnings ship with the package
   and are the fallback when no evidence has been fetched. `examples/ntt-fpga/`
   distills the v1–v23 trial-and-error honestly: what is settled and matches the

@@ -165,13 +165,16 @@ structures (an exact memory map, an addressing function, an FSM) are absent.
 number of rounds can climb past this — the information genuinely isn't in the
 loop.
 
-`visually evidence <scene>` closes that gap: it fetches the scene's
-`metadata.info.sources` with **web tools** (the one tool-enabled step;
-`runClaudeStreaming({ tools: ['WebFetch','WebSearch'] })`), transcribes the
-technical sections to Markdown, and caches them under
-`~/.visually-3d/evidence/<id>/` — falling back to a checked-in `examples/<id>/`
-seed. `--refs` also searches GitHub for reference implementations, tagged
-secondary (`[ref-impl]`, never authoritative over the paper).
+`refine` closes that gap autonomously — there is **no separate command**. The
+first time a round stalls below the reproducibility goal on source-dependent gaps
+(`hasSourceGaps`), refine fetches the scene's `metadata.info.sources` with **web
+tools** (the one tool-enabled step; `runClaudeStreaming({ tools:
+['WebFetch','WebSearch'] })`), transcribes the technical sections to Markdown, and
+caches them under `~/.visually-3d/evidence/<id>/` — falling back to a checked-in
+`examples/<id>/` seed. It runs once per loop, is skipped when the scene cites no
+source or already has fetched evidence, and is gated by `--no-evidence` /
+`--evidence-refs` (the latter also searches GitHub for reference implementations,
+tagged secondary `[ref-impl]`, never authoritative over the paper).
 
 **Invariant: evidence flows into `amend` ONLY.** reproduce's reverse-implementers
 never see it, because reproduce measures *"can you rebuild from the SPEC alone"* —
