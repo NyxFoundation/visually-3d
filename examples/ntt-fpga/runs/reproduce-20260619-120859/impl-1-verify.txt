@@ -1,5 +1,0 @@
-pass=true ran=true kind=pass
---- stdout ---
-VERIFIED
-
---- stderr ---

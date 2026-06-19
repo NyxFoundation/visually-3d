@@ -1,6 +1,0 @@
-pass=false ran=true kind=fail
---- stdout ---
-FAIL: [conflict-free bank map (exhaustive)] r4 tuple bank collide stride 2^0 at i=29: {4, 5, 6}
-
---- stderr ---
-Command failed: uv run --with z3-solver python3 /home/gohan/.visually-3d/runs/ntt-fpga/reproduce-20260619-163512/check.py

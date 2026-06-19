@@ -1,6 +1,0 @@
-pass=false ran=true kind=fail
---- stdout ---
-FAIL: round-trip failed at n=2
-
---- stderr ---
-Command failed: uv run --with z3-solver python3 /home/gohan/.visually-3d/runs/ntt-fpga/reproduce-20260619-120859/check.py

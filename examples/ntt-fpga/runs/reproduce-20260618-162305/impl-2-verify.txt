@@ -1,5 +1,0 @@
-pass=false ran=true
---- stdout ---
-
---- stderr ---
-Command failed: uv run --with z3-solver python3 /home/gohan/.visually-3d/runs/ntt-fpga/reproduce-20260618-162305/check.py

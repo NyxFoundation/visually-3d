@@ -1,8 +1,0 @@
-self-improve: /home/gohan/.visually-3d/scenes/ntt-fpga.json
-             history -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260619-202930
-             driver   -> claude (visual feedback enabled)
-             up to 1 iteration(s)
-
-──────── iteration 1 / 1 ────────
-render-scene: 100 parts, 5476 triangles -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260619-202930/iter-01-render.png (1128x1128)
-  rendered -> iter-01-render.png

@@ -1,6 +1,0 @@
-pass=false ran=true
---- stdout ---
-FAIL: L2 actuated DOF: a_heatsink moved only 0.0004 (frozen)
-
---- stderr ---
-Command failed: uv run --with mujoco python3 /home/gohan/.visually-3d/runs/ntt-fpga/reproduce-20260618-150735/check.py

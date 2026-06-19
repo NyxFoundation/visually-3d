@@ -1,9 +1,0 @@
-pass=false ran=false kind=error
---- stdout ---
-
---- stderr ---
-Traceback (most recent call last):
-  File "/home/gohan/.visually-3d/runs/ntt-fpga/reproduce-20260619-165857/check.py", line 44, in <module>
-    assert pow(PSI, N // 2, Q) == 12288     # j = psi^512, j^2 == -1
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError

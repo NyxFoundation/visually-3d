@@ -1,9 +1,0 @@
-pass=true ran=true
---- stdout ---
-L0 OK: model built (74 bodies, 3 joints, 3 actuators)
-L1 OK: 1000 steps stable, max|qpos|=0.188
-L2 OK: all 3 actuated DOFs respond (heatsink_lift, ex_lift, carriage_x)
-L3 OK: operand traversed loop crossbar(-3.94) -> reduction(2.21)
-VERIFIED | L0 built 74-body NTT-accelerator layout; L1 1000-step physics bounded; L2 3 actuated DOFs (heatsink/cluster lift + operand carriage) move; L3 operand reached crossbar & Barrett-reduction extremes.
-
---- stderr ---
