@@ -1,0 +1,9 @@
+pass=true ran=true
+--- stdout ---
+L0 OK: built 77 geoms, 2 joints, 2 actuators
+L1 OK: 1000 steps finite & bounded (max|qpos|=0.0016)
+L2 OK: both slide DOFs (heatsink, exploded cluster) are independently actuated
+L3 OK: heatsink hit Z extremes hi=0.498, lo=-0.500
+VERIFIED | L0 built 77 geoms/2 act; L1 1000 steps finite&bounded; L2 2 DOFs actuated; L3 heatsink reached Z min/max travel
+
+--- stderr ---

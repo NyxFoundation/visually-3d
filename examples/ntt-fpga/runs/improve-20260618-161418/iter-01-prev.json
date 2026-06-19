@@ -1,0 +1,1851 @@
+{
+  "machine_name": "CFNTT Radix-2/4 NTT Multiplication Accelerator (FPGA)",
+  "assembly_instructions": "1) Start from the FPGA PCB substrate (14x9 m floorplan) and overlay the silicon-die outline plate that bounds the placed-and-routed logic. 2) Along the left edge mount the eight interleaved BRAM banks at 1.1 m pitch and flank them with the forward-NTT input FIFO and the natural-order output FIFO. 3) Drop the conflict-free crossbar network as a vertical spine just inboard of the banks, and place the inverse-NTT N^-1 scaling unit on its output side. 4) Lay one shared open butterfly-array baseplate across the array, then populate it with eight parallel butterfly clusters (one per BRAM bank); inside each cluster wire the DSP modular multiplier into its symmetric modular adder (dark anodized) and subtractor (brushed steel), then both into the pipeline register. 5) Place the shared modular-reduction stage to the right as two distinct members: first the cylindrical Barrett q-multiplier spanning all eight lanes, then the boxy shift/subtract+correction member, wired from every pipeline register. 6) Route the operand-return bus from the reduction member back over the array to the crossbar, and route the operand-read bus from the crossbar east into the multiplier column; cap each with a direction arrow so the read/twiddle/return dataflow triad is fully visible and the conflict-free read-modify-write loop is closed. 7) On the right, install the twiddle-factor ROM and route a brass broadcast feeder west to the rail spanning the multiplier column so one fetched factor fans out to all eight multipliers; then add the address-generation unit, the radix-2/4 config selector, the schedule/FSM controller and the clock PLL. 8) For inspection, lift one butterfly cluster onto two riser posts into an exploded view above the array (multiply->add/sub->register), offset toward the +Z half so it clears the central lanes in plan view, and clamp the seven-fin exploded aluminum heatsink onto its riser stub above the die.",
+  "metadata": {
+    "reference": "https://tches.iacr.org/index.php/TCHES/article/view/9291",
+    "domain": "cryptographic-hardware",
+    "mode": "hardware",
+    "spec": {
+      "params": {
+        "N": 1024,
+        "parallel_butterfly_units": 8,
+        "radix": "scalable 2/4"
+      },
+      "widths": {
+        "coefficient": 14
+      },
+      "ops": [
+        "radix-2/radix-4 NTT/INTT butterfly",
+        "Barrett modular reduction: q-multiply then shift/subtract+correct",
+        "twiddle-factor broadcast/reuse across 8 multipliers"
+      ],
+      "properties": [
+        "conflict-free memory mapping: arbitrary radix and arbitrary #BU access the interleaved BRAM banks with no bank conflict",
+        "no bit-reversal stage",
+        "twiddle-factor reuse via a rearranged loop structure",
+        "radix-4 uses 33% fewer modular multiplications and 20% fewer modular add/sub than radix-2",
+        "~50% of butterfly hardware saved via symmetric operators",
+        "NTT followed by INTT (with N^-1 scaling) is the identity"
+      ],
+      "notes": "Authoritative claims from CFNTT, TCHES 2022 issue 1, pp.94-126 (Chen et al., Tsinghua). The exact modulus q is given in the source only as a 14-bit NTT-friendly prime; the 1024-pt benchmark uses a 14-bit q. Verification auto-selects the SMT backend because this is a digital/compute design (NTT datapath), not a mechanical machine."
+    },
+    "thumbnail_camera": [
+      10.4,
+      8.3,
+      10.4
+    ],
+    "info": {
+      "japanese_name": "CFNTT スケーラブル基数2/4 NTT 乗算アーキテクチャ (FPGA)",
+      "english_name": "CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture",
+      "summary": "An FPGA accelerator for the Number Theoretic Transform that combines a conflict-free memory mapping scheme with parallel radix-4 butterfly units, the polynomial-multiplication engine behind lattice post-quantum cryptography and homomorphic encryption.",
+      "description": "CFNTT is an algorithm-hardware co-designed NTT core proposed by Chen et al. (Tsinghua University) in TCHES 2022. Its central contribution is a conflict-free memory mapping scheme that lets an arbitrary radix and an arbitrary number of parallel butterfly units access an interleaved BRAM system without bank conflicts, removing the bit-reversal cost and reducing memory footprint by reusing twiddle factors across a rearranged loop structure.",
+      "description2": "Built on this scheme, the architecture realizes a scalable radix-2 / radix-4 datapath. A dedicated schedule cuts radix-4 modular additions/subtractions by 20% and modular multiplications by 33%, while exploiting symmetric operators saves nearly 50% of the butterfly hardware. For a 1024-point, 14-bit NTT with 8 parallel butterfly units, the radix-4 core achieves roughly 2.2x/1.2x/1.1x/1.9x lower LUT/FF/DSP/BRAM area-time product than the radix-2 core.",
+      "facts": [
+        {
+          "label": "Transform",
+          "value": "Number Theoretic Transform (NTT/INTT)"
+        },
+        {
+          "label": "Radix support",
+          "value": "Scalable radix-2 and radix-4"
+        },
+        {
+          "label": "Benchmark size",
+          "value": "1024 points, 14-bit modulus"
+        },
+        {
+          "label": "Parallel butterfly units",
+          "value": "8 (8 modeled)"
+        },
+        {
+          "label": "Radix-4 mult reduction",
+          "value": "33% fewer modular multiplications"
+        },
+        {
+          "label": "Radix-4 add/sub reduction",
+          "value": "20% fewer modular add/sub"
+        },
+        {
+          "label": "Hardware saving",
+          "value": "~50% via symmetric operators"
+        },
+        {
+          "label": "Reduction",
+          "value": "Barrett: q-multiply then shift/subtract"
+        },
+        {
+          "label": "ATP advantage (LUT)",
+          "value": "~2.2x lower vs radix-2"
+        },
+        {
+          "label": "Publication",
+          "value": "TCHES 2022, Issue 1, pp. 94-126"
+        }
+      ],
+      "sources": [
+        {
+          "title": "CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture (TCHES 2022)",
+          "url": "https://tches.iacr.org/index.php/TCHES/article/view/9291"
+        },
+        {
+          "title": "CFNTT PDF (IACR TCHES)",
+          "url": "https://tches.iacr.org/index.php/TCHES/article/download/9291/8857"
+        },
+        {
+          "title": "DOI 10.46586/tches.v2022.i1.94-126",
+          "url": "https://doi.org/10.46586/tches.v2022.i1.94-126"
+        }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "pcb_substrate",
+      "name": "FPGA PCB Substrate",
+      "shape": "box",
+      "position": [
+        0,
+        0.2,
+        0
+      ],
+      "size": [
+        14,
+        0.4,
+        9
+      ],
+      "material": "black composite",
+      "role": "The 14x9 m FPGA board floorplan carrying every NTT datapath block and the routing between them.",
+      "connections": [
+        "fpga_die",
+        "bram_0",
+        "bram_1",
+        "bram_2",
+        "bram_3",
+        "bram_4",
+        "bram_5",
+        "bram_6",
+        "bram_7",
+        "input_fifo",
+        "output_fifo",
+        "crossbar_network",
+        "intt_scale",
+        "bu_array_base",
+        "mod_red_mult",
+        "mod_red_subshift",
+        "return_bus",
+        "return_arrow",
+        "read_bus",
+        "read_arrow",
+        "twiddle_rom",
+        "addr_gen_unit",
+        "config_radix_selector",
+        "clock_pll",
+        "schedule_controller",
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "fpga_die",
+      "name": "FPGA Silicon Die Outline",
+      "shape": "box",
+      "position": [
+        0,
+        0.46,
+        0
+      ],
+      "size": [
+        12,
+        0.08,
+        7.4
+      ],
+      "material": "brushed steel",
+      "role": "Silicon-die outline of the FPGA; every block standing above this plate is placed-and-routed logic inside the die boundary, marking the chip extent on the board.",
+      "connections": [
+        "pcb_substrate",
+        "heatsink_riser"
+      ]
+    },
+    {
+      "id": "bram_0",
+      "name": "BRAM Bank 0",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        -3.85
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved ~18 Kb block RAM holding polynomial coefficients under conflict-free addressing; feeds butterfly lane 0 and the input stream head.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "input_fifo"
+      ]
+    },
+    {
+      "id": "bram_1",
+      "name": "BRAM Bank 1",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        -2.75
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved BRAM bank in the eight-way conflict-free memory system feeding butterfly lane 1.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "input_fifo"
+      ]
+    },
+    {
+      "id": "bram_2",
+      "name": "BRAM Bank 2",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        -1.65
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved BRAM bank addressed by the mapping scheme so no two parallel butterflies collide; feeds lane 2.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network"
+      ]
+    },
+    {
+      "id": "bram_3",
+      "name": "BRAM Bank 3",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        -0.55
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved BRAM bank in the eight-way conflict-free memory system feeding butterfly lane 3.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network"
+      ]
+    },
+    {
+      "id": "bram_4",
+      "name": "BRAM Bank 4",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        0.55
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved BRAM bank in the eight-way conflict-free memory system feeding butterfly lane 4.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network"
+      ]
+    },
+    {
+      "id": "bram_5",
+      "name": "BRAM Bank 5",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        1.65
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved BRAM bank in the eight-way conflict-free memory system feeding butterfly lane 5.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network"
+      ]
+    },
+    {
+      "id": "bram_6",
+      "name": "BRAM Bank 6",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        2.75
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved BRAM bank feeding lane 6 and the natural-order write-back path.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "output_fifo"
+      ]
+    },
+    {
+      "id": "bram_7",
+      "name": "BRAM Bank 7",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        3.85
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved BRAM bank providing the natural-order write-back path to the output FIFO (no bit-reversal); feeds lane 7.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "output_fifo"
+      ]
+    },
+    {
+      "id": "input_fifo",
+      "name": "Forward-NTT Input FIFO",
+      "shape": "capsule",
+      "position": [
+        -6.8,
+        0.95,
+        3.2
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.45,
+        1.8
+      ],
+      "material": "white composite",
+      "role": "Streams raw input coefficients into the head BRAM banks in natural order at the start of the forward NTT pass.",
+      "connections": [
+        "pcb_substrate",
+        "bram_0",
+        "bram_1"
+      ]
+    },
+    {
+      "id": "output_fifo",
+      "name": "Natural-Order Output FIFO",
+      "shape": "capsule",
+      "position": [
+        -6.8,
+        0.95,
+        -3.2
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.45,
+        1.8
+      ],
+      "material": "white composite",
+      "role": "Drains transformed coefficients out of the tail banks in natural order, eliminating the bit-reversal pass.",
+      "connections": [
+        "pcb_substrate",
+        "bram_6",
+        "bram_7",
+        "intt_scale"
+      ]
+    },
+    {
+      "id": "crossbar_network",
+      "name": "Conflict-Free Crossbar Network",
+      "shape": "box",
+      "position": [
+        -4.2,
+        0.9,
+        0
+      ],
+      "size": [
+        1.2,
+        1,
+        8.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Permutation crossbar (8x8) implementing the conflict-free mapping, routing operands between the eight banks and eight butterfly lanes and accepting reduced results back over the return bus.",
+      "connections": [
+        "pcb_substrate",
+        "bram_0",
+        "bram_1",
+        "bram_2",
+        "bram_3",
+        "bram_4",
+        "bram_5",
+        "bram_6",
+        "bram_7",
+        "bu_array_base",
+        "return_bus",
+        "return_arrow",
+        "read_bus",
+        "read_arrow",
+        "addr_gen_unit",
+        "schedule_controller",
+        "intt_scale"
+      ]
+    },
+    {
+      "id": "intt_scale",
+      "name": "Inverse-NTT N^-1 Scaling Unit",
+      "shape": "box",
+      "position": [
+        -3.25,
+        0.7,
+        3
+      ],
+      "size": [
+        0.85,
+        0.6,
+        1
+      ],
+      "material": "brass",
+      "role": "Inverse-NTT (INTT) stage: multiplies the returning coefficients by the modular inverse of the transform length (N^-1 mod q) so the same butterfly array performs both forward and inverse transforms.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "output_fifo"
+      ]
+    },
+    {
+      "id": "bu_array_base",
+      "name": "Butterfly-Array Open Baseplate",
+      "shape": "box",
+      "position": [
+        0,
+        0.475,
+        0
+      ],
+      "size": [
+        3.6,
+        0.15,
+        8.4
+      ],
+      "material": "brushed steel",
+      "role": "Single open mounting baseplate spanning all eight parallel butterfly lanes, exposing every DSP multiplier and symmetric add/sub operator from above (X-ray cutaway).",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "bu_mult_0",
+        "bu_add_0",
+        "bu_sub_0",
+        "bu_reg_0",
+        "bu_mult_1",
+        "bu_add_1",
+        "bu_sub_1",
+        "bu_reg_1",
+        "bu_mult_2",
+        "bu_add_2",
+        "bu_sub_2",
+        "bu_reg_2",
+        "bu_mult_3",
+        "bu_add_3",
+        "bu_sub_3",
+        "bu_reg_3",
+        "bu_mult_4",
+        "bu_add_4",
+        "bu_sub_4",
+        "bu_reg_4",
+        "bu_mult_5",
+        "bu_add_5",
+        "bu_sub_5",
+        "bu_reg_5",
+        "bu_mult_6",
+        "bu_add_6",
+        "bu_sub_6",
+        "bu_reg_6",
+        "bu_mult_7",
+        "bu_add_7",
+        "bu_sub_7",
+        "bu_reg_7",
+        "ex_riser_a",
+        "ex_riser_b"
+      ]
+    },
+    {
+      "id": "bu_mult_0",
+      "name": "DSP Modular Multiplier 0",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        -3.85
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 0, feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_0",
+        "bu_sub_0"
+      ]
+    },
+    {
+      "id": "bu_add_0",
+      "name": "Symmetric Modular Adder 0",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -4.09
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 0 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_0"
+      ]
+    },
+    {
+      "id": "bu_sub_0",
+      "name": "Symmetric Modular Subtractor 0",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -3.61
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 0 to save ~50% butterfly hardware in lane 0; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_0"
+      ]
+    },
+    {
+      "id": "bu_reg_0",
+      "name": "Pipeline Register 0",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        -3.85
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-0 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_1",
+      "name": "DSP Modular Multiplier 1",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        -2.75
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 1, feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_1",
+        "bu_sub_1"
+      ]
+    },
+    {
+      "id": "bu_add_1",
+      "name": "Symmetric Modular Adder 1",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -2.99
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 1 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_1"
+      ]
+    },
+    {
+      "id": "bu_sub_1",
+      "name": "Symmetric Modular Subtractor 1",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -2.51
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 1 to save ~50% butterfly hardware in lane 1; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_1"
+      ]
+    },
+    {
+      "id": "bu_reg_1",
+      "name": "Pipeline Register 1",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        -2.75
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-1 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_2",
+      "name": "DSP Modular Multiplier 2",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        -1.65
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 2, feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_2",
+        "bu_sub_2"
+      ]
+    },
+    {
+      "id": "bu_add_2",
+      "name": "Symmetric Modular Adder 2",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -1.89
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 2 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_2"
+      ]
+    },
+    {
+      "id": "bu_sub_2",
+      "name": "Symmetric Modular Subtractor 2",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -1.41
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 2 to save ~50% butterfly hardware in lane 2; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_2"
+      ]
+    },
+    {
+      "id": "bu_reg_2",
+      "name": "Pipeline Register 2",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        -1.65
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-2 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_3",
+      "name": "DSP Modular Multiplier 3",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        -0.55
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 3, receiving operands from the read bus and feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_3",
+        "bu_sub_3"
+      ]
+    },
+    {
+      "id": "bu_add_3",
+      "name": "Symmetric Modular Adder 3",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -0.79
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 3 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_3"
+      ]
+    },
+    {
+      "id": "bu_sub_3",
+      "name": "Symmetric Modular Subtractor 3",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -0.31
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 3 to save ~50% butterfly hardware in lane 3; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_3"
+      ]
+    },
+    {
+      "id": "bu_reg_3",
+      "name": "Pipeline Register 3",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        -0.55
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-3 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_4",
+      "name": "DSP Modular Multiplier 4",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        0.55
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 4, receiving operands from the read bus and feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_4",
+        "bu_sub_4"
+      ]
+    },
+    {
+      "id": "bu_add_4",
+      "name": "Symmetric Modular Adder 4",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        0.31
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 4 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_4"
+      ]
+    },
+    {
+      "id": "bu_sub_4",
+      "name": "Symmetric Modular Subtractor 4",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        0.79
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 4 to save ~50% butterfly hardware in lane 4; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_4"
+      ]
+    },
+    {
+      "id": "bu_reg_4",
+      "name": "Pipeline Register 4",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        0.55
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-4 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_5",
+      "name": "DSP Modular Multiplier 5",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        1.65
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 5, feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_5",
+        "bu_sub_5"
+      ]
+    },
+    {
+      "id": "bu_add_5",
+      "name": "Symmetric Modular Adder 5",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        1.41
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 5 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_5"
+      ]
+    },
+    {
+      "id": "bu_sub_5",
+      "name": "Symmetric Modular Subtractor 5",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        1.89
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 5 to save ~50% butterfly hardware in lane 5; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_5"
+      ]
+    },
+    {
+      "id": "bu_reg_5",
+      "name": "Pipeline Register 5",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        1.65
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-5 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_6",
+      "name": "DSP Modular Multiplier 6",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        2.75
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 6, feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_6",
+        "bu_sub_6"
+      ]
+    },
+    {
+      "id": "bu_add_6",
+      "name": "Symmetric Modular Adder 6",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        2.51
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 6 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_6"
+      ]
+    },
+    {
+      "id": "bu_sub_6",
+      "name": "Symmetric Modular Subtractor 6",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        2.99
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 6 to save ~50% butterfly hardware in lane 6; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_6"
+      ]
+    },
+    {
+      "id": "bu_reg_6",
+      "name": "Pipeline Register 6",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        2.75
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-6 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_7",
+      "name": "DSP Modular Multiplier 7",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        3.85
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 7, feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_7",
+        "bu_sub_7"
+      ]
+    },
+    {
+      "id": "bu_add_7",
+      "name": "Symmetric Modular Adder 7",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        3.61
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 7 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_7"
+      ]
+    },
+    {
+      "id": "bu_sub_7",
+      "name": "Symmetric Modular Subtractor 7",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        4.09
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 7 to save ~50% butterfly hardware in lane 7; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_7"
+      ]
+    },
+    {
+      "id": "bu_reg_7",
+      "name": "Pipeline Register 7",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        3.85
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-7 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "twiddle_rail",
+      "name": "Twiddle Broadcast Rail",
+      "shape": "box",
+      "position": [
+        -1.1,
+        1.65,
+        0
+      ],
+      "size": [
+        0.28,
+        0.12,
+        8
+      ],
+      "material": "brass",
+      "role": "Elevated broadcast rail running the full depth of the multiplier column, fanning the single fetched twiddle factor down to all eight DSP modular multipliers each cycle so each root of unity is read once and reused.",
+      "connections": [
+        "twiddle_feeder",
+        "bu_mult_0",
+        "bu_mult_1",
+        "bu_mult_2",
+        "bu_mult_3",
+        "bu_mult_4",
+        "bu_mult_5",
+        "bu_mult_6",
+        "bu_mult_7"
+      ]
+    },
+    {
+      "id": "twiddle_feeder",
+      "name": "Twiddle Broadcast Feeder",
+      "shape": "box",
+      "position": [
+        1.2,
+        1.65,
+        -2.5
+      ],
+      "size": [
+        4.6,
+        0.12,
+        0.28
+      ],
+      "material": "brass",
+      "role": "Routes each twiddle factor fetched once from the ROM westward to the broadcast rail above the multiplier column, the physical embodiment of the factor-reuse the rearranged loop schedule exploits.",
+      "connections": [
+        "twiddle_rom",
+        "twiddle_rail"
+      ]
+    },
+    {
+      "id": "read_bus",
+      "name": "Operand-Read Routing Bus",
+      "shape": "box",
+      "position": [
+        -2.65,
+        1.45,
+        0
+      ],
+      "size": [
+        3.3,
+        0.1,
+        0.32
+      ],
+      "material": "copper",
+      "role": "Operand-read bus carrying source coefficients fetched conflict-free from the crossbar eastward into the DSP multiplier-column inputs; together with the brass twiddle rail and the blue return bus it makes the full read/twiddle/return dataflow triad visible and is the read half of the read-modify-write loop.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "read_arrow"
+      ]
+    },
+    {
+      "id": "read_arrow",
+      "name": "Operand-Read Direction Arrow",
+      "shape": "cone",
+      "position": [
+        -0.95,
+        1.45,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -1.5708
+      ],
+      "size": [
+        0.18,
+        0.5
+      ],
+      "material": "copper",
+      "role": "Arrowhead at the multiplier-column end of the read bus, pointing +X into the DSP multipliers to mark that operands flow from the crossbar into the butterfly inputs (not the reverse), making the read path directional.",
+      "connections": [
+        "read_bus",
+        "bu_mult_3",
+        "bu_mult_4"
+      ]
+    },
+    {
+      "id": "ex_base",
+      "name": "Exploded Butterfly Cluster Baseplate",
+      "shape": "box",
+      "position": [
+        0,
+        2.3,
+        2.4
+      ],
+      "size": [
+        3.6,
+        0.12,
+        1.6
+      ],
+      "material": "brushed steel",
+      "role": "EXPLODED VIEW floating above the array on two riser posts, offset toward the +Z half of the array so it clears the central lanes (3-4) in plan view: one of the eight identical butterfly lanes lifted off the board to expose its left-to-right datapath (DSP multiply -> symmetric add/sub -> pipeline register).",
+      "connections": [
+        "ex_riser_a",
+        "ex_riser_b",
+        "ex_mult",
+        "ex_add",
+        "ex_sub",
+        "ex_reg"
+      ]
+    },
+    {
+      "id": "ex_riser_a",
+      "name": "Exploded-View Riser Post A",
+      "shape": "cylinder",
+      "position": [
+        -1.5,
+        1.39,
+        2.4
+      ],
+      "size": [
+        0.07,
+        1.7
+      ],
+      "material": "brushed steel",
+      "role": "Thin support post linking the array baseplate to the lifted exploded baseplate, making the exploded relationship explicit in the elevation views.",
+      "connections": [
+        "bu_array_base",
+        "ex_base"
+      ]
+    },
+    {
+      "id": "ex_riser_b",
+      "name": "Exploded-View Riser Post B",
+      "shape": "cylinder",
+      "position": [
+        1.5,
+        1.39,
+        2.4
+      ],
+      "size": [
+        0.07,
+        1.7
+      ],
+      "material": "brushed steel",
+      "role": "Second support post for the exploded butterfly lane, anchoring the lifted baseplate over the array so it does not read as floating.",
+      "connections": [
+        "bu_array_base",
+        "ex_base"
+      ]
+    },
+    {
+      "id": "ex_mult",
+      "name": "Exploded DSP Modular Multiplier",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        2.75,
+        2.4
+      ],
+      "size": [
+        0.4,
+        0.9
+      ],
+      "material": "copper",
+      "role": "Exploded view, first datapath stage: the DSP-slice modular multiplier applies the twiddle factor to one operand, then feeds the symmetric adder and subtractor.",
+      "connections": [
+        "ex_base",
+        "ex_add",
+        "ex_sub"
+      ]
+    },
+    {
+      "id": "ex_add",
+      "name": "Exploded Symmetric Modular Adder",
+      "shape": "box",
+      "position": [
+        0.5,
+        2.65,
+        2.16
+      ],
+      "size": [
+        1.1,
+        0.65,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Exploded view, second stage: symmetric modular adder (dark anodized = the sum path) producing the sum output of the radix-4 butterfly, latched into the pipeline register.",
+      "connections": [
+        "ex_base",
+        "ex_reg"
+      ]
+    },
+    {
+      "id": "ex_sub",
+      "name": "Exploded Symmetric Modular Subtractor",
+      "shape": "box",
+      "position": [
+        0.5,
+        2.65,
+        2.64
+      ],
+      "size": [
+        1.1,
+        0.65,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Exploded view, second stage: symmetric modular subtractor (brushed steel = the difference path) reusing the adder's operands (the ~50% hardware-saving trick), latched into the pipeline register.",
+      "connections": [
+        "ex_base",
+        "ex_reg"
+      ]
+    },
+    {
+      "id": "ex_reg",
+      "name": "Exploded Pipeline Register",
+      "shape": "box",
+      "position": [
+        1.5,
+        2.6,
+        2.4
+      ],
+      "size": [
+        0.4,
+        0.55,
+        0.9
+      ],
+      "material": "white composite",
+      "role": "Exploded view, final stage: pipeline register that latches the butterfly result and feeds the shared modular-reduction spine; this lane is one of eight identical instances on the array below.",
+      "connections": [
+        "ex_base"
+      ]
+    },
+    {
+      "id": "mod_red_mult",
+      "name": "Modular Reduction — Barrett q-Multiplier",
+      "shape": "cylinder",
+      "position": [
+        2.2,
+        0.95,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.5,
+        8
+      ],
+      "material": "welded steel",
+      "role": "First member of the shared modular-reduction stage: a cylindrical Barrett quotient-multiplier spine running the full depth of the array, estimating floor(x*mu / 2^k) for every incoming butterfly product before correction.",
+      "connections": [
+        "pcb_substrate",
+        "bu_reg_0",
+        "bu_reg_1",
+        "bu_reg_2",
+        "bu_reg_3",
+        "bu_reg_4",
+        "bu_reg_5",
+        "bu_reg_6",
+        "bu_reg_7",
+        "mod_red_subshift"
+      ]
+    },
+    {
+      "id": "mod_red_subshift",
+      "name": "Modular Reduction — Shift/Subtract & Correct",
+      "shape": "box",
+      "position": [
+        3.1,
+        0.85,
+        0
+      ],
+      "size": [
+        0.7,
+        0.9,
+        8
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second member of the reduction stage: shifts and subtracts the quotient*q estimate and applies the conditional correction to bring results into [0, q) before returning them to the crossbar.",
+      "connections": [
+        "pcb_substrate",
+        "mod_red_mult",
+        "return_bus"
+      ]
+    },
+    {
+      "id": "return_bus",
+      "name": "Operand-Return Routing Bus",
+      "shape": "box",
+      "position": [
+        -0.55,
+        1.62,
+        -4
+      ],
+      "size": [
+        7.3,
+        0.1,
+        0.35
+      ],
+      "material": "glass display",
+      "role": "Elevated return-routing channel carrying reduced coefficients from the shift/subtract member back across the array to the crossbar, closing the conflict-free read-modify-write loop (reduction -> crossbar -> banks).",
+      "connections": [
+        "pcb_substrate",
+        "mod_red_subshift",
+        "return_arrow",
+        "crossbar_network"
+      ]
+    },
+    {
+      "id": "return_arrow",
+      "name": "Operand-Return Direction Arrow",
+      "shape": "cone",
+      "position": [
+        -3.95,
+        1.62,
+        -4
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.18,
+        0.5
+      ],
+      "material": "glass display",
+      "role": "Arrowhead at the crossbar end of the return bus, pointing -X into the crossbar to mark that reduced operands flow from the reduction stage back to the crossbar (not the other way), making the read-modify-write loop directional.",
+      "connections": [
+        "return_bus",
+        "crossbar_network"
+      ]
+    },
+    {
+      "id": "twiddle_rom",
+      "name": "Twiddle-Factor ROM",
+      "shape": "box",
+      "position": [
+        4.6,
+        1.15,
+        -2.5
+      ],
+      "size": [
+        2.2,
+        1.5,
+        2.6
+      ],
+      "material": "glass display",
+      "role": "On-chip ROM storing precomputed roots of unity, reused across the rearranged loop so each factor is fetched once and broadcast over the feeder/rail to all eight multipliers.",
+      "connections": [
+        "pcb_substrate",
+        "addr_gen_unit",
+        "twiddle_feeder",
+        "bu_mult_0",
+        "bu_mult_1",
+        "bu_mult_2",
+        "bu_mult_3",
+        "bu_mult_4",
+        "bu_mult_5",
+        "bu_mult_6",
+        "bu_mult_7"
+      ]
+    },
+    {
+      "id": "addr_gen_unit",
+      "name": "Address Generation Unit",
+      "shape": "box",
+      "position": [
+        4.6,
+        0.95,
+        2.5
+      ],
+      "size": [
+        2.2,
+        1.1,
+        2.6
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Generates the conflict-free read/write addresses and bank indices that realize the memory-mapping scheme each cycle.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "twiddle_rom",
+        "config_radix_selector",
+        "clock_pll",
+        "schedule_controller"
+      ]
+    },
+    {
+      "id": "config_radix_selector",
+      "name": "Radix-2/4 Config Selector",
+      "shape": "box",
+      "position": [
+        6.1,
+        0.7,
+        1.2
+      ],
+      "size": [
+        0.9,
+        0.6,
+        1.1
+      ],
+      "material": "black composite",
+      "role": "Configuration register selecting radix (2 or 4) and the number of active parallel butterfly units (up to 8).",
+      "connections": [
+        "pcb_substrate",
+        "addr_gen_unit",
+        "schedule_controller"
+      ]
+    },
+    {
+      "id": "schedule_controller",
+      "name": "Conflict-Free Schedule/FSM Controller",
+      "shape": "box",
+      "position": [
+        6.1,
+        0.85,
+        3.4
+      ],
+      "size": [
+        1,
+        0.9,
+        1.3
+      ],
+      "material": "welded steel",
+      "role": "Finite-state controller driving the rearranged loop order that cuts radix-4 mults by 33% and add/sub by 20% while keeping memory accesses conflict-free.",
+      "connections": [
+        "pcb_substrate",
+        "addr_gen_unit",
+        "crossbar_network",
+        "config_radix_selector"
+      ]
+    },
+    {
+      "id": "clock_pll",
+      "name": "Clock PLL",
+      "shape": "cylinder",
+      "position": [
+        6.2,
+        0.8,
+        -1.2
+      ],
+      "size": [
+        0.5,
+        0.8
+      ],
+      "material": "metal",
+      "role": "Phase-locked loop generating the core datapath clock for the pipelined eight-lane butterfly array.",
+      "connections": [
+        "pcb_substrate",
+        "addr_gen_unit"
+      ]
+    },
+    {
+      "id": "heatsink_base",
+      "name": "Heatsink Baseplate (Exploded)",
+      "shape": "box",
+      "position": [
+        4.6,
+        2.75,
+        0
+      ],
+      "size": [
+        3,
+        0.2,
+        4
+      ],
+      "material": "brushed steel",
+      "role": "EXPLODED ABOVE: aluminum heatsink baseplate that clamps onto the FPGA package lid, lifted off here on a riser stub so the die floorplan stays visible.",
+      "connections": [
+        "pcb_substrate",
+        "heatsink_riser",
+        "heatsink_fin_0",
+        "heatsink_fin_1",
+        "heatsink_fin_2",
+        "heatsink_fin_3",
+        "heatsink_fin_4",
+        "heatsink_fin_5",
+        "heatsink_fin_6"
+      ]
+    },
+    {
+      "id": "heatsink_riser",
+      "name": "Heatsink Riser Stub",
+      "shape": "cylinder",
+      "position": [
+        4.6,
+        1.6,
+        0
+      ],
+      "size": [
+        0.08,
+        2.2
+      ],
+      "material": "brushed steel",
+      "role": "Support stub grounding the exploded heatsink baseplate to the silicon die, showing where the heatsink seats on the package in the assembled machine.",
+      "connections": [
+        "fpga_die",
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_0",
+      "name": "Heatsink Fin 0",
+      "shape": "box",
+      "position": [
+        3.25,
+        3.25,
+        0
+      ],
+      "size": [
+        0.18,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the DSP multiplier array into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_1",
+      "name": "Heatsink Fin 1",
+      "shape": "box",
+      "position": [
+        3.7,
+        3.25,
+        0
+      ],
+      "size": [
+        0.18,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the DSP multiplier array into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_2",
+      "name": "Heatsink Fin 2",
+      "shape": "box",
+      "position": [
+        4.15,
+        3.25,
+        0
+      ],
+      "size": [
+        0.18,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the DSP multiplier array into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_3",
+      "name": "Heatsink Fin 3",
+      "shape": "box",
+      "position": [
+        4.6,
+        3.25,
+        0
+      ],
+      "size": [
+        0.18,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the DSP multiplier array into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_4",
+      "name": "Heatsink Fin 4",
+      "shape": "box",
+      "position": [
+        5.05,
+        3.25,
+        0
+      ],
+      "size": [
+        0.18,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the DSP multiplier array into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_5",
+      "name": "Heatsink Fin 5",
+      "shape": "box",
+      "position": [
+        5.5,
+        3.25,
+        0
+      ],
+      "size": [
+        0.18,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the DSP multiplier array into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_6",
+      "name": "Heatsink Fin 6",
+      "shape": "box",
+      "position": [
+        5.95,
+        3.25,
+        0
+      ],
+      "size": [
+        0.18,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the DSP multiplier array into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    }
+  ]
+}

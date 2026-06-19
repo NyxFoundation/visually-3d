@@ -1,0 +1,32 @@
+{
+  "reproducibility": 8,
+  "verdict": "underspecified",
+  "divergences": [
+    "Pipeline depth: Impl1 guessed 4 stages (mult / add-sub / q-mul / shift-sub), Impl2 guessed 1 register per butterfly + 1 reduction stage → the spec gives only the ordering 'multiply→add/sub→register' with no cycle/latency counts.",
+    "Butterfly algorithm form: Impl1 left the a/b operand mapping abstract, Impl2 fixed it as Cooley-Tukey DIT (a±w·b) → spec never states DIT vs DIF or operand assignment.",
+    "Twiddle ROM behavior: Impl1 assumed a single factor broadcast to all 8 multipliers with depth N/2=512; Impl2 left depth/word-width abstract and described per-factor single reuse → spec only says 'feeds all multipliers'.",
+    "Config selector encoding: Impl1 invented {radix:1b, active_lanes:3b}; Impl2 left it abstract → spec gives no register layout.",
+    "FIFO depth: Impl1 guessed 64 entries; Impl2 left depths abstract → spec gives none.",
+    "Radix-4 datapath structure: Impl1 mapped it to operand counts/twiddle scheduling abstractly; Impl2 assumed split-radix-style mult/add sharing to hit the stated 33%/20% savings → spec gives only percentages, no structure.",
+    "FSM sequence: Impl1 described nested loops generically; Impl2 invented a load→stages→optional INTT scale→drain sequence → spec lists no states or transitions.",
+    "Mechanical metaphor (since neither could build Verilog from this): both modeled an 'operand token' sliding the read-modify-write loop, but Impl1 also actuated both exploded-view members as lifts while framing the whole thing as metaphor → spec implies no mechanism."
+  ],
+  "missing_fields": [
+    { "item": "Concrete modulus q and whether negacyclic (NWC) twist is used", "kind": "param", "where": "global / mod_red_mult" },
+    { "item": "Operand/coefficient bit width and address width", "kind": "width", "where": "global (BRAM ports, crossbar, butterfly)" },
+    { "item": "Barrett constant mu, shift amount k, product/quotient intermediate widths, number of conditional corrections", "kind": "param", "where": "mod_red_mult / mod_red_subshift" },
+    { "item": "Conflict-free bank-index/address mapping equation (the core contribution)", "kind": "operation", "where": "addr_gen_unit / crossbar_network" },
+    { "item": "Crossbar permutation control signals and per-cycle schedule", "kind": "control", "where": "crossbar_network" },
+    { "item": "Butterfly equation form (DIT vs DIF) and a/b operand mapping", "kind": "operation", "where": "bu_mult/bu_add/bu_sub clusters" },
+    { "item": "Radix-4 butterfly internal structure (mult/add sharing) and radix-2 vs radix-4 datapath difference", "kind": "operation", "where": "config_radix_selector" },
+    { "item": "Pipeline latency per stage, total latency, and initiation interval / throughput", "kind": "timing", "where": "global / bu_reg" },
+    { "item": "FSM state list, transitions, stage count per radix, and loop bounds for N=1024", "kind": "control", "where": "schedule_controller" },
+    { "item": "Transform length N and log2N stage count", "kind": "param", "where": "global" },
+    { "item": "Twiddle ROM depth, word width, and addressing scheme", "kind": "param", "where": "twiddle_rom" },
+    { "item": "INTT N^-1 constant value and pre/post placement of scaling", "kind": "param", "where": "intt_scale" },
+    { "item": "FIFO depths, valid/ready handshake protocol, full/empty semantics", "kind": "port", "where": "input_fifo / output_fifo" },
+    { "item": "Data-flow direction on every connection (edges are undirected)", "kind": "connection", "where": "global" },
+    { "item": "Reset/init behavior, clock-enable, PLL frequency, and top-level AXI/stream interface", "kind": "port", "where": "clock_pll / global" }
+  ],
+  "summary": "This spec is a 3D physical-layout/visualization document (positions, sizes, materials, roles, undirected connections) for a hardware diagram, not a hardware specification — it carries essentially none of the substance needed to rebuild a Verilog NTT accelerator. Every behavioral parameter (modulus, bit widths, Barrett constants, the central conflict-free mapping equation, pipeline timing, FSM, radix-4 structure) had to be invented, so both engineers fell back to guessed values plus a mechanical MuJoCo metaphor; the system is not reproducible from the spec alone."
+}

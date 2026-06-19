@@ -1,0 +1,6 @@
+pass=false ran=true kind=fail
+--- stdout ---
+FAIL: op-count reductions inconsistent (expect 33% mult / 20% add-sub)
+
+--- stderr ---
+Command failed: uv run --with z3-solver python3 /home/gohan/.visually-3d/runs/ntt-fpga/reproduce-20260619-202930/check.py

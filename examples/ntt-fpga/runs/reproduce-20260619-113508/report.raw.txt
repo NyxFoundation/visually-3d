@@ -1,0 +1,47 @@
+{
+  "reproducibility": 62,
+  "verdict": "ambiguous",
+  "divergences": [
+    "Per-stage conflict-free bank/offset addressing: both adopt the spec's b(i)=(i+(i>>3))%8, but Impl 1 verifies only global storage injectivity while Impl 2 explicitly notes the same map FAILS per-stage operand bank-distinctness for large strides (stride 512) — the spec leaves the real sigma_s permutation unspecified",
+    "Negacyclic twist placement: Impl 1 uses separate psi^i pre-twist / psi^-i post-twist around a cyclic NTT; Impl 2 folds psi into the same recursion — spec does not fix the merge convention",
+    "Radix-4 fusion convention: Impl 1 derives a generic DFT4 == two radix-2 stages; Impl 2 pins the DIT split X[k'+t·n/4]=A+I^t·B+... with I=w^{n/4} — spec gives only y0..y3 + j-rotator, not the index recurrence",
+    "Op-count reductions: Impl 1 flags the 33%/20% claims as non-derivable from the per-BU equations (per-BU it is 25% mult, 0% add/sub); Impl 2 ignores them — the spec does not reconcile the per-BU vs overall accounting",
+    "Generator choice: both land on g=11/psi=1945 but treat it as reproduction-chosen rather than transcribed"
+  ],
+  "missing_fields": [
+    { "item": "The actual paper bank-index and offset functions plus the per-stage crossbar permutation sigma_s that achieves true conflict-freedom for all radix/stride combinations", "kind": "operation", "where": "crossbar_network" },
+    { "item": "Twiddle ROM addressing function f(stage, block) and concrete table layout (only a seed table is implied)", "kind": "operation", "where": "twiddle_rom" },
+    { "item": "Schedule/FSM states, transitions and loop bounds for the rearranged loop structure", "kind": "control", "where": "schedule_controller" },
+    { "item": "Derivation/accounting that yields exactly the claimed 33% mult and 20% add/sub reductions (overall vs per-BU basis)", "kind": "param", "where": "global" },
+    { "item": "Confirmed pipeline cycle counts (mult 3 / add-sub 1 / Barrett 4 / reg 1 currently flagged 'reproduction defaults pending the paper')", "kind": "timing", "where": "global" },
+    { "item": "Inter-stage data ordering under the parallel-8-BU schedule that yields natural order without a bit-reversal pass", "kind": "control", "where": "config_radix_selector" },
+    { "item": "Confirmation that the transform is negacyclic and the canonical primitive root (currently 'implied' / reproduction-chosen)", "kind": "param", "where": "global" }
+  ],
+  "fidelity": 63,
+  "fidelity_report": {
+    "parameter_fidelity": [
+      { "param": "modulus q", "reference_value": "14-bit prime (q=12289 repro.)", "impl_value": "12289", "match": true, "where": "global" },
+      { "param": "transform size N", "reference_value": "1024", "impl_value": "1024", "match": true, "where": "global" },
+      { "param": "parallel butterfly units", "reference_value": "8", "impl_value": "8 (modeled as 8 lanes / 4 radix-4 BUs)", "match": true, "where": "global" },
+      { "param": "coefficient width", "reference_value": "14-bit", "impl_value": "14-bit", "match": true, "where": "global" },
+      { "param": "Barrett mu / shift", "reference_value": "mu=21843, k=28", "impl_value": "mu=21843, k=28", "match": true, "where": "mod_red_mult" },
+      { "param": "twiddle root psi", "reference_value": "psi=1945 (order 2048)", "impl_value": "1945", "match": true, "where": "twiddle_rom" },
+      { "param": "omega / N^-1", "reference_value": "omega=10302, N^-1=12277", "impl_value": "10302 / 12277", "match": true, "where": "global" },
+      { "param": "transform flavor", "reference_value": "unstated (PQC/HE implies negacyclic)", "impl_value": "negacyclic", "match": true, "where": "global" },
+      { "param": "pipeline latency", "reference_value": "9 cycles/lane (3+1+4+1)", "impl_value": "ignored (functional model)", "match": false, "where": "global" }
+    ],
+    "property_checks": [
+      { "property": "conflict-free memory mapping (arbitrary radix/#BU, no bank conflict)", "status": "violated", "evidence": "Both verify only the i->(bank,offset) storage map; Impl 2 shows the chosen map does NOT give per-stage operand bank-distinctness (b(i+512)=b(i)) — the paper's defining contribution is not reproduced", "where": "crossbar_network" },
+      { "property": "no bit-reversal stage", "status": "satisfied", "evidence": "Both produce natural-order output by construction", "where": "config_radix_selector" },
+      { "property": "radix-4 uses 33% fewer mults / 20% fewer add/sub", "status": "violated", "evidence": "Impl 1's per-BU accounting gives 25% mult / 0% add-sub reduction, not 33%/20%; the quantified saving is neither modeled nor reproduced", "where": "global" },
+      { "property": "~50% butterfly hardware saved via symmetric operators", "status": "unverifiable", "evidence": "Pure hardware/area claim; functional software models carry no resource accounting", "where": "bu_array_base" },
+      { "property": "NTT followed by INTT (with N^-1) is the identity", "status": "satisfied", "evidence": "Both prove round-trip identity at N=1024 and via small-N golden DFT/schoolbook", "where": "global" }
+    ],
+    "structural_findings": [
+      "The conflict-free memory-mapping scheme — the paper's headline contribution — is replaced by a guessed XOR/rotate storage map that does not realize per-stage conflict-freedom; the actual bank/offset/crossbar topology is absent",
+      "Both are recursive software NTT/INTT models with no hardware datapath: the 9-cycle pipeline, interleaved-BRAM read-modify-write loop, and twiddle-broadcast structure are not modeled",
+      "The radix-4 fusion is implemented as a mathematically-equivalent DFT4 rather than the paper's specific symmetric-operator schedule, so the claimed op-count and hardware-sharing structure is not exhibited"
+    ]
+  },
+  "summary": "Reproducibility is bounded by the architecture-specific details the spec itself flags as reproduction-chosen: the two impls converge on every math parameter but diverge on the bank/offset addressing, twist placement, and radix-4 recurrence, and the actual conflict-free permutation, twiddle addressing and FSM are simply absent. Fidelity is high on parameters (q, N, 8 BUs, 14-bit, Barrett mu/k, psi/omega/N^-1 all match the reference exactly) but the system's defining contributions are not reproduced — the 'conflict-free' mapping is a guess that fails per-stage, and the quantified 33%/20% op reductions and ~50% hardware saving are neither matched nor modeled."
+}

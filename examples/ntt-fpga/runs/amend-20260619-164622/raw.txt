@@ -1,0 +1,119 @@
+{
+  "metadata_spec": {
+    "params": {
+      "N": 1024,
+      "q": 12289,
+      "banks": 8,
+      "num_bu": 8,
+      "barrett_mu": 21843,
+      "barrett_k": 28,
+      "psi": 1945,
+      "omega": 10302,
+      "n_inv": 12277
+    },
+    "widths": { "coeff": 14 },
+    "ops": [
+      "forward NTT = CT/DIT butterflies, inverse INTT = GS/DIF butterflies, merged psi-twist negacyclic (Longa-Naehrig) [ref-impl/conv]",
+      "Barrett reduction: t = (x*mu) >> k; r = x - t*q; one conditional subtract -> r in [0,q) [calc]",
+      "round-trip INTT(NTT(x)) = x [calc]"
+    ],
+    "properties": [
+      "~50% butterfly hardware saved via symmetric operators [unverifiable: resource/area claim, not in functional SMT]",
+      "ATP LUT/FF/DSP/BRAM ~2.2x/1.2x/1.1x/1.9x lower than radix-2 core (N=1024, 14-bit, 8 BU, same FPGA) [unverifiable: synthesis metric]"
+    ],
+    "notes": "N=1024, coeff=14-bit [paper:abstract '1024 14-bit points NTT']. q=12289 is a reproduction fix [conv/ref-impl]; paper states only a '14-bit NTT-friendly prime' so the SPECIFIC prime is [source-missing] [paper] (PDF body undecodable). barrett_mu=21843=floor(2^28/12289), barrett_k=28 [calc]. psi=1945 is a primitive 2048th root mod 12289 (1945^1024 = -1 mod 12289, negacyclic) [src/calc]; omega=10302=1945^2 mod 12289 [calc]; n_inv=12277=1024^-1 mod 12289 [calc]. Butterfly schedule (CT fwd / GS inv) is reproduction-chosen [ref-impl] — both impls agreed; paper pins only 'DIT, merged psi-twist'."
+  },
+  "part_specs": {
+    "crossbar_network": {
+      "ops": [
+        "bank(i) = (i + floor(i/8)) mod 8 [conv skewed/diagonal map]",
+        "offset(i) = floor(i/8)  (range 0..127, = bram depth)",
+        "sigma_s: per-stage crossbar permutation [source-missing]"
+      ],
+      "properties": [
+        "conflict-free memory mapping (arbitrary radix/#BU, no bank conflict) [unverifiable: paper's exact Sec. III map not reproduced]",
+        "no bit-reversal stage / natural-order output [violated: impls compute bit-reversed intermediate then relabel]"
+      ],
+      "notes": "Committed a bijective skewed map bank(i)=(i+floor(i/8)) mod 8, offset(i)=floor(i/8): for fixed offset the 8 indices cover all 8 banks, so it is conflict-free for radix-2 and for radix-4 up to stride 16 — this fixes impl-2 FAIL (stride 2^0 r4 collision at i=29) [conv]. The paper's actual arbitrary-radix conflict-free bank-index/offset functions and per-stage crossbar permutation sigma_s (Sec. III headline) are [source-missing] [paper] (FlateDecode PDF body undecodable; eprint/RG mirrors 403). This skewed map is a reproducibility stand-in, NOT the paper's construction; the natural-order/no-bit-reversal datapath the paper claims is also not yet reproduced."
+    },
+    "bram_0": {
+      "params": { "depth_words": 128, "width_bits": 14 },
+      "notes": "depth_words=128=N/banks=1024/8 [calc] — resolves the 256-vs-128 inconsistency (256 was wrong; 1024 coeffs across 8 banks = 128 words/bank, matching crossbar offset range 0..127). One 14-bit coefficient per word [paper:14-bit]. Banks bram_0..bram_7 are symmetric — apply same depth to all."
+    },
+    "twiddle_rom": {
+      "params": { "depth": 1024, "psi": 1945 },
+      "ops": [
+        "table[k] = psi^k mod 12289 (seed power table) [calc]",
+        "addr(stage, j) = bitrev10(2^stage + j) [conv standard bit-reversed layout]"
+      ],
+      "notes": "Seed twiddle table = powers of psi=1945 mod 12289 [calc], depth 1024. Committed the standard 2^stage+block bit-reversed address that both impls assumed [conv]. The paper's actual twiddle-ROM addressing f(stage,block) under the rearranged-loop twiddle-reuse structure (loop-restructure + factor reuse to drop bit-reversal) is [source-missing] [paper] — mechanism confirmed by abstract, explicit formula not extractable."
+    },
+    "config_radix_selector": {
+      "params": {
+        "radix_options": "[2,4]",
+        "radix_default": 4,
+        "r4_stages": 5,
+        "r4_butterflies_per_stage": 256,
+        "r4_cycles_per_stage": 32,
+        "r4_total_bf_cycles": 160,
+        "r4_mults_naive": 3,
+        "r4_mults_opt": 2,
+        "r4_addsub_naive": 10,
+        "r4_addsub_opt": 8
+      },
+      "ops": [
+        "radix-4 transform = 5 fused two-stage passes over conflict-free addressing (each radix-4 stage fuses two radix-2 stages) [source-missing: exact fused schedule]"
+      ],
+      "properties": [
+        "radix-4: 33% fewer modular mults vs naive radix-4 (3 -> 2) [unverifiable: needs stated baseline]",
+        "radix-4: 20% fewer modular add/sub vs naive radix-4 (10 -> 8) [unverifiable: needs stated baseline]"
+      ],
+      "notes": "radix selectable 2 and 4 [paper: 'scalable radix-2 and radix-4 NTT'] — corrects impl guess '4 only as a butterfly unit'. Optimized radix-4 BU = 2 mults + 8 add/sub vs naive 3 mults + 10 add/sub -> exactly 33%/20% reductions [paper], which fixes the 3-vs-2 mult contradiction: 3 is the NAIVE baseline, 2 is the optimized count. Cycle accounting [calc]: r4_stages=5=log4(1024); r4_butterflies_per_stage=256=1024/4; r4_cycles_per_stage=32=256/8 BUs (the bad '64' came from dividing by 4 lanes — the correct divisor is the 8 parallel butterfly units); r4_total_bf_cycles=160=5*32. The exact fused two-stage radix-4 schedule and its conflict-free addressing equations are [source-missing] [paper]."
+    },
+    "schedule_controller": {
+      "fsm": [
+        "IDLE",
+        "LOAD",
+        "RUN_STAGE",
+        "NEXT_STAGE",
+        "SCALE",
+        "STORE",
+        "DONE",
+        "IDLE -> LOAD : start",
+        "LOAD -> RUN_STAGE : load_complete",
+        "RUN_STAGE -> RUN_STAGE : cycle < r4_cycles_per_stage-1",
+        "RUN_STAGE -> NEXT_STAGE : stage cycles done",
+        "NEXT_STAGE -> RUN_STAGE : stage < num_stages-1",
+        "NEXT_STAGE -> SCALE : stage == last && mode == INTT",
+        "NEXT_STAGE -> STORE : stage == last && mode == NTT",
+        "SCALE -> STORE : scale_complete (multiply by n_inv)",
+        "STORE -> DONE : store_complete",
+        "DONE -> IDLE : ack"
+      ],
+      "notes": "Committed ONE consistent, fully-wired FSM [conv] — resolves the two contradictory state lists and the unwired DONE (DONE now returns to IDLE). INTT path passes through SCALE (multiply by n_inv=12277) before STORE; NTT path skips it. The paper's exact FSM transition table is [source-missing] [paper] (not extractable); this is a minimal correct reconstruction, not transcribed."
+    },
+    "host_phy": {
+      "params": { "beat_width": 64, "coeffs_per_beat": 4, "handshake": "AXI4-Stream valid/ready" },
+      "ports": [
+        { "name": "s_axis_tdata", "dir": "in", "width": 64 },
+        { "name": "s_axis_tvalid", "dir": "in", "width": 1 },
+        { "name": "s_axis_tready", "dir": "out", "width": 1 },
+        { "name": "s_axis_tlast", "dir": "in", "width": 1 },
+        { "name": "m_axis_tdata", "dir": "out", "width": 64 },
+        { "name": "m_axis_tvalid", "dir": "out", "width": 1 },
+        { "name": "m_axis_tready", "dir": "in", "width": 1 },
+        { "name": "m_axis_tlast", "dir": "out", "width": 1 }
+      ],
+      "notes": "[conv/source-missing] reproduction-invented host boundary: AXI4-Stream valid/ready, 64-bit beats packing 4 coefficients (14-bit padded to 16). The paper presents an NTT CORE, not a host/PCIe interface, so framing/handshake/beat packing are NOT in the source [source-missing] [paper] — committed a standard convention only to make the boundary unambiguous; do not treat as a paper claim."
+    }
+  },
+  "rationale": [
+    "metadata: pinned source-settled core (N=1024, 14-bit, banks/BU=8, Barrett mu/k, psi/omega/n_inv) with verifiable expressions; flagged q=12289 as a reproduction fix since paper gives only '14-bit prime'; recorded the unverifiable hardware/ATP claims globally.",
+    "crossbar_network: committed a bijective skewed bank/offset map that fixes the impl-2 stride-2^0 collision counterexample, while honestly marking the paper's exact Sec. III map and sigma_s as source-missing; recorded conflict-free + no-bit-reversal named properties.",
+    "bram_0: set depth_words=128=N/8 to resolve the 256-vs-128 inconsistency, consistent with the crossbar offset range.",
+    "twiddle_rom: pinned the psi-power seed table and a concrete bit-reversed address (the impls' assumption) while marking the paper's reuse-loop addressing source-missing.",
+    "config_radix_selector: made radix 2/4 selectable per source, resolved the 3-vs-2 mult contradiction (naive 3 -> opt 2 = 33%) and the cycle accounting (32=256/8 BUs, total 160=5*32), exposing the bad /4-lane divisor; full fused radix-4 schedule left source-missing.",
+    "schedule_controller: committed one fully-wired FSM (DONE->IDLE, INTT via SCALE) to replace the contradictory/unwired state lists; exact paper transitions noted source-missing.",
+    "host_phy: committed a standard AXI4-Stream boundary as a labeled reproduction convention, since the host interface is outside the paper's scope."
+  ]
+}

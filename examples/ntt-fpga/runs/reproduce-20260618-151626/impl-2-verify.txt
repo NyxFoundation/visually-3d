@@ -1,0 +1,6 @@
+pass=true ran=true
+--- stdout ---
+VERIFIED
+L0 built 77 bodies, 3 actuators | L1 1000 steps bounded & finite | L2 3/3 actuated DOFs move | L3 operand shuttle reached read end (-4.2) and return end (3.1) within 0.2 m
+
+--- stderr ---

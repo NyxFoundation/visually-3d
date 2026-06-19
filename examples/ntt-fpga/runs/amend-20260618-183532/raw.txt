@@ -1,0 +1,23 @@
+I'm going to stop here rather than guess, because I don't have what I need to do this safely.
+
+**The problem:** This is the "amend" step of your loop, and the prompt gives me everything *except* the one thing I must edit — the actual scene descriptor JSON. I have the source metadata, the list of part ids, the missing fields, and the divergences, but not the current scene contents: each part's `shape/position/size/rotation/material`, its `role`/`assembly_instructions`, any existing `spec` blocks, `machine_name`, or `metadata`.
+
+The task's hard constraints are *"keep machine_name, every part id, and all existing fields intact"* and *"do NOT change geometry."* If I emit a "full updated scene descriptor" without the original, I'd be **fabricating the geometry of ~90 parts** — exactly the thing the rules forbid. That would silently corrupt the scene's appearance, which is worse than not running.
+
+I also can't retrieve it myself: the environment exposes only LSP and remote MCP integrations (Figma/Drive/Notion/etc.) — no file-read, glob, or shell tool — and probing `/home/gohan/workspace/visually-3d/scene.json` confirms it's not at the obvious path. I have no way to enumerate `~/.visually-3d/scenes/` to find the right `<id>.json`.
+
+**What I need from you (any one of these):**
+1. Paste the current scene descriptor JSON inline, or
+2. Give me its file path **and** a tool that can read it (e.g. enable a Read/Bash tool), or
+3. Confirm the `$VISUALLY_HOME`/scene id so I can name the exact file — though I'd still need read access.
+
+Once I can see the original, the amendment itself is well-scoped — I already know exactly what to write and where:
+
+- **`addr_gen_unit.spec`** — the conflict-free `b(i)`/`o(i)`; record `properties: ["conflict-free memory mapping ..."]` flagged as `[source-missing]` since the paper's real map isn't transcribed (I will *not* fabricate it — the supplied `b(i)=(i+(i>>3))%8, o(i)=i>>3` provably collides for radix-2 stages s≥6).
+- **`config_radix_selector.spec`** — commit to DIT increasing-stride forward / GS inverse `[conv]`, in-place buffering, the radix-4 fused schedule, plus the two `[unverifiable]` op-saving properties (33%/20%, ~50% HW).
+- **`crossbar_network.spec`** — per-stage σ_s (mark `[source-missing]`).
+- **`schedule_controller.spec`** — FSM/loop bounds from reproduction metadata `[conv]`.
+- **`twiddle_rom.spec`** — `psi=1945` (negacyclic order 2048) `[conv]`, `omega=10302`, `N^-1=12277 = 1024^-1 mod 12289`, Barrett `mu=21843 = floor(2^28/12289), k=28`, `q=12289`, `coeff width 14` — all `[src]`/`[calc]`.
+- **`metadata.spec`** — authoritative pipeline `9 cycles/lane (mult 3 + add/sub 1 + Barrett 4 + reg 1)` `[src]`.
+
+Send me the scene and I'll return the full descriptor with only the `spec`/prose additions applied.

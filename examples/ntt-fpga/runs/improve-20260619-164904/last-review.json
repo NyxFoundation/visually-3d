@@ -1,0 +1,28 @@
+{
+  "scores": {
+    "recognizability": 9,
+    "internal_legibility": 17,
+    "structural_decomposition": 14,
+    "buildability": 17,
+    "geometric_fidelity": 13,
+    "proportional_accuracy": 9,
+    "annotation_depth": 5,
+    "self_consistency": 4
+  },
+  "total": 88,
+  "verdict": "improve",
+  "critique": "The render reads clearly as an FPGA NTT accelerator board: eight blue BRAM banks line the back-left edge, the copper multiplier column and brown symmetric add/sub blocks fill the open butterfly frame, the brass twiddle rail spans them, and the twiddle ROM and finned heatsink anchor the right — the X-ray of the datapath is good. Two real defects remain. First, the headline exploded radix-4 butterfly unit is barely separable from the array in ISO/TOP (it sits low, just above the lanes, competing with the bigger grey exploded heatsink), so the architecture's title feature does not pop. Second, the scene carries internal contradictions the build test exposes: bram_1 still declares depth_words=256 while bram_0/crossbar commit 128 words/bank (offset range 0..127), the crossbar spec still carries a second buggy skewed bank map alongside the committed XOR-fold, and the exploded multiplier roles cite the wrong '3-vs-4' mult baseline instead of the committed naive-3 to optimized-2 (33%) reconciliation. The deeper source-missing items (exact σ_s crossbar table, twiddle addressing, fused radix-4 schedule, FSM table, PCIe framing) are paper-extraction limits and cannot be closed by a visual pass.",
+  "changelog": [
+    "Raised the entire exploded radix-4 butterfly cluster (ex_base, both risers, ex_mult_w1/w2/w3, ex_jrot, ex_add/ex_sub, ex_reg) by +0.35 in Y and lengthened the riser posts to match, so the headline radix-4 BU separates clearly above the open array in ISO/elevation views",
+    "Reconciled the exploded multiplier roles to the committed op-count: W1/W2/W3 are the three twiddle factors, but the symmetric-operator schedule realizes the butterfly in 2 modular multiplications (naive radix-4 uses 3 -> the 33% saving), the j-rotator contributing the order-4 rotation multiply-free; relabeled ex_mult_w2 as the folded/reused partial product",
+    "Fixed the bram_1 self-consistency defect: depth_words 256->128 (= N/banks = 1024/8, matching crossbar offset range 0..127 and bram_0), corrected the capacity (~1.8 Kb) and the '8x256=2048' note to '8x128=1024=N with 18Kb-primitive ping-pong headroom'"
+  ],
+  "remaining_gaps": [
+    "amend target (spec): crossbar_network still carries a second skewed/additive bank map bank(i)=(i+floor(i/8)) mod 8 in its ops/notes alongside the committed XOR-fold; purge the duplicate so only the GF(2)-linear XOR-fold map remains (visual roles already cite only the conflict-free loop)",
+    "source-missing (paper, not closeable visually): exact conflict-free bank-index/offset functions and the per-stage crossbar permutation table sigma_s (Sec. III headline) are still the reproduction XOR-fold stand-in, not the paper's construction",
+    "source-missing: twiddle-ROM addressing f(stage,block) under the rearranged-loop twiddle-reuse structure remains a committed CT/bit-reversed choice, not transcribed; note the residual bit-reversed-vs-natural-order tension in twiddle_rom spec",
+    "source-missing / structural mismatch: both impls compute a bit-reversed intermediate then relabel, so the paper's no-bit-reversal claim holds only at I/O, not structurally (crossbar properties still carry the honest [violated] tag)",
+    "source-missing: full radix-4 fused two-stage schedule and its conflict-free addressing, the exact FSM transition table, and the PCIe/DMA framing are reconstructed/reproduction-invented; keep them tagged, do not present as paper claims",
+    "amend target (spec): config_radix_selector/r4_fuse spec params still phrase mult_saving as '3 vs 4'; align the spec numbers to the committed naive-3/optimized-2 reconciliation so the spec stops contradicting its own r4_mults_opt=2"
+  ]
+}

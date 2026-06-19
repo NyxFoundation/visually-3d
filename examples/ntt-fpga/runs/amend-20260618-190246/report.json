@@ -1,0 +1,223 @@
+{
+  "reproducibility": 70,
+  "verdict": "ambiguous",
+  "divergences": [
+    "Global NTT dataflow: impl1 fixes iterative Cooley-Tukey decimation-in-time with an internal bit-reversal permutation in the golden; impl2 uses a standard stage/block CT loop — spec pins the butterfly equations but not DIT-vs-DIF or the global ordering.",
+    "Crossbar per-stage permutation: impl2 names a stride formula R_s=((2^s)>>3)+1 but does not implement it; impl1 abstracts the crossbar as a flat array entirely — the spec gives no concrete sigma_s, so both abstract it away differently.",
+    "Radix-4 fusion details: which two radix-2 stages are fused and the j-rotator sign convention are each derived independently (j=psi^512 chosen to match a standard radix-4 DIT) rather than read from the spec.",
+    "FSM / schedule: both reconstruct the stage/block loop and per-stage cycle counts; the spec's 'rearranged twiddle-stationary schedule' is not pinned, so each invents a transition table.",
+    "Modular adder/subtractor internal reduction (single conditional ±q vs other) is unspecified; both assume correct mod-q add/sub but neither is told the hardware convention."
+  ],
+  "missing_fields": [
+    {
+      "item": "The paper's actual conflict-free bank-index and offset functions (Sec. III headline result); supplied b(i)=(i+(i>>3))%8 is provably NOT conflict-free for radix-2 strides 64/128/256/512",
+      "kind": "control",
+      "where": "addr_gen_unit"
+    },
+    {
+      "item": "Crossbar per-stage permutation sigma_s mapping logical operand indices to physical bank/lane ports",
+      "kind": "control",
+      "where": "crossbar_network"
+    },
+    {
+      "item": "Twiddle-ROM address function f(stage s, block index) and negacyclic low/high-half storage layout",
+      "kind": "operation",
+      "where": "twiddle_rom"
+    },
+    {
+      "item": "Decimation convention (DIT vs DIF) and global butterfly/stage ordering",
+      "kind": "operation",
+      "where": "global"
+    },
+    {
+      "item": "Radix-4 fusion mapping: which two radix-2 stages fuse into each radix-4 BU, and the j-rotator sign convention",
+      "kind": "operation",
+      "where": "config_radix_selector"
+    },
+    {
+      "item": "FSM states/transitions and per-stage cycle counts of the rearranged twiddle-stationary schedule",
+      "kind": "timing",
+      "where": "schedule_controller"
+    },
+    {
+      "item": "Modular adder/subtractor internal reduction policy (conditional ±q correction count)",
+      "kind": "operation",
+      "where": "mod_red_subshift"
+    },
+    {
+      "item": "Primitive-root generator g (both picked g=11) and full twiddle-factor table contents",
+      "kind": "param",
+      "where": "twiddle_rom"
+    }
+  ],
+  "fidelity": 62,
+  "fidelity_report": {
+    "parameter_fidelity": [
+      {
+        "param": "N (transform size)",
+        "reference_value": "1024",
+        "impl_value": "1024",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "modulus q",
+        "reference_value": "14-bit NTT-friendly prime (q=12289 repro.)",
+        "impl_value": "12289",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "coefficient width",
+        "reference_value": "14-bit",
+        "impl_value": "14-bit",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "parallel butterfly units",
+        "reference_value": "8",
+        "impl_value": "8 (lanes)",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "radix",
+        "reference_value": "scalable radix-2/4",
+        "impl_value": "radix-2/4",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "Barrett mu / k",
+        "reference_value": "mu=21843, k=28",
+        "impl_value": "mu=21843, k=28",
+        "match": true,
+        "where": "mod_red_mult"
+      },
+      {
+        "param": "twiddle root psi",
+        "reference_value": "psi=1945 (negacyclic, order 2048)",
+        "impl_value": "psi=1945",
+        "match": true,
+        "where": "twiddle_rom"
+      },
+      {
+        "param": "omega",
+        "reference_value": "10302",
+        "impl_value": "10302 (psi^2)",
+        "match": true,
+        "where": "twiddle_rom"
+      },
+      {
+        "param": "N^-1",
+        "reference_value": "12277",
+        "impl_value": "12277",
+        "match": true,
+        "where": "intt_scale"
+      },
+      {
+        "param": "transform flavor",
+        "reference_value": "negacyclic (implied by PQC/HE context)",
+        "impl_value": "negacyclic",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "pipeline latency",
+        "reference_value": "9 cycles/lane (mult3+add1+Barrett4+reg1)",
+        "impl_value": "9 (functional labels, not cycle-accurate)",
+        "match": true,
+        "where": "schedule_controller"
+      }
+    ],
+    "property_checks": [
+      {
+        "property": "Conflict-free memory mapping for arbitrary radix / arbitrary #BU",
+        "status": "violated",
+        "evidence": "Both impls prove the spec's map b(i)=(i+(i>>3))%8 puts both operands in the SAME bank for radix-2 strides >=64; the paper's actual mapping is absent.",
+        "where": "addr_gen_unit"
+      },
+      {
+        "property": "No bit-reversal stage",
+        "status": "unverifiable",
+        "evidence": "Impls produce natural-order output but use an internal bit-reversal in the golden; the HW memory-mapping trick that removes it is not modeled.",
+        "where": "crossbar_network"
+      },
+      {
+        "property": "Radix-4: 33% fewer modular multiplications / 20% fewer add-sub",
+        "status": "unverifiable",
+        "evidence": "Radix-4 is modeled functionally vs DFT; neither impl counts hardware ops, so the quantified saving is not checked.",
+        "where": "config_radix_selector"
+      },
+      {
+        "property": "~50% butterfly hardware saved via symmetric operators",
+        "status": "unverifiable",
+        "evidence": "Structural/resource claim; behavioral reproductions cannot exhibit area savings.",
+        "where": "global"
+      },
+      {
+        "property": "NTT followed by INTT (with N^-1) is identity",
+        "status": "satisfied",
+        "evidence": "Both verify INTT(NTT(x))==x and transform-domain mult == schoolbook negacyclic convolution mod X^N+1.",
+        "where": "intt_scale"
+      },
+      {
+        "property": "Barrett reduction == x mod q",
+        "status": "satisfied",
+        "evidence": "Both z3-prove correctness exhaustively over x in [0,q^2) with <=2 corrections.",
+        "where": "mod_red_mult"
+      }
+    ],
+    "structural_findings": [
+      "The headline contribution — the conflict-free interleaved-BRAM mapping plus crossbar — is not faithfully reproduced: the supplied bank/offset functions are provably conflict-prone and the crossbar permutation is abstracted to a flat array in both impls.",
+      "Twiddle-stationary 'rearranged loop structure' (the source of twiddle reuse) is replaced by a generic Cooley-Tukey stage/block loop in both reproductions.",
+      "Radix-4 is realized as a functional 4-point butterfly rather than the symmetric-operator fused datapath the paper uses to claim ~50% hardware and 33%/20% op reductions; the area-time-product advantage is therefore not represented at all."
+    ]
+  },
+  "summary": "Reproducibility is high on the datapath math — the spec pins q, psi/omega/N^-1, Barrett mu/k, widths and parallelism so both impls converge on the same negacyclic NTT/INTT, and z3 confirms Barrett and the round-trip identity; the main reproducibility gap is everything structural (the actual conflict-free bank/offset functions, crossbar permutation, twiddle-ROM addressing, DIT/DIF convention and FSM), which each impl reconstructs differently. The biggest fidelity gap is that the paper's defining contribution — the conflict-free memory mapping — is both unspecified and, as supplied, provably non-conflict-free, and the quantified radix-4 op/area savings can't be exhibited by a behavioral model; parameters match the reference almost exactly, but the architecture reproduced is a generic correct NTT rather than CFNTT's scheme.",
+  "backend": "python-smt",
+  "executable_verification": {
+    "enabled": true,
+    "passed": 0,
+    "total": 2,
+    "ran": 0,
+    "harness_errors": 2
+  },
+  "verify_findings": [
+    {
+      "impl": 1,
+      "pass": false,
+      "ran": false,
+      "kind": "timeout",
+      "confidence": 55,
+      "counterexample": null
+    },
+    {
+      "impl": 2,
+      "pass": false,
+      "ran": false,
+      "kind": "timeout",
+      "confidence": 55,
+      "counterexample": null
+    }
+  ],
+  "guessed": [
+    "Transform flavor -> negacyclic (psi order 2N=2048, omega=psi^2); spec only says 'implied negacyclic', cyclic given as fallback. I implemented negacyclic and verify it against schoolbook mod (X^N+1).",
+    "NTT algorithm structure -> iterative Cooley-Tukey decimation-in-time; spec gives only the radix-2/4 butterfly equations, not the global dataflow/ordering. Golden uses an internal bit-reversal permutation even though the HW claims 'no bit-reversal' (that is a memory-mapping trick, not a math difference).",
+    "INTT formulation -> inverse NTT with omega^{-1}, scale by N^{-1}=12277, post-twist by psi^{-i}; spec only names the N^-1 unit and 'INTT is identity', not the full inverse pipeline.",
+    "Radix-4 output point ordering -> y_m = P(w*j^m) for m=0..3 over points {w, jw, -w, -jw}; derived from the given equations + j=psi^512.",
+    "Barrett datapath uses up to 2 conditional subtractions over inputs in [0,q^2); spec gives mu=21843,k=28,max_corrections=2 — verified exhaustively by z3.",
+    "Bank conflict-free claim -> the given map b(i)=(i+(i>>3)) mod 8 is a valid STORAGE bijection but does NOT satisfy the asserted conflict-free butterfly property for radix-2 stages s>=6 (where 2^(s-3)≡0 mod 8 makes b(i)==b(i+2^s)). I verify the bijection and the s<6 sub-property, and FLAG the violation rather than asserting a false claim.",
+    "PCIe/DMA framing, FIFO handshake, pipeline cycle counts -> treated as non-functional decoration; not modeled in the behavioral verification.",
+    "Pipeline cycle counts (mult 3 / add-sub 1 / Barrett 4 / reg 1 = 9) -> taken from spec verbatim but spec itself flags them as 'reproduction defaults pending the paper'; not modeled cycle-accurately, only as functional latency labels",
+    "Transform flavor -> negacyclic (psi order 2048) as the spec recommends; cyclic was the rejected fallback",
+    "Concrete generator/roots -> g=11, psi=1945, omega=10302, j=psi^512, N^-1=12277 (spec-pinned reproduction values, verified self-consistent mod 12289)",
+    "Barrett parameters -> mu=21843, k=28, <=2 conditional corrections (spec-pinned; proven correct exhaustively)",
+    "Bank/offset mapping b(i)=(i+(i>>3))%8, o(i)=i>>3 -> implemented as given; it IS a valid storage bijection but is NOT the conflict-free per-cycle map the spec claims (see below)",
+    "Radix-4 j-rotator sign convention -> chosen so spec eqs equal the standard radix-4 DIT butterfly (omega4=j=root^(N/4)); verified against direct DFT",
+    "FSM transition table & loop arrangement -> modeled as the standard stage/block Cooley-Tukey loop; spec's exact rearranged twiddle-stationary schedule not reproduced",
+    "Host PCIe/DMA protocol (128-bit beats, AXI-Stream ready/valid, descriptor framing) -> spec-pinned but purely an I/O boundary, not modeled in the datapath",
+    "Crossbar per-stage permutation sigma_s with R_s=((2^s)>>3)+1 -> not implemented; software uses a flat array, so the crossbar is abstracted away"
+  ]
+}

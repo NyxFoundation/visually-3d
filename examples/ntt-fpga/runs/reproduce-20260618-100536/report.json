@@ -1,0 +1,110 @@
+{
+  "reproducibility": 8,
+  "verdict": "underspecified",
+  "divergences": [
+    "Modulus value: Impl1 left q as a runtime input port (no constant); Impl2 hardwired q=12289 → spec never gives the actual modulus, only '14-bit'.",
+    "Native radix: Impl1 built a real radix-4 datapath (two coupled radix-2 stages with w1/w2/w3); Impl2 kept only a radix-2 primitive and 'emulated' radix-4 via FSM scheduling → spec doesn't define the radix-4 butterfly topology.",
+    "Datapath ordering: Impl1 followed the spec wiring (add/sub then shared reduction); Impl2 deliberately reordered to mult+reduction BEFORE add/sub, calling the spec's order contradictory → spec's stated wiring conflicts with CT-correct dataflow.",
+    "Twiddle ROM depth/contents: Impl1 used depth N with a single broadcast factor to all multipliers; Impl2 used depth N/2=512 roots → spec gives neither depth nor per-butterfly twiddle assignment.",
+    "N^-1 INTT constant: Impl1 supplied n_inv as a runtime port; Impl2 hardcoded 12277 (unverified) → spec gives no value or source.",
+    "Conflict-free bank mapping: Impl1 used bank_idx = idx XOR stage with cluster offset 4c+j; Impl2 used linear stride bank=(step+i) mod 8 with BANKS/2 lane offset → spec gives no mapping equation at all.",
+    "Natural-order coefficient layout: Impl1 used high counter bits as offset (linear); Impl2 used bank=idx[2:0], addr=idx[9:3] → spec doesn't fix the coeff-to-bank addressing.",
+    "Barrett constant K: both chose K=2W=28 but neither could derive it from spec; mu derivation and correction-step count (Impl1 'up to 2', Impl2 'up to 2') were invented.",
+    "FSM state set: Impl1 used IDLE→LOAD→RUN→SCALE→DRAIN→FIN; Impl2 used IDLE/RUN/DRAIN with single-cycle drain → spec gives no FSM.",
+    "Address/signal widths: Impl1 (AW=7, DEPTH=128) vs Impl2 (AWIDTH=8, SWIDTH=4, TWIDTH=9) → spec gives no bus widths.",
+    "Parallelism: both modeled P=4 but neither knew how 'up to 8' butterfly units reconfigure → config selector behavior unspecified."
+  ],
+  "missing_fields": [
+    {
+      "item": "Actual modulus value q (only '14-bit' stated)",
+      "kind": "param",
+      "where": "global / mod arithmetic"
+    },
+    {
+      "item": "Transform size N and LOGN as authoritative parameters (inferred from benchmark only)",
+      "kind": "param",
+      "where": "global"
+    },
+    {
+      "item": "Datapath bit-widths for coefficients, products, adders, address buses, FIFO width",
+      "kind": "width",
+      "where": "global / all datapath"
+    },
+    {
+      "item": "Conflict-free memory-mapping equation (bank index + intra-bank offset as function of stage/butterfly index)",
+      "kind": "operation",
+      "where": "crossbar_network / addr_gen_unit"
+    },
+    {
+      "item": "Radix-4 butterfly equations and twiddle assignment (number of distinct twiddles per butterfly, root indices W,W^2,W^3)",
+      "kind": "operation",
+      "where": "bu_base_* / bu_mult_*"
+    },
+    {
+      "item": "Whether transform is DIT or DIF and decimation order vs the no-bit-reversal claim",
+      "kind": "operation",
+      "where": "global"
+    },
+    {
+      "item": "Ordering of shared reduction relative to add/sub (spec wiring vs CT-correct)",
+      "kind": "connection",
+      "where": "mod_red_* / bu_add_*/bu_sub_*"
+    },
+    {
+      "item": "Barrett parameters: K/shift amount, mu derivation, number of conditional corrections",
+      "kind": "operation",
+      "where": "mod_red_mult / mod_red_subshift"
+    },
+    {
+      "item": "Pipeline depths (multiplier, reduction, crossbar) and overall butterfly/transform latency",
+      "kind": "timing",
+      "where": "global / bu_reg_*"
+    },
+    {
+      "item": "Twiddle ROM depth, contents/initialization, addressing scheme, forward vs inverse table selection",
+      "kind": "param",
+      "where": "twiddle_rom"
+    },
+    {
+      "item": "N^-1 mod q value and where/how it is applied during INTT",
+      "kind": "param",
+      "where": "intt_scale"
+    },
+    {
+      "item": "FIFO protocol: depth, handshake (valid/ready), ordering, backpressure",
+      "kind": "port",
+      "where": "input_fifo / output_fifo"
+    },
+    {
+      "item": "BRAM organization: word width, port count (simple vs true dual-port), coeff-to-bank distribution",
+      "kind": "shape",
+      "where": "bram_0..7"
+    },
+    {
+      "item": "FSM state list, transitions, and micro-schedule yielding the claimed utilization",
+      "kind": "control",
+      "where": "schedule_controller"
+    },
+    {
+      "item": "Config/radix selector mapping to datapath gating and 4-vs-8 unit reconfiguration",
+      "kind": "control",
+      "where": "config_radix_selector"
+    },
+    {
+      "item": "Crossbar 8x4 permutation pattern and timing relative to BRAM read latency",
+      "kind": "timing",
+      "where": "crossbar_network"
+    },
+    {
+      "item": "Clock/PLL frequency, multiplication factor, reset polarity and clock domains",
+      "kind": "timing",
+      "where": "clock_pll"
+    },
+    {
+      "item": "Whether outputs are guaranteed reduced to [0,q) at drain",
+      "kind": "operation",
+      "where": "output_fifo"
+    }
+  ],
+  "summary": "This spec is a physical/3D placement descriptor (positions, sizes, materials, mechanical connections) of an FPGA floorplan, not a functional or RTL specification, so essentially every behavioral detail — modulus, bit-widths, the conflict-free mapping that is the design's whole point, radix-4 equations, Barrett constants, FSM, and timing — had to be invented. Both engineers produced low-confidence (12, 22) implementations that diverge on nearly every substantive parameter and even on basic dataflow ordering, confirming the spec alone cannot reproduce the same system."
+}

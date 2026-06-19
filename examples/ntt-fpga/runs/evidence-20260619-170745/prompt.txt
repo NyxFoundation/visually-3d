@@ -1,0 +1,66 @@
+You are gathering GROUND-TRUTH evidence about a specific engineered system so a
+downstream tool can pin its real parameters and structures. Use your web tools
+(WebFetch on each source URL; WebSearch when a URL is not enough). Then write a
+faithful Markdown transcription.
+
+SUBJECT: CFNTT Radix-2/4 NTT Multiplication Accelerator (FPGA) (domain: cryptographic-hardware)
+
+Scene summary (for context only — do NOT just repeat it):
+An FPGA accelerator for the Number Theoretic Transform that combines a conflict-free memory mapping scheme with parallel radix-4 butterfly units, the polynomial-multiplication engine behind lattice post-quantum cryptography and homomorphic encryption.
+
+SOURCES to fetch (the authoritative paper/datasheet for this system):
+1. CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture (TCHES 2022) — https://tches.iacr.org/index.php/TCHES/article/view/9291
+2. CFNTT PDF (IACR TCHES) — https://tches.iacr.org/index.php/TCHES/article/download/9291/8857
+3. DOI 10.46586/tches.v2022.i1.94-126 — https://doi.org/10.46586/tches.v2022.i1.94-126
+4. https://tches.iacr.org/index.php/TCHES/article/view/9291
+
+PRIORITY — the downstream loop is specifically blocked on these facts. Hunt for
+each one and, if found, transcribe it precisely; if the source genuinely does not
+state it, say so per item:
+- [operation] Paper's actual conflict-free (bank,offset) mapping function and per-stage crossbar permutation sigma_s (the headline Sec. III contribution)
+- [operation] Twiddle-ROM addressing function f(stage,block) under the rearranged twiddle-reuse loop
+- [control] Exact FSM transition table and per-state cycle latencies (only aggregate 9 cycles/lane given)
+- [param] Naive-radix-4 add/sub baseline (10 assumed) that pins the 20% reduction claim
+- [operation] Whether output is genuinely bit-reversal-free in hardware vs. computed bit-reversed then relabeled
+- [param] Specific 14-bit modulus of the paper benchmark (q=12289 is a reproduction fix, not the stated prime)
+- [port] Host PCIe/DMA framing, beat packing and handshake (explicitly reproduction-invented) (part pcb_substrate)
+- evidence for the named property "Conflict-free memory mapping (arbitrary radix/#BU, no bank conflict)"
+- evidence for the named property "No bit-reversal stage / natural-order output"
+- evidence for the named property "Twiddle-factor reuse via rearranged loop"
+- evidence for the named property "radix-4 uses 33% fewer mults / 20% fewer add/sub (vs NAIVE radix-4)"
+- evidence for the named property "~50% butterfly hardware saved via symmetric operators"
+- evidence for the named property "ATP LUT/FF/DSP/BRAM ~2.2x/1.2x/1.1x/1.9x lower than radix-2"
+- the source's actual structure for: The architecture's headline contribution — the conflict-free interleaved-BRAM mapping and crossbar permutation — is replaced by a guessed XOR-fold in both impls; the SPECIFIC mapping the paper describes is not reproduced
+- the source's actual structure for: Twiddle addressing uses generic bit-reversed ROM layout rather than the paper's rearranged twiddle-reuse loop, so the memory-footprint/reuse optimization is structurally absent
+- the source's actual structure for: Functional Python models do not realize the 9-cycle pipeline (mult 3 + add/sub 1 + Barrett 4 + reg 1) as actual pipeline stages — latency is only asserted as a bound
+
+Do this:
+1. Fetch each source URL. If a URL is a PDF, fetch and read it. If a source is
+   paywalled or unreachable, try an open mirror (arXiv / eprint / the project
+   site) found via search; if still unavailable, record that explicitly.
+2. TRANSCRIBE — do not summarize away — the technical sections that PIN DOWN the
+   system, especially the parts a short abstract omits and the PRIORITY gaps:
+   - exact parameters (sizes, moduli, bit-widths, counts, constants);
+   - datapath / core equations (e.g. butterfly, reduction, the actual formulas);
+   - memory organization and any addressing / bank / mapping functions;
+   - control: scheduling, loop structure, FSM states & transitions, pipeline;
+   - I/O ordering and interface;
+   - any QUANTIFIED claims (resource/area/timing/throughput) with their basis.
+3. Tag every transcribed fact with its origin section, e.g.
+   `[paper:Sec III.B]`, so the downstream tool can cite it.
+4. NEVER invent. If the source does not state something, write it under a
+   "## Not stated in the source" list rather than guessing a plausible value.
+
+ALSO, search for REFERENCE IMPLEMENTATIONS (e.g. on GitHub) of "CFNTT Radix-2/4 NTT Multiplication Accelerator (FPGA)". For
+each promising repository:
+- give the repo URL and the file/function that is relevant;
+- summarize ONLY the algorithmic/architectural choices it makes for the pieces
+  the paper leaves implicit (memory mapping, addressing, scheduling, FSM, exact
+  butterfly/datapath equations, parameter values);
+- mark these clearly as SECONDARY. A reference implementation may DIFFER from the
+  paper; never present its choices as the paper's. Tag every such fact
+  `[ref-impl:<repo-url>]`.
+
+OUTPUT: a SINGLE Markdown document and nothing else (no preamble, no closing
+remarks). Start with "# Evidence: CFNTT Radix-2/4 NTT Multiplication Accelerator (FPGA)". Use clear section headings. This
+text is saved verbatim and APPENDED to any evidence already gathered.

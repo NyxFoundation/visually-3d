@@ -1,0 +1,51 @@
+{
+  "reproducibility": 64,
+  "verdict": "ambiguous",
+  "divergences": [
+    "Host interface framing: Impl 1 commits a concrete AXI4-Stream/PCIe protocol (64-bit beats, 4 coeffs/beat, 14b→16b padding); Impl 2 drops the host interface entirely as functionally irrelevant — spec flags it as reproduction-invented with no defined protocol.",
+    "BRAM depth per bank: Impl 1 explicitly chose 128 words/bank over the spec's flagged 256-vs-128 inconsistency; Impl 2 does not pin a depth — spec leaves the primitive sizing unresolved.",
+    "Both impls had to invent the per-stage crossbar permutation sigma_s from their own XOR-fold map rather than from the spec — the actual conflict-free map is absent, so any two reconstructions could differ.",
+    "Per-state cycle latencies beyond the aggregate 9-cycle lane are reconstructed independently (treated as structural assertions, not derived from spec)."
+  ],
+  "missing_fields": [
+    { "item": "Paper's actual conflict-free (bank, offset) functions and per-stage crossbar permutation sigma_s for arbitrary radix/#BU (the headline Sec.III contribution)", "kind": "operation", "where": "global" },
+    { "item": "Twiddle-ROM address function f(stage,block) under the rearranged twiddle-reuse loop", "kind": "operation", "where": "global" },
+    { "item": "Naive-radix-4 add/sub baseline value (10) that anchors the 20% reduction claim", "kind": "param", "where": "global" },
+    { "item": "BRAM depth/primitive sizing per bank (256-vs-128 inconsistency)", "kind": "shape", "where": "global" },
+    { "item": "Host/PCIe DMA interface protocol, beat packing and coefficient ordering", "kind": "port", "where": "global" },
+    { "item": "Per-FSM-state cycle latencies (only the aggregate 9 cycles/lane is given)", "kind": "timing", "where": "global" },
+    { "item": "Explicit forward/inverse butterfly convention (DIT/CT vs GS/DIF) and twiddle table layout — inferred, not stated", "kind": "operation", "where": "global" }
+  ],
+  "fidelity": 62,
+  "fidelity_report": {
+    "parameter_fidelity": [
+      { "param": "N (transform size)", "reference_value": "1024", "impl_value": "1024", "match": true, "where": "global" },
+      { "param": "modulus q", "reference_value": "14-bit NTT-friendly prime (q=12289 in repro.)", "impl_value": "12289", "match": true, "where": "global" },
+      { "param": "coefficient width", "reference_value": "14-bit", "impl_value": "14 (product 28)", "match": true, "where": "global" },
+      { "param": "parallel butterfly units", "reference_value": "8", "impl_value": "8", "match": true, "where": "global" },
+      { "param": "reduction algorithm", "reference_value": "Barrett (mu=21843, k=28)", "impl_value": "Barrett mu=21843, k=28", "match": true, "where": "global" },
+      { "param": "twiddle root psi", "reference_value": "psi=1945 (negacyclic, order 2048)", "impl_value": "1945", "match": true, "where": "global" },
+      { "param": "omega / Ninv", "reference_value": "omega=10302, N^-1=12277", "impl_value": "10302 / 12277", "match": true, "where": "global" },
+      { "param": "radix-4 mult reduction", "reference_value": "33% (3→2 mults/BU vs naive)", "impl_value": "3→2 mults/BU", "match": true, "where": "global" },
+      { "param": "radix-4 add/sub reduction", "reference_value": "20% (10→8 add/sub vs naive)", "impl_value": "10→8 add/sub", "match": true, "where": "global" },
+      { "param": "pipeline latency", "reference_value": "9 cycles/lane", "impl_value": "9 (mult3+addsub1+Barrett4+reg1)", "match": true, "where": "global" }
+    ],
+    "property_checks": [
+      { "property": "Conflict-free memory mapping (arbitrary radix/#BU, no bank conflict)", "status": "unverifiable", "evidence": "Both impls use a generic XOR-fold stand-in, not the paper's Sec.III map; bijection/no-conflict is checked only for the stand-in, so the SPECIFIC scheme is not reproduced.", "where": "global" },
+      { "property": "No bit-reversal stage / natural-order output", "status": "violated", "evidence": "Both rely on bit-reversed twiddle tables (T[k]=psi^bitrev10(k)); the paper's no-bit-reversal structural property is not embodied.", "where": "global" },
+      { "property": "Twiddle-factor reuse via rearranged loop", "status": "unverifiable", "evidence": "The paper's f(stage,block) reuse addressing is source-missing; impls use standard ROM addressing, so the memory-footprint optimization is structurally absent.", "where": "global" },
+      { "property": "Radix-4 uses 33% fewer mults / 20% fewer add/sub vs NAIVE radix-4", "status": "satisfied", "evidence": "Both correctly anchor 3→2 mults and 10→8 add/sub against a naive radix-4 baseline, not against radix-2.", "where": "global" },
+      { "property": "NTT∘INTT (with N^-1 scaling) is the identity", "status": "satisfied", "evidence": "Both verify the negacyclic round-trip identity at full N (z3/golden).", "where": "global" },
+      { "property": "~50% butterfly hardware saved via symmetric operators", "status": "unverifiable", "evidence": "Resource/area claim with no synthesis in a functional model.", "where": "global" },
+      { "property": "ATP LUT/FF/DSP/BRAM ~2.2x/1.2x/1.1x/1.9x lower than radix-2", "status": "unverifiable", "evidence": "Synthesis area-time metric, not expressible in functional SMT.", "where": "global" },
+      { "property": "Negacyclic transform with merged psi twist (no separate pre/post pass)", "status": "satisfied", "evidence": "Both implement merged psi-twist negacyclic NTT (Longa-Naehrig style) with psi order 2048.", "where": "global" }
+    ],
+    "structural_findings": [
+      "The paper's defining contribution — the conflict-free (bank,offset) map and per-stage crossbar permutation — is replaced by a generic XOR-fold stand-in in both impls, so the architecture is functionally equivalent but structurally not the CFNTT scheme.",
+      "Twiddle-reuse rearranged-loop addressing (a memory-footprint optimization) is absent; impls use standard bit-reversed ROM tables, diverging from the reference's reuse loop.",
+      "Bit-reversal-free, natural-order datapath claimed by the paper is not realized — bit-reversed twiddle layout reintroduces the reordering the paper eliminates.",
+      "Radix-4 fusion of lane-pairs and symmetric-operator hardware sharing exist only as op-count assertions, not as the structural datapath the reference describes."
+    ]
+  },
+  "summary": "Reproducibility is bounded by the spec withholding the paper's headline contribution: the exact conflict-free (bank,offset)/crossbar map and the twiddle-reuse loop addressing are flagged source-missing, so both engineers fell back to the same generic XOR-fold and bit-reversed-ROM stand-ins (the functional NTT core, by contrast, is fully pinned and both impls converge on it). Fidelity is solid on every recoverable parameter (N, q=12289, 14-bit, 8 BU, Barrett, psi/omega/Ninv, op-count reductions all match) but weak on the system's identity: the conflict-free mapping and no-bit-reversal/natural-order structure — the very things that make this CFNTT rather than a generic radix-2/4 NTT — are unverifiable or violated in both implementations."
+}

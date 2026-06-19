@@ -1,0 +1,104 @@
+{
+  "reproducibility": 8,
+  "verdict": "underspecified",
+  "divergences": [
+    "Internal datapath width: Impl1 keeps a 28-bit product path; Impl2 widens to a 32-bit internal datapath → spec never states intermediate/accumulator widths.",
+    "Pipeline depth/latency: Impl1 invents a 6-stage butterfly (mult=3, add/sub=1, reduce=2); Impl2 invents ~3 cycles (1 butterfly reg + 2 Barrett) → spec gives no per-stage cycle counts.",
+    "Radix stage count: Impl1 frames it as LOGN=10 radix-2 stages; Impl2 frames it as 5 radix-4 stages → spec never fixes the loop/stage decomposition.",
+    "FIFO depth: Impl1 sizes FIFOs at 1024×14b (one full polynomial); Impl2 sizes them at 64 entries → spec gives no depth.",
+    "Conflict-free bank-mapping function: Impl1 leaves the permutation unspecified (driven by addr_gen); Impl2 guesses bank=(i XOR (i>>radix_log)) → spec only describes 'conflict-free' qualitatively.",
+    "INTT N^-1 placement: Impl1 applies scaling on the crossbar return path; Impl2 applies it on the output-FIFO side only → spec wording is ambiguous about where the scale lands.",
+    "radix-select encoding: Impl1 uses a 1/2-bit config register; Impl2 uses 0=radix2/1=radix4 plus a 1..8 active-lane count → spec never defines the config field.",
+    "FSM state set: Impl1 leaves the schedule unspecified; Impl2 invents {IDLE,LOAD,NTT_STAGE,INTT_STAGE,SCALE,DRAIN} → no controller state machine in spec.",
+    "Reset polarity / clock: both guessed (Impl2 active-high sync reset; frequency unspecified by both) → spec omits clocking and reset entirely."
+  ],
+  "missing_fields": [
+    {
+      "item": "Modulus q value (spec says only '14-bit'; both guessed 12289)",
+      "kind": "param",
+      "where": "global"
+    },
+    {
+      "item": "Coefficient / BRAM word width and transform length N",
+      "kind": "width",
+      "where": "bram_0..7"
+    },
+    {
+      "item": "Conflict-free address-to-bank mapping equation (the core algorithm)",
+      "kind": "operation",
+      "where": "crossbar_network / addr_gen_unit"
+    },
+    {
+      "item": "Crossbar permutation pattern per NTT stage",
+      "kind": "control",
+      "where": "crossbar_network"
+    },
+    {
+      "item": "Barrett parameters: constant mu, shift amount k, number of conditional corrections",
+      "kind": "param",
+      "where": "mod_red_mult / mod_red_subshift"
+    },
+    {
+      "item": "DSP multiplier product width and intermediate reduction widths",
+      "kind": "width",
+      "where": "butterfly multiplier"
+    },
+    {
+      "item": "Radix-4 butterfly arithmetic: which twiddle powers (W^0,W^k,W^2k,W^3k) feed which add/sub, where the 4th-root multiply lives",
+      "kind": "operation",
+      "where": "butterfly cluster"
+    },
+    {
+      "item": "Twiddle ROM depth, contents, and address ordering",
+      "kind": "param",
+      "where": "twiddle_rom"
+    },
+    {
+      "item": "INTT N^-1 constant value and exact application point",
+      "kind": "param",
+      "where": "intt_scale"
+    },
+    {
+      "item": "Schedule/FSM state sequence, loop bounds, and how radix-2 vs radix-4 reconfigures the datapath",
+      "kind": "control",
+      "where": "schedule_controller / config_radix_selector"
+    },
+    {
+      "item": "Pipeline depth per stage, total latency, and initiation interval",
+      "kind": "timing",
+      "where": "global datapath"
+    },
+    {
+      "item": "Streaming handshake/back-pressure protocol (valid/ready/stall) and port widths on every bus/FIFO",
+      "kind": "port",
+      "where": "input_fifo / output_fifo / read_bus / return_bus"
+    },
+    {
+      "item": "FIFO depths",
+      "kind": "param",
+      "where": "input_fifo / output_fifo"
+    },
+    {
+      "item": "Bus directions (read=crossbar→mult, return=reduction→crossbar) — only inferable from arrow parts",
+      "kind": "connection",
+      "where": "read_bus / return_bus"
+    },
+    {
+      "item": "Clock frequency, reset polarity, and FIFO clock-domain-crossing behavior",
+      "kind": "timing",
+      "where": "clock_pll"
+    },
+    {
+      "item": "BRAM port count (single/dual) and read/write timing of the RMW loop",
+      "kind": "timing",
+      "where": "bram_0..7"
+    }
+  ],
+  "summary": "The 'spec' is a 3D floorplan/geometry description (part shapes, positions, materials, and a physical assembly narrative), not an RTL specification — it carries essentially none of the numeric parameters, bit-widths, arithmetic, or control logic needed to rebuild the actual NTT accelerator. Both engineers (each at confidence 37) had to invent the modulus, widths, Barrett constants, the central conflict-free mapping equation, the radix-4 arithmetic, the FSM, timing, and handshakes, and they diverged on nearly all of them. It conveys what the machine looks like, not what it does, so the underlying system is not reproducible from it.",
+  "backend": "sim",
+  "executable_verification": {
+    "enabled": true,
+    "passed": 2,
+    "total": 2
+  }
+}

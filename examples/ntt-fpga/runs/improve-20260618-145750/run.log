@@ -1,0 +1,37 @@
+self-improve: /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             history -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-145750
+             driver   -> claude (visual feedback enabled)
+             up to 2 iteration(s)
+
+──────── iteration 1 / 2 ────────
+render-scene: 72 parts, 3520 triangles -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-145750/iter-01-render.png (1128x1128)
+  rendered -> iter-01-render.png
+  claude done (thinking trace: iter-01-events.jsonl, 104 events)
+  parts: 74   score: 92/100
+  critique: The render now passes both acceptance tests and closes all three carried-over gaps: TOP shows all eight blue BRAM banks, eight copper DSP multipliers as a clean orange column, the symmetric add/sub clusters, the two distinct reduction members (cylindrical Barrett spine + boxy shift/subtract), the right-edge controllers and both white FIFOs; FRONT/ISO show the exploded butterfly lane on its two risers and the seven-fin exploded heatsink, and the return bus carries a clear arrowhead into the crossbar. The remaining weakness is a dataflow asymmetry: only the operand-return path is drawn as a visible bus, so the twiddle-broadcast and crossbar-read paths are inferable only from the connection graph, not from the silhouette. A second nit is that adder and subtractor members are materially identical, so a viewer cannot tell sum from difference at a glance even though the build test wants them labelled.
+  + Added a brass Twiddle Broadcast Rail running the full depth of the multiplier column (y=1.65) so the 'fetched once, broadcast to all eight multipliers' claim is now visible geometry rather than only a logical edge.
+  + Added a brass Twiddle Broadcast Feeder linking the twiddle-factor ROM to the rail with a continuous abutting path (ROM west face -> rail T-junction), avoiding any floating segment.
+  + Wired twiddle_rom -> twiddle_feeder -> twiddle_rail -> all eight DSP multipliers and rooted the new members through the ROM so the connection graph stays single-rooted with no dangling ids.
+  + Updated assembly_instructions step 7 to sequence the broadcast feeder/rail install between the ROM and the address-generation unit.
+  · gap: Draw the crossbar-read path as a third visible bus (crossbar -> multiplier column inputs) to complete the read/twiddle/return dataflow triad; right now only twiddle and return are rendered, so the operand-read half of the conflict-free RMW loop is still invisible in ISO.
+  · gap: Give the eight subtractor members a distinct material (e.g. brushed steel vs the adders' dark anodized aluminum) so sum vs difference is readable at a glance without losing the 'symmetric pair' grouping.
+  · gap: Consider nudging the exploded butterfly baseplate +Z by ~1.2 m so it no longer sits directly over its source lane in the TOP plan view, where it currently occludes lanes 2-4.
+
+──────── iteration 2 / 2 ────────
+render-scene: 74 parts, 3544 triangles -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-145750/iter-02-render.png (1128x1128)
+  rendered -> iter-02-render.png
+  claude done (thinking trace: iter-02-events.jsonl, 84 events)
+  parts: 76   score: 93/100  (prev 92)
+  critique: The render passes both acceptance tests: the ISO shows the open butterfly array with no opaque block hiding a subsystem, TOP shows all eight blue BRAM banks, the orange DSP multiplier column, the symmetric add/sub clusters, the two distinct reduction members, the right-edge controllers, both white FIFOs, and the brass twiddle feeder L; FRONT/SIDE show the exploded butterfly lane and seven-fin exploded heatsink on their risers, all seated on the ground line. The only weaknesses left were the three carried-over nits — an incomplete dataflow triad (only twiddle and return drawn), materially identical add/sub members, and the exploded lane occluding central lanes in TOP — each individually worth under two points. Also corrected a prior scoring error where self_consistency was reported as 6 against a max of 5.
+  + Added a copper Operand-Read Bus running from the crossbar east into the DSP multiplier column with a copper direction arrow, completing the read/twiddle/return dataflow triad so the operand-read half of the conflict-free read-modify-write loop is now visible geometry rather than only a connection-graph edge.
+  + Rooted the read bus through the crossbar (crossbar -> read_bus -> read_arrow -> bu_mult_3/bu_mult_4) and registered both new ids on pcb_substrate and crossbar_network so the graph stays single-rooted with no dangling ids.
+  + Re-materialed all eight lane subtractors (and the exploded subtractor) from dark anodized aluminum to brushed steel so the difference path reads distinct from the adders' sum path at a glance while keeping the symmetric-pair grouping.
+  + Shifted the entire exploded butterfly cluster (baseplate, two risers, multiply/add/sub/register) +1.2 m in Z so it no longer sits over the central add/sub lanes 2-4 in the TOP plan view.
+  + Updated assembly_instructions step 6 to sequence the operand-read bus install alongside the operand-return bus, and corrected the self_consistency axis to its valid 0-5 range.
+
+self-improve: model reports convergence — stopping.
+
+self-improve: done. Improved scene written to /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             full history: /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-145750
+             review change: git diff -- /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             revert:        cp /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-145750/iter-00.json /home/gohan/.visually-3d/scenes/ntt-fpga.json

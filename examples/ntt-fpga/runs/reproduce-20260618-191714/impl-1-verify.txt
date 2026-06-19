@@ -1,0 +1,5 @@
+pass=false ran=false kind=timeout
+--- stdout ---
+
+--- stderr ---
+Command failed: uv run --with z3-solver python3 /home/gohan/.visually-3d/runs/ntt-fpga/reproduce-20260618-191714/check.py

@@ -1,0 +1,6 @@
+pass=false ran=true kind=fail
+--- stdout ---
+FAIL: add/sub reduction != 20%
+
+--- stderr ---
+Command failed: uv run --with z3-solver python3 /home/gohan/.visually-3d/runs/ntt-fpga/reproduce-20260619-115200/check.py

@@ -1,0 +1,248 @@
+#!/usr/bin/env python3
+"""
+Self-checking MuJoCo build+sim of the CFNTT Radix-2/4 NTT accelerator spec.
+
+The real system is a synthesizable FPGA datapath (BRAM banks -> conflict-free
+crossbar -> 8 parallel butterfly lanes -> shared Barrett reduction -> return bus
+-> crossbar). MuJoCo cannot simulate digital logic, so this script renders the
+spec's *physical layout* as a kinematic tree and exercises a small set of
+mechanical DOFs that stand in for the machine's structure and its operand loop:
+
+  - heatsink_lift : the spec's "exploded heatsink above the die" assembly DOF
+  - ex_lift       : the spec's "exploded butterfly cluster on two risers" DOF
+  - carriage_x    : an operand token traversing the read-modify-write loop,
+                    i.e. crossbar (min X) -> reduction stage (max X), matching
+                    the spec's operand-return bus + direction arrow.
+
+Verification: L0 build, L1 bounded physics under gravity, L2 each actuated DOF
+moves, L3 the operand carriage reaches the crossbar and reduction extremes.
+"""
+
+import sys
+try:
+    import mujoco
+except Exception as e:  # pragma: no cover
+    print("FAIL L0: could not import mujoco:", e)
+    sys.exit(1)
+import numpy as np
+
+# Parts whose long cylinder axis lies along the spec-Z (board depth) direction.
+HORIZ = {"input_fifo", "output_fifo", "mod_red_mult"}
+
+
+def to_mj(p):
+    """Spec is Y-up; MuJoCo is Z-up. Remap (x, y, z)_spec -> (x, z, y)_mj."""
+    return (p[0], p[2], p[1])
+
+
+def geom_str(shape, size, horizontal):
+    if shape == "box":
+        sx, sy, sz = size
+        return f'<geom type="box" size="{sx/2:.4f} {sz/2:.4f} {sy/2:.4f}"/>'
+    if shape in ("cylinder", "capsule"):
+        r, L = size
+        e = ' euler="90 0 0"' if horizontal else ""
+        return f'<geom type="{shape}" size="{r:.4f} {L/2:.4f}"{e}/>'
+    if shape == "cone":  # MuJoCo has no cone primitive; approximate.
+        r, L = size
+        return f'<geom type="cylinder" size="{r:.4f} {L/2:.4f}"/>'
+    raise ValueError(shape)
+
+
+# ----------------------------------------------------------------------------
+# Flat (static, welded-to-world) parts straight from the spec.
+# ----------------------------------------------------------------------------
+flat = [
+    ("pcb_substrate", "box", (0, 0.2, 0), (14, 0.4, 9)),
+    ("fpga_die", "box", (0, 0.46, 0), (12, 0.08, 7.4)),
+    ("input_fifo", "capsule", (-6.8, 0.95, 3.2), (0.45, 1.8)),
+    ("output_fifo", "capsule", (-6.8, 0.95, -3.2), (0.45, 1.8)),
+    ("crossbar_network", "box", (-4.2, 0.9, 0), (1.2, 1, 8.4)),
+    ("intt_scale", "box", (-3.25, 0.7, 3), (0.85, 0.6, 1)),
+    ("bu_array_base", "box", (0, 0.475, 0), (3.6, 0.15, 8.4)),
+    ("ex_riser_a", "cylinder", (-1.5, 1.39, -0.55), (0.07, 1.7)),
+    ("ex_riser_b", "cylinder", (1.5, 1.39, -0.55), (0.07, 1.7)),
+    ("mod_red_mult", "cylinder", (2.2, 0.95, 0), (0.5, 8)),
+    ("mod_red_subshift", "box", (3.1, 0.85, 0), (0.7, 0.9, 8)),
+    ("return_bus", "box", (-0.55, 1.62, -4), (7.3, 0.1, 0.35)),
+    ("return_arrow", "cone", (-3.95, 1.62, -4), (0.18, 0.5)),
+    ("twiddle_rom", "box", (4.6, 1.15, -2.5), (2.2, 1.5, 2.6)),
+    ("addr_gen_unit", "box", (4.6, 0.95, 2.5), (2.2, 1.1, 2.6)),
+    ("config_radix_selector", "box", (6.1, 0.7, 1.2), (0.9, 0.6, 1.1)),
+    ("schedule_controller", "box", (6.1, 0.85, 3.4), (1, 0.9, 1.3)),
+    ("clock_pll", "cylinder", (6.2, 0.8, -1.2), (0.5, 0.8)),
+    ("heatsink_riser", "cylinder", (4.6, 1.6, 0), (0.08, 2.2)),
+]
+
+# 8 interleaved BRAM banks + 8 butterfly lanes (mult/add/sub/reg per lane).
+zlanes = [-3.85, -2.75, -1.65, -0.55, 0.55, 1.65, 2.75, 3.85]
+for i, z in enumerate(zlanes):
+    flat.append((f"bram_{i}", "box", (-5.8, 1, z), (1.3, 1.2, 0.85)))
+    flat.append((f"bu_mult_{i}", "cylinder", (-1.1, 0.95, z), (0.35, 0.9)))
+    flat.append((f"bu_add_{i}", "box", (0.5, 0.72, z - 0.24), (1.1, 0.66, 0.42)))
+    flat.append((f"bu_sub_{i}", "box", (0.5, 0.72, z + 0.24), (1.1, 0.66, 0.42)))
+    flat.append((f"bu_reg_{i}", "box", (1.5, 0.68, z), (0.4, 0.52, 0.8)))
+
+flat_xml = []
+for pid, shape, pos, size in flat:
+    mx, my, mz = to_mj(pos)
+    g = geom_str(shape, size, pid in HORIZ)
+    flat_xml.append(f'<body name="{pid}" pos="{mx:.4f} {my:.4f} {mz:.4f}">{g}</body>')
+
+# ----------------------------------------------------------------------------
+# Exploded heatsink assembly (lifts as one rigid body) -> heatsink_lift DOF.
+# ----------------------------------------------------------------------------
+hb_pos = (4.6, 2.75, 0)
+hb_mj = to_mj(hb_pos)
+fin_xml = []
+for i, fx in enumerate([3.25, 3.7, 4.15, 4.6, 5.05, 5.5, 5.95]):
+    fmj = to_mj((fx, 3.25, 0))
+    rel = (fmj[0] - hb_mj[0], fmj[1] - hb_mj[1], fmj[2] - hb_mj[2])
+    g = geom_str("box", (0.18, 0.85, 3.7), False)
+    fin_xml.append(f'<body name="heatsink_fin_{i}" pos="{rel[0]:.4f} {rel[1]:.4f} {rel[2]:.4f}">{g}</body>')
+heatsink_xml = (
+    f'<body name="heatsink_base" pos="{hb_mj[0]:.4f} {hb_mj[1]:.4f} {hb_mj[2]:.4f}">'
+    f'<joint name="heatsink_lift" type="slide" axis="0 0 1" range="-0.6 0.6" damping="30"/>'
+    f'{geom_str("box", (3, 0.2, 4), False)}{"".join(fin_xml)}</body>'
+)
+
+# ----------------------------------------------------------------------------
+# Exploded butterfly cluster (mult->add/sub->reg) lifts as one body -> ex_lift.
+# ----------------------------------------------------------------------------
+eb_pos = (0, 2.3, -0.55)
+eb_mj = to_mj(eb_pos)
+ex_children = [
+    ("ex_mult", "cylinder", (-1.1, 2.75, -0.55), (0.4, 0.9)),
+    ("ex_add", "box", (0.5, 2.65, -0.79), (1.1, 0.65, 0.42)),
+    ("ex_sub", "box", (0.5, 2.65, -0.31), (1.1, 0.65, 0.42)),
+    ("ex_reg", "box", (1.5, 2.6, -0.55), (0.4, 0.55, 0.9)),
+]
+ex_child_xml = []
+for pid, shape, pos, size in ex_children:
+    cmj = to_mj(pos)
+    rel = (cmj[0] - eb_mj[0], cmj[1] - eb_mj[1], cmj[2] - eb_mj[2])
+    g = geom_str(shape, size, False)
+    ex_child_xml.append(f'<body name="{pid}" pos="{rel[0]:.4f} {rel[1]:.4f} {rel[2]:.4f}">{g}</body>')
+ex_xml = (
+    f'<body name="ex_base" pos="{eb_mj[0]:.4f} {eb_mj[1]:.4f} {eb_mj[2]:.4f}">'
+    f'<joint name="ex_lift" type="slide" axis="0 0 1" range="-0.6 0.6" damping="30"/>'
+    f'{geom_str("box", (3.6, 0.12, 1.6), False)}{"".join(ex_child_xml)}</body>'
+)
+
+# ----------------------------------------------------------------------------
+# Operand carriage: read-modify-write loop traversal (crossbar -> reduction).
+# ----------------------------------------------------------------------------
+carriage_xml = (
+    '<body name="operand_carriage" pos="0 -4.0 1.75">'
+    '<joint name="carriage_x" type="slide" axis="1 0 0" range="-6 3" damping="5"/>'
+    '<geom type="box" size="0.18 0.18 0.18"/></body>'
+)
+
+MJCF = f"""
+<mujoco model="cfntt_ntt_accelerator">
+  <compiler inertiafromgeom="true" angle="degree"/>
+  <option timestep="0.002" gravity="0 0 -9.81">
+    <flag contact="disable"/>
+  </option>
+  <default><geom density="20" rgba="0.6 0.6 0.65 1"/></default>
+  <worldbody>
+    <geom name="floor" type="plane" size="40 40 0.1" rgba="0.2 0.2 0.2 1"/>
+    {''.join(flat_xml)}
+    {heatsink_xml}
+    {ex_xml}
+    {carriage_xml}
+  </worldbody>
+  <actuator>
+    <position name="a_heatsink_lift" joint="heatsink_lift" kp="9000" ctrlrange="-0.6 0.6"/>
+    <position name="a_ex_lift" joint="ex_lift" kp="9000" ctrlrange="-0.6 0.6"/>
+    <position name="a_carriage_x" joint="carriage_x" kp="3000" ctrlrange="-6 3"/>
+  </actuator>
+</mujoco>
+"""
+
+# ===========================================================================
+# L0 — builds
+# ===========================================================================
+try:
+    model = mujoco.MjModel.from_xml_string(MJCF)
+    data = mujoco.MjData(model)
+except Exception as e:
+    print("FAIL L0: from_xml_string raised:", e)
+    sys.exit(1)
+n_bodies = model.nbody
+n_act = model.nu
+print(f"L0 OK: model built ({n_bodies} bodies, {model.njnt} joints, {n_act} actuators)")
+
+
+def qadr(name):
+    return model.joint(name).qposadr[0]
+
+
+# ===========================================================================
+# L1 — valid, bounded physics under gravity (actuators hold target 0)
+# ===========================================================================
+mujoco.mj_resetData(model, data)
+for _ in range(1000):
+    mujoco.mj_step(model, data)
+    if not (np.all(np.isfinite(data.qpos)) and np.all(np.isfinite(data.qvel))):
+        print("FAIL L1: non-finite state during rollout")
+        sys.exit(1)
+if np.max(np.abs(data.qpos)) > 100.0 or np.max(np.abs(data.qvel)) > 1.0e3:
+    print("FAIL L1: state diverged (model exploded)")
+    sys.exit(1)
+print(f"L1 OK: 1000 steps stable, max|qpos|={np.max(np.abs(data.qpos)):.3f}")
+
+# ===========================================================================
+# L2 — each actuated DOF measurably moves when commanded
+# ===========================================================================
+act_targets = {
+    "a_heatsink_lift": ("heatsink_lift", 0.5),
+    "a_ex_lift": ("ex_lift", 0.5),
+    "a_carriage_x": ("carriage_x", 2.0),
+}
+for aname, (jname, target) in act_targets.items():
+    mujoco.mj_resetData(model, data)
+    aid = model.actuator(aname).id
+    adr = qadr(jname)
+    start = data.qpos[adr]
+    data.ctrl[aid] = target
+    for _ in range(500):
+        mujoco.mj_step(model, data)
+    delta = abs(data.qpos[adr] - start)
+    if delta < 0.05:
+        print(f"FAIL L2: actuator {aname} did not move its DOF (delta={delta:.4f})")
+        sys.exit(1)
+print("L2 OK: all 3 actuated DOFs respond (heatsink_lift, ex_lift, carriage_x)")
+
+# ===========================================================================
+# L3 — operand carriage reaches crossbar (min X) and reduction (max X) extremes,
+#       i.e. completes the conflict-free read-modify-write loop traversal.
+# ===========================================================================
+mujoco.mj_resetData(model, data)
+aid = model.actuator("a_carriage_x").id
+adr = qadr("carriage_x")
+TOL = 0.3
+
+x_crossbar = -4.0   # operands read out of / written back to the crossbar spine
+data.ctrl[aid] = x_crossbar
+for _ in range(600):
+    mujoco.mj_step(model, data)
+reach_min = data.qpos[adr]
+if abs(reach_min - x_crossbar) > TOL:
+    print(f"FAIL L3: carriage did not reach crossbar X={x_crossbar} (got {reach_min:.3f})")
+    sys.exit(1)
+
+x_reduction = 2.2   # Barrett q-multiplier / shift-subtract reduction spine
+data.ctrl[aid] = x_reduction
+for _ in range(900):
+    mujoco.mj_step(model, data)
+reach_max = data.qpos[adr]
+if abs(reach_max - x_reduction) > TOL:
+    print(f"FAIL L3: carriage did not reach reduction X={x_reduction} (got {reach_max:.3f})")
+    sys.exit(1)
+print(f"L3 OK: operand traversed loop crossbar({reach_min:.2f}) -> reduction({reach_max:.2f})")
+
+print("VERIFIED | L0 built %d-body NTT-accelerator layout; L1 1000-step physics bounded; "
+      "L2 3 actuated DOFs (heatsink/cluster lift + operand carriage) move; "
+      "L3 operand reached crossbar & Barrett-reduction extremes." % n_bodies)
+sys.exit(0)

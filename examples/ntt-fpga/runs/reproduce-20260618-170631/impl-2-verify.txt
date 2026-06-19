@@ -1,0 +1,5 @@
+pass=true ran=true
+--- stdout ---
+VERIFIED
+
+--- stderr ---

@@ -1,0 +1,121 @@
+{
+  "metadata_spec": {
+    "params": {
+      "N": 1024,
+      "q": 12289,
+      "radix": "scalable_radix2_and_radix4",
+      "butterfly_units": 8,
+      "psi": 1945,
+      "omega": 10302,
+      "N_inv": 12277,
+      "barrett_mu": 21843,
+      "barrett_k": 28,
+      "j_rotator": "psi^512 mod q",
+      "r4_mult_naive": 3,
+      "r4_mult_opt": 2,
+      "r4_addsub_naive": 10,
+      "r4_addsub_opt": 8,
+      "pipeline_latency_cycles": 9
+    },
+    "widths": { "coeff": 14, "modulus": 14 },
+    "ops": [
+      "negacyclic NTT/INTT, N=1024, q=12289, psi order 2048 (psi^1024 = -1 mod q)",
+      "bank_index b(i) = (i&7)^((i>>3)&7)^((i>>6)&7)^((i>>9)&7)  [conv stand-in; paper's Sec.III map source-missing]",
+      "bank_offset o(i) = i >> 3  [conv stand-in]",
+      "twiddle ROM addr: T[k] = psi^bitrev10(k) mod q  [conv; paper's reuse-loop f(stage,block) source-missing]",
+      "Barrett reduce(x): t = (x * 21843) >> 28; r = x - t*q; if (r >= q) r -= q  (single conditional subtraction)",
+      "radix-4 butterfly = two fused radix-2 stages sharing j = psi^512 mod q rotator (symmetric-operator math)",
+      "INTT final scale by N_inv = 12277 = 1024^-1 mod q"
+    ],
+    "fsm": [
+      "IDLE -> LOAD",
+      "LOAD -> RUN_STAGES",
+      "RUN_STAGES -> RUN_STAGES (per log-radix stage)",
+      "RUN_STAGES -> SCALE_INTT (INTT only)",
+      "RUN_STAGES -> DRAIN (NTT)",
+      "SCALE_INTT -> DRAIN",
+      "DRAIN -> DONE",
+      "DONE -> IDLE"
+    ],
+    "properties": [
+      "conflict-free memory mapping (arbitrary radix / #BU, no bank conflict) [unverifiable: paper Sec.III map not reproduced]",
+      "no bit-reversal stage / natural-order output [paper structural claim; functional impls do not embody it]",
+      "twiddle-factor reuse via rearranged loop [unverifiable: paper f(stage,block) not transcribed]",
+      "radix-4: 33% fewer mults (3->2/BU) and 20% fewer add/sub (10->8/BU) vs naive radix-4 [op-count claim, baseline reconstructed]",
+      "~50% butterfly hardware saved via symmetric operators [unverifiable: synthesis/area claim]",
+      "ATP LUT/FF/DSP/BRAM ~2.2x/1.2x/1.1x/1.9x lower than radix-2 (N=1024,14-bit,8 BU) [unverifiable: synthesis metric]"
+    ],
+    "notes": "[paper] abstract pins N=1024, 14-bit modulus, 8 parallel BUs, radix-2/4 architecture, 20%/33% add-sub/mult reduction, ~50% hardware saving, ATP 2.2/1.2/1.1/1.9x. [ref-impl:cfntt_ref] q=12289=3*2^12+1 (model_code/poly_mult_radix_2.py, hardware_code_radix-4/modular_mul.v). [src] psi=1945 (negacyclic, order 2048), omega=10302, N_inv=12277, Barrett mu=21843,k=28. [calc] 21843 = floor(2^28/12289); 12277 = 1024^-1 mod 12289; omega = psi^2 mod q (order-1024 root); j_rotator = psi^512 mod q (since psi^1024 = -1, this is the order-4 root for radix-4 fusion). [source-missing] paper's actual conflict-free (bank,offset) functions, per-stage crossbar permutation sigma_s, and twiddle-ROM f(stage,block) under the reuse loop are NOT transcribable (PDF FlateDecode body undecodable; eprint/ResearchGate 403); committed XOR-fold + bit-reversed ROM are [conv] reproduction stand-ins, not the paper's scheme. [source-missing] per-state cycle latencies beyond the aggregate 9 cycles/lane (mult 3 + add/sub 1 + Barrett 4 + reg 1) not stated. [source-missing] naive-radix-4 add/sub baseline of 10 is reconstructed to anchor the 20% claim, not quoted."
+  },
+  "part_specs": {
+    "addr_gen_unit": {
+      "ops": [
+        "bank_index b(i) = (i&7)^((i>>3)&7)^((i>>6)&7)^((i>>9)&7)  [conv stand-in]",
+        "bank_offset o(i) = i >> 3  [conv stand-in]"
+      ],
+      "notes": "[source-missing] paper's headline Sec.III conflict-free (bank,offset) map for arbitrary radix/#BU is not transcribable; the XOR-fold here is a [conv] reproduction stand-in that is conflict-free only for power-of-two strides and fails per-stage operand-distinctness at large strides."
+    },
+    "crossbar_network": {
+      "ops": [
+        "sigma_s = read/write permutation induced by the (bank,offset) map per stage s  [conv: derived from XOR-fold stand-in]"
+      ],
+      "notes": "[source-missing] the paper's explicit per-stage crossbar permutation table sigma_s is not transcribed; recorded as the permutation induced by addr_gen_unit's stand-in map."
+    },
+    "twiddle_rom": {
+      "widths": { "coeff": 14 },
+      "ops": [
+        "T[k] = psi^bitrev10(k) mod q, psi=1945  [conv; standard bit-reversed layout]"
+      ],
+      "params": { "psi": 1945, "depth": 1024 },
+      "notes": "[src] psi=1945. [source-missing] paper's twiddle-reuse addressing f(stage,block) under the rearranged loop not transcribed; bit-reversed ROM is a [conv] stand-in so the memory-footprint/reuse optimization is structurally absent here."
+    },
+    "schedule_controller": {
+      "fsm": [
+        "IDLE", "LOAD", "RUN_STAGES", "SCALE_INTT", "DRAIN", "DONE"
+      ],
+      "notes": "[conv] FSM both reverse-impls converged on: IDLE->LOAD->RUN_STAGES->(SCALE_INTT for INTT)->DRAIN->DONE->IDLE; DONE is wired back to IDLE to remove the dangling-state ambiguity prior lists carried. [source-missing] exact transition table and per-state cycle latencies not in retrievable source."
+    },
+    "config_radix_selector": {
+      "params": { "radix_modes": "2 | 4", "r4_requires": "N power of 4" },
+      "notes": "[paper] scalable radix-2/radix-4 datapath; [ref-impl:cfntt_ref README] radix-4 needs N a power of 4 (Falcon-1024/Dilithium/Saber), radix-2 covers Falcon-512."
+    },
+    "intt_scale": {
+      "params": { "N_inv": 12277 },
+      "ops": ["INTT output scale: y[i] = x[i] * 12277 mod q"],
+      "notes": "[calc] 12277 = 1024^-1 mod 12289 (N_inv); applied only in INTT direction."
+    },
+    "bram_0": {
+      "widths": { "coeff": 14 },
+      "params": { "depth_words": 128 },
+      "notes": "[calc] 8 interleaved banks x 128 words = 1024 coeffs (in-place). [source-missing] paper's exact BRAM depth/bank-size figures not retrievable (256 vs 128 inconsistency); 128 chosen as the N/banks-consistent value."
+    },
+    "bu_mult_0": {
+      "params": { "mult_latency": 3, "barrett_mu": 21843, "barrett_k": 28 },
+      "ops": ["modular multiply: Barrett reduce t=(a*b*21843)>>28; r=a*b - t*q; if(r>=q) r-=q"],
+      "notes": "[calc] 21843 = floor(2^28/12289). [paper] 9-cycle lane = mult 3 + add/sub 1 + Barrett 4 + reg 1; radix-4 BU uses 2 mults (opt) vs 3 (naive). [source-missing] per-stage cycle table not transcribed."
+    },
+    "r4_fuse_01": {
+      "params": { "j_rotator": "psi^512 mod q" },
+      "ops": ["radix-4 fusion: two radix-2 stages sharing j = psi^512 (order-4 root) via symmetric operators"],
+      "notes": "[calc] j = psi^512 mod q is the order-4 root (psi^1024 = -1). [paper] symmetric-operator sharing yields the ~50% hardware saving; functional model composes two radix-2 stages, faithful to the math but not the hardware sharing (unverifiable in SMT)."
+    },
+    "pcb_substrate": {
+      "ports": [
+        { "name": "pcie_rx", "dir": "in", "width": 14 },
+        { "name": "pcie_tx", "dir": "out", "width": 14 }
+      ],
+      "notes": "[source-missing] host PCIe/DMA framing, beat packing and handshake are reproduction-invented; the paper presents an NTT core, not a host interface, and the abstract does not describe one. Ports are [conv] placeholders (coeff-width beats) only — not source-confirmed."
+    }
+  },
+  "rationale": [
+    "metadata.spec.params pins the source-confirmed N=1024, 14-bit q=12289 (ref-impl), 8 BUs, and the [src] roots psi/omega/N_inv + Barrett constants so the numeric core stays reproducible.",
+    "Resolved the q ambiguity: q=12289 from the authors' own reference impl (was a [source-missing] reproduction fix).",
+    "Committed the divergent (bank,offset) map and crossbar sigma_s to the shared XOR-fold stand-in but kept the paper's real Sec.III map flagged [source-missing] so the guessed headline structure is visible, not papered over.",
+    "Committed twiddle-ROM to bit-reversed addressing [conv] while marking the paper's reuse-loop f(stage,block) source-missing.",
+    "Pinned the FSM to the converged IDLE->LOAD->RUN_STAGES->SCALE_INTT->DRAIN->DONE list with DONE->IDLE to kill the dangling-DONE and contradictory-state-list ambiguity.",
+    "Recorded all six named properties (conflict-free map, no-bit-reversal, twiddle reuse, op-count reductions, ~50% hw save, ATP ratios) with unverifiable/violated tags so they are explicit and not silently treated as failures.",
+    "Wrote naive-radix-4 baselines (3 mult / 10 add-sub) to anchor the 33%/20% claims, noting the add/sub baseline is reconstructed.",
+    "Derived constants written as verifiable expressions (21843=floor(2^28/12289), 12277=1024^-1 mod q, j=psi^512) for machine-checking.",
+    "Host PCIe ports placed on pcb_substrate as explicit [conv]/[source-missing] placeholders since the paper has no host interface."
+  ]
+}

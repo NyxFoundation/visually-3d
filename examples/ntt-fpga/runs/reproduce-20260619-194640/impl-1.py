@@ -1,0 +1,437 @@
+#!/usr/bin/env python3
+"""
+Self-checking reproduction of the CFNTT Radix-2/4 NTT Multiplication Accelerator
+from its scene spec ALONE.
+
+Functional core (what the hardware computes):
+  - a negacyclic (psi-twisted) NTT / INTT polynomial-multiplication engine over
+    GF(q), q=12289, N=1024, psi=1945, omega=psi^2, n_inv=1024^-1;
+  - Barrett modular reduction (mu=21843, k=28) as the shared reducer;
+  - an XOR-fold conflict-free bank/offset memory map for B=8 banks;
+  - a radix-4 butterfly fused from two radix-2 lanes (j=psi^512 rotator).
+
+Verification is split into two tiers (Tier-1 size-independent z3 proofs at full
+width; Tier-2 whole-system equivalence vs an independent golden at a SMALL valid
+instance). Prints exactly VERIFIED / FAIL.
+"""
+
+import os
+import random
+import z3
+
+# ----------------------------------------------------------------------------
+# Authoritative parameters (from metadata.spec.params / widths) -- verbatim.
+# ----------------------------------------------------------------------------
+Q          = 12289
+N          = 1024
+BANKS      = 8
+PSI        = 1945          # primitive 2N=2048-th root (negacyclic)
+OMEGA      = 10302         # psi^2
+NINV       = 12277         # 1024^-1 mod q
+GEN_G      = 11            # psi = g^6
+BARRETT_MU = 21843
+BARRETT_K  = 28
+COEFF_BITS = 14
+PROD_BITS  = 28
+
+
+def fail(msg):
+    print("FAIL: " + msg)
+    raise SystemExit(1)
+
+
+# ----------------------------------------------------------------------------
+# Plain-Python implementation of the datapath functions
+# ----------------------------------------------------------------------------
+def bank_idx(i):
+    """Committed GF(2) XOR-fold bank function b(i)."""
+    return (i & 7) ^ ((i >> 3) & 7) ^ ((i >> 6) & 7) ^ ((i >> 9) & 7)
+
+
+def offset_idx(i):
+    return i >> 3
+
+
+def barrett_reduce(x, q=Q, mu=BARRETT_MU, k=BARRETT_K):
+    """Hardware Barrett: qh=(x*mu)>>k; r=x-qh*q; up to 2 conditional subtracts."""
+    qh = (x * mu) >> k
+    r = x - qh * q
+    if r >= q:
+        r -= q
+    if r >= q:
+        r -= q
+    return r
+
+
+def _bitrev(x, bits):
+    r = 0
+    for _ in range(bits):
+        r = (r << 1) | (x & 1)
+        x >>= 1
+    return r
+
+
+def make_tables(n, q, psi):
+    bits = n.bit_length() - 1
+    psi_inv = pow(psi, q - 2, q)
+    psi_rev = [pow(psi, _bitrev(i, bits), q) for i in range(n)]
+    psi_inv_rev = [pow(psi_inv, _bitrev(i, bits), q) for i in range(n)]
+    ninv = pow(n, q - 2, q)
+    return psi_rev, psi_inv_rev, ninv
+
+
+def ntt_fwd(a, n, q, psi_rev):
+    """Merged-negacyclic Cooley-Tukey / DIT forward NTT (in place on a copy)."""
+    a = a[:]
+    t = n
+    m = 1
+    while m < n:
+        t //= 2
+        for i in range(m):
+            j1 = 2 * i * t
+            j2 = j1 + t
+            s = psi_rev[m + i]
+            for j in range(j1, j2):
+                u = a[j]
+                v = a[j + t] * s % q
+                a[j] = (u + v) % q
+                a[j + t] = (u - v) % q
+        m *= 2
+    return a
+
+
+def ntt_inv(a, n, q, psi_inv_rev, ninv):
+    """Gentleman-Sande / DIF inverse NTT, then scale by N^-1."""
+    a = a[:]
+    t = 1
+    m = n
+    while m > 1:
+        j1 = 0
+        h = m // 2
+        for i in range(h):
+            j2 = j1 + t
+            s = psi_inv_rev[h + i]
+            for j in range(j1, j2):
+                u = a[j]
+                v = a[j + t]
+                a[j] = (u + v) % q
+                a[j + t] = (u - v) * s % q
+            j1 += 2 * t
+        t *= 2
+        m //= 2
+    return [x * ninv % q for x in a]
+
+
+def pointwise(a, b, q):
+    return [(x * y) % q for x, y in zip(a, b)]
+
+
+# ----------------------------------------------------------------------------
+# Independent golden models (derived from the SPEC, not from the impl)
+# ----------------------------------------------------------------------------
+def negacyclic_conv_golden(a, b, q):
+    """Schoolbook polynomial mult mod (x^N + 1) -- the engine's whole-system job."""
+    n = len(a)
+    c = [0] * n
+    for i in range(n):
+        ai = a[i]
+        if ai == 0:
+            continue
+        for j in range(n):
+            k = i + j
+            v = ai * b[j] % q
+            if k < n:
+                c[k] = (c[k] + v) % q
+            else:
+                c[k - n] = (c[k - n] - v) % q
+    return c
+
+
+def radix4_butterfly_spec(x0, x1, x2, x3, w, j, q):
+    """The spec's explicit symmetric radix-4 BU (config_radix_selector eqns)."""
+    b = w * x1 % q
+    c = w * w % q * x2 % q
+    d = w * w % q * w % q * x3 % q
+    y0 = (x0 + b + c + d) % q
+    y1 = (x0 + j * b - c - j * d) % q
+    y2 = (x0 - b + c - d) % q
+    y3 = (x0 - j * b - c + j * d) % q
+    return [y0, y1, y2, y3]
+
+
+def radix4_butterfly_golden(x0, x1, x2, x3, w, j, q):
+    """DFT4: Y[t] = sum_r (w^r * x_r) * j^(r*t) mod q (independent definition)."""
+    W = [1, w % q, w * w % q, w * w % q * w % q]
+    X = [x0, x1, x2, x3]
+    XW = [W[r] * X[r] % q for r in range(4)]
+    out = []
+    for t in range(4):
+        acc = 0
+        for r in range(4):
+            acc = (acc + XW[r] * pow(j, (r * t) % 4, q)) % q
+        out.append(acc)
+    return out
+
+
+# ----------------------------------------------------------------------------
+# TIER 1 -- size-independent properties, proven with z3 at full bit-width
+# ----------------------------------------------------------------------------
+def tier1_constants():
+    """Algebraic relations among the pinned twiddle/reduction constants."""
+    if pow(PSI, 2048, Q) != 1:
+        fail("psi^2048 != 1 mod q")
+    if pow(PSI, 1024, Q) != Q - 1:
+        fail("psi^1024 != -1 mod q (not negacyclic)")
+    if OMEGA != PSI * PSI % Q:
+        fail("omega != psi^2")
+    if pow(OMEGA, 1024, Q) != 1 or pow(OMEGA, 512, Q) != Q - 1:
+        fail("omega is not a primitive 1024-th root")
+    if NINV * N % Q != 1:
+        fail("Ninv * N != 1 mod q")
+    if pow(GEN_G, 6, Q) != PSI:
+        fail("g^6 != psi (g=11)")
+    j = pow(PSI, 512, Q)
+    if j * j % Q != Q - 1:
+        fail("j=psi^512 is not an order-4 root (j^2 != -1)")
+    if BARRETT_MU != (1 << BARRETT_K) // Q:
+        fail("mu != floor(2^k / q)")
+    if Q * Q >= (1 << BARRETT_K):
+        fail("q^2 >= 2^28: Barrett input bound violated")
+    return j
+
+
+def tier1_barrett():
+    """Prove Barrett reduction == x mod q, in [0,q), for EVERY x in [0, q^2)."""
+    x = z3.Int("x")
+    qh = (x * BARRETT_MU) / (1 << BARRETT_K)      # z3 Int floor-div
+    r0 = x - qh * Q
+    r1 = z3.If(r0 >= Q, r0 - Q, r0)
+    r2 = z3.If(r1 >= Q, r1 - Q, r1)
+    s = z3.Solver()
+    s.add(x >= 0, x < Q * Q)
+    s.add(z3.Or(r2 < 0, r2 >= Q, (x - r2) % Q != 0))   # any wrong outcome
+    if s.check() == z3.sat:
+        m = s.model()
+        fail("Barrett wrong at x=%s" % m[x])
+
+
+def _bank_bv(i):
+    seven = z3.BitVecVal(7, i.size())
+    return (i & seven) ^ (z3.LShR(i, 3) & seven) ^ \
+           (z3.LShR(i, 6) & seven) ^ (z3.LShR(i, 9) & seven)
+
+
+def tier1_bank_conflict_free():
+    """For every power-of-two stride 2^s, paired operands land in distinct banks."""
+    W = 16
+    for s in range(10):                       # strides 1,2,...,512 (s=0..9)
+        stride = 1 << s
+        i = z3.BitVec("i", W)
+        sol = z3.Solver()
+        sol.add(z3.ULT(i, N), z3.ULT(i + stride, N))
+        sol.add(_bank_bv(i) == _bank_bv(i + stride))
+        if sol.check() == z3.sat:
+            fail("radix-2 bank collision at stride 2^%d" % s)
+
+    # radix-4 gathers (i, i+2^s, i+2^{s+1}, i+3*2^s): all 4 in distinct banks.
+    for s in range(9):
+        st = 1 << s
+        idxs = [0, st, 2 * st, 3 * st]
+        i = z3.BitVec("i", W)
+        sol = z3.Solver()
+        sol.add(z3.ULT(i, N), z3.ULT(i + 3 * st, N))
+        coll = z3.Or(*[
+            _bank_bv(i + idxs[a]) == _bank_bv(i + idxs[b])
+            for a in range(4) for b in range(a + 1, 4)
+        ])
+        sol.add(coll)
+        if sol.check() == z3.sat:
+            fail("radix-4 bank collision at stride 2^%d" % s)
+
+
+def tier1_bank_bijection():
+    """(bank, offset) is injective on [0, N): a true conflict-free address map."""
+    W = 11
+    i = z3.BitVec("i", W)
+    j = z3.BitVec("j", W)
+    sol = z3.Solver()
+    sol.add(z3.ULT(i, N), z3.ULT(j, N), i != j)
+    sol.add(_bank_bv(i) == _bank_bv(j))
+    sol.add(z3.LShR(i, 3) == z3.LShR(j, 3))
+    if sol.check() == z3.sat:
+        fail("(bank,offset) not injective -- mapping not conflict-free")
+
+
+def tier1_radix4_identity(j):
+    """Prove the spec's explicit radix-4 BU == DFT4 mod q, for all operands/twiddle.
+
+    The y-equations are LINEAR in (x0, b'=w*x1, c'=w^2*x2, d'=w^3*x3) with the
+    concrete order-4 rotator j, so treating the twiddled products as free vars
+    keeps the proof in decidable linear integer arithmetic at full modulus.
+    """
+    x0, b, c, d = z3.Ints("x0 b c d")
+    j2 = pow(j, 2, Q)
+    j3 = pow(j, 3, Q)
+    spec = [
+        (x0 + b + c + d) % Q,
+        (x0 + j * b - c - j * d) % Q,
+        (x0 - b + c - d) % Q,
+        (x0 - j * b - c + j * d) % Q,
+    ]
+    jp = [1, j, j2, j3]
+    gold = []
+    for t in range(4):
+        gold.append((x0 + b * jp[(1 * t) % 4] + c * jp[(2 * t) % 4]
+                     + d * jp[(3 * t) % 4]) % Q)
+    sol = z3.Solver()
+    sol.add(x0 >= 0, x0 < Q, b >= 0, b < Q, c >= 0, c < Q, d >= 0, d < Q)
+    sol.add(z3.Or(*[spec[t] != gold[t] for t in range(4)]))
+    if sol.check() == z3.sat:
+        fail("radix-4 butterfly != DFT4")
+
+
+def tier1_radix2_modular():
+    """Radix-2 CT butterfly stays in [0,q) and is correct mod q (free operands)."""
+    u, v = z3.Ints("u v")
+    y0 = (u + v) % Q
+    y1 = (u - v) % Q
+    sol = z3.Solver()
+    sol.add(u >= 0, u < Q, v >= 0, v < Q)
+    sol.add(z3.Or(y0 < 0, y0 >= Q, y1 < 0, y1 >= Q,
+                  (y0 - (u + v)) % Q != 0, (y1 - (u - v)) % Q != 0))
+    if sol.check() == z3.sat:
+        fail("radix-2 butterfly out of range / incorrect mod q")
+
+
+# ----------------------------------------------------------------------------
+# TIER 2 -- whole-system equivalence vs the independent golden, SMALL instance
+# ----------------------------------------------------------------------------
+def tier2_small():
+    """N=8, q=17, psi=3 (primitive 16th root): identity + negacyclic-conv golden."""
+    n, q, psi = 8, 17, 3
+    if pow(psi, 2 * n, q) != 1 or pow(psi, n, q) != q - 1:
+        fail("small instance roots invalid")
+    psr, pir, ninv = make_tables(n, q, psi)
+
+    rnd = random.Random(20220101)
+    for _ in range(300):
+        a = [rnd.randrange(q) for _ in range(n)]
+        b = [rnd.randrange(q) for _ in range(n)]
+        # (1) round-trip identity
+        if ntt_inv(ntt_fwd(a, n, q, psr), n, q, pir, ninv) != a:
+            fail("small INTT(NTT(a)) != a  a=%r" % a)
+        # (2) whole-system: NTT-domain mult == schoolbook negacyclic conv
+        prod = ntt_inv(pointwise(ntt_fwd(a, n, q, psr),
+                                 ntt_fwd(b, n, q, psr),
+                                 q), n, q, pir, ninv)
+        gold = negacyclic_conv_golden(a, b, q)
+        if prod != gold:
+            fail("small negacyclic conv mismatch a=%r b=%r got=%r want=%r"
+                 % (a, b, prod, gold))
+
+    # also exercise the radix-4 BU numerically at the small modulus
+    jsm = pow(psi, 2 * n // 4, q)  # order-4 element
+    for _ in range(200):
+        x = [rnd.randrange(q) for _ in range(4)]
+        w = rnd.randrange(q)
+        if (radix4_butterfly_spec(x[0], x[1], x[2], x[3], w, jsm, q)
+                != radix4_butterfly_golden(x[0], x[1], x[2], x[3], w, jsm, q)):
+            fail("small radix-4 BU mismatch")
+
+
+def tier2_production_roundtrip():
+    """Production instance (N=1024, q=12289, psi=1945): O(N log N) round-trip only."""
+    psr, pir, ninv = make_tables(N, Q, PSI)
+    if ninv != NINV:
+        fail("derived n_inv != spec NINV")
+    rnd = random.Random(7)
+    vectors = [
+        [0] * N,
+        [1] + [0] * (N - 1),
+        [(i % Q) for i in range(N)],
+        [rnd.randrange(Q) for _ in range(N)],
+        [rnd.randrange(Q) for _ in range(N)],
+    ]
+    for a in vectors:
+        a = [x % Q for x in a]
+        if ntt_inv(ntt_fwd(a, N, Q, psr), N, Q, pir, ninv) != a:
+            fail("production INTT(NTT(a)) != a")
+
+    # Barrett impl must match Python's % q across the full product range (sampled).
+    for _ in range(20000):
+        x = rnd.randrange(Q * Q)
+        if barrett_reduce(x) != x % Q:
+            fail("barrett_reduce(%d) != %d" % (x, x % Q))
+
+    # Optional full O(N^2) golden conv at production size -- gated, off by default.
+    if os.environ.get("DEEP_VERIFY") == "1":
+        a = [rnd.randrange(Q) for _ in range(N)]
+        b = [rnd.randrange(Q) for _ in range(N)]
+        got = ntt_inv(pointwise(ntt_fwd(a, N, Q, psr),
+                                ntt_fwd(b, N, Q, psr), Q),
+                      N, Q, pir, ninv)
+        if got != negacyclic_conv_golden(a, b, Q):
+            fail("production negacyclic conv mismatch (DEEP_VERIFY)")
+
+
+# ----------------------------------------------------------------------------
+# Structural / control sanity (cycle accounting + committed FSM walk)
+# ----------------------------------------------------------------------------
+def check_structure_and_fsm():
+    # cycle accounting from N=1024, P=8 parallel BUs (config_radix_selector).
+    if 4 ** 5 != N:
+        fail("radix-4 stage count: log4(N) != 5")
+    if (N // 4) // BANKS != 32 or 5 * 32 != 160:
+        fail("radix-4 cycle accounting wrong")
+    if (N // 2) // BANKS != 64 or 10 * 64 != 640:
+        fail("radix-2 cycle accounting wrong")
+    if COEFF_BITS != 14 or PROD_BITS != 2 * COEFF_BITS:
+        fail("width relation product != 2*coeff")
+
+    # Committed schedule FSM walk (NTT skips SCALE; INTT passes through it).
+    def run(intt, stages):
+        st = "IDLE"
+        seq = [st]
+        st = "LOAD";      seq.append(st)
+        st = "RUN_STAGE"; seq.append(st)
+        for s in range(1, stages):
+            st = "NEXT_STAGE"; seq.append(st)
+            st = "RUN_STAGE";  seq.append(st)
+        st = "NEXT_STAGE"; seq.append(st)
+        if intt:
+            st = "SCALE"; seq.append(st)
+        st = "STORE"; seq.append(st)
+        st = "DONE";  seq.append(st)
+        st = "IDLE";  seq.append(st)
+        return seq
+
+    ntt_seq = run(False, 5)
+    intt_seq = run(True, 5)
+    if "SCALE" in ntt_seq:
+        fail("NTT path must not enter SCALE")
+    if "SCALE" not in intt_seq:
+        fail("INTT path must enter SCALE (N^-1 scaling)")
+    if ntt_seq[-1] != "IDLE" or ntt_seq[-2] != "DONE":
+        fail("FSM does not return DONE->IDLE")
+
+
+# ----------------------------------------------------------------------------
+def main():
+    j = tier1_constants()
+    tier1_barrett()
+    tier1_bank_conflict_free()
+    tier1_bank_bijection()
+    tier1_radix4_identity(j)
+    tier1_radix2_modular()
+
+    tier2_small()
+    tier2_production_roundtrip()
+
+    check_structure_and_fsm()
+
+    print("VERIFIED")
+    raise SystemExit(0)
+
+
+if __name__ == "__main__":
+    main()

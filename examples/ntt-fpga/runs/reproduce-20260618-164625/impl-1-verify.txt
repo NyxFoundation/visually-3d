@@ -1,0 +1,8 @@
+pass=false ran=true
+--- stdout ---
+
+--- stderr ---
+  File "/home/gohan/.visually-3d/runs/ntt-fpga/reproduce-20260618-164625/check.py", line 261
+    rng = random.Random(0xCFNTT)
+                           ^
+SyntaxError: invalid hexadecimal literal

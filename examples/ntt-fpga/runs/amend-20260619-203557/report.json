@@ -1,0 +1,237 @@
+{
+  "reproducibility": 71,
+  "verdict": "ambiguous",
+  "divergences": [
+    "Reference/golden model: Impl 1 self-checks via z3 proofs + a single e2e_N=16 whole-system equivalence; Impl 2 adds an independent schoolbook negacyclic-convolution AND direct O(N^2) DFT golden — the spec never pins which reference behavior the impl must equal, so each invented its own correctness oracle.",
+    "Output ordering: both embed a bit-reversed psi/twiddle table and relabel to natural order, but neither could reproduce the paper's 'no bit-reversal' natural-order datapath — the spec leaves the rearranged-loop addressing open, so both fell back to the same reconstruction (a shared guess, not a spec-pinned fact).",
+    "Radix-4 fused butterfly: both verify only the DFT4 identity (2-mult count asserted), neither reproduces the actual symmetric-operator 2-mult sharing mechanism — the spec gives only the 2/3 and 8/10 counts, not the formula.",
+    "Barrett conditional-subtract count: spec is internally inconsistent ('exactly 2' vs '<=2' vs 'one conditional subtract'); both impls independently chose '<=2 for x in [0,(q-1)^2]' to resolve it.",
+    "FSM transition table: spec carries three contradictory state lists; each impl reconstructed its own (Impl 2: IDLE->LOAD->RUN_STAGE/NEXT_STAGE->SCALE->DRAIN->DONE), source-missing.",
+    "Naive radix-4 add/sub baseline (10) used to anchor the 20% claim is reconstructed by both, not given."
+  ],
+  "missing_fields": [
+    {
+      "item": "Paper Sec.III conflict-free bank()/offset() functions (the headline result; spec carries only a committed XOR-fold reconstruction marked [conv])",
+      "kind": "operation",
+      "where": "global"
+    },
+    {
+      "item": "Per-stage crossbar permutation sigma_s table that achieves bank-conflict-free 8-lane access",
+      "kind": "operation",
+      "where": "global"
+    },
+    {
+      "item": "Rearranged-loop twiddle-ROM addressing that yields true natural-order I/O with NO bit-reversal anywhere",
+      "kind": "operation",
+      "where": "global"
+    },
+    {
+      "item": "Concrete 2-modular-multiplication symmetric-operator radix-4 butterfly formula (only counts 2/3, 8/10 are given)",
+      "kind": "operation",
+      "where": "global"
+    },
+    {
+      "item": "Authoritative FSM/state-machine transition table and per-stage cycle schedule (three contradictory versions present)",
+      "kind": "control",
+      "where": "global"
+    },
+    {
+      "item": "Exact Barrett correction bound — number of conditional subtractions (spec says 'exactly 2', '<=2', and 'one' in different places)",
+      "kind": "operation",
+      "where": "global"
+    },
+    {
+      "item": "Naive radix-4 add/sub baseline that the 20% reduction is measured against",
+      "kind": "param",
+      "where": "global"
+    },
+    {
+      "item": "Host PCIe/DMA/AXI-Stream interface protocol, handshake and beat-packing (declared reproduction-invented, omitted by both)",
+      "kind": "port",
+      "where": "global"
+    },
+    {
+      "item": "9-cycle pipeline latency as a cycle-accurate model (carried only as a scalar, not a timing semantics)",
+      "kind": "timing",
+      "where": "global"
+    },
+    {
+      "item": "8-way simultaneous (single-cycle) bank-distinctness guarantee — both only prove pairwise per-operand distinctness",
+      "kind": "operation",
+      "where": "global"
+    }
+  ],
+  "fidelity": 54,
+  "fidelity_report": {
+    "parameter_fidelity": [
+      {
+        "param": "transform size N",
+        "reference_value": "1024",
+        "impl_value": "1024",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "modulus q",
+        "reference_value": "14-bit NTT-friendly prime (12289 is a reproduction choice, not paper-stated)",
+        "impl_value": "12289",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "coefficient/modulus width",
+        "reference_value": "14-bit",
+        "impl_value": "14-bit (product 28-bit)",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "parallel butterfly units",
+        "reference_value": "8",
+        "impl_value": "8",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "radix support",
+        "reference_value": "scalable radix-2/4 (N power of 4 for r4)",
+        "impl_value": "radix-2 and radix-4 DIT",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "reduction algorithm",
+        "reference_value": "Barrett, mu=21843, k=28",
+        "impl_value": "Barrett mu=21843, k=28",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "twiddle root psi (negacyclic, order 2048)",
+        "reference_value": "psi=1945, omega=10302, N^-1=12277",
+        "impl_value": "psi=1945, omega=10302, Ninv=12277",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "radix-4 mult count",
+        "reference_value": "naive 3 -> optimized 2",
+        "impl_value": "2 (asserted via DFT4 identity, sharing mechanism not reproduced)",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "radix-4 add/sub count",
+        "reference_value": "naive 10 -> optimized 8",
+        "impl_value": "8 (baseline 10 reconstructed)",
+        "match": true,
+        "where": "global"
+      }
+    ],
+    "property_checks": [
+      {
+        "property": "NTT followed by INTT (with N^-1 scaling) is the identity",
+        "status": "satisfied",
+        "evidence": "Both prove round-trip = identity (Impl 2 against schoolbook negacyclic conv + direct DFT goldens).",
+        "where": "global"
+      },
+      {
+        "property": "negacyclic transform with merged psi-twist",
+        "status": "satisfied",
+        "evidence": "Both implement Longa-Naehrig merged-psi CT/DIT forward + GS/DIF inverse over Z_q[x]/(x^N+1).",
+        "where": "global"
+      },
+      {
+        "property": "no bit-reversal stage / natural-order output",
+        "status": "violated",
+        "evidence": "Both embed a bit-reversed twiddle ROM and relabel to natural order — neither reproduces the paper's bit-reversal-free datapath; spec itself marks this 'target — not yet reproduced'.",
+        "where": "global"
+      },
+      {
+        "property": "conflict-free memory mapping (arbitrary radix/#BU, no bank conflict)",
+        "status": "unverifiable",
+        "evidence": "Only a committed XOR-fold reconstruction is used; both prove just pairwise stride distinctness, not the paper's full 8-lane single-cycle no-conflict guarantee, and the paper's actual map is source-missing.",
+        "where": "global"
+      },
+      {
+        "property": "radix-4 uses 33% fewer mults / 20% fewer add/sub via symmetric operators",
+        "status": "unverifiable",
+        "evidence": "Counts are asserted but the actual 2-mult symmetric sharing formula and the naive baseline are reconstructed, not derived from source; spec flags the 'vs radix-2' framing as [violated] (it is vs naive radix-4).",
+        "where": "global"
+      },
+      {
+        "property": "~50% butterfly hardware saved via symmetric operators",
+        "status": "unverifiable",
+        "evidence": "Resource/area claim — not expressible in the functional Python/SMT model.",
+        "where": "global"
+      },
+      {
+        "property": "ATP LUT/FF/DSP/BRAM ~2.2x/1.2x/1.1x/1.9x lower than radix-2",
+        "status": "unverifiable",
+        "evidence": "Synthesis metric; no place-and-route in a functional reproduction.",
+        "where": "global"
+      },
+      {
+        "property": "twiddle-factor reuse via rearranged loop",
+        "status": "unverifiable",
+        "evidence": "Standard (1<<stage)+block addressing used; the rearranged-loop reuse structure is source-missing.",
+        "where": "global"
+      }
+    ],
+    "structural_findings": [
+      "The defining contribution — the conflict-free bank/offset map and per-stage crossbar — is replaced by a reconstructed XOR-fold; the architecture is functionally equivalent but is NOT the paper's specific mapping.",
+      "Both retain a bit-reversed intermediate then relabel, directly contradicting the paper's natural-order / no-bit-reversal datapath.",
+      "The fused two-stage radix-4 schedule that realizes the 2-mult/8-add-sub savings is collapsed to a recursive/textbook radix-4 DIT verified only by the DFT4 identity, not the paper's symmetric-operator datapath.",
+      "Host PCIe/DMA/AXI-Stream boundary and the cycle-accurate 9-stage pipeline are omitted entirely — modeled as pure functional transforms."
+    ]
+  },
+  "summary": "Reproducibility is moderate: the spec pins the full functional parameter set (N, q=12289, psi/omega/Ninv, Barrett mu/k, 8 BU, 14-bit widths) so the two impls agree almost everywhere, but the paper's headline structures — the conflict-free Sec.III bank/offset map, the natural-order no-bit-reversal addressing, the fused 2-mult radix-4 schedule, and a consistent FSM and Barrett-correction bound — are source-missing, forcing shared reconstructions. Fidelity is mid: every recoverable parameter matches and the negacyclic round-trip identity holds, but the system's actual differentiators (no bit-reversal, the specific conflict-free mapping, the symmetric-operator savings) are violated or unverifiable, so the impls are closer to a generic correct negacyclic NTT than to the precise CFNTT architecture.",
+  "backend": "python-smt",
+  "executable_verification": {
+    "enabled": true,
+    "passed": 0,
+    "total": 2,
+    "ran": 2,
+    "harness_errors": 0
+  },
+  "verify_findings": [
+    {
+      "impl": 1,
+      "pass": false,
+      "ran": true,
+      "kind": "fail",
+      "confidence": 52,
+      "counterexample": "FAIL: bank conflict at stride 2^0 for i=799"
+    },
+    {
+      "impl": 2,
+      "pass": false,
+      "ran": true,
+      "kind": "fail",
+      "confidence": 61,
+      "counterexample": "FAIL: op-count reductions inconsistent (expect 33% mult / 20% add-sub)"
+    }
+  ],
+  "guessed": [
+    "Forward/inverse butterfly convention -> CT/DIT forward, GS/DIF inverse (Longa-Naehrig merged psi-twist negacyclic); spec only pins 'DIT, merged psi-twist'",
+    "Fast-NTT output ordering -> standard bit-reversed output reindexed to natural (the committed ROM embeds bit-reversal, contradicting the paper's no-bit-reversal claim which I could not reproduce)",
+    "Twiddle-ROM address function f(stage,block) -> standard (1<<stage)+block with bit-reversed psi-power table; paper's rearranged-loop addressing is source-missing",
+    "Per-stage crossbar permutation sigma_s -> taken as the permutation induced by the committed bank() (sigma_s = bank^-1 at stride 2^s); paper's table not transcribed",
+    "Conflict-free bank()/offset() -> committed XOR-fold bank(i)=(i&7)^((i>>3)&7)^((i>>6)&7)^((i>>9)&1), offset(i)=i>>3; paper's Sec.III functions not transcribed",
+    "Radix-4 fused 2-mult symmetric schedule -> verified only as the DFT4 identity y_t=sum in[m]*j^{tm} with j=psi^512; the actual 2-vs-3-mult sharing mechanism is source-missing",
+    "Barrett conditional-subtract count -> <=2 subtractions for x in [0,(q-1)^2] (spec is internally inconsistent: 'exactly 2' vs '<=2', 'one conditional subtract' elsewhere)",
+    "e2e small size root psi16 -> psi^(2048/32)=1945^64 mod 12289 (order 32, 16th power = -1), per spec verification.e2e_N=16",
+    "Host/PCIe/DMA AXI-Stream framing -> not modeled functionally (spec marks the whole host boundary reproduction-invented / source-missing)",
+    "modulus q -> 12289 (ref-impl value; paper body only says '14-bit NTT-friendly prime')",
+    "Exact merged-negacyclic NTT algorithm -> standard Longa-Naehrig CT/DIT forward (bit-reversed psi table) + GS/DIF inverse with final N^-1 scale; spec pins only 'DIT merged psi-twist' / 'GS inverse' and a bit-reversed ROM layout",
+    "Reference golden for correctness -> schoolbook negacyclic convolution in Z_q[x]/(x^N+1) and a direct O(N^2) DFT; spec gives only properties, not a reference model",
+    "Radix-4 butterfly equations -> taken verbatim from the exploded-view part (y0..y3 with j=omega^(N/4) constant rotator); verified to equal a recursive radix-4 DIT == direct DFT, but the paper's *fused two-stage conflict-free schedule* is source-missing",
+    "Conflict-free bank/offset map -> bank(i)=(i&7)^((i>>3)&7)^((i>>6)&7)^((i>>9)&1), offset(i)=i>>3 (the spec's committed XOR-fold; paper's Sec.III function is undecodable)",
+    "Per-stage crossbar permutation sigma_s -> defined as bank()-induced routing; paper's explicit table is source-missing",
+    "Twiddle-ROM address f(stage,block) -> (1<<stage)+block with bit-reversed contents; this still embeds bit-reversal, contradicting the headline 'no bit-reversal' claim which the source does not let me reconstruct",
+    "FSM transition table -> reconstructed IDLE->LOAD->RUN_STAGE/NEXT_STAGE->(SCALE if INTT)->DRAIN->DONE->IDLE; paper's exact table is source-missing",
+    "Barrett conditional-subtract count -> <=2 subtractions, proven sufficient for x in [0,(q-1)^2]",
+    "Host PCIe/DMA/AXI-Stream boundary -> omitted from the functional model entirely (spec itself flags it as reproduction-invented, not in the paper)",
+    "8-way simultaneous bank distinctness -> only pairwise (per butterfly operand pair) distinctness proven for every stride; full 8-lane no-conflict at one cycle is asserted by the map but not exhaustively proven here"
+  ]
+}

@@ -1,0 +1,10 @@
+  parts: 38   score: 84/100
+  critique: In the ISO render the 16x12 board is an oversized flat slab (bounds.radius ~10, over the ~9 limit) so the floorplan reads as a dark featureless plate with low parts crouching on it; the TOP view is the only legible angle. The four butterfly clusters used a single opaque 'housing' box per cluster — a build-test failure because the paper's whole point is the symmetric add/sub operators and the DSP multiplier, which were collapsed into one ALU box rather than modeled as distinct members. The conflict-free schedule controller (the central algorithmic contribution) was missing entirely, and primitives were almost all boxes.
+  + Shrank board to 14x0.4x9 (bounds.radius 10 -> 8.3) and re-pitched all eight BRAM banks to fit, fixing the proportional violation
+  + Replaced each opaque butterfly 'housing' with a thin open baseplate so internals are fully exposed in ISO (X-ray test)
+  + Split every butterfly cluster into four real members — DSP modular multiplier, symmetric modular adder, symmetric modular subtractor, and a pipeline register — modeled 4x with distinct ids
+  + Added the Conflict-Free Schedule/FSM Controller (the loop-reordering contribution) on the right cluster
+  + Raised component heights and tightened the connection graph into a clean assembly order rooted at the PCB
+  · gap: Add an exploded copy of one butterfly cluster floating ~2.5 m above the board to make the radix-4 datapath unmistakable from ISO
+  · gap: Add an FPGA die/package outline plus a heatsink so the silhouette reads instantly as an FPGA accelerator, not a generic PCB
+  · gap: Differentiate a forward-NTT vs inverse-NTT (INTT) annotation/path and vary primitives further (e.g. capsule pipeline FIFOs) for the geometry axis

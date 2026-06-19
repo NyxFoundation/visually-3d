@@ -1,0 +1,162 @@
+You are closing the loop of a "visioned self-improvement" system. A scene
+descriptor doubles as the SPEC for a real system (a circuit, an algorithm, a
+machine, a building). Independent engineers tried to rebuild the system from
+this spec alone and a verifier ran their implementations. They found exactly
+which facts the spec FAILED to pin down. Your job: write those facts back into
+the scene's functional spec so the spec becomes reproducible — WITHOUT changing
+what the scene looks like.
+
+THE SPEC SUBSTRATE (this is the ONLY thing you grow):
+- Each part may carry `spec`: { params?, widths?, ports?[ {name,dir,width} ],
+  ops?[], fsm?[], notes? }. Top-level `metadata.spec` holds the same shape for
+  system-level facts (clocking, global params, handshake, FSM).
+- Geometry (shape/position/size/rotation/material) is 3D DECORATION. Do NOT
+  change it. Do NOT add, remove, move, reshape, or re-material any part.
+- Keep machine_name, every part id, and all existing fields intact. You may only
+  ADD/refine `spec` blocks, and tighten `role` / `assembly_instructions`
+  prose so it stays consistent with the new spec.
+
+THE SOURCE this system comes from (paper/datasheet metadata — QUOTE it to pin
+the SPECIFIC system's real values; do NOT invent values it does not support):
+```json
+{
+ "reference": "https://tches.iacr.org/index.php/TCHES/article/view/9291",
+ "domain": "cryptographic-hardware",
+ "info": {
+  "japanese_name": "CFNTT スケーラブル基数2/4 NTT 乗算アーキテクチャ (FPGA)",
+  "english_name": "CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture",
+  "summary": "An FPGA accelerator for the Number Theoretic Transform that combines a conflict-free memory mapping scheme with parallel radix-4 butterfly units, the polynomial-multiplication engine behind lattice post-quantum cryptography and homomorphic encryption.",
+  "description": "CFNTT is an algorithm-hardware co-designed NTT core proposed by Chen et al. (Tsinghua University) in TCHES 2022. Its central contribution is a conflict-free memory mapping scheme that lets an arbitrary radix and an arbitrary number of parallel butterfly units access an interleaved BRAM system without bank conflicts, removing the bit-reversal cost and reducing memory footprint by reusing twiddle factors across a rearranged loop structure.",
+  "description2": "Built on this scheme, the architecture realizes a scalable radix-2 / radix-4 datapath. A dedicated schedule cuts radix-4 modular additions/subtractions by 20% and modular multiplications by 33%, while exploiting symmetric operators saves nearly 50% of the butterfly hardware. For a 1024-point, 14-bit NTT with 8 parallel butterfly units, the radix-4 core achieves roughly 2.2x/1.2x/1.1x/1.9x lower LUT/FF/DSP/BRAM area-time product than the radix-2 core.",
+  "facts": [
+   {
+    "label": "Transform",
+    "value": "Number Theoretic Transform (NTT/INTT)"
+   },
+   {
+    "label": "Benchmark size",
+    "value": "1024 points, 14-bit modulus (q=12289 repro.)"
+   },
+   {
+    "label": "Parallel butterfly units",
+    "value": "8 (8 modeled, 1.1 m bank/lane pitch)"
+   },
+   {
+    "label": "Radix-4 mult reduction",
+    "value": "33% fewer modular multiplications"
+   },
+   {
+    "label": "Radix-4 add/sub reduction",
+    "value": "20% fewer modular add/sub"
+   },
+   {
+    "label": "Hardware saving",
+    "value": "~50% via symmetric operators"
+   },
+   {
+    "label": "Reduction",
+    "value": "Barrett: mu=21843, k=28, shift/subtract"
+   },
+   {
+    "label": "Pipeline latency",
+    "value": "9 cycles/lane (mult 3 + add/sub 1 + Barrett 4 + reg 1)"
+   },
+   {
+    "label": "ATP advantage (LUT)",
+    "value": "~2.2x lower vs radix-2"
+   },
+   {
+    "label": "Twiddle root",
+    "value": "psi=1945 (negacyclic, order 2048), omega=10302, N^-1=12277"
+   }
+  ],
+  "sources": [
+   {
+    "title": "CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture (TCHES 2022)",
+    "url": "https://tches.iacr.org/index.php/TCHES/article/view/9291"
+   },
+   {
+    "title": "CFNTT PDF (IACR TCHES)",
+    "url": "https://tches.iacr.org/index.php/TCHES/article/download/9291/8857"
+   },
+   {
+    "title": "DOI 10.46586/tches.v2022.i1.94-126",
+    "url": "https://doi.org/10.46586/tches.v2022.i1.94-126"
+   }
+  ]
+ }
+}
+```
+
+MISSING FIELDS the spec must now carry (each says which part's spec to write):
+- [operation] The paper's actual conflict-free bank-index b(i) and offset o(i) functions (the headline Sec. III result); the supplied map collides for radix-2 stages s>=6 → write into part "addr_gen_unit".spec
+- [control] Exact NTT/INTT datapath algorithm: DIT vs DIF, stride direction, twiddle ordering, in-place vs ping-pong → write into part "config_radix_selector".spec
+- [operation] Radix-4 fused per-stage schedule and twiddle addressing that realize the 33%/20% op savings → write into part "config_radix_selector".spec
+- [operation] Per-stage crossbar permutation sigma_s that routes lanes to banks each stage → write into part "crossbar_network".spec
+- [control] Schedule/FSM states, loop bounds and transitions (taken from reproduction metadata, not the paper) → write into part "schedule_controller".spec
+- [param] Twiddle-ROM contents / generator convention and stage-to-address mapping (psi=1945 is a reproduction choice) → write into part "twiddle_rom".spec
+- [timing] Authoritative pipeline cycle counts (currently 'reproduction defaults') → write into metadata.spec
+
+WHERE INDEPENDENT IMPLEMENTATIONS DIVERGED (the spec was ambiguous here — you
+must COMMIT to ONE concrete value to remove the ambiguity, and record it):
+- NTT decimation/stride direction: Impl1 uses decreasing-stride Cooley-Tukey forward + Gentleman-Sande inverse; Impl2 notes the spec's pairing rule (i, i+2^s) implies increasing-stride DIT but it did NOT follow it. The spec gives parts/wiring but no actual transform algorithm (DIT vs DIF, twiddle ordering).
+- Bank index/offset functions: both impls take b(i)=(i+(i>>3))%8, o(i)=i>>3 verbatim and both independently find it is NOT conflict-free for the higher radix-2 stages (partners (i,i+2^s) collide for s>=6). The spec's central 'conflict-free' map is unrecoverable, so each impl only proves injectivity, not conflict-freedom.
+- Per-stage crossbar permutation sigma_s: unverifiable against any reference; each impl improvises the schedule.
+- INTT twiddle handling (psi^-i post-twist vs merged into butterflies) left to implementer.
+- In-place vs ping-pong buffering of the BRAM banks not pinned.
+
+VERIFIER COUNTEREXAMPLES (hard evidence — the spec/impl was actually wrong here;
+fix the spec so the intended behavior is unambiguous):
+(none — verification passed or was disabled)
+
+FIDELITY GAPS — the impls drifted from the SPECIFIC system the SOURCE/paper
+describes. Pin the source's truth into the spec so the scene stops being a
+generic "a-correct-one" and becomes the actual system:
+
+  Parameter mismatches (write the SOURCE value, not the impls' guess):
+- pipeline latency: source says "9 cycles/lane (3+1+4+1)" but impls used "not modeled (noted as irrelevant to functional result)" → record the source value in metadata.spec
+
+  Named properties not clearly satisfied (record them so they are explicit and
+  checkable — e.g. spec.properties: ["conflict-free memory mapping", ...]):
+- [violated] "conflict-free memory mapping (arbitrary radix / #BU, no bank conflict)" — Both impls independently show the only available bank map b(i)=(i+(i>>3))%8 collides for radix-2 stages s>=6; the paper's actual map is not transcribed, so the headline contribution is not reproduced. → record this named property in part "addr_gen_unit".spec.properties
+- [unverifiable] "radix-4 = 33% fewer mults / 20% fewer add-sub vs radix-2" — Impls verify radix-4 fused == two composed radix-2 stages but never count or quantify the op savings; it is asserted, not exhibited. → record this named property in part "config_radix_selector".spec.properties
+- [unverifiable] "~50% butterfly hardware saved via symmetric operators" — Functional Python cannot exhibit a hardware-area saving; symmetric add/sub are named but resource sharing is not modeled. → record this named property in part "config_radix_selector".spec.properties
+
+  Structural divergences from the source's described architecture:
+- The paper's defining feature — the conflict-free interleaved-BRAM mapping — is not faithfully reproduced; the supplied address map is injective but conflicts at high stages, so the architecture realizes a generic NTT, not CFNTT's no-conflict access.
+- Radix-4 fusion is reproduced only as a mathematical 2x radix-2 composition; the specific fused schedule/twiddle reuse that produces the quoted 33%/20% operation savings is improvised, not the paper's.
+- Forward/inverse decimation direction diverges between the two impls (DIT-stride vs CT decreasing-stride), indicating the precise datapath ordering the paper specifies is not pinned.
+- Timing/pipeline structure (9-cycle lane) and the host PCIe/DMA boundary are reproduction-invented and not exercised functionally.
+
+RULES for choosing values:
+1. For every missing field, write a CONCRETE value into the named part's `spec`
+   (or metadata.spec for "global"). Never leave it as a description of what is
+   missing — pick the actual width/param/op/port/state.
+2. To resolve a divergence, pick the value the passing / highest-confidence
+   implementation used; if it is genuinely a free choice, pick the standard,
+   well-known convention for this kind of system and note the choice in
+   `spec.notes`. The point is to make the bad (ambiguous) state unrepresentable.
+3. Be specific and numeric. "14-bit" → `widths: { coeff: 14 }`; a modulus →
+   `params: { q: 12289 }`; an FSM → `fsm: ["IDLE","LOAD","RUN","DRAIN"]`.
+4. DERIVED CONSTANTS — do not trust your own mental arithmetic. For any value you
+   COMPUTE (a modular inverse, a modular power, a floor/round, a precomputed table
+   entry), WRITE IT AS A VERIFIABLE EXPRESSION the value is derived from, e.g.
+   "12277 = 1024^-1 mod 12289", "1945 = 11^6 mod 12289", "21843 = floor(2^28 / 12289)".
+   These are MACHINE-CHECKED after you answer and a wrong result is auto-corrected,
+   so an arithmetically false constant is worse than useless — get the arithmetic
+   right or leave the operands symbolic. A self-inconsistent counterexample above
+   (e.g. "spec N != computed N") MUST be fixed at its numeric source, not annotated.
+5. PROVENANCE — for each fact you commit, mark where it came from in `spec.notes`
+   using a tag: `[src]` quoted/derived from the SOURCE above, `[conv]` a
+   convention you chose to break a tie (not stated by the source), `[calc]` a
+   value you derived by computation. `[conv]` facts are reproducibility aids, NOT
+   claims about the real system — never present a guessed value as the source's.
+6. CEILING — if a missing field is genuinely NOT determinable from the source and
+   is NOT a free convention (it is specific architectural detail the scene simply
+   lacks), do not fabricate it. Record what is needed in `spec.notes` prefixed
+   `[source-missing]` so the gap is visible instead of papered over.
+
+Existing part ids you may target: pcb_substrate, fpga_die, host_edge, host_phy, bram_0, bram_1, bram_2, bram_3, bram_4, bram_5, bram_6, bram_7, input_fifo, output_fifo, crossbar_network, intt_scale, bu_array_base, bu_rail_left, bu_rail_right, bu_xbrace, r4_fuse_01, r4_fuse_23, r4_fuse_45, r4_fuse_67, twiddle_post, read_post, bu_mult_0, bu_add_0, bu_sub_0, bu_reg_0, bu_mult_1, bu_add_1, bu_sub_1, bu_reg_1, bu_mult_2, bu_add_2, bu_sub_2, bu_reg_2, bu_mult_3, bu_add_3, bu_sub_3, bu_reg_3, bu_mult_4, bu_add_4, bu_sub_4, bu_reg_4, bu_mult_5, bu_add_5, bu_sub_5, bu_reg_5, bu_mult_6, bu_add_6, bu_sub_6, bu_reg_6, bu_mult_7, bu_add_7, bu_sub_7, bu_reg_7, twiddle_rail, twiddle_feeder, read_bus, read_arrow, ex_base, ex_riser_a, ex_riser_b, ex_mult_w1, ex_mult_w2, ex_mult_w3, ex_jrot, ex_add, ex_sub, ex_reg, mod_red_mult, mod_red_subshift, return_post, return_bus, return_arrow, twiddle_rom, addr_gen_unit, config_radix_selector, schedule_controller, clock_pll, heatsink_base, heatsink_riser, heatsink_fin_0, heatsink_fin_1, heatsink_fin_2, heatsink_fin_3, heatsink_fin_4, heatsink_fin_5, heatsink_fin_6, heatsink_fin_7, heatsink_fin_8, heatsink_fin_9
+
+Return ONLY the full, updated scene descriptor as a single JSON object — no
+markdown fences, no prose before or after.

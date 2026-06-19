@@ -1,0 +1,52 @@
+self-improve: /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             history -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-190434
+             driver   -> claude (visual feedback enabled)
+             up to 2 iteration(s)
+
+──────── iteration 1 / 2 ────────
+render-scene: 94 parts, 5232 triangles -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-190434/iter-01-render.png (1128x1128)
+  rendered -> iter-01-render.png
+  claude done (thinking trace: iter-01-events.jsonl, 130 events)
+  parts: 94   score: 89/100
+  critique: The render reads cleanly as an FPGA NTT accelerator card: eight blue interleaved BRAM banks line the −X edge, the copper DSP-multiplier column and dark/steel symmetric add/sub pairs sit in an open framed array, the three routing layers (read/return/twiddle) and their arrows are legible in TOP, and both exploded views (radix-4 BU and ten-fin heatsink) lift cleanly off the die — no floating parts or ground violations in FRONT/SIDE. Geometry is essentially mature; the binding defect is fidelity, not form. The carried-over verifier finding is correct and unaddressed in the prose: the asserted headline conflict-free map b(i)=(i+(i>>3)) mod 8 provably COLLIDES for radix-2 strides 2^6..2^9 (b(i+2^s)=b(i) there), so the scene was overclaiming its central contribution; the exact crossbar permutation, twiddle-ROM addressing, DIT/DIF convention and per-stage FSM cycle counts are reproduction guesses, not transcribed from CFNTT Sec. III, and cannot be recovered without the source PDF.
+  + Corrected the false headline claim in crossbar_network.notes: kept all params but replaced 'satisfy the asserted no-conflict property' with the verifier-proven fact that the candidate map is conflict-free only for stages s=0..5 and collides for strides 2^6..2^9, marking the paper's exact functions as still-to-transcribe (no longer asserting something the reproduce loop disproved)
+  + Propagated the same known-reproduction-gap caveat into addr_gen_unit.notes so the address-generation block no longer claims a conflict-free guarantee it does not meet
+  + Recorded the missing decimation convention as an explicit reproduction CHOICE in schedule_controller.notes (DIT, natural-order in/out, no bit-reversal) while flagging that DIT-vs-DIF, global stage ordering and per-stage cycle counts remain unconfirmed against the source
+  + Preserved every numeric spec param, all 80 parts, the connection graph, exploded views, routing-layer heights and thumbnail_camera unchanged — honesty correction only, no geometry churn
+  · gap: Make reproducible — record the control: transcribe the paper's ACTUAL conflict-free bank-index b(i) and offset o(i) (CFNTT Sec. III headline result); the current candidate provably collides for strides 64/128/256/512 (parts crossbar_network, addr_gen_unit). Requires the source PDF — not closeable from the render alone.
+  · gap: Make reproducible — record the control: the crossbar per-stage permutation sigma_s mapping logical operand indices to physical bank/lane ports must be taken from the source, not the reproduction-candidate rotation map (part crossbar_network).
+  · gap: Make reproducible — record the operation: twiddle-ROM address function f(stage s, block index) and the negacyclic low/high-half storage layout still need source confirmation (part twiddle_rom).
+  · gap: Make reproducible — record the operation: confirm DIT vs DIF and the global butterfly/stage ordering against the source (currently a reproduction choice in schedule_controller).
+  · gap: Make reproducible — record the operation: radix-4 fusion mapping — which two radix-2 stages fuse per radix-4 BU and the j-rotator sign convention — needs source confirmation (parts config_radix_selector, r4_fuse_*).
+  · gap: Make reproducible — record the timing: FSM per-stage cycle counts of the twiddle-stationary schedule are reconstructed, not transcribed (part schedule_controller).
+  · gap: Make reproducible — record the operation: modular adder/subtractor internal reduction policy (conditional ±q correction count) needs source confirmation (part mod_red_subshift).
+  · gap: Make reproducible — record the param: primitive-root generator g and the full twiddle table are reproduction-pinned (g=11, psi=1945); confirm against source (part twiddle_rom).
+  · gap: Match the source's architecture: the headline interleaved-BRAM conflict-free mapping + crossbar is now honestly flagged as not-yet-faithful rather than overclaimed; faithful reproduction still pending the source's exact functions.
+  · gap: Match the source's architecture: the twiddle-stationary 'rearranged loop structure' is still a generic Cooley-Tukey stage/block loop in spec; the true reuse schedule must come from the source.
+  · gap: Geometry polish (low value): bu_add_0 (z≈−4.30) and bu_sub_7 (z≈+4.30) overhang the array floor edge (z=±4.2) by ~0.1 m; nudge inward by ~0.12 if revisited.
+
+──────── iteration 2 / 2 ────────
+render-scene: 94 parts, 5232 triangles -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-190434/iter-02-render.png (1128x1128)
+  rendered -> iter-02-render.png
+  claude done (thinking trace: iter-02-events.jsonl, 63 events)
+  parts: 94   score: 90/100  (prev 89)
+  critique: The ISO render reads cleanly and quickly as an FPGA NTT card: eight blue interleaved BRAM banks line the −X edge, the copper DSP-multiplier column and the symmetric add/sub pairs sit in an open framed array, the exploded radix-4 BU and ten-fin heatsink lift cleanly off the die, and FRONT/SIDE show no parts sunk below or floating above the ground line. Form is mature; the binding deficit remains reproduction-faithfulness, not silhouette. The one residual geometry defect the previous pass flagged is real: bu_add_0 (z=−4.09, outer face −4.30) and bu_sub_7 (z=+4.09, outer face +4.30) overhang the array floor's z=±4.2 edge by ~0.1 m — fixed this pass by widening the open frame to contain them rather than nudging the operators into interpenetration. The deep faithfulness gaps (the paper's exact conflict-free bank/offset functions, crossbar permutation σ_s, twiddle-ROM addressing, DIT/DIF convention, radix-4 fusion mapping and per-stage cycle counts) are honestly flagged in the specs as reproduction candidates and require the CFNTT source PDF, which is not available in this non-interactive pass.
+  + Closed the carried-over geometry-polish gap by widening the open butterfly-array frame to contain its outermost operators: bu_array_base depth 8.4 -> 8.8 and both longitudinal rails (bu_rail_left, bu_rail_right) 8.4 -> 8.8, so bu_add_0's −4.30 face and bu_sub_7's +4.30 face now sit inside the frame's ±4.4 edge instead of overhanging the old ±4.2 floor — fixed without moving the operators (which would have interpenetrated the paired add/sub at 0.36 m separation)
+  + Preserved all 80 parts, every spec/notes block (including the source-confirmation caveats added in iter-02), the connection graph, both exploded views, the three routing-layer heights, metadata.spec and thumbnail_camera unchanged — single measurable geometry fix only, no churn
+  · gap: Make reproducible — record the control: transcribe the paper's ACTUAL conflict-free bank-index b(i) and offset o(i) (CFNTT Sec. III headline result); the candidate b(i)=(i+(i>>3)) mod 8 provably collides for strides 2^6..2^9 (parts crossbar_network, addr_gen_unit). Requires the source PDF — not closeable from the render.
+  · gap: Make reproducible — record the control: the crossbar per-stage permutation sigma_s mapping logical operand indices to physical bank/lane ports must come from the source, not the reproduction-candidate rotation map (part crossbar_network).
+  · gap: Make reproducible — record the operation: twiddle-ROM address function f(stage s, block index) and the negacyclic low/high-half storage layout need source confirmation (part twiddle_rom).
+  · gap: Make reproducible — record the operation: confirm DIT vs DIF and the global butterfly/stage ordering against the source (currently a reproduction choice in schedule_controller).
+  · gap: Make reproducible — record the operation: radix-4 fusion mapping — which two radix-2 stages fuse per radix-4 BU and the j-rotator sign convention — needs source confirmation (parts config_radix_selector, r4_fuse_*).
+  · gap: Make reproducible — record the timing: FSM per-stage cycle counts of the twiddle-stationary schedule are reconstructed, not transcribed (part schedule_controller).
+  · gap: Make reproducible — record the param: primitive-root generator g=11 and psi=1945 plus the full twiddle table are reproduction-pinned; confirm against source (part twiddle_rom).
+  · gap: Make reproducible — record the operation: modular adder/subtractor internal reduction policy (conditional +/-q correction count) needs source confirmation (part mod_red_subshift).
+  · gap: Match the source's architecture: the twiddle-stationary 'rearranged loop structure' is still a generic Cooley-Tukey stage/block loop in spec; the true reuse schedule must come from the source.
+  (gain < 2 points — plateau)
+
+self-improve: no further gain — stopping.
+
+self-improve: done. Improved scene written to /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             full history: /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-190434
+             review change: git diff -- /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             revert:        cp /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-190434/iter-00.json /home/gohan/.visually-3d/scenes/ntt-fpga.json

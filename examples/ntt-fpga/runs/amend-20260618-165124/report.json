@@ -1,0 +1,209 @@
+{
+  "reproducibility": 68,
+  "verdict": "ambiguous",
+  "divergences": [
+    "Primitive 2N-th root psi: impl1 fixes psi=g^6 with g=11 (smallest primitive root); impl2 searches for any element of order 2048 — spec gives only the constraints psi^2048=1, psi^1024=-1, leaving the actual ROM root open",
+    "Transform flavor: both chose negacyclic, but spec only marks it 'implied' (cyclic is the explicit fallback) — agreement here is interpretive, not specified",
+    "Radix-4 datapath: both model it as two fused radix-2 stages rather than genuine 4-point butterflies; neither verifies the 33%/20% op-count claims because the spec gives no radix-4 butterfly equations",
+    "Conflict-free scheme: both verify only that b(i)=(i+(i>>3))%8, o(i)=i>>3 is a storage bijection; neither reproduces the per-cycle 8-BU operand routing / crossbar permutation because the schedule is unspecified",
+    "Forward-transform output ordering (natural vs bit-reversed) is assumed by convention; spec states 'no bit-reversal stage' but not the resulting index convention"
+  ],
+  "missing_fields": [
+    {
+      "item": "Exact primitive root psi and the twiddle-factor ROM table contents/addressing function",
+      "kind": "param",
+      "where": "twiddle_rom"
+    },
+    {
+      "item": "Radix-4 butterfly equations and the 3-twiddle assignment per radix-4 BU (the basis of the 33%/20% reduction)",
+      "kind": "operation",
+      "where": "global"
+    },
+    {
+      "item": "Per-cycle conflict-free access schedule and the 8x8 crossbar permutation mapping operand pairs to lanes per stage",
+      "kind": "control",
+      "where": "crossbar_network"
+    },
+    {
+      "item": "Schedule/FSM transition table and exact loop bounds (rearranged loop structure for twiddle reuse)",
+      "kind": "control",
+      "where": "schedule_controller"
+    },
+    {
+      "item": "Definitive transform flavor (negacyclic vs cyclic) rather than 'implied'",
+      "kind": "param",
+      "where": "global"
+    },
+    {
+      "item": "BRAM word/depth semantics beyond bank 0 and the full per-bank addressing for banks 1-7",
+      "kind": "shape",
+      "where": "bram_1"
+    },
+    {
+      "item": "Pipeline cycle counts as observable I/O timing (9-cycle lane latency is a reproduction default, not the paper's reported figure)",
+      "kind": "timing",
+      "where": "global"
+    },
+    {
+      "item": "FIFO/PCIe/DMA I/O protocol: widths, handshake, DMA framing of coefficient vectors",
+      "kind": "port",
+      "where": "host_phy"
+    },
+    {
+      "item": "Forward-transform output index convention (natural vs bit-reversed) given the no-bit-reversal claim",
+      "kind": "operation",
+      "where": "global"
+    },
+    {
+      "item": "INTT N^-1 scaling placement and interaction with the psi^-i post-twist",
+      "kind": "operation",
+      "where": "intt_scale"
+    }
+  ],
+  "fidelity": 58,
+  "fidelity_report": {
+    "parameter_fidelity": [
+      {
+        "param": "Transform size N",
+        "reference_value": "1024",
+        "impl_value": "1024",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "Modulus q",
+        "reference_value": "unstated (14-bit NTT-friendly prime)",
+        "impl_value": "12289",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "Coefficient width",
+        "reference_value": "14-bit",
+        "impl_value": "14",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "Parallel butterfly units",
+        "reference_value": "8",
+        "impl_value": "8 lanes (modeled, not parallelized functionally)",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "Reduction algorithm",
+        "reference_value": "Barrett mu=21843, k=28",
+        "impl_value": "Barrett mu=21843, k=28",
+        "match": true,
+        "where": "global"
+      },
+      {
+        "param": "Radix",
+        "reference_value": "scalable radix-2/4",
+        "impl_value": "radix-2 only; radix-4 modeled as fused radix-2 stages",
+        "match": false,
+        "where": "global"
+      },
+      {
+        "param": "Primitive root psi",
+        "reference_value": "unstated (paper's specific twiddle table)",
+        "impl_value": "any order-2048 element (impl1 11^6, impl2 search)",
+        "match": false,
+        "where": "twiddle_rom"
+      }
+    ],
+    "property_checks": [
+      {
+        "property": "Conflict-free memory mapping (arbitrary radix / #BU, no bank conflict)",
+        "status": "unverifiable",
+        "evidence": "both only prove the storage map is a bijection scattering 8-blocks across banks; the actual per-cycle conflict-free butterfly-operand access is never exercised",
+        "where": "crossbar_network"
+      },
+      {
+        "property": "No bit-reversal stage",
+        "status": "satisfied",
+        "evidence": "both use merged-psi CT/GS datapath with pointwise product in the bit-reversed domain, avoiding an explicit reversal",
+        "where": "global"
+      },
+      {
+        "property": "Radix-4: 33% fewer mults, 20% fewer add/sub vs radix-2",
+        "status": "unverifiable",
+        "evidence": "neither implements genuine radix-4 butterflies; op-count claims are not exercised at all",
+        "where": "global"
+      },
+      {
+        "property": "~50% butterfly hardware saved via symmetric operators",
+        "status": "unverifiable",
+        "evidence": "a functional (untimed, non-RTL) model cannot express hardware area/operator sharing",
+        "where": "global"
+      },
+      {
+        "property": "Twiddle-factor reuse via rearranged loop structure",
+        "status": "unverifiable",
+        "evidence": "loop structure / schedule not implemented; twiddles computed as needed, no reuse accounting",
+        "where": "schedule_controller"
+      },
+      {
+        "property": "NTT followed by INTT (with N^-1 scaling) is the identity",
+        "status": "satisfied",
+        "evidence": "both verify INTT(NTT(a))==a and NTT-multiply == schoolbook negacyclic product",
+        "where": "intt_scale"
+      },
+      {
+        "property": "Barrett reduction equals true mod",
+        "status": "satisfied",
+        "evidence": "both z3-prove Barrett(x)==x mod q over the full product domain [0,(q-1)^2]",
+        "where": "mod_red_mult"
+      }
+    ],
+    "structural_findings": [
+      "Both are untimed combinational functional models: the 9-cycle pipelined datapath, the eight parallel lanes, and the crossbar are described but not realized as concurrent/pipelined structure",
+      "The headline contribution — radix-4 datapath and its quantified op savings — is collapsed into ordinary radix-2 processing, so the specific architecture the paper describes is not reproduced",
+      "The conflict-free scheme is reduced to a static storage bijection; the per-stage operand routing / crossbar permutation that is the paper's Sec. III result is absent",
+      "I/O boundary (PCIe edge, DMA, FIFOs) is modeled as plain in-memory coefficient vectors with no protocol or ordering semantics"
+    ]
+  },
+  "summary": "Reproducibility is moderate: the spec firmly pins the functional core (N=1024, q=12289, 14-bit, Barrett mu/k) and both impls independently rebuild a verified negacyclic NTT with the round-trip identity, but they diverge on the unspecified primitive root and cannot reconstruct the conflict-free schedule, radix-4 butterfly equations, or pipeline timing — the architectural substance is left open. Fidelity is limited by exactly those gaps: parameters match the paper well, but the system's defining innovations (scalable radix-4 with 33%/20% op savings, ~50% operator-sharing, and the per-cycle conflict-free access) are unimplemented or unverifiable, so the impls capture a generic correct NTT engine rather than the specific CFNTT architecture.",
+  "backend": "python-smt",
+  "executable_verification": {
+    "enabled": true,
+    "passed": 0,
+    "total": 2
+  },
+  "verify_findings": [
+    {
+      "impl": 1,
+      "pass": false,
+      "ran": true,
+      "confidence": 55,
+      "counterexample": null
+    },
+    {
+      "impl": 2,
+      "pass": false,
+      "ran": true,
+      "confidence": 57,
+      "counterexample": "FAIL: N^-1 mismatch: spec 8857 != 12277"
+    }
+  ],
+  "guessed": [
+    "Transform flavor (spec: 'unstated in source, PQC/HE context implies negacyclic') -> negacyclic NTT over Z_q[x]/(x^N+1)",
+    "Primitive 2N-th root psi (spec: 'any generator satisfying psi^2048=1, psi^1024=-1') -> psi = g^6 mod q with g the smallest primitive root of 12289 (g=11), so psi=11^6 mod 12289; satisfies the stated constraints",
+    "NTT datapath algorithm (not given) -> Longa-Naehrig style: Cooley-Tukey/DIT forward (natural-in, bit-reversed-out) with merged psi twiddles + Gentleman-Sande/DIF inverse (bit-reversed-in, natural-out); pointwise product done in the bit-reversed domain so no explicit bit-reversal stage is needed",
+    "Modular multiply realization -> Barrett everywhere (mu=21843, k=28 from spec); symmetric add/sub = conditional single subtract/add of q",
+    "Forward-transform output index convention -> array position k holds natural frequency brv(k) (standard DIT result)",
+    "Radix-4 path -> NOT functionally implemented; modeled only as stage-fusion of two radix-2 stages; the 33%/20% op-count claims are NOT verified (spec gives them only as properties)",
+    "Pipeline latencies (mult 3 / add-sub 1 / Barrett 4 / reg 1 = 9) -> treated as cosmetic; the functional model is combinational (spec marks these 'reproduction defaults')",
+    "INTT N^-1 scaling value -> ninv=pow(1024,-1,12289); asserted to equal the spec's 8857",
+    "Transform flavor -> negacyclic NTT (psi a primitive 2N=2048-th root, omega=psi^2); spec says only 'implied', not stated",
+    "Primitive root psi -> smallest element of multiplicative order 2048 mod 12289 found by search (the paper's actual root/twiddle table is not transcribed)",
+    "NTT datapath structure -> canonical Cooley-Tukey forward (DIT, natural-in / bit-reversed-out) + Gentleman-Sande inverse (Longa-Naehrig merged psi-NTT); spec gives no butterfly equations or data ordering",
+    "Modular multiply inside butterfly -> Barrett(a*w) using the given mu=21843,k=28 (authoritative); product assumed < q^2 so Barrett input domain is [0,q^2)",
+    "Per-cycle conflict-free schedule -> only verified the storage map b(i)=(i+(i>>3))%8, o(i)=i>>3 is a bijection and that any aligned block of 8 consecutive indices spans all 8 banks; the actual cycle-by-cycle 8-BU operand routing is not given",
+    "Radix-4 datapath -> assumed to be two fused radix-2 stages producing identical results (the 33%/20% saving claim); not separately implemented as genuine 4-point butterflies",
+    "Twiddle-ROM contents/addressing -> assumed psi^brv(k) tables; spec gives neither table contents nor address function",
+    "FIFO/PCIe/DMA I/O -> modeled as plain coefficient-vector in/out; no width/handshake/protocol given",
+    "Pipeline latencies (9 cyc/lane) -> not modeled; functional model is untimed (spec calls them 'reproduction defaults')"
+  ]
+}

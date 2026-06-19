@@ -1,0 +1,137 @@
+{
+  "metadata_spec": {
+    "params": {
+      "N": 1024,
+      "q": 12289,
+      "radix_modes": "2,4",
+      "parallel_bu": 8,
+      "twiddle_psi": 1945,
+      "twiddle_omega": 10302,
+      "n_inverse": 12277,
+      "barrett_mu": 21843,
+      "barrett_k": 28,
+      "negacyclic_order": 2048,
+      "r4_mults_per_bu_optimized": 2,
+      "r4_mults_per_bu_naive": 3,
+      "r4_addsub_per_bu_optimized": 8,
+      "r4_addsub_per_bu_naive": 10,
+      "pipeline_latency_cycles_per_lane": 9
+    },
+    "widths": { "coeff": 14, "modulus": 14 },
+    "ops": [
+      "negacyclic NTT/INTT: forward DIT/Cooley-Tukey, inverse GS/Gentleman-Sande [conv]",
+      "radix-4 BU = 2 modular mults + 8 modular add/sub (optimized), naive baseline 3 mults + 10 add/sub [src]",
+      "Barrett reduction: t = (x*mu) >> k=28, x - t*q, then conditional subtract; mu=21843=floor(2^28/12289) [paper/calc]",
+      "twiddle generation: omega = psi^2 mod q; T[k] = psi^k mod q for negacyclic twisting [calc]"
+    ],
+    "fsm": [
+      "IDLE",
+      "LOAD",
+      "NTT_STAGE",
+      "INTT_STAGE",
+      "SCALE",
+      "DRAIN",
+      "DONE",
+      "IDLE->LOAD",
+      "LOAD->NTT_STAGE",
+      "NTT_STAGE->NTT_STAGE",
+      "NTT_STAGE->INTT_STAGE",
+      "INTT_STAGE->INTT_STAGE",
+      "INTT_STAGE->SCALE",
+      "SCALE->DRAIN",
+      "DRAIN->DONE",
+      "DONE->IDLE"
+    ],
+    "properties": [
+      "conflict-free memory mapping (arbitrary radix/#BU, no bank conflict)",
+      "no bit-reversal stage / natural-order output",
+      "twiddle-factor reuse via rearranged loop",
+      "~50% butterfly hardware saved via symmetric operators",
+      "ATP LUT/FF/DSP/BRAM ~2.2x/1.2x/1.1x/1.9x lower than radix-2",
+      "negacyclic (psi-twisted) NTT",
+      "NTT∘INTT = identity"
+    ],
+    "notes": "CFNTT TCHES 2022(1) 1024-pt radix-2/4 NTT, 8 parallel BUs. [paper] N=1024, 14-bit modulus, 8 BUs, 33% fewer mults / 20% fewer add/sub in radix-4 BU, ~50% HW via symmetric operators, ATP 2.2x/1.2x/1.1x/1.9x. [ref-impl] q=12289 from authors' cfntt_ref (poly_mult_radix_2.py, modular_mul.v), 14-bit prime =3*2^12+1; paper body only says '14-bit modulus'. [calc] omega=10302=1945^2 mod 12289; 12277=1024^-1 mod 12289; 21843=floor(2^28/12289), k=28; psi=1945 has order 2048 (negacyclic). [src] r4 BU naive 3 mults/10 add-sub -> optimized 2 mults/8 add-sub anchors the 33%/20% claims. The named properties 'conflict-free mapping', 'no bit-reversal', 'twiddle-reuse' are confirmed-by-abstract contributions but recorded as documentary: the ~50% HW and ATP ratios are RTL/synthesis claims unverifiable in a functional python-smt model. [source-missing] the exact Sec.III conflict-free (bank,offset) functions, per-stage crossbar permutation sigma_s, the twiddle-ROM address function f(stage,block) under the reuse loop, the full radix-4 transform schedule, and the paper's FSM transition table were NOT extractable (PDF FlateDecode body undecodable, eprint/RG mirrors 403); the bank/crossbar/FSM/host values below marked [conv] are tie-breaking stand-ins to make the spec unambiguous, NOT the paper's actual structures."
+  },
+  "part_specs": {
+    "crossbar_network": {
+      "params": { "banks": 8, "lanes": 8 },
+      "ops": [
+        "per-stage operand routing across 8 banks for parallel BUs [conv]",
+        "bank(addr) = (addr ^ (addr >> 3)) & 7 ; offset(addr) = addr >> 3 [conv stand-in]"
+      ],
+      "notes": "[source-missing] the paper's actual conflict-free (bank,offset) map and per-stage crossbar permutation sigma_s (Sec.III headline) were not extractable. Both reverse impls invented an XOR-fold; to remove ambiguity the spec commits the XOR-fold bank(addr)=(addr^(addr>>3))&7, offset(addr)=addr>>3 as the [conv] stand-in (bijective, no-conflict for the stand-in only). This is NOT verified against the paper's interleaved-bank topology and fails operand-distinctness at large strides; replace with the real sigma_s table once the PDF body is decoded."
+    },
+    "twiddle_rom": {
+      "params": { "psi": 1945, "omega": 10302, "n_inverse": 12277, "depth": 1024 },
+      "widths": { "entry": 14 },
+      "ops": [
+        "forward twiddle T[k] = psi^k mod 12289 (negacyclic twist) [calc]",
+        "inverse twiddle Tinv[k] = psi^(-k) mod 12289, final scale by N^-1=12277 [calc]",
+        "address f(stage,block): standard ROM addr = (block << stage_shift) [conv]"
+      ],
+      "notes": "[calc] omega=1945^2 mod 12289=10302; 12277=1024^-1 mod 12289; psi=1945 order 2048. [source-missing] the paper's twiddle-ROM address function f(stage,block) under the rearranged twiddle-reuse loop (the memory-footprint optimization) is not extractable; spec commits standard per-stage ROM addressing as [conv]. Impls used bit-reversed table layout T[k]=psi^bitrev10(k), which REINTRODUCES the bit-reversal the paper eliminates — flagged as a property violation, fix to natural-order at the source."
+    },
+    "mod_red_mult": {
+      "params": { "barrett_mu": 21843, "barrett_k": 28, "q": 12289, "conditional_subtracts": 2 },
+      "ops": [
+        "Barrett: t=(x*21843)>>28; r=x-t*12289; while r>=q: r-=q (<=2 corrections) [paper/calc/conv]"
+      ],
+      "notes": "[paper] Barrett mu=21843, k=28, shift/subtract. [calc] 21843=floor(2^28/12289). [conv] output-correction bound (number of conditional subtractions) is source-missing; committed to <=2 conditional subtracts (standard for 14-bit operands * 14-bit), final r in [0,q). [source-missing] paper's exact correction bound."
+    },
+    "bram_0": {
+      "params": { "depth_words": 128, "banks": 8 },
+      "widths": { "word": 14 },
+      "notes": "[calc] depth = N/banks = 1024/8 = 128 words/bank. Impl 1 explicitly chose 128 over the flagged 256-vs-128 inconsistency; Impl 2 left it unpinned — spec commits 128 to make sizing unambiguous. Same sizing applies to bram_1..bram_7. [source-missing] paper's specific BRAM primitive depth/bank-size not retrievable."
+    },
+    "host_phy": {
+      "params": { "beat_width": 64, "coeffs_per_beat": 4, "coeff_pad_width": 16 },
+      "ports": [
+        { "name": "axis_tdata", "dir": "in", "width": 64 },
+        { "name": "axis_tvalid", "dir": "in", "width": 1 },
+        { "name": "axis_tready", "dir": "out", "width": 1 },
+        { "name": "axis_tlast", "dir": "in", "width": 1 },
+        { "name": "axis_tdata_out", "dir": "out", "width": 64 }
+      ],
+      "notes": "[conv] AXI4-Stream/PCIe DMA: 64-bit beats, 4 coeffs/beat, each 14-bit coeff zero-padded to 16-bit lanes, natural coefficient order. Impl 1 committed this concrete protocol; Impl 2 dropped the host interface as functionally irrelevant. Committed here only to remove ambiguity. [source-missing] the paper presents an NTT CORE, not a host interface — the host/PCIe framing is reproduction-invented and NOT a source claim; do not present it as the paper's."
+    },
+    "schedule_controller": {
+      "fsm": [
+        "IDLE", "LOAD", "NTT_STAGE", "INTT_STAGE", "SCALE", "DRAIN", "DONE",
+        "IDLE->LOAD", "LOAD->NTT_STAGE", "NTT_STAGE->NTT_STAGE",
+        "NTT_STAGE->INTT_STAGE", "INTT_STAGE->INTT_STAGE",
+        "INTT_STAGE->SCALE", "SCALE->DRAIN", "DRAIN->DONE", "DONE->IDLE"
+      ],
+      "notes": "[conv] Single committed FSM replacing the two contradictory lists and the unwired DONE the scene carried; DONE now transitions back to IDLE. [source-missing] paper's actual FSM transition table not extractable; this is a standard NTT-controller stand-in chosen to remove ambiguity, not a source-confirmed table."
+    },
+    "bu_mult_0": {
+      "params": { "mults_per_r4_bu_optimized": 2, "mults_per_r4_bu_naive": 3 },
+      "notes": "[src] radix-4 BU uses 2 modular mults (optimized) vs naive 3 -> 33% reduction. Per-BU op count is finite/checkable; the absolute multiplier count contradiction (3 vs 2) resolved to 2 optimized via symmetric-operator sharing."
+    },
+    "bu_add_0": {
+      "params": { "addsub_per_r4_bu_optimized": 8, "addsub_per_r4_bu_naive": 10 },
+      "notes": "[src] radix-4 BU uses 8 modular add/sub (optimized) vs naive baseline 10 -> 20% reduction. The naive=10 baseline anchors the 20% claim (the previously source-missing baseline value)."
+    },
+    "bu_reg_0": {
+      "params": { "lane_latency_cycles": 9 },
+      "ops": [
+        "lane pipeline depth = mult(3) + add/sub(1) + Barrett(4) + reg(1) = 9 [src]"
+      ],
+      "notes": "[src] aggregate 9 cycles/lane decomposed: mult 3, add/sub 1, Barrett 4, reg 1. [source-missing] per-FSM-state cycle latencies and clock frequency not in retrievable text; per-stage decomposition above is the per-BU pipeline breakdown the source gives, not a full per-state schedule."
+    },
+    "config_radix_selector": {
+      "params": { "radix_modes": "2,4", "radix4_requires_pow4_N": true },
+      "notes": "[paper] full radix-2 AND radix-4 NTT architecture (not merely a radix-4 BU) — corrects the earlier 'radix-4 only as a butterfly unit' guess. [ref-impl] radix-4 requires N a power of 4 (Falcon-1024/Dilithium/Saber); radix-2 covers Falcon-512. [source-missing] the explicit radix-4 transform index/stride schedule and lane-pair fusion equations not extractable."
+    }
+  },
+  "rationale": [
+    "metadata.spec params pin the source's reproducible numeric core: N=1024, q=12289 [ref-impl], 8 BUs, Barrett (mu=21843,k=28), psi/omega/N^-1 as verifiable [calc] expressions, plus the r4 op-count baselines (naive 3/10 -> optimized 2/8) that anchor the 33%/20% claims.",
+    "Naive-radix-4 add/sub baseline=10 written (bu_add_0 + global) — the previously missing anchor for the 20% reduction claim, from [src] facts.",
+    "BRAM depth committed to 128 words/bank (= N/banks=1024/8) resolving the 256-vs-128 divergence with Impl 1's passing choice.",
+    "Host/PCIe interface committed to Impl 1's concrete AXI4-Stream protocol but explicitly flagged [conv]/reproduction-invented since the paper has no host interface — removes the Impl1-vs-Impl2 ambiguity without claiming it as source truth.",
+    "Per-lane cycle decomposition (mult3/addsub1/Barrett4/reg1=9) recorded from [src]; full per-state latencies marked [source-missing].",
+    "Forward DIT/CT vs inverse GS/DIF butterfly convention committed as [conv] to fix the unstated direction; twiddle layout flagged because impls' bit-reversed tables violate the no-bit-reversal property.",
+    "Conflict-free (bank,offset) map, crossbar sigma_s, twiddle f(stage,block), and FSM committed as explicit [conv] stand-ins (XOR-fold / standard ROM / single FSM with wired DONE) to make the ambiguous state unrepresentable, each tagged [source-missing] for the paper's actual undecodable structures.",
+    "All six named properties recorded in metadata.spec.properties so the unverifiable synthesis/area claims (~50% HW, ATP ratios) and the structurally-absent ones (conflict-free map, no-bit-reversal, twiddle-reuse) are explicit and checkable rather than silently assumed."
+  ]
+}

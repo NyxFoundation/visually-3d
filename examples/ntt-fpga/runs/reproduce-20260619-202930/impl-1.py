@@ -1,0 +1,351 @@
+#!/usr/bin/env python3
+"""
+CFNTT Radix-2/4 NTT Multiplication Accelerator (FPGA) -- reverse implementation
+from the scene spec ALONE. Functional reproduction in plain Python + a two-tier
+self-checking harness (Tier 1: size-independent z3 proofs at real width; Tier 2:
+whole-system equivalence vs an independent golden at e2e_N=16).
+
+Only stdlib + z3. Prints exactly "VERIFIED" (exit 0) or "FAIL: ..." (exit 1).
+"""
+
+import os
+import sys
+import random
+
+# ----------------------------------------------------------------------------
+# Authoritative parameters (from metadata.spec -- treated as given, not guessed)
+# ----------------------------------------------------------------------------
+Q          = 12289          # modulus q = 3*2^12 + 1
+N_PROD     = 1024           # production transform size
+PSI        = 1945           # primitive 2N=2048-th root mod q (psi^1024 = -1)
+OMEGA      = 10302          # psi^2, primitive N=1024-th root
+NINV_PROD  = 12277          # 1024^-1 mod q
+BARRETT_MU = 21843          # floor(2^28 / q)
+BARRETT_K  = 28
+COEFF_BITS = 14
+BANKS      = 8
+E2E_N      = 16             # spec: metadata.spec.verification.e2e_N
+
+# ----------------------------------------------------------------------------
+# Bit helpers
+# ----------------------------------------------------------------------------
+def bit_reverse(x, bits):
+    r = 0
+    for _ in range(bits):
+        r = (r << 1) | (x & 1)
+        x >>= 1
+    return r
+
+def log2_int(n):
+    b = n.bit_length() - 1
+    assert (1 << b) == n, "n must be a power of two"
+    return b
+
+# ----------------------------------------------------------------------------
+# Barrett modular reduction (datapath reducer).  GUESS: <=2 conditional subs.
+# ----------------------------------------------------------------------------
+def barrett_reduce(x, q=Q, mu=BARRETT_MU, k=BARRETT_K):
+    qh = (x * mu) >> k          # quotient estimate
+    r = x - qh * q
+    # at most two conditional subtractions land r in [0, q)
+    if r >= q:
+        r -= q
+    if r >= q:
+        r -= q
+    return r
+
+# ----------------------------------------------------------------------------
+# Conflict-free address mapping (committed XOR-fold, spec-given)
+# ----------------------------------------------------------------------------
+def bank(i):
+    return (i & 7) ^ ((i >> 3) & 7) ^ ((i >> 6) & 7) ^ ((i >> 9) & 1)
+
+def offset(i):
+    return i >> 3
+
+# ----------------------------------------------------------------------------
+# Twiddle ROM (powers of psi in bit-reversed order, CT/DIT layout)
+# ----------------------------------------------------------------------------
+def build_psi_table(n, psi, q):
+    logn = log2_int(n)
+    return [pow(psi, bit_reverse(i, logn), q) for i in range(n)]
+
+# ----------------------------------------------------------------------------
+# Fast forward NTT (Cooley-Tukey / DIT, merged negacyclic psi-twist).
+# Input natural order -> output bit-reversed order (Longa-Naehrig Alg.1).
+# ----------------------------------------------------------------------------
+def ntt_ct(a, psi_tab, q):
+    a = list(a)
+    n = len(a)
+    t = n
+    m = 1
+    while m < n:
+        t //= 2
+        for i in range(m):
+            j1 = 2 * i * t
+            S = psi_tab[m + i]
+            for j in range(j1, j1 + t):
+                U = a[j]
+                V = (a[j + t] * S) % q
+                a[j]     = (U + V) % q
+                a[j + t] = (U - V) % q
+        m *= 2
+    return a  # bit-reversed order
+
+# Fast inverse INTT (Gentleman-Sande / DIF).  Bit-reversed input -> natural.
+def intt_gs(a, psiinv_tab, ninv, q):
+    a = list(a)
+    n = len(a)
+    t = 1
+    m = n
+    while m > 1:
+        j1 = 0
+        h = m // 2
+        for i in range(h):
+            S = psiinv_tab[h + i]
+            for j in range(j1, j1 + t):
+                U = a[j]
+                V = a[j + t]
+                a[j]     = (U + V) % q
+                a[j + t] = ((U - V) * S) % q
+            j1 += 2 * t
+        t *= 2
+        m //= 2
+    return [(v * ninv) % q for v in a]
+
+def ntt_natural(a, psi_tab, q):
+    """Forward NTT, reindexed to natural order to match the golden model."""
+    out = ntt_ct(a, psi_tab, q)
+    logn = log2_int(len(a))
+    return [out[bit_reverse(k, logn)] for k in range(len(a))]
+
+# ----------------------------------------------------------------------------
+# Radix-4 fused butterfly (the headline contribution), spec formulas.
+# b'=W1*x1, c'=W2*x2, d'=W3*x3 ; j = psi^512 (order-4 constant rotator).
+# ----------------------------------------------------------------------------
+def radix4_butterfly(x0, x1, x2, x3, W1, W2, W3, j, q):
+    bb = (W1 * x1) % q
+    cc = (W2 * x2) % q
+    dd = (W3 * x3) % q
+    y0 = (x0 + bb + cc + dd) % q
+    y1 = (x0 + j * bb - cc - j * dd) % q
+    y2 = (x0 - bb + cc - dd) % q
+    y3 = (x0 - j * bb - cc + j * dd) % q
+    return y0, y1, y2, y3
+
+# Radix-4 op counts (spec, optimized vs naive)
+R4_MULT_OPT, R4_MULT_NAIVE     = 2, 3
+R4_ADDSUB_OPT, R4_ADDSUB_NAIVE = 8, 10
+
+# ----------------------------------------------------------------------------
+# Independent golden model (direct negacyclic NTT definition -- NOT the fast
+# implementation): X[k] = sum_j x[j] * psi^{(2k+1)j} mod q.
+# ----------------------------------------------------------------------------
+def golden_fwd(x, psi, q):
+    n = len(x)
+    X = []
+    for k in range(n):
+        acc = 0
+        for jx in range(n):
+            acc += x[jx] * pow(psi, (2 * k + 1) * jx, q)
+        X.append(acc % q)
+    return X
+
+def golden_inv(X, psi, ninv, q):
+    n = len(X)
+    psii = pow(psi, -1, q)
+    out = []
+    for jx in range(n):
+        acc = 0
+        for k in range(n):
+            acc += X[k] * pow(psii, (2 * k + 1) * jx, q)
+        out.append((acc * ninv) % q)
+    return out
+
+# ============================================================================
+# VERIFICATION
+# ============================================================================
+def fail(msg):
+    print("FAIL: " + msg)
+    sys.exit(1)
+
+def tier1_zustand_proofs():
+    try:
+        from z3 import (BitVec, BitVecVal, LShR, ULT, ULE, Solver, sat,
+                        Int, Implies, And, Or, Not)
+    except Exception as e:  # pragma: no cover
+        fail("z3 is required for Tier-1 proofs but is unavailable: %r" % e)
+        return
+
+    # --- 1.1 root-of-unity facts (concrete, size-independent) ----------------
+    if pow(PSI, 1024, Q) != Q - 1:
+        fail("psi^1024 != -1 mod q (not a negacyclic 2048th root)")
+    if pow(PSI, 2048, Q) != 1:
+        fail("psi^2048 != 1 mod q")
+    if (PSI * PSI) % Q != OMEGA:
+        fail("omega != psi^2 mod q")
+    if pow(PSI, 2, Q) != OMEGA:
+        fail("omega recomputation mismatch")
+    j_const = pow(PSI, 512, Q)
+    if (j_const * j_const) % Q != Q - 1:
+        fail("j=psi^512 does not satisfy j^2 == -1 mod q")
+    if (NINV_PROD * 1024) % Q != 1:
+        fail("Ninv*1024 != 1 mod q")
+    if BARRETT_MU != (1 << BARRETT_K) // Q:
+        fail("barrett_mu != floor(2^28/q)")
+
+    # --- 1.2 Barrett correctness over the FULL legal input range -------------
+    # Prove: for all x in [0,(q-1)^2], with qh=(x*mu)>>28, r0=x-qh*q one has
+    # 0 <= r0 < 3q  (=> 0<=r0, and <=2 conditional subtracts of q give [0,q)).
+    # Divisibility q | (x - final) is structural (only multiples of q removed).
+    W = 64
+    x = BitVec('x', W)
+    q  = BitVecVal(Q, W)
+    mu = BitVecVal(BARRETT_MU, W)
+    xmax = BitVecVal((Q - 1) * (Q - 1), W)
+    qh = LShR(x * mu, BARRETT_K)
+    qhq = qh * q
+    r0 = x - qhq
+    s = Solver()
+    s.add(ULE(x, xmax))
+    # negation of the property we want to hold for all x
+    s.add(Or(ULT(x, qhq),                       # r0 < 0  (estimate too big)
+             Not(ULT(r0, BitVecVal(3 * Q, W)))))  # r0 >= 3q (too many subs)
+    if s.check() == sat:
+        cex = s.model()[x]
+        fail("Barrett range proof failed at x=%s" % cex)
+
+    # --- 1.3 conflict-free mapping: bijection + per-stride distinctness -------
+    BW = 11
+    def zbank(iv):
+        return ((iv & BitVecVal(7, BW))
+                ^ (LShR(iv, 3) & BitVecVal(7, BW))
+                ^ (LShR(iv, 6) & BitVecVal(7, BW))
+                ^ (LShR(iv, 9) & BitVecVal(1, BW)))
+    def zoff(iv):
+        return LShR(iv, 3)
+
+    # bijection: distinct indices in [0,N) never share (bank,offset)
+    i1 = BitVec('i1', BW)
+    i2 = BitVec('i2', BW)
+    sb = Solver()
+    sb.add(ULT(i1, BitVecVal(N_PROD, BW)), ULT(i2, BitVecVal(N_PROD, BW)))
+    sb.add(i1 != i2)
+    sb.add(zbank(i1) == zbank(i2), zoff(i1) == zoff(i2))
+    if sb.check() == sat:
+        m = sb.model()
+        fail("bank/offset map is NOT a bijection: collision %s vs %s"
+             % (m[i1], m[i2]))
+
+    # per-stride operand-bank distinctness for every radix-2 stage stride 2^s
+    for sidx in range(log2_int(N_PROD)):
+        stride = 1 << sidx
+        iv = BitVec('iv_%d' % sidx, BW)
+        ss = Solver()
+        ss.add(ULT(iv + BitVecVal(stride, BW), BitVecVal(N_PROD, BW)))
+        ss.add(zbank(iv) == zbank(iv + BitVecVal(stride, BW)))
+        if ss.check() == sat:
+            mm = ss.model()
+            fail("bank conflict at stride 2^%d for i=%s" % (sidx, mm[iv]))
+
+    # --- 1.4 radix-4 butterfly == DFT4 over node j (full-width, symbolic) -----
+    # Prove y_t == sum_m in[m]*j^{t*m} mod q for symbolic (x0,b',c',d').
+    jv = j_const
+    jp = [[pow(jv, (t * m) % 4, Q) for m in range(4)] for t in range(4)]
+    x0i = Int('x0'); bbi = Int('bb'); cci = Int('cc'); ddi = Int('dd')
+    inp = [x0i, bbi, cci, ddi]
+    # spec formulas (with concrete j):
+    spec_y = [
+        x0i + bbi + cci + ddi,
+        x0i + jv * bbi - cci - jv * ddi,
+        x0i - bbi + cci - ddi,
+        x0i - jv * bbi - cci + jv * ddi,
+    ]
+    s4 = Solver()
+    s4.add(And(x0i >= 0, x0i < Q, bbi >= 0, bbi < Q,
+               cci >= 0, cci < Q, ddi >= 0, ddi < Q))
+    diff_terms = []
+    for t in range(4):
+        dft = inp[0] * jp[t][0] + inp[1] * jp[t][1] + inp[2] * jp[t][2] + inp[3] * jp[t][3]
+        diff_terms.append((spec_y[t] - dft) % Q != 0)
+    s4.add(Or(*diff_terms))
+    if s4.check() == sat:
+        fail("radix-4 butterfly != DFT4 with node j=psi^512")
+
+    # --- 1.5 op-count reductions (size-independent structural facts) ----------
+    if R4_MULT_OPT != 2 or R4_MULT_NAIVE != 3:
+        fail("radix-4 mult counts wrong")
+    if R4_ADDSUB_OPT != 8 or R4_ADDSUB_NAIVE != 10:
+        fail("radix-4 add/sub counts wrong")
+    if round(100 * (R4_MULT_NAIVE - R4_MULT_OPT) / R4_MULT_NAIVE) != 33:
+        fail("mult reduction != 33%")
+    if round(100 * (R4_ADDSUB_NAIVE - R4_ADDSUB_OPT) / R4_ADDSUB_NAIVE) != 20:
+        fail("add/sub reduction != 20%")
+
+    # cross-check the python Barrett against % on a deterministic sample at width
+    for xv in [0, 1, Q - 1, Q, Q + 1, (Q - 1) * (Q - 1), 151019520, 12288 * 7]:
+        if barrett_reduce(xv) != xv % Q:
+            fail("python barrett_reduce(%d) != %d mod q" % (xv, xv))
+
+def tier2_equivalence():
+    # ---- e2e at N=16 with the SAME prime q (spec: e2e_N=16) ------------------
+    n = E2E_N
+    # psi16 = psi^(2048/(2n)) is the primitive 2n-th root; for n=16 -> psi^64
+    psi16 = pow(PSI, 2048 // (2 * n), Q)
+    if pow(psi16, n, Q) != Q - 1:
+        fail("psi16^16 != -1 mod q (bad small-N negacyclic root)")
+    psi16_inv = pow(psi16, -1, Q)
+    ninv16 = pow(n, -1, Q)
+
+    psi_tab    = build_psi_table(n, psi16, Q)
+    psiinv_tab = build_psi_table(n, psi16_inv, Q)
+
+    rnd = random.Random(0)
+    for trial in range(64):
+        x = [rnd.randrange(Q) for _ in range(n)]
+
+        # (a) fast forward (natural order) == independent golden definition
+        fast = ntt_natural(x, psi_tab, Q)
+        gold = golden_fwd(x, psi16, Q)
+        if fast != gold:
+            fail("fast NTT != golden at N=16, trial %d: %s vs %s"
+                 % (trial, fast, gold))
+
+        # (b) fast round-trip INTT(NTT(x)) == x  (uses bit-reversed-order pair)
+        rt = intt_gs(ntt_ct(x, psi_tab, Q), psiinv_tab, ninv16, Q)
+        if rt != x:
+            fail("INTT(NTT(x)) != x at N=16, trial %d" % trial)
+
+        # (c) golden round-trip closes (sanity on the reference model itself)
+        gr = golden_inv(golden_fwd(x, psi16, Q), psi16, ninv16, Q)
+        if gr != x:
+            fail("golden INTT(NTT(x)) != x at N=16, trial %d" % trial)
+
+    # ---- production N=1024: structural O(N log N) round-trip + randomized ----
+    psi_tab_p    = build_psi_table(N_PROD, PSI, Q)
+    psiinv_tab_p = build_psi_table(N_PROD, pow(PSI, -1, Q), Q)
+    for trial in range(8):
+        x = [rnd.randrange(Q) for _ in range(N_PROD)]
+        rt = intt_gs(ntt_ct(x, psi_tab_p, Q), psiinv_tab_p, NINV_PROD, Q)
+        if rt != x:
+            fail("INTT(NTT(x)) != x at production N=1024, trial %d" % trial)
+    # edge cases
+    for x in ([0] * N_PROD, [1] + [0] * (N_PROD - 1), [Q - 1] * N_PROD):
+        rt = intt_gs(ntt_ct(x, psi_tab_p, Q), psiinv_tab_p, NINV_PROD, Q)
+        if rt != x:
+            fail("INTT(NTT(x)) != x at production edge case")
+
+    # ---- optional deep check (full natural-order golden at production N) -----
+    if os.environ.get("DEEP_VERIFY") == "1":
+        x = [rnd.randrange(Q) for _ in range(N_PROD)]
+        if ntt_natural(x, psi_tab_p, Q) != golden_fwd(x, PSI, Q):
+            fail("DEEP: fast NTT != golden at N=1024")
+
+def main():
+    tier1_zustand_proofs()   # size-independent, full-width z3 proofs
+    tier2_equivalence()      # whole-system equivalence at e2e_N=16
+    print("VERIFIED")
+    sys.exit(0)
+
+if __name__ == "__main__":
+    main()

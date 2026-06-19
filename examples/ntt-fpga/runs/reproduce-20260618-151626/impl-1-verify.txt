@@ -1,0 +1,6 @@
+pass=true ran=true
+--- stdout ---
+VERIFIED
+L0 build: 4 bodies, 3 actuators, valid kinematic tree | L1 stable: 1000 steps, |qpos|<50 finite | L2 DOF: 3/3 actuators move their joints | L3 task: datapath span=6.00m (x[-3.50,2.50]), exploded lift=0.83m, heatsink lift=0.58m
+
+--- stderr ---

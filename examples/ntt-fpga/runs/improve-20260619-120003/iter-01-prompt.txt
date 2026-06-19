@@ -1,0 +1,3070 @@
+# Self-Improvement Prompt — visually-3d Scene Descriptors
+
+You are a mechanical-engineering reviewer and 3D scene architect. You are
+running **one iteration of a recursive self-improvement loop** over a single
+`MachineSceneDescriptor` JSON file. Each iteration you receive the current
+scene, a **rendered image of it**, and — from the second iteration onward —
+your own reflection from the previous pass. You critique all of it, then
+return a strictly better scene.
+
+This message contains, in order:
+
+1. **An attached image** — a rendered 2×2 contact sheet of the current scene.
+   Look at it. It is your eyes.
+2. A `## Carried-over reflection` block (second iteration onward) — last pass's
+   unfinished gaps. They are the highest-priority work this iteration.
+3. A `## Current scene to improve` block — the scene JSON itself.
+
+You are running non-interactively via the Codex CLI. **Do not explore the
+repository or run shell commands** — everything you need is in this message.
+Your final message must be **only** the JSON object specified at the end.
+
+---
+
+## The attached render — how to read it
+
+The image is a 2×2 grid of orthographic/isometric views of the *current*
+scene, rendered with an opaque painter's-algorithm rasterizer:
+
+- **top-left `ISO`** — shaded isometric. Judge recognizability and, crucially,
+  **occlusion**: anything you cannot see here is hidden from a real viewer too.
+- **top-right `FRONT`** — elevation looking along −Z. A thin grey line marks
+  the ground (world y = 0); parts floating above it or sunk below it are bugs.
+- **bottom-left `SIDE`** — elevation looking along −X, ground line as above.
+- **bottom-right `TOP`** — plan view looking straight down.
+
+Because faces are opaque, **the render is the X-ray test made literal**: if a
+subsystem is swallowed by a featureless block in the ISO view, it fails. If a
+part hangs in empty space away from everything it connects to, the elevation
+views expose it. Treat disagreements between the render and the JSON's intent
+as defects to fix.
+
+---
+
+## Mode-awareness (read `metadata.mode` first)
+
+This scene was generated in one of three modes; respect it — do **not** "fix" a
+non-hardware scene by forcing it into the mechanical-engineering mould.
+
+- **hardware** (default): everything below applies as written.
+- **architecture**: judge the structural system (columns/beams/slabs/roof,
+  facade rhythm) and materials (concrete/steel/timber/glass), not "subsystems".
+- **algorithm**: judge dataflow legibility and that color encodes role; blocks
+  are abstract, materials are semantic, "buildability" means a CS student could
+  rebuild the algorithm.
+
+## The standard you are improving toward
+
+A finished scene must pass **two acceptance tests**. Improve until both pass.
+
+1. **The X-ray test — "understand it just by looking."**
+   A viewer who has never seen this machine can, by orbiting the scene,
+   name every major subsystem and see how they nest. Nothing important is
+   hidden inside an opaque block. Interiors are exposed by removing some
+   outer walls, by cutaway, or by an exploded view stacked directly above
+   the enclosure. *You verify this against the attached ISO render.*
+
+2. **The build test — "build it with your own hands."**
+   A competent engineer could reconstruct the real machine from this scene
+   alone: every part has real-world dimensions, a named material, a function,
+   and a connection graph that reads as an assembly order. `assembly_instructions`
+   is a real sequence, not a slogan.
+
+Neither test is "looks pretty." Both are "is it *legible* and *faithful*."
+
+---
+
+## How recursive self-improvement works here
+
+This loop is grounded in published self-improvement research. Apply the ideas,
+do not just cite them:
+
+- **Self-Refine** (Madaan et al., 2023): the same model produces output, then
+  *explicit written feedback* on that output, then a revision. Never revise
+  without first writing the critique — the critique is what makes the revision
+  non-random.
+- **Reflexion** (Shinn et al., 2023): verbal self-reflection is carried forward
+  as memory across attempts. The `remaining_gaps` you emit become next
+  iteration's `## Carried-over reflection`. Write them as concrete, actionable
+  notes to your future self, not vague regrets.
+- **Constitutional self-critique** (Bai et al., 2022): critique against an
+  explicit, fixed rubric (below) — not against taste. The rubric is the
+  constitution.
+- **Visual grounding** (VLM-as-a-judge): you are given a render precisely so
+  the critique is grounded in what the scene *looks like*, not only in what
+  the JSON *claims*. Trust the image over the prose.
+- **Recursive self-improvement / Gödel-machine principle** (Schmidhuber): only
+  adopt a self-modification when it is *measurably* better. A change that does
+  not raise a rubric axis is not an improvement — it is churn.
+- **Goodhart / reward-hacking caution**: the rubric is a *proxy* for the two
+  acceptance tests. Do not optimize the number while betraying the tests
+  (see Anti-patterns).
+
+**Convergence.** Stop improving — emit `"verdict": "converged"` — only when
+*all three* hold: (a) total ≥ 92/100, (b) every rubric axis is at ≥ 85% of its
+maximum, and (c) you cannot name a single concrete change worth more than
+2 points. Otherwise emit `"verdict": "improve"`. Honest convergence beats an
+inflated score; the loop also stops on its own once your score stops rising.
+
+---
+
+## Your procedure this iteration
+
+Do all four steps. Steps 1, 2 and 4 are recorded in the `review` field; step 3
+is the `scene` field.
+
+1. **Critique (be a harsh examiner).** First study the attached render, then
+   walk the rubric below axis by axis. For each axis name the *specific* part
+   ids or omissions that cost points. From the render, list every opaque block
+   that hides interior parts, every part floating off the ground line or away
+   from its neighbours, and every silhouette that does not read as the real
+   machine.
+2. **Prioritize.** Pick the 3–7 changes with the highest score-per-effort.
+   Address `## Carried-over reflection` items first if present.
+3. **Rewrite.** Produce the *complete* improved scene — every part, not a
+   diff. Apply the prioritized changes. You may and should add, split, move,
+   re-shape, re-material, re-connect, and re-annotate parts. Preserve the
+   machine's identity, its `metadata.info`, and `thumbnail_camera`.
+4. **Re-score and decide.** Score the rewritten scene, write the critique,
+   the changelog and the remaining gaps, and set the verdict per the
+   convergence rule.
+
+---
+
+## The rubric (100 points)
+
+Score the scene you are *emitting*, not the one you received.
+
+| Axis | Max | Full marks means |
+|---|---|---|
+| **Recognizability** | 10 | Nameable in ~5 s from the ISO render; iconic silhouette features all present. |
+| **Internal legibility** (X-ray test) | 20 | In the ISO render every interior subsystem is visible — walls removed, cutaway, or exploded above. Zero opaque blocks hiding ≥2 parts. `role` of exploded parts says so. |
+| **Structural decomposition** | 15 | Frames are modelled as real members (rails, posts, cross-braces, thin floor) — never one chassis box. Symmetric hardware is modelled N times with distinct ids and positions, never once "representatively". |
+| **Buildability** (build test) | 20 | Every part has dimensions traceable to a real spec; `assembly_instructions` is an ordered build sequence; the connection graph reads as assembly order. |
+| **Geometric fidelity** | 15 | Right primitive per part (`cone`/`torus`/`capsule`/tapered `cylinder` where the silhouette calls for it — not box stacks); correct axis rotations; no interpenetration; nothing floating in the elevation views. |
+| **Proportional accuracy** | 10 | Relative sizes match the real machine; absolute sizes in metres; cited in `facts[]`. `bounds.radius` stays < ~9. |
+| **Annotation depth** | 5 | Every `role` explains function in one concrete sentence; `facts[]` has 6–10 numeric entries; `sources[]` has 2–4 real citations. |
+| **Self-consistency** | 5 | Connection graph is rooted at the main structural part, every non-root part connects, no dangling/duplicate ids, no NaN/Infinity/zero sizes. |
+
+A 10-part scene cannot score above ~50 — recognizable machines and buildings
+need **20–40 parts**. Add the iconic sub-features the current scene is missing.
+
+---
+
+## Hard constraints
+
+- **Schema.** The `scene` must be a valid `MachineSceneDescriptor`:
+  `{ machine_name, assembly_instructions?, metadata?, parts[] }`; each part is
+  `{ id, name, shape, position[3], rotation?[3], size[], material, role,
+  connections?[], spec? }`. Keep engineering fields (`compute_profile`,
+  `algorithm`, …) only if the input scene used them.
+- **Preserve the functional spec.** A part may carry a `spec` block
+  (`params`/`widths`/`ports`/`ops`/`fsm`/`notes`), and there may be a top-level
+  `metadata.spec`. These hold *verified* facts about what the system does (they
+  are written by the reproducibility loop). **Never drop or weaken them.** Carry
+  every `spec` field through unchanged, and make your `role`/`facts`/annotations
+  *consistent* with them — the geometry is the visualization of this spec.
+- **No regression.** Never delete a correct, informative part to raise a
+  number. Part count and information should rise or hold across iterations.
+- **Keep identity.** Same machine, same `machine_name`, same domain. You are
+  refining a model, not replacing it. Carry `metadata.mode`,
+  `metadata.reference`, `metadata.backend`, `metadata.info`, `metadata.spec` and
+  `thumbnail_camera` through unchanged — they are set once and must survive.
+- **Validity.** No `NaN`, `Infinity`, or `≤ 0` sizes. Positions are finite.
+  Every `connections` id must exist.
+
+---
+
+## Geometry & material reference
+
+*(Mirrors `server/analyst.js` — keep consistent with it.)*
+
+**Coordinate system.** Right-handed, +Y up. Forward = +X, port = +Z. Units are
+metres; scale large machines (spacecraft, locomotives, turbines) by 0.3–0.5×
+so `bounds.radius` < ~9. Floor-standing machines: feet at y = 0.
+
+**Primitives** — pick the one whose silhouette matches; do not stack boxes for
+curves:
+- `box` — size `[width-X, height-Y, depth-Z]`.
+- `cylinder` — `[radius, height]` uniform, **or** `[radiusTop, radiusBottom,
+  height]` tapered (nozzles, tower tapers, the Apollo cone, hoppers). Axis Y.
+- `cone` — `[radius, height]`, apex along +Y (nose cones, drill tips).
+- `sphere` — `[radius]` (domes, tanks, sensor heads).
+- `torus` — `[ringRadius, tubeRadius]`, ring in the XY plane / axis Z (tires,
+  O-rings, hubs, hand-wheels, ring trusses).
+- `capsule` — `[radius, length]`, axis Y (hydraulic cylinders, pressure
+  vessels, rounded rods, limbs).
+- `complex` — a bevelled box for genuinely irregular machined parts; use
+  sparingly, prefer a real primitive.
+
+**Axis rotation** (cylinder/cone/capsule native axis Y; torus native axis Z):
+- Along X: `[0, 0, 1.5708]`. Along Z: `[1.5708, 0, 0]`.
+- Tilted in XY: `[0, 0, angle]`. Upright torus wheel: no rotation; flat torus:
+  `[1.5708, 0, 0]`.
+
+**Material vocabulary** (use verbatim — the viewer maps these to colour +
+metalness/roughness): `welded steel` / `forged steel` / `brushed steel`,
+`dark anodized aluminum`, `white composite`, `black composite`,
+`glass display`, `rubber`, `fiberglass`, `carbon fiber`, `concrete`,
+`brass` / `copper`, `steel` / `aluminum` / `metal`.
+
+---
+
+## Anti-patterns (reward hacking — do not do these)
+
+- Adding near-duplicate filler parts to push the count without adding
+  information. Each part must be visible in the silhouette, an iconic named
+  detail, or required to root the connection graph.
+- Claiming `"verdict": "converged"` while the render still shows opaque blocks
+  hiding parts, or while parts still lack dimensional grounding.
+- Inflating `scores` past what the emitted scene supports.
+- Deleting hard-to-render parts to dodge the geometry axis.
+- Replacing concrete `role`/`facts` text with adjectives ("advanced",
+  "high-performance"). Use numbers and functions.
+- Switching to a different (easier-to-model) machine.
+
+---
+
+## Output contract
+
+Your final message must be **only** a single JSON object — no markdown fences,
+no prose before or after, no commentary:
+
+```
+{
+  "review": {
+    "scores": {
+      "recognizability": <0-10>,
+      "internal_legibility": <0-20>,
+      "structural_decomposition": <0-15>,
+      "buildability": <0-20>,
+      "geometric_fidelity": <0-15>,
+      "proportional_accuracy": <0-10>,
+      "annotation_depth": <0-5>,
+      "self_consistency": <0-5>
+    },
+    "total": <0-100>,
+    "verdict": "improve" | "converged",
+    "critique": "<2-5 sentences: the worst failures you saw in the render and JSON>",
+    "changelog": ["<concrete change applied this iteration>", ...],
+    "remaining_gaps": ["<concrete actionable note to your next iteration>", ...]
+  },
+  "scene": { <the full, improved MachineSceneDescriptor> }
+}
+```
+
+`total` must equal the sum of `scores`. `changelog` is what you changed this
+pass; `remaining_gaps` is what is still imperfect (empty array only when
+`verdict` is `converged`).
+
+## Carried-over reflection (from the previous iteration)
+
+Address these gaps first — the previous pass could not yet close them:
+
+```json
+{
+  "source": "reproduce findings",
+  "remaining_gaps": [
+    "Make reproducible — record the operation: The paper's actual conflict-free bank-index and offset functions (Sec. III headline result is not transcribed; both impls reconstructed an XOR-fold) (part \"crossbar_network\")",
+    "Make reproducible — record the control: Per-stage crossbar permutation sigma_s routing table (part \"crossbar_network\")",
+    "Make reproducible — record the operation: Twiddle-ROM address function f(stage,block) under the rearranged twiddle-reuse loop (part \"twiddle_rom\")",
+    "Make reproducible — record the operation: Whether the optimized radix-4 butterfly uses 2 or 3 modular multiplications (datapath fields say 3, op-count reconciliation says 2) (part \"config_radix_selector\")",
+    "Make reproducible — record the param: Naive-radix-4 add/sub baseline (assumed 10) that anchors the 20% reduction claim",
+    "Make reproducible — record the control: Exact FSM transition table, radix-2 vs radix-4 sequencing, and wiring of the DONE state (two contradictory fsm lists given) (part \"schedule_controller\")",
+    "Make reproducible — record the operation: Exact Barrett post-reduction bound / number of conditional subtractions (<2q vs <3q, <=2 subs) (part \"mod_red_subshift\")",
+    "Make reproducible — record the control: Internal coefficient ordering (natural vs bit-reversed) between NTT output and INTT input",
+    "Match the source — pipeline latency should be \"9 cycles/lane (3+1+4+1)\" (impls used \"not functionally modeled (timing decoration)\")",
+    "Match the source's architecture — The paper's central contribution — the conflict-free bank/offset mapping — is a reconstructed XOR-fold, not the source's actual scheme, so the headline architectural feature is reproduced only by analogy.",
+    "Match the source's architecture — The 20%/33%-reducing radix-4 schedule (the second key contribution) is absent: the implemented butterfly uses the naive 3-mult datapath, so the optimization the reference is named for is not present.",
+    "Match the source's architecture — Crossbar permutation, twiddle-ROM rearranged-loop addressing, and 9-cycle pipeline are not modeled — the verified artifact is the NTT algebra, not the CFNTT datapath/schedule that distinguishes this system."
+  ],
+  "notes": [
+    "These gaps come from the reproducibility check: engineers could not rebuild the system from the scene alone. Keep the scene's spec/annotations consistent with the values amend writes in."
+  ]
+}```
+
+## Current scene to improve
+
+```json
+{
+  "machine_name": "CFNTT Radix-2/4 NTT Multiplication Accelerator (FPGA)",
+  "assembly_instructions": "1) Start from the FPGA PCB substrate (14x9 m floorplan) and overlay the silicon-die outline plate that bounds the placed-and-routed logic; on the -X edge seat the host interface: a PCIe x16 gold-finger edge connector feeding a host DMA/PCIe controller block, the boundary where coefficient vectors enter and transformed results leave. 2) Drive the controller into the forward-NTT input FIFO and natural-order output FIFO, then mount the eight interleaved BRAM banks along the left edge at 1.1 m pitch between them. 3) Drop the conflict-free crossbar network as a vertical spine just inboard of the banks, and place the inverse-NTT N^-1 scaling unit on its output side. 4) Build the open butterfly-array frame: lay a thin floor across the array, then bolt the two longitudinal steel rails and the mid cross-brace so the chassis stays open from above; populate the eight parallel radix-2 butterfly lanes (one per BRAM bank) by wiring each DSP modular multiplier into its symmetric modular adder (dark anodized) and subtractor (brushed steel), then both into the pipeline register; finally seat the four carbon-fiber radix-4 fusion yokes in the open gap between the multiplier and add/sub columns, each binding a lane-pair (0-1, 2-3, 4-5, 6-7) into one fused 4-input radix-4 butterfly unit so the eight radix-2 lanes reconfigure into four radix-4 BUs. 5) Place the shared modular-reduction stage to the right as two distinct members: first the cylindrical Barrett q-multiplier spanning all eight lanes, then the boxy shift/subtract+correction member abutting it, wired from every pipeline register. 6) Route the operand-return bus from the reduction member back over the array to the crossbar (grounded by a standoff post onto the reduction member), and route the operand-read bus from the crossbar east into the multiplier column (grounded by its own standoff onto the array frame), keeping the read, return and twiddle channels on three separate heights; cap each with a direction arrow so the read/twiddle/return dataflow triad is fully visible and the conflict-free read-modify-write loop is closed. 7) On the right, install the twiddle-factor ROM and route a brass broadcast feeder west to the elevated rail spanning the multiplier column (grounded by a standoff onto the array frame) so one fetched factor fans out to all eight multipliers; then add the address-generation unit, the radix-2/4 config selector, the schedule/FSM controller and the clock PLL. 8) For inspection, lift one fused radix-4 butterfly unit onto two riser posts into an exploded view above the array (three twiddle multipliers W1/W2/W3 -> constant j-rotator -> y0..y3 add/sub tree -> four-output register), offset toward the +Z half so it clears the central lanes in plan view, and clamp the ten-fin exploded aluminum heatsink high onto its riser stub well above the die so the datapath below stays visible.",
+  "metadata": {
+    "reference": "https://tches.iacr.org/index.php/TCHES/article/view/9291",
+    "domain": "cryptographic-hardware",
+    "mode": "hardware",
+    "spec": {
+      "params": {
+        "N": 1024,
+        "parallel_butterfly_units": 8,
+        "radix": "2/4 (configurable)",
+        "modulus_q": 12289,
+        "modulus_q_note": "Source gives only '14-bit NTT-friendly prime'; reproduction fixes q=12289=3*2^12+1, the canonical 14-bit prime with 2048 | (q-1) so 2N-th roots of unity exist for a 1024-point transform. No other modulus is recoverable from the source — there is no distinct 'paper benchmark modulus' to substitute.",
+        "transform_flavor": "Unstated in source; PQC/HE context implies negacyclic (psi = 2N=2048-th primitive root, omega = psi^2 the N-th root). Cyclic is the degenerate fallback the earlier functional impls used and is a likely mismatch.",
+        "twiddle_root_constraints": "psi^2048 ≡ 1 and psi^1024 ≡ -1 (mod q); omega = psi^2; any generator satisfying these is a valid reproduction choice.",
+        "pipeline_latency_cycles": 9,
+        "q": 12289,
+        "transform": "NTT/INTT (negacyclic, DIT)",
+        "psi": "1945 = 11^6 mod 12289 (primitive 2048th root, negacyclic)",
+        "omega": "10302 = 1945^2 mod 12289 (primitive 1024th root)",
+        "Ninv": 12277,
+        "generator_g": 11,
+        "barrett_mu": "21843 = floor(2^28 / 12289)",
+        "barrett_k": 28,
+        "parallel_BU": 8,
+        "negacyclic": true,
+        "psi_order": 2048,
+        "modulus_bits": 14,
+        "num_butterfly_units": 8,
+        "N_inv": "12277 = 1024^-1 mod 12289",
+        "naive_radix4_addsub_baseline": 10,
+        "opt_radix4_addsub_count": "8 = round(10 * 0.80) (20% reduction)",
+        "opt_radix4_mult_count": "2 (33% fewer than naive 3)",
+        "pipeline_latency_breakdown": "mult 3 + add/sub 1 + Barrett 4 + reg 1 = 9 cycles/lane",
+        "internal_coeff_order": "external natural-order I/O; NTT=CT/DIT (natural->bit-reversed intermediate), INTT=GS/DIF (bit-reversed->natural), so no explicit bit-reversal permutation stage"
+      },
+      "widths": {
+        "coefficient": 14,
+        "coeff": 14,
+        "modulus": 14,
+        "twiddle": 14,
+        "product": 28,
+        "index": 10,
+        "bank": 3,
+        "bank_offset": 7
+      },
+      "ops": [
+        "radix-2/radix-4 NTT/INTT butterfly",
+        "Barrett modular reduction: q-multiply then shift/subtract+correct",
+        "twiddle-factor broadcast/reuse across 8 multipliers",
+        "forward NTT (DIT, merged negacyclic psi-twist)",
+        "inverse INTT then scale by Ninv=12277",
+        "Barrett modular reduction (mu=21843, k=28)",
+        "twiddle reuse across rearranged loop"
+      ],
+      "properties": [
+        "conflict-free memory mapping: arbitrary radix and arbitrary #BU access the interleaved BRAM banks with no bank conflict",
+        "no bit-reversal stage",
+        "twiddle-factor reuse via a rearranged loop structure",
+        "radix-4 uses 33% fewer modular multiplications and 20% fewer modular add/sub than radix-2",
+        "~50% of butterfly hardware saved via symmetric operators",
+        "NTT followed by INTT (with N^-1 scaling) is the identity",
+        "conflict-free memory mapping (arbitrary radix / #BU, no bank conflict)",
+        "[violated] radix-4 schedule uses 33% fewer mults / 20% fewer add/sub vs a naive radix-4 butterfly (NOT vs radix-2)",
+        "negacyclic transform with merged psi twist (no separate pre/post pass)",
+        "natural-order output (no bit-reversal pass)",
+        "no bit-reversal stage / natural-order output — [unverifiable]: reproduced only functionally via an internal bit-reversed intermediate undone by GS inverse; hardware ordering not structurally realized",
+        "ATP advantage 2.2x/1.2x/1.1x/1.9x (LUT/FF/DSP/BRAM) vs radix-2 — [unverifiable] FPGA resource-time metric, outside functional reproduction"
+      ],
+      "notes": "Authoritative claims from CFNTT, TCHES 2022 issue 1, pp.94-126 (Chen et al., Tsinghua). The exact modulus q is given in the source only as a 14-bit NTT-friendly prime; the 1024-pt benchmark uses a 14-bit q. Verification auto-selects the SMT backend because this is a digital/compute design (NTT datapath), not a mechanical machine.\n[src] q=12289, N=1024, coeff=14b, psi=1945 (negacyclic order 2048), omega=10302, Ninv=12277 from CFNTT (TCHES 2022). [calc] psi=1945=11^6 mod 12289; omega=10302=1945^2 mod 12289; Ninv=12277=1024^-1 mod 12289 (1024*12277=1+1023*12289); barrett_mu=21843=floor(2^28/12289), barrett_k=28 (q^2=151019521<2^28). [conv] generator g=11 (yields the source's psi) treated as reproduction-transcribed, not independently stated. [src] pipeline latency 9 cycles/lane = mult 3 + add/sub 1 + Barrett 4 + reg 1 (replaces prior 'functional-model/ignored' default). [src->calc] OP-COUNT RECONCILIATION: the 33%/20% reductions are measured against a NAIVE radix-4 butterfly (3 mults+10 add/sub) -> optimized (2 mults+8 add/sub): 1-2/3=33% mult, 1-8/10=20% add/sub; they are NOT a radix-4-vs-radix-2 claim, so any verifier asserting radix4_mults<radix2_mults at the same transform is wrong (both ~equal) — the radix-4 advantage over radix-2 is the AREA-TIME product (2.2x/1.2x/1.1x/1.9x LUT/FF/DSP/BRAM), a resource metric, not an op count. [source-missing] the paper's exact naive-radix-4 add/sub baseline (assumed 10) is reconstructed; if the paper defines it differently the 20% anchor must be re-pinned. [src] negacyclic confirmed; psi is the canonical primitive 2048th root.\n[src] N=1024, 14-bit q=12289, 8 parallel BUs, radix-2/4 datapath, pipeline 9 cyc/lane (3+1+4+1). [calc] psi=1945=11^6 mod 12289, omega=1945^2 mod 12289=10302, N_inv=1024^-1 mod 12289=12277, mu=floor(2^28/12289)=21843. [conv] naive-radix4 add/sub baseline fixed at 10 to anchor the source's 20% reduction (-> optimized 8); fixes verifier counterexample 'add/sub reduction != 20%' at its numeric source. [conv] internal ordering: CT-DIT NTT + GS-DIF INTT convention chosen to satisfy the natural-order claim without an explicit bit-reversal.",
+      "ports": [
+        {
+          "name": "clk",
+          "dir": "in",
+          "width": 1
+        },
+        {
+          "name": "rst",
+          "dir": "in",
+          "width": 1
+        },
+        {
+          "name": "start",
+          "dir": "in",
+          "width": 1
+        },
+        {
+          "name": "mode_intt",
+          "dir": "in",
+          "width": 1
+        },
+        {
+          "name": "radix_sel",
+          "dir": "in",
+          "width": 1
+        },
+        {
+          "name": "done",
+          "dir": "out",
+          "width": 1
+        }
+      ],
+      "fsm": [
+        "IDLE",
+        "LOAD",
+        "RUN_STAGES",
+        "SCALE_INTT",
+        "DRAIN",
+        "DONE"
+      ]
+    },
+    "thumbnail_camera": [
+      10.4,
+      8.3,
+      10.4
+    ],
+    "info": {
+      "japanese_name": "CFNTT スケーラブル基数2/4 NTT 乗算アーキテクチャ (FPGA)",
+      "english_name": "CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture",
+      "summary": "An FPGA accelerator for the Number Theoretic Transform that combines a conflict-free memory mapping scheme with parallel radix-4 butterfly units, the polynomial-multiplication engine behind lattice post-quantum cryptography and homomorphic encryption.",
+      "description": "CFNTT is an algorithm-hardware co-designed NTT core proposed by Chen et al. (Tsinghua University) in TCHES 2022. Its central contribution is a conflict-free memory mapping scheme that lets an arbitrary radix and an arbitrary number of parallel butterfly units access an interleaved BRAM system without bank conflicts, removing the bit-reversal cost and reducing memory footprint by reusing twiddle factors across a rearranged loop structure.",
+      "description2": "Built on this scheme, the architecture realizes a scalable radix-2 / radix-4 datapath. A dedicated schedule cuts radix-4 modular additions/subtractions by 20% and modular multiplications by 33%, while exploiting symmetric operators saves nearly 50% of the butterfly hardware. For a 1024-point, 14-bit NTT with 8 parallel butterfly units, the radix-4 core achieves roughly 2.2x/1.2x/1.1x/1.9x lower LUT/FF/DSP/BRAM area-time product than the radix-2 core.",
+      "facts": [
+        {
+          "label": "Transform",
+          "value": "Number Theoretic Transform (NTT/INTT)"
+        },
+        {
+          "label": "Benchmark size",
+          "value": "1024 points, 14-bit modulus (q=12289 repro.)"
+        },
+        {
+          "label": "Parallel butterfly units",
+          "value": "8 (8 modeled, 1.1 m bank/lane pitch)"
+        },
+        {
+          "label": "Radix-4 mult reduction",
+          "value": "33% fewer modular multiplications"
+        },
+        {
+          "label": "Radix-4 add/sub reduction",
+          "value": "20% fewer modular add/sub"
+        },
+        {
+          "label": "Hardware saving",
+          "value": "~50% via symmetric operators"
+        },
+        {
+          "label": "Reduction",
+          "value": "Barrett: mu=21843, k=28, shift/subtract"
+        },
+        {
+          "label": "Pipeline latency",
+          "value": "9 cycles/lane (mult 3 + add/sub 1 + Barrett 4 + reg 1)"
+        },
+        {
+          "label": "ATP advantage (LUT)",
+          "value": "~2.2x lower vs radix-2"
+        },
+        {
+          "label": "Twiddle root",
+          "value": "psi=1945 (negacyclic, order 2048), omega=10302, N^-1=12277"
+        }
+      ],
+      "sources": [
+        {
+          "title": "CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture (TCHES 2022)",
+          "url": "https://tches.iacr.org/index.php/TCHES/article/view/9291"
+        },
+        {
+          "title": "CFNTT PDF (IACR TCHES)",
+          "url": "https://tches.iacr.org/index.php/TCHES/article/download/9291/8857"
+        },
+        {
+          "title": "DOI 10.46586/tches.v2022.i1.94-126",
+          "url": "https://doi.org/10.46586/tches.v2022.i1.94-126"
+        }
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "pcb_substrate",
+      "name": "FPGA PCB Substrate",
+      "shape": "box",
+      "position": [
+        0,
+        0.2,
+        0
+      ],
+      "size": [
+        14,
+        0.4,
+        9
+      ],
+      "material": "black composite",
+      "role": "The 14x9 m FPGA board floorplan carrying every NTT datapath block and the routing between them.",
+      "connections": [
+        "fpga_die",
+        "bram_0",
+        "bram_1",
+        "bram_2",
+        "bram_3",
+        "bram_4",
+        "bram_5",
+        "bram_6",
+        "bram_7",
+        "input_fifo",
+        "output_fifo",
+        "crossbar_network",
+        "intt_scale",
+        "bu_array_base",
+        "bu_rail_left",
+        "bu_rail_right",
+        "mod_red_mult",
+        "mod_red_subshift",
+        "return_bus",
+        "return_arrow",
+        "read_bus",
+        "read_arrow",
+        "twiddle_rom",
+        "addr_gen_unit",
+        "config_radix_selector",
+        "clock_pll",
+        "schedule_controller",
+        "heatsink_base",
+        "host_edge",
+        "host_phy"
+      ]
+    },
+    {
+      "id": "fpga_die",
+      "name": "FPGA Silicon Die Outline",
+      "shape": "box",
+      "position": [
+        0,
+        0.46,
+        0
+      ],
+      "size": [
+        12,
+        0.08,
+        7.4
+      ],
+      "material": "brushed steel",
+      "role": "Silicon-die outline of the FPGA; every block standing above this plate is placed-and-routed logic inside the die boundary, marking the chip extent on the board.",
+      "connections": [
+        "pcb_substrate",
+        "heatsink_riser"
+      ]
+    },
+    {
+      "id": "host_edge",
+      "name": "PCIe x16 Host Edge Connector",
+      "shape": "box",
+      "position": [
+        -7.35,
+        0.2,
+        0
+      ],
+      "size": [
+        0.5,
+        0.28,
+        5
+      ],
+      "material": "brass",
+      "role": "PCIe x16 gold-finger edge connector protruding from the board's -X edge; the physical host interface where the host streams raw coefficient vectors into the accelerator and reads transformed results back, marking this die as an NTT coprocessor card rather than a standalone chip.",
+      "connections": [
+        "pcb_substrate",
+        "host_phy"
+      ],
+      "spec": {
+        "params": {
+          "link": "PCIe x16 gold-finger edge",
+          "direction": "bidirectional: coeff in / result out",
+          "feeds": "host DMA controller -> input/output FIFO"
+        }
+      }
+    },
+    {
+      "id": "host_phy",
+      "name": "Host DMA / PCIe Controller",
+      "shape": "box",
+      "position": [
+        -6.4,
+        0.8,
+        0
+      ],
+      "size": [
+        0.7,
+        0.6,
+        1.6
+      ],
+      "material": "black composite",
+      "role": "Host-side DMA / PCIe controller block on the board edge that buffers the edge-connector traffic and drives the forward-NTT input FIFO and drains the natural-order output FIFO, the data origin and sink of the whole datapath.",
+      "connections": [
+        "pcb_substrate",
+        "host_edge",
+        "input_fifo",
+        "output_fifo"
+      ],
+      "spec": {
+        "params": {
+          "link": "PCIe Gen3 x16",
+          "data_width_bits": 128,
+          "dma": "scatter-gather; one polynomial = N=1024 x 14-bit coefficients packed little-endian into 64-bit beats (~4.57 beats per 8-coeff group)",
+          "framing": "per-transfer descriptor {base_addr, length=1024 words, dir(in|out)}; one descriptor per polynomial vector",
+          "fifo_handshake": "AXI-Stream style ready/valid into input_fifo and out of output_fifo; deasserted ready back-pressures and stalls the DMA engine",
+          "ordering": "coefficients streamed in natural index order i=0..1023; transformed results drained in natural order (no bit-reversal pass)"
+        },
+        "notes": "Reproduction I/O protocol. The source models this boundary abstractly as in-memory coefficient vectors with no protocol/ordering semantics; the widths, framing and handshake recorded here make the host edge rebuildable by a CS student."
+      }
+    },
+    {
+      "id": "bram_0",
+      "name": "BRAM Bank 0",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        -3.85
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved ~18 Kb dual-port block RAM holding polynomial coefficients under conflict-free addressing; serves two operand reads per cycle into butterfly lane 0 and the input stream head.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "input_fifo"
+      ],
+      "spec": {
+        "params": {
+          "bank_index": 0,
+          "depth_words": 256,
+          "word_bits": 14,
+          "ports": "dual-port (2 reads or 1 read + 1 write per cycle)",
+          "addressing": "offset o(i)=i>>3 within bank b(i)=(i+(i>>3)) mod 8"
+        }
+      }
+    },
+    {
+      "id": "bram_1",
+      "name": "BRAM Bank 1",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        -2.75
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved dual-port BRAM bank in the eight-way conflict-free memory system feeding butterfly lane 1.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "input_fifo"
+      ],
+      "spec": {
+        "params": {
+          "bank_index": 1,
+          "depth_words": 256,
+          "word_bits": 14,
+          "ports": "dual-port",
+          "addressing": "identical map to every bank: a coefficient with global index i lives in bank b(i)=(i+(i>>3)) mod 8 at offset o(i)=i>>3; bank 1 holds exactly the indices whose b(i)=1",
+          "capacity": "256 words x 14 bits ~= 3.5 Kb sub-region of an 18 Kb BRAM primitive"
+        },
+        "notes": "Banks 1-7 replicate bank 0's word/depth/port semantics; only the resident index set differs (the b(i)=k preimage). 8 banks x 256 words = 2048 >= N=1024, leaving double-buffer headroom for ping-pong between forward and inverse passes."
+      }
+    },
+    {
+      "id": "bram_2",
+      "name": "BRAM Bank 2",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        -1.65
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved dual-port BRAM bank addressed by the mapping scheme so no two parallel butterflies collide; feeds lane 2.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network"
+      ]
+    },
+    {
+      "id": "bram_3",
+      "name": "BRAM Bank 3",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        -0.55
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved dual-port BRAM bank in the eight-way conflict-free memory system feeding butterfly lane 3.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network"
+      ]
+    },
+    {
+      "id": "bram_4",
+      "name": "BRAM Bank 4",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        0.55
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved dual-port BRAM bank in the eight-way conflict-free memory system feeding butterfly lane 4.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network"
+      ]
+    },
+    {
+      "id": "bram_5",
+      "name": "BRAM Bank 5",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        1.65
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved dual-port BRAM bank in the eight-way conflict-free memory system feeding butterfly lane 5.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network"
+      ]
+    },
+    {
+      "id": "bram_6",
+      "name": "BRAM Bank 6",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        2.75
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved dual-port BRAM bank feeding lane 6 and the natural-order write-back path.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "output_fifo"
+      ]
+    },
+    {
+      "id": "bram_7",
+      "name": "BRAM Bank 7",
+      "shape": "box",
+      "position": [
+        -5.8,
+        1,
+        3.85
+      ],
+      "size": [
+        1.3,
+        1.2,
+        0.85
+      ],
+      "material": "glass display",
+      "role": "Interleaved dual-port BRAM bank providing the natural-order write-back path to the output FIFO (no bit-reversal); feeds lane 7.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "output_fifo"
+      ]
+    },
+    {
+      "id": "input_fifo",
+      "name": "Forward-NTT Input FIFO",
+      "shape": "capsule",
+      "position": [
+        -6.8,
+        0.95,
+        3.2
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.45,
+        1.8
+      ],
+      "material": "white composite",
+      "role": "Streams raw input coefficients from the host controller into the head BRAM banks in natural order at the start of the forward NTT pass.",
+      "connections": [
+        "pcb_substrate",
+        "bram_0",
+        "bram_1",
+        "host_phy"
+      ]
+    },
+    {
+      "id": "output_fifo",
+      "name": "Natural-Order Output FIFO",
+      "shape": "capsule",
+      "position": [
+        -6.8,
+        0.95,
+        -3.2
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.45,
+        1.8
+      ],
+      "material": "white composite",
+      "role": "Drains transformed coefficients out of the tail banks in natural order back to the host controller, eliminating the bit-reversal pass.",
+      "connections": [
+        "pcb_substrate",
+        "bram_6",
+        "bram_7",
+        "intt_scale",
+        "host_phy"
+      ]
+    },
+    {
+      "id": "crossbar_network",
+      "name": "Conflict-Free Crossbar Network",
+      "shape": "box",
+      "position": [
+        -4.2,
+        0.9,
+        0
+      ],
+      "size": [
+        1.2,
+        1,
+        8.4
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Permutation crossbar (8x8) implementing the conflict-free mapping: each cycle it gathers up to 16 operands from the eight dual-port BRAM banks and routes them to the eight butterfly lanes, then accepts the 8 reduced results back over the return bus and writes them home — the read and write halves of the conflict-free read-modify-write loop.",
+      "connections": [
+        "pcb_substrate",
+        "bram_0",
+        "bram_1",
+        "bram_2",
+        "bram_3",
+        "bram_4",
+        "bram_5",
+        "bram_6",
+        "bram_7",
+        "bu_array_base",
+        "return_bus",
+        "return_arrow",
+        "read_bus",
+        "read_arrow",
+        "addr_gen_unit",
+        "schedule_controller",
+        "intt_scale"
+      ],
+      "spec": {
+        "params": {
+          "banks": 8,
+          "ports": "16 operand reads + 8 result writes per cycle: eight radix-2 butterflies x 2 operand reads = 16 reads, served by 8 dual-port BRAM banks (2 read ports each); 8 reduced results write back. Radix-4 mode gathers 4 operands per fused BU from 4 distinct banks (still 16 reads across the 4 active fused units).",
+          "bank_index": "b(i) = (i + (i >> 3)) mod 8",
+          "offset": "o(i) = i >> 3   (floor(i/8))",
+          "per_stage_permutation": "at radix-2 stage s (s=0..9) a butterfly pairs operands at indices (i, i+2^s); the crossbar applies read permutation sigma_s where operand-a of lane L is fetched from bank (L - s) mod 8 and operand-b from bank (L - s + R_s) mod 8 with R_s = ((2^s)>>3)+1; the write-back applies the inverse sigma_s^{-1} so reduced results return to their home banks",
+          "radix4_routing": "a radix-4 BU gathers 4 operands (i, i+2^s, i+2^{s+1}, i+3*2^s) which b(i) guarantees fall in 4 distinct banks; the crossbar routes them to the 4 input ports of one fused lane-pair in a single cycle",
+          "words_per_bank": 128,
+          "bank_fn": "bank(i) = (i&7) ^ ((i>>3)&7) ^ ((i>>6)&7) ^ ((i>>9)&7)",
+          "offset_fn": "offset(i) = i>>3",
+          "sigma_s": "crossbar lane l <- bank( base_s + l*stride_s ); per-stage permutation induced by bank_fn over the 8 lane indices"
+        },
+        "notes": "Reproduction conflict-free mapping: for B=8 banks the up-to-4 operands of any radix-2/4 butterfly at every stage land in distinct banks, so reads/writes never collide and no bit-reversal stage is needed. Port accounting: eight radix-2 butterflies require 16 simultaneous operand reads, so the banks MUST be dual-ported (2 read ports each) — a rebuilder provisioning single-port BRAM would halve throughput. The paper's exact bank-index/offset functions (its headline Sec. III result) are not transcribed in the source; this XOR/rotate-style map plus the rotation permutation sigma_s satisfy the asserted no-conflict property and are rebuildable by a CS student.\n[conv] COMMITTED conflict-free map: bank(i)=XOR-fold of the four 3-bit groups of i, offset(i)=floor(i/8). This is a GF(2)-linear bank function, so for any power-of-two stride 2^k the two operands differ in exactly one address bit and bank(i) XOR bank(i+2^k) = fold(2^k) != 0 -> operands always in distinct banks. [calc] FIXES the verifier counterexample of the prior map b(i)=(i+(i>>3))%8: there b(i+512)=b(i) (576 mod 8 = 0) so stride-512 operands collided; with XOR-fold fold(bit9)->bank bit0 = 1 != 0. (bank,offset) is a bijection on [0,1024) (offset fixes bits 9..3, low 3 bits XOR-map to all 8 banks). [source-missing] the paper's exact sigma_s crossbar permutation table per stage is not transcribed; the XOR-fold realizes the named property (per-stage 8-way distinctness) but may differ in routing from the paper's specific construction.\n[source-missing] the paper's actual conflict-free bank-index and offset functions (Sec. III headline result) are not transcribed. [conv] committed XOR-fold bank(i) + offset=floor(i/8) for reproducibility/distinctness, matching what both impls reconstructed. [source-missing] exact per-stage sigma_s routing table; [conv] stride-rotation table committed to remove ambiguity.",
+        "widths": {
+          "bank_idx": 3,
+          "offset": 7,
+          "bank": 3,
+          "bank_offset": 7,
+          "index": 10
+        },
+        "ports": [
+          {
+            "name": "rd_addr",
+            "dir": "in",
+            "width": 10
+          },
+          {
+            "name": "bank_sel",
+            "dir": "out",
+            "width": 3
+          },
+          {
+            "name": "row_sel",
+            "dir": "out",
+            "width": 7
+          }
+        ],
+        "ops": [
+          "map coeff index i -> (bank,offset) via XOR-fold",
+          "route 8 bank reads -> 8 BU lanes via sigma_s",
+          "writeback under same map preserving conflict-freedom",
+          "bank(i) = (i ^ (i>>3) ^ (i>>6) ^ (i>>9)) & 0x7  [conv XOR-fold reconstruction; 8 banks]",
+          "offset(i) = i >> 3  (= floor(i/8); 128-deep per bank, 1024/8)",
+          "sigma_s (per-stage crossbar permutation) = cyclic lane rotation by stride(s)=2^s mod 8 at stage s"
+        ],
+        "properties": [
+          "conflict-free memory mapping (arbitrary radix/#BU, no bank conflict)",
+          "per-stage operand bank-distinctness for ALL strides incl. 512",
+          "conflict-free memory mapping (arbitrary radix/#BU, no bank conflict) — [unverifiable]: verified only via the reconstructed XOR-fold, not the paper's actual (untranscribed) mapping"
+        ],
+        "fsm": []
+      }
+    },
+    {
+      "id": "intt_scale",
+      "name": "Inverse-NTT N^-1 Scaling Unit",
+      "shape": "box",
+      "position": [
+        -3.25,
+        0.7,
+        3
+      ],
+      "size": [
+        0.85,
+        0.6,
+        1
+      ],
+      "material": "brass",
+      "role": "Inverse-NTT (INTT) stage: multiplies the returning coefficients by the modular inverse of the transform length (N^-1 mod q) so the same butterfly array performs both forward and inverse transforms.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "output_fifo"
+      ],
+      "spec": {
+        "params": {
+          "scale": "N^-1 mod q",
+          "N_inv_value": "12277 = 1024^-1 mod 12289 (since 12289 = 12*1024 + 1, 1024^-1 ≡ -12 ≡ 12277)",
+          "applies": "INTT pass only",
+          "Ninv": 12277,
+          "applied": "after all INTT stages, before output"
+        },
+        "widths": {
+          "coeff": 14
+        },
+        "ops": [
+          "per-coeff multiply by Ninv=12277 then Barrett-reduce"
+        ],
+        "notes": "[calc] Ninv=12277=1024^-1 mod 12289 (1024*12277 = 12571648 = 1 + 1023*12289). [src] INTT divides by N; merged-negacyclic so only the single Ninv scaling remains."
+      }
+    },
+    {
+      "id": "bu_array_base",
+      "name": "Butterfly-Array Open Frame Floor",
+      "shape": "box",
+      "position": [
+        0,
+        0.475,
+        0
+      ],
+      "size": [
+        3.6,
+        0.1,
+        8.4
+      ],
+      "material": "brushed steel",
+      "role": "Thin open floor of the butterfly-array frame; together with the two longitudinal rails and the cross-brace it forms an open chassis spanning all eight parallel lanes, exposing every DSP multiplier and symmetric add/sub operator from above (X-ray cutaway).",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "bu_rail_left",
+        "bu_rail_right",
+        "bu_xbrace",
+        "twiddle_post",
+        "read_post",
+        "r4_fuse_01",
+        "r4_fuse_23",
+        "r4_fuse_45",
+        "r4_fuse_67",
+        "bu_mult_0",
+        "bu_add_0",
+        "bu_sub_0",
+        "bu_reg_0",
+        "bu_mult_1",
+        "bu_add_1",
+        "bu_sub_1",
+        "bu_reg_1",
+        "bu_mult_2",
+        "bu_add_2",
+        "bu_sub_2",
+        "bu_reg_2",
+        "bu_mult_3",
+        "bu_add_3",
+        "bu_sub_3",
+        "bu_reg_3",
+        "bu_mult_4",
+        "bu_add_4",
+        "bu_sub_4",
+        "bu_reg_4",
+        "bu_mult_5",
+        "bu_add_5",
+        "bu_sub_5",
+        "bu_reg_5",
+        "bu_mult_6",
+        "bu_add_6",
+        "bu_sub_6",
+        "bu_reg_6",
+        "bu_mult_7",
+        "bu_add_7",
+        "bu_sub_7",
+        "bu_reg_7",
+        "ex_riser_a",
+        "ex_riser_b"
+      ],
+      "spec": {
+        "params": {
+          "lanes": 8,
+          "lane_pipeline": "mult(3) -> add/sub(1) -> reg(1); shared Barrett reduction adds 4 -> lane_total 9 cycles",
+          "datapath_dir": "+X: operands read at -X multiplier column, results latched at +X register column",
+          "radix4_mults_per_bf": 2,
+          "radix4_addsub_per_bf": 8,
+          "naive_radix4_mults_per_bf": 3,
+          "naive_radix4_addsub_per_bf": 10,
+          "fusion": "DIT radix-4: X[k'+t*N/4] = A + I^t*B + I^(2t)*C + I^(3t)*D, I=omega^(N/4)"
+        },
+        "properties": [
+          "[unverifiable] ~50% butterfly hardware saved via symmetric operators (resource claim; functional model carries no area accounting)",
+          "[violated] 33% fewer mults / 20% fewer add/sub vs naive radix-4",
+          "~50% butterfly hardware saved via symmetric operators — [unverifiable]: resource/area metric, not expressible in the functional model"
+        ],
+        "notes": "[src] symmetric-operator radix-4 butterfly: optimized 2 mults + 8 add/sub vs naive 3 mults + 10 add/sub -> 33% mult / 20% add/sub reduction (these are within-radix-4 figures, see metadata). [src] the ~50% hardware saving is a pure FPGA resource/area claim and is recorded as unverifiable in a functional model. [calc] DIT radix-4 index recurrence pinned (Impl-2 convention) with I=omega^(N/4) as the j-rotator; resolves the prior 'generic DFT4 == two radix-2' ambiguity.\n[src] symmetric-operator sharing across the 8 BUs saves nearly 50% of butterfly hardware; recorded as an explicit resource property (not functionally verifiable).",
+        "widths": {},
+        "ports": [],
+        "ops": [],
+        "fsm": []
+      }
+    },
+    {
+      "id": "bu_rail_left",
+      "name": "Butterfly-Array Left Rail",
+      "shape": "box",
+      "position": [
+        -1.85,
+        0.65,
+        0
+      ],
+      "size": [
+        0.16,
+        0.5,
+        8.4
+      ],
+      "material": "welded steel",
+      "role": "Left longitudinal frame rail running the full depth of the array just outboard of the DSP multiplier column; a real chassis member that frames the open lanes without enclosing them, so every multiplier stays visible from above.",
+      "connections": [
+        "pcb_substrate",
+        "bu_array_base",
+        "bu_rail_right",
+        "bu_xbrace"
+      ]
+    },
+    {
+      "id": "bu_rail_right",
+      "name": "Butterfly-Array Right Rail",
+      "shape": "box",
+      "position": [
+        1.8,
+        0.65,
+        0
+      ],
+      "size": [
+        0.16,
+        0.5,
+        8.4
+      ],
+      "material": "welded steel",
+      "role": "Right longitudinal frame rail running the full depth of the array just outboard of the pipeline-register column; paired with the left rail it carries the lane loads to the board while leaving the datapath exposed.",
+      "connections": [
+        "pcb_substrate",
+        "bu_array_base",
+        "bu_rail_left",
+        "bu_xbrace"
+      ]
+    },
+    {
+      "id": "bu_xbrace",
+      "name": "Butterfly-Array Cross-Brace",
+      "shape": "box",
+      "position": [
+        0.05,
+        0.6,
+        0
+      ],
+      "size": [
+        3.8,
+        0.12,
+        0.16
+      ],
+      "material": "welded steel",
+      "role": "Mid-span cross-brace tying the two array rails together across the lane-3/lane-4 gap, stiffening the open frame; placed in the empty central gap so it crosses no lane and hides no operator.",
+      "connections": [
+        "bu_rail_left",
+        "bu_rail_right"
+      ]
+    },
+    {
+      "id": "r4_fuse_01",
+      "name": "Radix-4 Fusion Yoke (Lanes 0-1)",
+      "shape": "box",
+      "position": [
+        -0.375,
+        0.7,
+        -3.3
+      ],
+      "size": [
+        0.75,
+        0.12,
+        1.5
+      ],
+      "material": "carbon fiber",
+      "role": "Radix-4 fusion yoke binding butterfly lanes 0 and 1 into one fused 4-input radix-4 butterfly unit — the architecture's headline contribution made physical. In radix-4 mode the config selector merges this lane pair so their two DSP multipliers and shared symmetric add/sub trees act as a single 4-operand BU computing y0..y3 with the 3 twiddles W1,W2,W3 and the constant j-rotator; four such yokes turn the eight radix-2 lanes into four radix-4 BUs.",
+      "connections": [
+        "bu_array_base",
+        "bu_mult_0",
+        "bu_mult_1"
+      ],
+      "spec": {
+        "params": {
+          "fuses": "lanes 0,1",
+          "radix4_BU_index": 0,
+          "operands": "x0,x1,x2,x3 -> y0,y1,y2,y3 in one pass",
+          "twiddles": "W1=w, W2=w^2, W3=w^3 (3 modular mults); j=psi^512 constant rotator (no fetch)",
+          "mult_saving": "3 mults per radix-4 BU vs 4 across the two fused radix-2 stages on the same 4 points (33% fewer)"
+        }
+      }
+    },
+    {
+      "id": "r4_fuse_23",
+      "name": "Radix-4 Fusion Yoke (Lanes 2-3)",
+      "shape": "box",
+      "position": [
+        -0.375,
+        0.7,
+        -1.1
+      ],
+      "size": [
+        0.75,
+        0.12,
+        1.5
+      ],
+      "material": "carbon fiber",
+      "role": "Radix-4 fusion yoke binding butterfly lanes 2 and 3 into the second fused 4-input radix-4 butterfly unit; in radix-4 mode their two DSP multipliers and add/sub trees form one 4-operand BU sharing W1,W2,W3 and the j-rotator.",
+      "connections": [
+        "bu_array_base",
+        "bu_mult_2",
+        "bu_mult_3"
+      ],
+      "spec": {
+        "params": {
+          "fuses": "lanes 2,3",
+          "radix4_BU_index": 1,
+          "operands": "x0,x1,x2,x3 -> y0,y1,y2,y3 in one pass",
+          "twiddles": "W1=w, W2=w^2, W3=w^3; j=psi^512 constant rotator",
+          "mult_saving": "3 mults vs 4 (33% fewer)"
+        }
+      }
+    },
+    {
+      "id": "r4_fuse_45",
+      "name": "Radix-4 Fusion Yoke (Lanes 4-5)",
+      "shape": "box",
+      "position": [
+        -0.375,
+        0.7,
+        1.1
+      ],
+      "size": [
+        0.75,
+        0.12,
+        1.5
+      ],
+      "material": "carbon fiber",
+      "role": "Radix-4 fusion yoke binding butterfly lanes 4 and 5 into the third fused 4-input radix-4 butterfly unit; merges the pair's multipliers and add/sub trees into one 4-operand BU.",
+      "connections": [
+        "bu_array_base",
+        "bu_mult_4",
+        "bu_mult_5"
+      ],
+      "spec": {
+        "params": {
+          "fuses": "lanes 4,5",
+          "radix4_BU_index": 2,
+          "operands": "x0,x1,x2,x3 -> y0,y1,y2,y3 in one pass",
+          "twiddles": "W1=w, W2=w^2, W3=w^3; j=psi^512 constant rotator",
+          "mult_saving": "3 mults vs 4 (33% fewer)"
+        }
+      }
+    },
+    {
+      "id": "r4_fuse_67",
+      "name": "Radix-4 Fusion Yoke (Lanes 6-7)",
+      "shape": "box",
+      "position": [
+        -0.375,
+        0.7,
+        3.3
+      ],
+      "size": [
+        0.75,
+        0.12,
+        1.5
+      ],
+      "material": "carbon fiber",
+      "role": "Radix-4 fusion yoke binding butterfly lanes 6 and 7 into the fourth fused 4-input radix-4 butterfly unit; with the other three yokes it makes the eight radix-2 lanes read as four radix-4 BUs in the array.",
+      "connections": [
+        "bu_array_base",
+        "bu_mult_6",
+        "bu_mult_7"
+      ],
+      "spec": {
+        "params": {
+          "fuses": "lanes 6,7",
+          "radix4_BU_index": 3,
+          "operands": "x0,x1,x2,x3 -> y0,y1,y2,y3 in one pass",
+          "twiddles": "W1=w, W2=w^2, W3=w^3; j=psi^512 constant rotator",
+          "mult_saving": "3 mults vs 4 (33% fewer)"
+        }
+      }
+    },
+    {
+      "id": "twiddle_post",
+      "name": "Twiddle Broadcast Rail Standoff",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        1.13,
+        0
+      ],
+      "size": [
+        0.05,
+        1.2
+      ],
+      "material": "welded steel",
+      "role": "Short standoff post in the central lane-3/4 gap grounding the elevated brass twiddle broadcast rail down onto the open array frame, so the twiddle fan-out reads as physically supported wiring rather than a floating line in the elevation views.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rail"
+      ]
+    },
+    {
+      "id": "read_post",
+      "name": "Operand-Read Bus Standoff",
+      "shape": "cylinder",
+      "position": [
+        -1.6,
+        1,
+        0
+      ],
+      "size": [
+        0.05,
+        0.9
+      ],
+      "material": "copper",
+      "role": "Short standoff post tying the elevated operand-read bus down onto the array frame between its crossbar seat and the multiplier-column arrow, so the read channel is physically supported and the read/twiddle/return routing triad all reads as real wiring.",
+      "connections": [
+        "bu_array_base",
+        "read_bus"
+      ]
+    },
+    {
+      "id": "bu_mult_0",
+      "name": "DSP Modular Multiplier 0",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        -3.85
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 0, feeding its symmetric adder/subtractor pair; 14x14-bit product, 3-cycle latency.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_0",
+        "bu_sub_0"
+      ],
+      "spec": {
+        "params": {
+          "operand_bits": 14,
+          "product_bits": 28,
+          "latency_cycles": 3,
+          "function": "t = a * w mod-pending (Barrett reduction shared downstream)"
+        }
+      }
+    },
+    {
+      "id": "bu_add_0",
+      "name": "Symmetric Modular Adder 0",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -4.09
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 0 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_0"
+      ]
+    },
+    {
+      "id": "bu_sub_0",
+      "name": "Symmetric Modular Subtractor 0",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -3.61
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 0 to save ~50% butterfly hardware in lane 0; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_0"
+      ]
+    },
+    {
+      "id": "bu_reg_0",
+      "name": "Pipeline Register 0",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        -3.85
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-0 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_1",
+      "name": "DSP Modular Multiplier 1",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        -2.75
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 1, feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_1",
+        "bu_sub_1"
+      ]
+    },
+    {
+      "id": "bu_add_1",
+      "name": "Symmetric Modular Adder 1",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -2.99
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 1 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_1"
+      ]
+    },
+    {
+      "id": "bu_sub_1",
+      "name": "Symmetric Modular Subtractor 1",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -2.51
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 1 to save ~50% butterfly hardware in lane 1; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_1"
+      ]
+    },
+    {
+      "id": "bu_reg_1",
+      "name": "Pipeline Register 1",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        -2.75
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-1 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_2",
+      "name": "DSP Modular Multiplier 2",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        -1.65
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 2, feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_2",
+        "bu_sub_2"
+      ]
+    },
+    {
+      "id": "bu_add_2",
+      "name": "Symmetric Modular Adder 2",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -1.89
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 2 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_2"
+      ]
+    },
+    {
+      "id": "bu_sub_2",
+      "name": "Symmetric Modular Subtractor 2",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -1.41
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 2 to save ~50% butterfly hardware in lane 2; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_2"
+      ]
+    },
+    {
+      "id": "bu_reg_2",
+      "name": "Pipeline Register 2",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        -1.65
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-2 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_3",
+      "name": "DSP Modular Multiplier 3",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        -0.55
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 3, receiving operands from the read bus and feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_3",
+        "bu_sub_3"
+      ]
+    },
+    {
+      "id": "bu_add_3",
+      "name": "Symmetric Modular Adder 3",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -0.79
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 3 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_3"
+      ]
+    },
+    {
+      "id": "bu_sub_3",
+      "name": "Symmetric Modular Subtractor 3",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        -0.31
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 3 to save ~50% butterfly hardware in lane 3; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_3"
+      ]
+    },
+    {
+      "id": "bu_reg_3",
+      "name": "Pipeline Register 3",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        -0.55
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-3 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_4",
+      "name": "DSP Modular Multiplier 4",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        0.55
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 4, receiving operands from the read bus and feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_4",
+        "bu_sub_4"
+      ]
+    },
+    {
+      "id": "bu_add_4",
+      "name": "Symmetric Modular Adder 4",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        0.31
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 4 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_4"
+      ]
+    },
+    {
+      "id": "bu_sub_4",
+      "name": "Symmetric Modular Subtractor 4",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        0.79
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 4 to save ~50% butterfly hardware in lane 4; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_4"
+      ]
+    },
+    {
+      "id": "bu_reg_4",
+      "name": "Pipeline Register 4",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        0.55
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-4 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_5",
+      "name": "DSP Modular Multiplier 5",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        1.65
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 5, feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_5",
+        "bu_sub_5"
+      ]
+    },
+    {
+      "id": "bu_add_5",
+      "name": "Symmetric Modular Adder 5",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        1.41
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 5 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_5"
+      ]
+    },
+    {
+      "id": "bu_sub_5",
+      "name": "Symmetric Modular Subtractor 5",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        1.89
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 5 to save ~50% butterfly hardware in lane 5; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_5"
+      ]
+    },
+    {
+      "id": "bu_reg_5",
+      "name": "Pipeline Register 5",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        1.65
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-5 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_6",
+      "name": "DSP Modular Multiplier 6",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        2.75
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 6, feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_6",
+        "bu_sub_6"
+      ]
+    },
+    {
+      "id": "bu_add_6",
+      "name": "Symmetric Modular Adder 6",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        2.51
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 6 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_6"
+      ]
+    },
+    {
+      "id": "bu_sub_6",
+      "name": "Symmetric Modular Subtractor 6",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        2.99
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 6 to save ~50% butterfly hardware in lane 6; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_6"
+      ]
+    },
+    {
+      "id": "bu_reg_6",
+      "name": "Pipeline Register 6",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        2.75
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-6 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "bu_mult_7",
+      "name": "DSP Modular Multiplier 7",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        0.95,
+        3.85
+      ],
+      "size": [
+        0.35,
+        0.9
+      ],
+      "material": "copper",
+      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly lane 7, feeding its symmetric adder/subtractor pair.",
+      "connections": [
+        "bu_array_base",
+        "twiddle_rom",
+        "twiddle_rail",
+        "bu_add_7",
+        "bu_sub_7"
+      ]
+    },
+    {
+      "id": "bu_add_7",
+      "name": "Symmetric Modular Adder 7",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        3.61
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Symmetric modular adder forming the sum half of butterfly lane 7 (dark anodized = the sum path).",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_7"
+      ]
+    },
+    {
+      "id": "bu_sub_7",
+      "name": "Symmetric Modular Subtractor 7",
+      "shape": "box",
+      "position": [
+        0.5,
+        0.72,
+        4.09
+      ],
+      "size": [
+        1.1,
+        0.66,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Symmetric modular subtractor sharing operands with adder 7 to save ~50% butterfly hardware in lane 7; brushed steel so the difference path reads distinct from the adder's sum path.",
+      "connections": [
+        "bu_array_base",
+        "bu_reg_7"
+      ]
+    },
+    {
+      "id": "bu_reg_7",
+      "name": "Pipeline Register 7",
+      "shape": "box",
+      "position": [
+        1.5,
+        0.68,
+        3.85
+      ],
+      "size": [
+        0.4,
+        0.52,
+        0.8
+      ],
+      "material": "white composite",
+      "role": "Pipeline register latching lane-7 outputs before the shared modular-reduction stage.",
+      "connections": [
+        "bu_array_base",
+        "mod_red_mult"
+      ]
+    },
+    {
+      "id": "twiddle_rail",
+      "name": "Twiddle Broadcast Rail",
+      "shape": "box",
+      "position": [
+        -1.1,
+        1.72,
+        0
+      ],
+      "size": [
+        0.28,
+        0.12,
+        8
+      ],
+      "material": "brass",
+      "role": "Elevated broadcast rail running the full depth of the multiplier column, fanning the single fetched twiddle factor down to all eight DSP modular multipliers each cycle so each root of unity is read once and reused; held on the highest of the three routing layers (twiddle 1.72 above return 1.62 above read 1.5) so the read/twiddle/return triad stays legible in plan view, supported on a central standoff post onto the array frame.",
+      "connections": [
+        "twiddle_feeder",
+        "twiddle_post",
+        "bu_mult_0",
+        "bu_mult_1",
+        "bu_mult_2",
+        "bu_mult_3",
+        "bu_mult_4",
+        "bu_mult_5",
+        "bu_mult_6",
+        "bu_mult_7"
+      ]
+    },
+    {
+      "id": "twiddle_feeder",
+      "name": "Twiddle Broadcast Feeder",
+      "shape": "box",
+      "position": [
+        1.2,
+        1.72,
+        -2.5
+      ],
+      "size": [
+        4.6,
+        0.12,
+        0.28
+      ],
+      "material": "brass",
+      "role": "Routes each twiddle factor fetched once from the ROM westward to the broadcast rail above the multiplier column, the physical embodiment of the factor-reuse the rearranged loop schedule exploits.",
+      "connections": [
+        "twiddle_rom",
+        "twiddle_rail"
+      ]
+    },
+    {
+      "id": "read_bus",
+      "name": "Operand-Read Routing Bus",
+      "shape": "box",
+      "position": [
+        -2.65,
+        1.5,
+        0
+      ],
+      "size": [
+        3.3,
+        0.1,
+        0.26
+      ],
+      "material": "copper",
+      "role": "Operand-read bus carrying source coefficients fetched conflict-free from the crossbar eastward into the DSP multiplier-column inputs; thinned and set on the lowest routing layer (y=1.5) so it reads distinct from the return (1.62) and twiddle (1.72) channels, the read half of the read-modify-write loop, supported on a standoff post onto the array frame.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "read_post",
+        "read_arrow"
+      ]
+    },
+    {
+      "id": "read_arrow",
+      "name": "Operand-Read Direction Arrow",
+      "shape": "cone",
+      "position": [
+        -0.95,
+        1.5,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        -1.5708
+      ],
+      "size": [
+        0.18,
+        0.5
+      ],
+      "material": "copper",
+      "role": "Arrowhead at the multiplier-column end of the read bus, pointing +X into the DSP multipliers to mark that operands flow from the crossbar into the butterfly inputs (not the reverse), making the read path directional.",
+      "connections": [
+        "read_bus",
+        "bu_mult_3",
+        "bu_mult_4"
+      ]
+    },
+    {
+      "id": "ex_base",
+      "name": "Exploded Radix-4 Butterfly Baseplate",
+      "shape": "box",
+      "position": [
+        0,
+        2.3,
+        2.4
+      ],
+      "size": [
+        3.6,
+        0.12,
+        1.9
+      ],
+      "material": "brushed steel",
+      "role": "EXPLODED VIEW floating above the array on two riser posts, offset toward the +Z half so it clears the central lanes (3-4) in plan view: one of the four fused radix-4 butterfly units lifted off the board to expose its left-to-right datapath (three twiddle multipliers W1/W2/W3 -> constant j-rotator -> y0..y3 add/sub tree -> four-output register).",
+      "connections": [
+        "ex_riser_a",
+        "ex_riser_b",
+        "ex_mult_w1",
+        "ex_mult_w2",
+        "ex_mult_w3",
+        "ex_jrot",
+        "ex_add",
+        "ex_sub",
+        "ex_reg"
+      ]
+    },
+    {
+      "id": "ex_riser_a",
+      "name": "Exploded-View Riser Post A",
+      "shape": "cylinder",
+      "position": [
+        -1.5,
+        1.39,
+        2.4
+      ],
+      "size": [
+        0.07,
+        1.7
+      ],
+      "material": "brushed steel",
+      "role": "Thin support post linking the array baseplate to the lifted exploded baseplate, making the exploded relationship explicit in the elevation views.",
+      "connections": [
+        "bu_array_base",
+        "ex_base"
+      ]
+    },
+    {
+      "id": "ex_riser_b",
+      "name": "Exploded-View Riser Post B",
+      "shape": "cylinder",
+      "position": [
+        1.5,
+        1.39,
+        2.4
+      ],
+      "size": [
+        0.07,
+        1.7
+      ],
+      "material": "brushed steel",
+      "role": "Second support post for the exploded radix-4 butterfly unit, anchoring the lifted baseplate over the array so it does not read as floating.",
+      "connections": [
+        "bu_array_base",
+        "ex_base"
+      ]
+    },
+    {
+      "id": "ex_mult_w1",
+      "name": "Exploded Radix-4 Twiddle Multiplier W1",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        2.72,
+        1.9
+      ],
+      "size": [
+        0.32,
+        0.8
+      ],
+      "material": "copper",
+      "role": "Exploded radix-4 BU, first of three twiddle multipliers: computes b' = W1*x1 with W1 = w = omega^k, one of the 3 modular multiplications per radix-4 butterfly (vs 4 across two radix-2 stages — the 33% saving).",
+      "connections": [
+        "ex_base",
+        "ex_jrot",
+        "ex_add",
+        "ex_sub"
+      ]
+    },
+    {
+      "id": "ex_mult_w2",
+      "name": "Exploded Radix-4 Twiddle Multiplier W2",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        2.72,
+        2.4
+      ],
+      "size": [
+        0.32,
+        0.8
+      ],
+      "material": "copper",
+      "role": "Exploded radix-4 BU, second twiddle multiplier: computes c' = W2*x2 with W2 = w^2 = omega^{2k}, feeding the y0..y3 add/sub tree.",
+      "connections": [
+        "ex_base",
+        "ex_add",
+        "ex_sub"
+      ]
+    },
+    {
+      "id": "ex_mult_w3",
+      "name": "Exploded Radix-4 Twiddle Multiplier W3",
+      "shape": "cylinder",
+      "position": [
+        -1.1,
+        2.72,
+        2.9
+      ],
+      "size": [
+        0.32,
+        0.8
+      ],
+      "material": "copper",
+      "role": "Exploded radix-4 BU, third twiddle multiplier: computes d' = W3*x3 with W3 = w^3 = omega^{3k}; together with W1 and W2 these are the only 3 fetched-twiddle multiplications of the radix-4 butterfly.",
+      "connections": [
+        "ex_base",
+        "ex_jrot",
+        "ex_add",
+        "ex_sub"
+      ]
+    },
+    {
+      "id": "ex_jrot",
+      "name": "Exploded Constant j-Rotator",
+      "shape": "torus",
+      "position": [
+        -0.25,
+        2.68,
+        2.4
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.22,
+        0.06
+      ],
+      "material": "brass",
+      "role": "Exploded radix-4 BU: the constant rotator j = psi^512 (order 4, j^2 ≡ -1 mod q) applied to b' and d' in the y1/y3 paths without a fetched twiddle — a multiply-by-i, modeled as a small ring to distinguish it from the three real twiddle multipliers.",
+      "connections": [
+        "ex_base",
+        "ex_sub"
+      ]
+    },
+    {
+      "id": "ex_add",
+      "name": "Exploded Radix-4 Add Tree",
+      "shape": "box",
+      "position": [
+        0.6,
+        2.65,
+        2.16
+      ],
+      "size": [
+        1.1,
+        0.65,
+        0.42
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Exploded radix-4 BU, sum tree (dark anodized = the sum paths): produces y0 = x0+b'+c'+d' and y2 = x0-b'+c'-d' (mod q) from the multiplier outputs, latched into the register.",
+      "connections": [
+        "ex_base",
+        "ex_reg"
+      ]
+    },
+    {
+      "id": "ex_sub",
+      "name": "Exploded Radix-4 Sub/Rotate Tree",
+      "shape": "box",
+      "position": [
+        0.6,
+        2.65,
+        2.64
+      ],
+      "size": [
+        1.1,
+        0.65,
+        0.42
+      ],
+      "material": "brushed steel",
+      "role": "Exploded radix-4 BU, difference/rotate tree (brushed steel = the difference paths): produces y1 = x0+j*b'-c'-j*d' and y3 = x0-j*b'-c'+j*d' (mod q), reusing the same b'/c'/d' and the j-rotator as the add tree (the ~50% symmetric-operator saving), latched into the register.",
+      "connections": [
+        "ex_base",
+        "ex_reg"
+      ]
+    },
+    {
+      "id": "ex_reg",
+      "name": "Exploded Radix-4 Output Register",
+      "shape": "box",
+      "position": [
+        1.6,
+        2.6,
+        2.4
+      ],
+      "size": [
+        0.4,
+        0.55,
+        0.9
+      ],
+      "material": "white composite",
+      "role": "Exploded radix-4 BU, final stage: pipeline register latching all four outputs y0..y3 before the shared modular-reduction spine; this fused unit is one of four identical radix-4 BUs (eight radix-2 lanes joined by the four fusion yokes) on the array below.",
+      "connections": [
+        "ex_base"
+      ]
+    },
+    {
+      "id": "mod_red_mult",
+      "name": "Modular Reduction — Barrett q-Multiplier",
+      "shape": "cylinder",
+      "position": [
+        2.45,
+        0.95,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.5,
+        8
+      ],
+      "material": "welded steel",
+      "role": "First member of the shared modular-reduction stage: a cylindrical Barrett quotient-multiplier spine running the full depth of the array, estimating t = floor(x*mu / 2^28) (mu=21843) for every incoming butterfly product before correction.",
+      "connections": [
+        "pcb_substrate",
+        "bu_reg_0",
+        "bu_reg_1",
+        "bu_reg_2",
+        "bu_reg_3",
+        "bu_reg_4",
+        "bu_reg_5",
+        "bu_reg_6",
+        "bu_reg_7",
+        "mod_red_subshift"
+      ],
+      "spec": {
+        "ops": [
+          "t = (x * mu) >> k",
+          "Barrett estimate qh=(x*mu)>>28",
+          "r = x - qh*q"
+        ],
+        "params": {
+          "algorithm": "Barrett",
+          "q": 12289,
+          "k_shift": 28,
+          "mu": 21843,
+          "mu_formula": "floor(2^28 / q) = floor(268435456 / 12289) = 21843",
+          "input_bits": 28,
+          "latency_cycles": 2,
+          "k": 28,
+          "input_bound": "x in [0, q^2-1], q^2=151019521 < 2^28",
+          "estimate": "qh = (x*mu) >> 28",
+          "remainder": "r = x - qh*q"
+        },
+        "notes": "Reduces 28-bit products of two sub-q operands; computes the quotient estimate t here, with subtract+correct done in mod_red_subshift. mu/k are reproduction values for q=12289.\n[src] Barrett mu=21843, k=28. [calc] mu=floor(2^28/12289)=21843 (12289*21843=268428627<=2^28<12289*21844). Decidability fix for the 'z3 inconclusive' counterexample: BOUND the input to x<q^2<2^28 (product of two reduced coeffs), making qh and the final correction finite/decidable. Pairs with mod_red_subshift for the conditional final subtraction.",
+        "widths": {
+          "x": 28,
+          "r": 14
+        }
+      }
+    },
+    {
+      "id": "mod_red_subshift",
+      "name": "Modular Reduction — Shift/Subtract & Correct",
+      "shape": "box",
+      "position": [
+        3.3,
+        0.85,
+        0
+      ],
+      "size": [
+        0.7,
+        0.9,
+        8
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Second member of the reduction stage, abutting the Barrett q-multiplier cylinder on its +X side: computes r = x - t*q and applies up to two conditional subtractions of q to bring results into [0, q) before returning them to the crossbar.",
+      "connections": [
+        "pcb_substrate",
+        "mod_red_mult",
+        "return_bus",
+        "return_post"
+      ],
+      "spec": {
+        "ops": [
+          "r = x - t*q",
+          "while r >= q: r -= q   (<=2 iterations)",
+          "conditional subtract: at most 2x r-=q so result in [0,q)",
+          "Barrett: t = (x * mu) >> k; r = x - t*q  (mu=21843, k=28)",
+          "post-reduction correction: at most 2 conditional subtractions of q; final r in [0, q)"
+        ],
+        "params": {
+          "q": 12289,
+          "max_corrections": 2,
+          "output_range": "[0, q)",
+          "latency_cycles": 2,
+          "final_correction": "while (r >= q) r -= q;",
+          "max_subtractions": 2,
+          "mu": "21843 = floor(2^28/12289)",
+          "k": 28,
+          "conditional_subtractions": 2,
+          "pre_correction_bound": "< 3q"
+        },
+        "notes": "Completes the Barrett reduction begun in mod_red_mult.\n[calc] for x<q^2 and qh=(x*mu)>>28, r=x-qh*q satisfies 0<=r<3q, so at most TWO conditional subtractions of q land r in [0,q). Stating the explicit bound (2 subtractions) is what makes the Barrett z3 query conclusive instead of 'unknown'.\n[calc] mu=floor(2^28/12289)=21843. [conv] resolves the r<2q vs r<3q / <=2-subs divergence by committing pre-correction bound < 3q with at most 2 conditional subtractions (standard two-step Barrett correction), which subsumes both impl claims and is exact/checkable.",
+        "widths": {
+          "r": 14,
+          "coeff": 14
+        },
+        "ports": [],
+        "fsm": [],
+        "properties": [
+          "Barrett output in [0,q) after <=2 conditional subtractions"
+        ]
+      }
+    },
+    {
+      "id": "return_post",
+      "name": "Operand-Return Bus Standoff",
+      "shape": "cylinder",
+      "position": [
+        3.3,
+        1.45,
+        -3.7
+      ],
+      "size": [
+        0.05,
+        0.45
+      ],
+      "material": "welded steel",
+      "role": "Short standoff post grounding the elevated operand-return bus down onto the shift/subtract reduction member, so the overhead return routing is physically supported rather than floating in the elevation views.",
+      "connections": [
+        "mod_red_subshift",
+        "return_bus"
+      ]
+    },
+    {
+      "id": "return_bus",
+      "name": "Operand-Return Routing Bus",
+      "shape": "box",
+      "position": [
+        -0.45,
+        1.62,
+        -4
+      ],
+      "size": [
+        7.5,
+        0.1,
+        0.35
+      ],
+      "material": "glass display",
+      "role": "Elevated return-routing channel carrying reduced coefficients from the shift/subtract member back across the array to the crossbar, closing the conflict-free read-modify-write loop (reduction -> crossbar -> banks); routed along the front edge on the middle layer (y=1.62) so it stays clear of the read and twiddle channels, and now spans east to x=3.3 to meet the relocated reduction member.",
+      "connections": [
+        "pcb_substrate",
+        "mod_red_subshift",
+        "return_post",
+        "return_arrow",
+        "crossbar_network"
+      ]
+    },
+    {
+      "id": "return_arrow",
+      "name": "Operand-Return Direction Arrow",
+      "shape": "cone",
+      "position": [
+        -3.95,
+        1.62,
+        -4
+      ],
+      "rotation": [
+        0,
+        0,
+        1.5708
+      ],
+      "size": [
+        0.18,
+        0.5
+      ],
+      "material": "glass display",
+      "role": "Arrowhead at the crossbar end of the return bus, pointing -X into the crossbar to mark that reduced operands flow from the reduction stage back to the crossbar (not the other way), making the read-modify-write loop directional.",
+      "connections": [
+        "return_bus",
+        "crossbar_network"
+      ]
+    },
+    {
+      "id": "twiddle_rom",
+      "name": "Twiddle-Factor ROM",
+      "shape": "box",
+      "position": [
+        4.6,
+        1.15,
+        -2.5
+      ],
+      "size": [
+        2.2,
+        1.5,
+        2.6
+      ],
+      "material": "glass display",
+      "role": "On-chip ROM storing precomputed roots of unity (psi^k / omega^k), reused across the rearranged loop so each factor is fetched once and broadcast over the feeder/rail to all eight multipliers.",
+      "connections": [
+        "pcb_substrate",
+        "addr_gen_unit",
+        "twiddle_feeder",
+        "bu_mult_0",
+        "bu_mult_1",
+        "bu_mult_2",
+        "bu_mult_3",
+        "bu_mult_4",
+        "bu_mult_5",
+        "bu_mult_6",
+        "bu_mult_7"
+      ],
+      "spec": {
+        "params": {
+          "depth_entries": 1024,
+          "word_bits": 14,
+          "generator_g": 11,
+          "primitive_root_psi": "psi = g^6 = 11^6 mod 12289 = 1945 (order 2048; psi^1024 ≡ -1 mod 12289, i.e. negacyclic)",
+          "omega": "omega = psi^2 = 1945^2 mod 12289 = 10302 (order-1024 N-th root)",
+          "j_fourth_root": "j = psi^512 (order 4, j^2 ≡ -1 ≡ 12288 mod q); used as the constant rotator by the radix-4 butterflies",
+          "psi_inv": "psi^{-1} mod q via Fermat (psi^{q-2}); INTT uses psi^{-i}/omega^{-k} twiddles together with N^-1 = 12277",
+          "psi_power_table_sample": "entry[k] = psi^k mod 12289 with psi=1945: psi^0=1, psi^1=1945, psi^2=10302(=omega), psi^3=6320, psi^4=3400, ...; structural anchors psi^512=j (j^2≡12288≡-1), psi^1024≡12288≡-1 (negacyclic sign flip), psi^2048≡1; the omega table is the even subsequence omega^k = psi^(2k). The full 0..2047 table is generated by iterated multiply-by-1945-mod-12289 from this seed (bit-exact, no bit-reversal indexing).",
+          "stored": "omega^k stage twiddles for k=0..N-1; psi^i pre-twist and psi^{-i} post-twist factors for the negacyclic case stored in the low/high halves",
+          "addressing": "address = f(stage s, butterfly-block index); one fetch reused across all 8 lanes per block",
+          "table_contents": "entry[s][block] = omega raised to the block's stage exponent (no bit-reversal indexing); negacyclic twist factors keyed by coefficient index i",
+          "depth": 1024,
+          "table_fwd": "T[k] = psi^(bitrev_10(k)) mod 12289, k=0..1023",
+          "table_inv": "Tinv[k] = psi^(-bitrev_10(k)) mod 12289 for INTT",
+          "addr_fn": "f(stage,block) = (1<<stage) + block, block in [0, 2^stage), stage 0..9",
+          "width": 14,
+          "root": "psi=1945, omega=10302"
+        },
+        "notes": "Depth N=1024 covers every stage twiddle without bit-reversal. Reproduction pins the concrete generator g=11 -> psi=1945 and the seed power table above so the ROM contents are bit-exact reproducible; the source states reuse via the rearranged loop but gives neither the table contents nor the primitive root, so these are reproduction-chosen values consistent with the negacyclic constraints psi^1024≡-1, psi^2048≡1.\n[conv] CT/DIT merged-negacyclic layout (Longa-Naehrig style): single ROM of N=1024 entries holding psi^(brv(k)) so stage s reads the 2^s twiddles at base 2^s sequentially; INTT uses the inverse table. [src] psi=1945. [calc] entries are powers of 1945 mod 12289. [source-missing] the paper's exact f(stage,block) addressing under its rearranged loop (which reuses twiddles across the loop) may index differently; the standard CT addressing above is the committed reproducible choice (only a seed table was implied).\n[source-missing] exact rearranged twiddle-reuse loop address function f(stage,block). [conv] committed CT-DIT convention f(stage,block)=block<<stage so the address is concrete; [src] single shared ROM (twiddle reuse) reduces footprint.",
+        "widths": {
+          "twiddle": 14,
+          "addr": 10
+        },
+        "ports": [
+          {
+            "name": "addr",
+            "dir": "in",
+            "width": 10
+          },
+          {
+            "name": "tw",
+            "dir": "out",
+            "width": 14
+          }
+        ],
+        "ops": [
+          "sequential bit-reversed psi-power lookup per CT/DIT stage",
+          "broadcast one twiddle to the 8 BU lanes (twiddle reuse)",
+          "f(stage,block) = block << stage  [conv CT-DIT twiddle index; rearranged-reuse loop shares one ROM across the 8 BUs]"
+        ],
+        "fsm": [],
+        "properties": []
+      }
+    },
+    {
+      "id": "addr_gen_unit",
+      "name": "Address Generation Unit",
+      "shape": "box",
+      "position": [
+        4.6,
+        0.95,
+        2.5
+      ],
+      "size": [
+        2.2,
+        1.1,
+        2.6
+      ],
+      "material": "dark anodized aluminum",
+      "role": "Generates the conflict-free read/write addresses and bank indices (b(i)=(i+(i>>3)) mod 8, offset i>>3) that realize the memory-mapping scheme each cycle.",
+      "connections": [
+        "pcb_substrate",
+        "crossbar_network",
+        "twiddle_rom",
+        "config_radix_selector",
+        "clock_pll",
+        "schedule_controller"
+      ],
+      "spec": {
+        "params": {
+          "bank_index": "b(i) = (i + (i >> 3)) mod 8",
+          "offset": "o(i) = i >> 3",
+          "twiddle_addr": "derived from stage s and block index, shared by all active lanes"
+        },
+        "notes": "Drives the crossbar permutation and the twiddle-ROM address; stride switches with the radix selector (radix-4 doubles the per-pass stage span)."
+      }
+    },
+    {
+      "id": "config_radix_selector",
+      "name": "Radix-2/4 Config Selector",
+      "shape": "box",
+      "position": [
+        6.1,
+        0.7,
+        1.2
+      ],
+      "size": [
+        0.9,
+        0.6,
+        1.1
+      ],
+      "material": "black composite",
+      "role": "Configuration register selecting radix (2 or 4) and the number of active parallel butterfly units (up to 8); in radix-4 mode it commands the four fusion yokes to merge lane-pairs into four 4-input radix-4 BUs.",
+      "connections": [
+        "pcb_substrate",
+        "addr_gen_unit",
+        "schedule_controller"
+      ],
+      "spec": {
+        "params": {
+          "radix": "2/4 configurable",
+          "active_BU": "1..8",
+          "lane_map_radix2": "8 lanes = 8 independent 2-input/1-twiddle butterflies per cycle",
+          "lane_map_radix4": "two adjacent radix-2 lanes fuse into one 4-input/3-twiddle radix-4 butterfly -> 8 lanes = 4 radix-4 BUs per cycle",
+          "radix2_butterfly": "Cooley-Tukey: with w=omega^k, u=x0, v=w*x1 -> y0=(u+v) mod q, y1=(u-v) mod q",
+          "radix4_butterfly": "with b'=W1*x1, c'=W2*x2, d'=W3*x3: y0=(x0+b'+c'+d'), y1=(x0+j*b'-c'-j*d'), y2=(x0-b'+c'-d'), y3=(x0-j*b'-c'+j*d')  (all mod q)",
+          "twiddles_per_radix4_BU": "3 nontrivial twiddles W1=w, W2=w^2, W3=w^3 (so 3 modular mults); j=psi^512 is a stored constant rotator, not a fetched twiddle",
+          "op_counts": "radix-4 BU = 3 modular mults + 8 modular add/sub, vs two radix-2 stages = 4 mults + 8 add/sub on the same 4 points; the paper's rearranged schedule realizes 33% fewer modular multiplications and 20% fewer modular add/sub overall",
+          "output_order": "natural",
+          "bit_reversal_pass": false,
+          "stride_schedule_r2": "s = N/2, N/4, ..., 1",
+          "stride_schedule_r4": "s = N/4, N/16, ..., 1",
+          "radix4_mult_count": 2,
+          "radix2_mult_count": 1
+        },
+        "notes": "Radix-4 fuses two consecutive NTT stages into one pass, the source of the 33% fewer multiplications and 20% fewer add/sub vs radix-2; selector also sets address strides in addr_gen and twiddle indexing. The radix-4 equations and 3-twiddle assignment recorded here are the basis of the quantified op savings.\n[src] the conflict-free mapping is what removes the bit-reversal cost: with the XOR-fold (bank,offset) write addressing applied across all stages, data is consumed/produced in natural order, so no separate permutation pass is needed. [calc] strides are the DIT stage strides for the selected radix. [conv] radix encoded as the literal value (2 or 4) for the BU array.\n[src] the named optimization is the 2-mult / 8-add scheduled radix-4 butterfly; commit mult count = 2 (33% reduction from naive 3) and add/sub = 8 (20% from naive 10). This pins the value the source describes, not the impls' naive guess of 3.",
+        "ports": [
+          {
+            "name": "radix_sel",
+            "dir": "in",
+            "width": 1
+          },
+          {
+            "name": "radix",
+            "dir": "out",
+            "width": 3
+          }
+        ],
+        "ops": [
+          "select radix-2 or radix-4 datapath + stride schedule",
+          "drive crossbar so inter-stage order stays natural (no bit-reversal)",
+          "optimized radix-4 butterfly = 2 modular multiplications (AUTHORITATIVE: resolves datapath-says-3 (W1/W2/W3) vs op-count-says-2 contradiction in favor of the source's optimized scheduled butterfly)"
+        ],
+        "properties": [
+          "natural-order output without a bit-reversal pass",
+          "radix-4 uses 33% fewer mults (3->2) and 20% fewer add/sub (10->8) vs naive radix-4 — [violated] in impls, which built the naive 3-mult datapath"
+        ],
+        "widths": {},
+        "fsm": []
+      }
+    },
+    {
+      "id": "schedule_controller",
+      "name": "Conflict-Free Schedule/FSM Controller",
+      "shape": "box",
+      "position": [
+        6.1,
+        0.85,
+        3.4
+      ],
+      "size": [
+        1,
+        0.9,
+        1.3
+      ],
+      "material": "welded steel",
+      "role": "Finite-state controller driving the rearranged loop order that cuts radix-4 mults by 33% and add/sub by 20% while keeping memory accesses conflict-free.",
+      "connections": [
+        "pcb_substrate",
+        "addr_gen_unit",
+        "crossbar_network",
+        "config_radix_selector"
+      ],
+      "spec": {
+        "fsm": [
+          "IDLE",
+          "LOAD",
+          "STAGE_LOOP (s = 0..log2N-1 = 9)",
+          "TWIDDLE_FETCH",
+          "BUTTERFLY",
+          "REDUCE",
+          "WRITEBACK",
+          "INTT_STAGE_LOOP",
+          "SCALE_N_INV",
+          "DRAIN",
+          "ADDR_GEN",
+          "READ",
+          "NEXT_STAGE",
+          "SCALE",
+          "DONE",
+          "IDLE->LOAD on start",
+          "LOAD->ADDR_GEN",
+          "ADDR_GEN->READ->BUTTERFLY->WRITEBACK",
+          "WRITEBACK->ADDR_GEN while block<bf_cycles_per_stage",
+          "WRITEBACK->NEXT_STAGE at stage end",
+          "NEXT_STAGE->ADDR_GEN while stage<stages",
+          "NEXT_STAGE->SCALE if mode_intt else DRAIN",
+          "SCALE->DRAIN->DONE",
+          "RUN",
+          "IDLE->LOAD (start)",
+          "LOAD->RUN (operands loaded)",
+          "RUN->RUN (stages remaining)",
+          "RUN->DRAIN (last stage issued)",
+          "DRAIN->DONE (pipeline empty)",
+          "DONE->IDLE (ack)"
+        ],
+        "transitions": [
+          "IDLE -> LOAD  [host start pulse]",
+          "LOAD -> STAGE_LOOP  [coefficient vector resident in banks]",
+          "STAGE_LOOP -> TWIDDLE_FETCH  [enter next twiddle-sharing block]",
+          "TWIDDLE_FETCH -> BUTTERFLY  [w latched onto broadcast rail]",
+          "BUTTERFLY -> REDUCE  [lane products valid]",
+          "REDUCE -> WRITEBACK  [r in [0,q) from Barrett stage]",
+          "WRITEBACK -> TWIDDLE_FETCH  [blocks remain in stage s]",
+          "WRITEBACK -> STAGE_LOOP  [stage done, s++ while s<S]",
+          "STAGE_LOOP -> INTT_STAGE_LOOP  [forward stages done AND INTT requested]",
+          "STAGE_LOOP -> DRAIN  [forward-only transform done]",
+          "INTT_STAGE_LOOP -> SCALE_N_INV  [inverse stages done]",
+          "SCALE_N_INV -> DRAIN  [coefficients scaled by N^-1]",
+          "DRAIN -> IDLE  [output FIFO emptied to host]"
+        ],
+        "loop_bounds": {
+          "stages_radix2": "S = log2(N) = 10 (s = 0..9)",
+          "stages_radix4": "S4 = log4(N) = 5 passes, each fusing two radix-2 stages",
+          "blocks_per_stage": "N / 2^(s+1) groups at stage s, each sharing one twiddle factor",
+          "butterflies_per_block": "2^s",
+          "parallel_lanes": 8
+        },
+        "ops": [
+          "for s in stages: for block in groups_sharing_one_twiddle: { fetch w once; parallel for bu in 0..7: butterfly(bu) }"
+        ],
+        "notes": "The factor-constant inner block is what lets one twiddle fetch be reused across all 8 lanes. The transition table and loop bounds here are reconstructed; the source asserts the 33%/20% savings only as a property and does not publish its state machine.\n[calc] loop bounds from N=1024, P=8: radix-2 has log2(1024)=10 stages x (N/2)/P = 512/8 = 64 issue cycles; radix-4 has log4(1024)=5 stages x (N/4)/P = 256/8 = 32 cycles. [src] read-modify-write interleaved-BRAM loop with 9-cycle pipeline fill per lane. SCALE state runs only for INTT (multiply by Ninv=12277). [conv] state names; rearranged-loop ordering delegated to addr_gen_unit + crossbar_network.\n[conv] single coherent FSM replacing the two contradictory lists. DONE is wired as a DISTINCT terminal state reached from DRAIN and returning to IDLE on ack — NOT a DRAIN->IDLE self-loop. [src] stage count = log_radix(N): radix-2 = 10 stages, radix-4 = 5 stages, set by config_radix_selector.",
+        "params": {
+          "stages_radix2": 10,
+          "stages_radix4": 5,
+          "bf_cycles_per_stage_r2": 64,
+          "bf_cycles_per_stage_r4": 32,
+          "total_bf_cycles_r2": 640,
+          "total_bf_cycles_r4": 160,
+          "pipeline_fill": 9,
+          "ntt_stages_radix2": 10,
+          "ntt_stages_radix4": 5
+        },
+        "ports": [
+          {
+            "name": "start",
+            "dir": "in",
+            "width": 1
+          },
+          {
+            "name": "stage",
+            "dir": "out",
+            "width": 4
+          },
+          {
+            "name": "busy",
+            "dir": "out",
+            "width": 1
+          },
+          {
+            "name": "done",
+            "dir": "out",
+            "width": 1
+          }
+        ],
+        "widths": {},
+        "properties": []
+      }
+    },
+    {
+      "id": "clock_pll",
+      "name": "Clock PLL",
+      "shape": "cylinder",
+      "position": [
+        6.2,
+        0.8,
+        -1.2
+      ],
+      "size": [
+        0.5,
+        0.8
+      ],
+      "material": "metal",
+      "role": "Phase-locked loop generating the core datapath clock for the pipelined eight-lane butterfly array.",
+      "connections": [
+        "pcb_substrate",
+        "addr_gen_unit"
+      ]
+    },
+    {
+      "id": "heatsink_base",
+      "name": "Heatsink Baseplate (Exploded)",
+      "shape": "box",
+      "position": [
+        4.6,
+        3.6,
+        0
+      ],
+      "size": [
+        3,
+        0.2,
+        4
+      ],
+      "material": "brushed steel",
+      "role": "EXPLODED ABOVE: aluminum heatsink baseplate that clamps onto the FPGA package lid covering the whole die, lifted high (y=3.6) on a long riser stub so it floats clearly above the datapath and the Barrett reduction spine — keeping the die floorplan and the +X pipeline-register column visible in the ISO X-ray rather than swallowing them; carries ten fins at 0.3 pitch.",
+      "connections": [
+        "pcb_substrate",
+        "heatsink_riser",
+        "heatsink_fin_0",
+        "heatsink_fin_1",
+        "heatsink_fin_2",
+        "heatsink_fin_3",
+        "heatsink_fin_4",
+        "heatsink_fin_5",
+        "heatsink_fin_6",
+        "heatsink_fin_7",
+        "heatsink_fin_8",
+        "heatsink_fin_9"
+      ],
+      "spec": {
+        "params": {
+          "fin_count": 10,
+          "fin_pitch": 0.3,
+          "fin_span_x": "3.25..5.95"
+        }
+      }
+    },
+    {
+      "id": "heatsink_riser",
+      "name": "Heatsink Riser Stub",
+      "shape": "cylinder",
+      "position": [
+        4.6,
+        2,
+        0
+      ],
+      "size": [
+        0.08,
+        3
+      ],
+      "material": "brushed steel",
+      "role": "Support stub grounding the exploded heatsink baseplate down to the silicon die, showing where the heatsink seats on the package in the assembled machine; lengthened so the baseplate floats well clear of the datapath.",
+      "connections": [
+        "fpga_die",
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_0",
+      "name": "Heatsink Fin 0",
+      "shape": "box",
+      "position": [
+        3.25,
+        4.13,
+        0
+      ],
+      "size": [
+        0.12,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the FPGA die into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_1",
+      "name": "Heatsink Fin 1",
+      "shape": "box",
+      "position": [
+        3.55,
+        4.13,
+        0
+      ],
+      "size": [
+        0.12,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the FPGA die into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_2",
+      "name": "Heatsink Fin 2",
+      "shape": "box",
+      "position": [
+        3.85,
+        4.13,
+        0
+      ],
+      "size": [
+        0.12,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the FPGA die into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_3",
+      "name": "Heatsink Fin 3",
+      "shape": "box",
+      "position": [
+        4.15,
+        4.13,
+        0
+      ],
+      "size": [
+        0.12,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the FPGA die into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_4",
+      "name": "Heatsink Fin 4",
+      "shape": "box",
+      "position": [
+        4.45,
+        4.13,
+        0
+      ],
+      "size": [
+        0.12,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the FPGA die into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_5",
+      "name": "Heatsink Fin 5",
+      "shape": "box",
+      "position": [
+        4.75,
+        4.13,
+        0
+      ],
+      "size": [
+        0.12,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the FPGA die into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_6",
+      "name": "Heatsink Fin 6",
+      "shape": "box",
+      "position": [
+        5.05,
+        4.13,
+        0
+      ],
+      "size": [
+        0.12,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the FPGA die into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_7",
+      "name": "Heatsink Fin 7",
+      "shape": "box",
+      "position": [
+        5.35,
+        4.13,
+        0
+      ],
+      "size": [
+        0.12,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the FPGA die into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_8",
+      "name": "Heatsink Fin 8",
+      "shape": "box",
+      "position": [
+        5.65,
+        4.13,
+        0
+      ],
+      "size": [
+        0.12,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the FPGA die into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    },
+    {
+      "id": "heatsink_fin_9",
+      "name": "Heatsink Fin 9",
+      "shape": "box",
+      "position": [
+        5.95,
+        4.13,
+        0
+      ],
+      "size": [
+        0.12,
+        0.85,
+        3.7
+      ],
+      "material": "brushed steel",
+      "role": "Heatsink fin dissipating switching heat from the FPGA die into airflow.",
+      "connections": [
+        "heatsink_base"
+      ]
+    }
+  ]
+}
+```
+
+## Rendered view — read this file before critiquing
+
+The 2x2 ISO/front/side/top contact-sheet render of the current
+scene is saved at:
+
+    /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260619-120003/iter-01-render.png
+
+Use the Read tool to open that PNG now and inspect it visually.
+It is the image this prompt refers to as the attached render.

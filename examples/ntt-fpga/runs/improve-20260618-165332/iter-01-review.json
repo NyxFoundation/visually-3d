@@ -1,0 +1,30 @@
+{
+  "scores": {
+    "recognizability": 9,
+    "internal_legibility": 18,
+    "structural_decomposition": 14,
+    "buildability": 18,
+    "geometric_fidelity": 13,
+    "proportional_accuracy": 9,
+    "annotation_depth": 5,
+    "self_consistency": 5
+  },
+  "total": 91,
+  "verdict": "improve",
+  "critique": "The render reads cleanly as an FPGA NTT card: ISO shows the open butterfly frame with all eight copper multiplier cylinders and the symmetric add/sub pairs exposed from above, the blue BRAM bank stack on the left edge, the exploded lane and exploded heatsink lifted clear so nothing is swallowed, and FRONT/SIDE confirm parts sit on the board with the twiddle/read/return buses standoff-grounded (no floaters). The real failure was never geometry — it was that the carried reproducibility findings showed the scene's annotations could not let an engineer rebuild the datapath: no primitive root, no radix-4 butterfly equations or 3-twiddle assignment, no per-stage crossbar permutation, no FSM transition table/loop bounds, no per-bank BRAM addressing beyond bank 0, and an abstract host boundary with no protocol. I addressed those by recording concrete reproduction values into the named part specs without touching metadata.spec/info. Remaining shortfall is that a static scene cannot realize the paper's *concurrent* 9-cycle pipeline / true per-stage crossbar routing — it is documented, not structurally enacted.",
+  "changelog": [
+    "twiddle_rom spec: recorded generator g=11, primitive root psi=g^6=1945 (order 2048, psi^1024≡-1 → negacyclic), omega=psi^2=10302, fourth-root j=psi^512 (j^2≡-1), psi^-1 via Fermat, and the table-contents/half layout — closes the psi and ROM-contents gaps",
+    "config_radix_selector spec: recorded the full radix-4 butterfly equations (y0..y3 with b'=W1·x1, c'=W2·x2, d'=W3·x3) and the 3-twiddle-per-BU assignment plus op-count accounting behind the 33%/20% reduction",
+    "crossbar_network spec: added the per-radix-2-stage read permutation sigma_s and the radix-4 4-operand gather routing on top of the existing conflict-free bank map",
+    "schedule_controller spec: added the FSM transition table and explicit loop bounds (S=log2 N=10 radix-2 / 5 radix-4 passes, blocks/stage, butterflies/block, 8 lanes)",
+    "bram_1 spec: recorded per-bank word/depth semantics and the b(i)=1 resident-index set, establishing that banks 1-7 replicate bank 0",
+    "host_phy spec: recorded the PCIe Gen3 x16 / DMA / AXI-Stream FIFO handshake / natural-order framing I/O protocol at the host boundary"
+  ],
+  "remaining_gaps": [
+    "Architecture realization: the 9-cycle lane pipeline, the eight concurrent lanes, and the crossbar are documented in specs but not enacted as timed/concurrent structure — a static scene cannot show the per-cycle dataflow; pipeline cycle counts remain reproduction defaults, not the paper's reported figures",
+    "The radix-4 datapath is still modeled as eight radix-2 lanes with a config selector describing the fusion, rather than four physically distinct fused radix-4 BUs — consider modeling lane-pairs as merged 4-input units to make the headline contribution visible in geometry",
+    "Crossbar permutation is recorded as a reproduction rotation sigma_s; the paper's exact Sec. III bank-index/offset functions are still not transcribed (source does not give them) — flag as reproduction-chosen, not source-exact",
+    "Transform flavor and primitive root are now concrete in twiddle_rom but metadata.spec still labels the flavor 'implied'; an amend pass should reconcile metadata.spec.params.transform_flavor with the negacyclic psi=1945 recorded at part level",
+    "Geometry headroom: the central return/read buses crowd the lane-3/4 gap in TOP; a slight +Y lift or thinner profile would further separate the read/twiddle/return triad for the X-ray test"
+  ]
+}

@@ -1,0 +1,41 @@
+self-improve: /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             history -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-165332
+             driver   -> claude (visual feedback enabled)
+             up to 2 iteration(s)
+
+──────── iteration 1 / 2 ────────
+render-scene: 87 parts, 4016 triangles -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-165332/iter-01-render.png (1128x1128)
+  rendered -> iter-01-render.png
+  claude done (thinking trace: iter-01-events.jsonl, 109 events)
+  parts: 87   score: 91/100
+  critique: The render reads cleanly as an FPGA NTT card: ISO shows the open butterfly frame with all eight copper multiplier cylinders and the symmetric add/sub pairs exposed from above, the blue BRAM bank stack on the left edge, the exploded lane and exploded heatsink lifted clear so nothing is swallowed, and FRONT/SIDE confirm parts sit on the board with the twiddle/read/return buses standoff-grounded (no floaters). The real failure was never geometry — it was that the carried reproducibility findings showed the scene's annotations could not let an engineer rebuild the datapath: no primitive root, no radix-4 butterfly equations or 3-twiddle assignment, no per-stage crossbar permutation, no FSM transition table/loop bounds, no per-bank BRAM addressing beyond bank 0, and an abstract host boundary with no protocol. I addressed those by recording concrete reproduction values into the named part specs without touching metadata.spec/info. Remaining shortfall is that a static scene cannot realize the paper's *concurrent* 9-cycle pipeline / true per-stage crossbar routing — it is documented, not structurally enacted.
+  + twiddle_rom spec: recorded generator g=11, primitive root psi=g^6=1945 (order 2048, psi^1024≡-1 → negacyclic), omega=psi^2=10302, fourth-root j=psi^512 (j^2≡-1), psi^-1 via Fermat, and the table-contents/half layout — closes the psi and ROM-contents gaps
+  + config_radix_selector spec: recorded the full radix-4 butterfly equations (y0..y3 with b'=W1·x1, c'=W2·x2, d'=W3·x3) and the 3-twiddle-per-BU assignment plus op-count accounting behind the 33%/20% reduction
+  + crossbar_network spec: added the per-radix-2-stage read permutation sigma_s and the radix-4 4-operand gather routing on top of the existing conflict-free bank map
+  + schedule_controller spec: added the FSM transition table and explicit loop bounds (S=log2 N=10 radix-2 / 5 radix-4 passes, blocks/stage, butterflies/block, 8 lanes)
+  + bram_1 spec: recorded per-bank word/depth semantics and the b(i)=1 resident-index set, establishing that banks 1-7 replicate bank 0
+  + host_phy spec: recorded the PCIe Gen3 x16 / DMA / AXI-Stream FIFO handshake / natural-order framing I/O protocol at the host boundary
+  · gap: Architecture realization: the 9-cycle lane pipeline, the eight concurrent lanes, and the crossbar are documented in specs but not enacted as timed/concurrent structure — a static scene cannot show the per-cycle dataflow; pipeline cycle counts remain reproduction defaults, not the paper's reported figures
+  · gap: The radix-4 datapath is still modeled as eight radix-2 lanes with a config selector describing the fusion, rather than four physically distinct fused radix-4 BUs — consider modeling lane-pairs as merged 4-input units to make the headline contribution visible in geometry
+  · gap: Crossbar permutation is recorded as a reproduction rotation sigma_s; the paper's exact Sec. III bank-index/offset functions are still not transcribed (source does not give them) — flag as reproduction-chosen, not source-exact
+  · gap: Transform flavor and primitive root are now concrete in twiddle_rom but metadata.spec still labels the flavor 'implied'; an amend pass should reconcile metadata.spec.params.transform_flavor with the negacyclic psi=1945 recorded at part level
+  · gap: Geometry headroom: the central return/read buses crowd the lane-3/4 gap in TOP; a slight +Y lift or thinner profile would further separate the read/twiddle/return triad for the X-ray test
+
+──────── iteration 2 / 2 ────────
+render-scene: 87 parts, 4016 triangles -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-165332/iter-02-render.png (1128x1128)
+  rendered -> iter-02-render.png
+  claude done (thinking trace: iter-02-events.jsonl, 104 events)
+  parts: 94   score: 95/100  (prev 91)
+  critique: The render reads instantly as an open-frame FPGA NTT card: ISO shows all eight copper multiplier cylinders, the symmetric dark/brushed add-sub pairs, the blue BRAM stack on the -X edge, the exploded lane and finned heatsink lifted clear, and FRONT/SIDE confirm every part sits on the board with the buses standoff-grounded (no floaters). The single remaining actionable defect from the carried reflection was that the architecture's HEADLINE contribution — radix-4 — existed only in the config-selector spec text, not in geometry: eight radix-2 lanes with prose about fusion, and an exploded 'lane' whose roles even claimed a radix-4 butterfly it did not show. I closed that by enacting the fusion physically (four carbon-fiber radix-4 fusion yokes binding lane-pairs 0-1/2-3/4-5/6-7 into four 4-input BUs) and by rebuilding the exploded cluster into a true radix-4 butterfly (three twiddle multipliers W1/W2/W3, the constant j=psi^512 rotator as a torus, and the y0..y3 add/sub tree), so the X-ray view now teaches the paper's actual datapath. The only residual is inherent to any static scene — the concurrent 9-cycle pipeline cannot be enacted as timed structure — which is a property of the medium, not a fixable scene defect worth >2 points.
+  + Enacted the radix-4 headline in geometry: added four carbon-fiber 'Radix-4 Fusion Yoke' members (lanes 0-1, 2-3, 4-5, 6-7) seated in the open gap between the multiplier and add/sub columns, each binding its lane-pair's two DSP multipliers into one fused 4-input radix-4 BU, with a spec recording the W1/W2/W3 twiddles, the j rotator and the 33% mult saving — turning the eight radix-2 lanes into the four radix-4 BUs the paper headlines
+  + Rebuilt the exploded cluster from a generic radix-2 lane into a true radix-4 butterfly: replaced the single ex_mult with three twiddle multipliers ex_mult_w1/w2/w3 (b'=W1x1, c'=W2x2, d'=W3x3) plus a brass torus ex_jrot for the constant j=psi^512 rotator, and rewrote ex_add/ex_sub/ex_reg roles to the y0..y3 radix-4 add/sub tree and four-output register — the exploded view now matches its own captions and teaches the contribution
+  + Widened the exploded baseplate (depth 1.6 -> 1.9) so the three multipliers fit without overhanging, and kept the +Z offset so it still clears central lanes 3-4 in plan view
+  + Separated the read/twiddle/return routing triad in elevation: thinned the operand-read bus (depth 0.32 -> 0.26) and lifted it to y=1.5, raised the twiddle broadcast rail/feeder/standoff to y=1.72, leaving read (1.5) / return (1.62) / twiddle (1.72) on three distinct layers to de-crowd the lane-3/4 gap in TOP
+  + Updated assembly_instructions steps 4 and 8 to install the four radix-4 fusion yokes and to describe the exploded view as a fused radix-4 BU; preserved metadata.info, metadata.spec, thumbnail_camera and every existing part spec unchanged
+
+self-improve: model reports convergence — stopping.
+
+self-improve: done. Improved scene written to /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             full history: /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-165332
+             review change: git diff -- /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             revert:        cp /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-165332/iter-00.json /home/gohan/.visually-3d/scenes/ntt-fpga.json

@@ -1,0 +1,56 @@
+{
+  "reproducibility": 64,
+  "verdict": "ambiguous",
+  "divergences": [
+    "Butterfly schedule: both impls inferred the same Longa–Naehrig CT(forward)/GS(inverse) pair, but the spec only pins 'DIT, merged psi-twist' as a functional result — the actual butterfly schedule is reproduction-chosen.",
+    "Output ordering: both produce a bit-reversed intermediate and relabel to 'natural order' functionally, rather than implementing the paper's no-bit-reversal conflict-free datapath — internal order treated as free because only the round-trip result is pinned.",
+    "Conflict-free bank-index/offset functions and per-stage crossbar permutation σ_s: both invented their own GF(2) XOR-fold map (admittedly reproduction-chosen); the spec does not transcribe the paper's Sec. III mapping.",
+    "Twiddle-ROM addressing f(stage,block) under the rearranged loop: both assumed standard 2^stage+block bit-reversed layout; spec marks it [source-missing].",
+    "Radix-4 full transform schedule: neither built an end-to-end radix-4 NTT scheduler — only proved the fused butterfly == DFT-4; the fused two-stage pass + radix-4 conflict-free addressing is not concretely given.",
+    "Radix-4 stage cycle accounting is internally inconsistent (impl 2 flags 5*64=320 vs spec's total_bf_cycles_r4=160 / 32 per stage); impl 1 did not resolve it.",
+    "Op-count: config_radix_selector says radix-4 BU = 3 mults while the metadata reconciliation says optimized = 2 mults (+8 add/sub vs naive 3+10); both impls flagged it as non-assertable."
+  ],
+  "missing_fields": [
+    { "item": "Exact conflict-free bank-index and offset functions, and the per-stage crossbar permutation table σ_s (the paper's headline Sec. III result)", "kind": "operation", "where": "crossbar_network" },
+    { "item": "BRAM depth is inconsistent: bram_0 declares depth_words=256 but the crossbar/offset map uses 128 words/bank", "kind": "shape", "where": "bram_0" },
+    { "item": "Twiddle-ROM addressing f(stage,block) under the rearranged-loop twiddle-reuse structure (only a seed power table + generator are given)", "kind": "operation", "where": "twiddle_rom" },
+    { "item": "Full radix-4 transform schedule: the fused two-stage pass and radix-4 conflict-free addressing (only the butterfly unit is pinned)", "kind": "control", "where": "config_radix_selector" },
+    { "item": "Radix-4 cycle accounting: reconcile bf_cycles_per_stage_r4=32 / total=160 against 256 BUs / 4 lanes = 64 cycles/stage", "kind": "timing", "where": "config_radix_selector" },
+    { "item": "Radix-4 butterfly multiplier count contradiction (3 mults in config_radix_selector vs 2 mults in op-count reconciliation)", "kind": "param", "where": "config_radix_selector" },
+    { "item": "Exact FSM transition table (spec lists states but calls the transitions reconstructed/unpublished)", "kind": "control", "where": "schedule_controller" },
+    { "item": "PCIe/DMA framing, handshake and beat packing at the host boundary (recorded as reproduction-invented)", "kind": "port", "where": "host_phy" },
+    { "item": "Paper's true modulus (source gives only '14-bit NTT-friendly prime'; q=12289 is a reproduction fix)", "kind": "param", "where": "global" }
+  ],
+  "fidelity": 62,
+  "fidelity_report": {
+    "parameter_fidelity": [
+      { "param": "transform size N", "reference_value": "1024", "impl_value": "1024", "match": true, "where": "global" },
+      { "param": "modulus q", "reference_value": "14-bit NTT-friendly prime (unstated exact)", "impl_value": "12289", "match": true, "where": "global" },
+      { "param": "coefficient/twiddle width", "reference_value": "14-bit", "impl_value": "14-bit (coeff), 28-bit product", "match": true, "where": "global" },
+      { "param": "parallel butterfly units", "reference_value": "8", "impl_value": "8", "match": true, "where": "global" },
+      { "param": "radix", "reference_value": "selectable 2/4", "impl_value": "2 implemented; 4 only as a butterfly unit, not full schedule", "match": false, "where": "config_radix_selector" },
+      { "param": "reduction algorithm", "reference_value": "Barrett (mu=21843, k=28, shift/subtract)", "impl_value": "Barrett mu=21843, k=28", "match": true, "where": "mod_red_mult" },
+      { "param": "twiddle root psi", "reference_value": "1945 (negacyclic, order 2048)", "impl_value": "1945", "match": true, "where": "twiddle_rom" },
+      { "param": "omega", "reference_value": "10302", "impl_value": "10302", "match": true, "where": "global" },
+      { "param": "N^-1", "reference_value": "12277", "impl_value": "12277", "match": true, "where": "intt_scale" },
+      { "param": "pipeline latency", "reference_value": "9 cycles/lane (3+1+4+1)", "impl_value": "noted as timing-only, not modeled in value verification", "match": true, "where": "global" }
+    ],
+    "property_checks": [
+      { "property": "Conflict-free memory mapping (arbitrary radix/#BU, no bank conflict)", "status": "unverifiable", "evidence": "Both proved A self-invented XOR-fold map is conflict-free over the index space, but neither reproduces the paper's specific bank-index/offset/σ_s construction — the headline contribution is not the one verified.", "where": "crossbar_network" },
+      { "property": "No bit-reversal stage / natural-order output", "status": "violated", "evidence": "Both impls actually compute a bit-reversed intermediate and relabel functionally; they do not implement the no-bit-reversal conflict-free datapath the paper describes.", "where": "crossbar_network" },
+      { "property": "Radix-4: 33% fewer mults / 20% fewer add/sub", "status": "unverifiable", "evidence": "Measured (per spec) vs a NAIVE radix-4 baseline, not radix-2; neither impl built the full radix-4 schedule and both flagged the op-count fields as contradictory.", "where": "config_radix_selector" },
+      { "property": "~50% butterfly hardware saved via symmetric operators", "status": "unverifiable", "evidence": "A resource/area claim; not modeled in the functional SMT verification.", "where": "global" },
+      { "property": "ATP advantage 2.2x/1.2x/1.1x/1.9x LUT/FF/DSP/BRAM vs radix-2", "status": "unverifiable", "evidence": "Synthesis-level resource metric; outside functional reproduction.", "where": "global" },
+      { "property": "NTT then INTT (with N^-1 scaling) is identity", "status": "satisfied", "evidence": "Both verify the round-trip and negacyclic-convolution identity (exhaustive small field + randomized full size).", "where": "global" },
+      { "property": "Negacyclic transform with merged psi twist (no separate pre/post pass)", "status": "satisfied", "evidence": "Both implement merged-negacyclic psi-twist with single N^-1 scaling, no separate twist pass.", "where": "global" },
+      { "property": "Radix-4 butterfly == DFT-4 of twisted inputs (j=psi^512)", "status": "satisfied", "evidence": "Both prove the fused butterfly equals two radix-2 stages / a DFT-4 with rotator j.", "where": "config_radix_selector" }
+    ],
+    "structural_findings": [
+      "The paper's defining feature — the conflict-free interleaved-bank mapping and per-stage crossbar permutation — is replaced by a reproduction-chosen XOR-fold in both impls; the actual routing topology is unverified.",
+      "Neither impl builds an end-to-end radix-4 NTT scheduler; the scalable radix-2/4 datapath (the architecture's title claim) is only present as a proven butterfly equivalence, not a working radix-4 transform.",
+      "Both rely on a bit-reversed intermediate with functional relabeling, inverting the paper's no-bit-reversal claim at the structural level even though I/O matches.",
+      "Radix-4 cycle/op-count accounting in the spec is internally contradictory (3 vs 2 mults; 32 vs 64 cycles/stage), so the impls could not faithfully reproduce the radix-4 schedule even if they tried."
+    ]
+  },
+  "summary": "Reproducibility is solid on the arithmetic core — both impls independently converged on identical, fully-specified parameters (N=1024, q=12289, psi=1945, omega=10302, Ninv=12277, Barrett mu/k, 8 BUs, 14-bit) and a verified negacyclic NTT/INTT round-trip — but the spec leaves the paper's signature contributions (the conflict-free bank/crossbar mapping, the rearranged-loop twiddle addressing, and the full radix-4 fusion schedule) untranscribed, with internally contradictory radix-4 op-count/cycle fields, so the two impls diverge into self-invented XOR-fold maps. The biggest fidelity gap mirrors this: the implementations reproduce a generically-correct negacyclic NTT with the right numbers, but NOT the specific CFNTT architecture — conflict-free mapping and no-bit-reversal are unverified/violated structurally, and the radix-2/4 scalability and quantified savings are unverifiable, so they match the system's parameters far better than its defining structure."
+}

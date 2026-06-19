@@ -1,0 +1,23 @@
+{
+  "scores": {
+    "recognizability": 9,
+    "internal_legibility": 19,
+    "structural_decomposition": 15,
+    "buildability": 19,
+    "geometric_fidelity": 14,
+    "proportional_accuracy": 9,
+    "annotation_depth": 5,
+    "self_consistency": 5
+  },
+  "total": 95,
+  "verdict": "converged",
+  "critique": "The render now passes both acceptance tests. TOP shows all eight BRAM banks, eight copper DSP multipliers as a clean column of orange dots (the prior occlusion worry is resolved — they are not mutually hidden), the two distinct reduction members, the twiddle/addr/controller cluster on the right, and the two white FIFOs. SIDE confirms the exploded butterfly lane riding correctly on its two risers above the array, and the exploded heatsink floating on its stub, with nothing sunk below or floating off the ground line. The only residual nits were dataflow legibility ones: the intra-lane multiply→add/sub→register order and the exploded datapath order lived only in the prose, the heatsink read as too few fins to be unmistakably a heatsink, and the operand-return bus had no direction marker.",
+  "changelog": [
+    "Added a glass directional cone (return_arrow) at the crossbar end of the operand-return bus so the reduction->crossbar return direction is unambiguous in ISO/TOP rather than just a bidirectional span",
+    "Densified the exploded heatsink from 3 to 7 fins at ~0.45 m pitch (heatsink_fin_0..6) so the floating block reads unmistakably as a finned heatsink in FRONT/TOP",
+    "Wired the intra-lane datapath into the connection graph: every DSP multiplier (bu_mult_0..7) now connects to its own symmetric adder and subtractor, making the multiply->add/sub->register order an explicit assembly sequence",
+    "Connected the exploded cluster internally (ex_mult->ex_add/ex_sub->ex_reg) so the lifted lane visibly shows the left-to-right butterfly datapath instead of four parts hanging off one baseplate",
+    "Updated assembly_instructions to record the per-lane datapath wiring and the seven-fin heatsink"
+  ],
+  "remaining_gaps": []
+}

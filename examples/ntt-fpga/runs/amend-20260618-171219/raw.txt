@@ -1,0 +1,26 @@
+I've hit a hard tooling blocker I need to flag rather than work around silently.
+
+**The problem:** To return the *full* updated scene descriptor I have to read the existing scene JSON and reproduce its ~90 parts (geometry, materials, ids) **verbatim**, then only graft `spec` blocks on top. But in this session I have no way to read that file:
+
+- There's no `Read`/`Bash`/`Glob`/`Grep` tool available to me here — only the LSP server and a set of MCP servers (Figma/Gmail/Drive/etc.).
+- The LSP server returns *"No LSP server available for file type: .json"* for `package.json`, so it can't read the scene JSON either. On the `.ts` files it only yields types (e.g. `BUNDLED_SAMPLES: any`), not the literal sample path or contents.
+- Probing confirmed there's no `samples/` dir at repo root, and I can't list directories to find where the bundled scene lives (`$VISUALLY_HOME/scenes/<id>.json` or the package `samples`).
+
+I won't fabricate the geometry of 90 parts — that would directly violate the one inviolable rule of this task ("Do NOT change what the scene looks like… keep every part id and all existing fields intact"). Inventing them would almost certainly corrupt the scene.
+
+**What I need from you (any one of these):**
+1. Paste the current scene JSON (or its path, e.g. `~/.visually-3d/scenes/<id>.json`), or
+2. Enable a file-read/Bash tool for this session so I can open it myself.
+
+**What's ready to go the moment I can see the file** — the concrete spec values I'll write (the task pins most of these; I'll only merge, not touch geometry):
+
+- `intt_scale.spec.params`: `{ N: 1024, q: 12289, N_inv: 12277 }` + note that the old `8857` was a numeric error (`8857·1024 ≡ 286 ≢ 1 mod 12289`); `1024⁻¹ mod 12289 = 12277`. This also clears the impl-1 counterexample.
+- `metadata.spec.params`: `transform_flavor: "negacyclic"`, `parallel_butterfly_units: 8`, `pipeline: { mult: 3, add_sub: 1, barrett: 4, reg: 1 }`; `metadata.spec.properties += "~50% butterfly hardware saved via symmetric operators (area claim, not functionally exhibited)"`.
+- `bram_0.spec`: interleaved 8-bank address map `bank(i)=⌊i/(N/8)⌋`-style → I'll commit to the standard low-order interleave `bank = i mod 8`, `word = ⌊i/8⌋`, documented in notes.
+- `config_radix_selector.spec.fsm` + loop bounds for radix-2/4 switching; `.properties += ["radix-4: 33% fewer mults / 20% fewer add-sub vs radix-2 (asserted, not formally verified)"]`.
+- `twiddle_rom.spec`: generator `g = 11` (primitive 1024th root via `ω = g^((q-1)/N) mod q`), ROM holds `ω^k, k∈[0,N)`, addressed by stage/index.
+- `crossbar_network.spec`: the bank-index/offset/per-stage `σ_s`, plus `properties: ["conflict-free memory mapping", "no bit-reversal stage"]`.
+
+One honesty caveat on `crossbar_network`: the headline conflict-free `b(i)/o(i)/σ_s` is the **source paper's** result. The task itself notes the reconstructed guess `b(i)=(i+(i>>3))%8` provably collides at stage 6, so I should *not* re-enshrine that. If the scene's existing `notes`/`role` don't already transcribe the paper's mapping, I'll commit to a verifiable conflict-free scheme (sum-of-digits bank index `b(i)=(⊕ of i's 3-bit radix digits) mod 8` with stride-stage offset) and flag in `spec.notes` that it's the standard conflict-free convention, not necessarily the source's exact σ_s — unless you can point me at the paper's mapping.
+
+Send me the scene JSON (or read access) and I'll return the complete updated descriptor.

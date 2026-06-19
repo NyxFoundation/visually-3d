@@ -1,0 +1,353 @@
+PART 1 — metadata:
+
+{
+  "language": "python",
+  "guessed": [
+    "Pipeline cycle counts (mult 3 / add-sub 1 / Barrett 4 / reg 1 = 9) -> taken from spec verbatim but spec itself flags them as 'reproduction defaults pending the paper'; not modeled cycle-accurately, only as functional latency labels",
+    "Transform flavor -> negacyclic (psi order 2048) as the spec recommends; cyclic was the rejected fallback",
+    "Concrete generator/roots -> g=11, psi=1945, omega=10302, j=psi^512, N^-1=12277 (spec-pinned reproduction values, verified self-consistent mod 12289)",
+    "Barrett parameters -> mu=21843, k=28, <=2 conditional corrections (spec-pinned; proven correct exhaustively)",
+    "Bank/offset mapping b(i)=(i+(i>>3))%8, o(i)=i>>3 -> implemented as given; it IS a valid storage bijection but is NOT the conflict-free per-cycle map the spec claims (see below)",
+    "Radix-4 j-rotator sign convention -> chosen so spec eqs equal the standard radix-4 DIT butterfly (omega4=j=root^(N/4)); verified against direct DFT",
+    "FSM transition table & loop arrangement -> modeled as the standard stage/block Cooley-Tukey loop; spec's exact rearranged twiddle-stationary schedule not reproduced",
+    "Host PCIe/DMA protocol (128-bit beats, AXI-Stream ready/valid, descriptor framing) -> spec-pinned but purely an I/O boundary, not modeled in the datapath",
+    "Crossbar per-stage permutation sigma_s with R_s=((2^s)>>3)+1 -> not implemented; software uses a flat array, so the crossbar is abstracted away"
+  ],
+  "underspecified": [
+    "The paper's ACTUAL conflict-free bank-index/offset functions (its headline Sec. III result) are not in the spec; the supplied formula b(i)=(i+(i>>3))%8 is provably NOT conflict-free — at radix-2 strides 64,128,256,512 every butterfly's two operands land in the SAME bank (b(i+64)-b(i) = (64+8) mod 8 = 0). So as given the central claim is unreproducible.",
+    "Exact pipeline/throughput timing (initiation interval, stall behavior, fill/drain) — only nominal latencies are given",
+    "Bit-exact twiddle ROM address function f(stage s, block index) and the negacyclic low/high-half storage layout",
+    "Which transform direction (DIF vs DIT) and whether output is truly natural-order without any reorder are not pinned beyond 'no bit-reversal stage'",
+    "Modular adder/subtractor internal reduction (single conditional add/sub of q?) not specified; assumed correct mod-q add/sub",
+    "Whether radix-4 mode reuses the same Barrett spine timing or a wider one is not specified"
+  ],
+  "confidence": 55
+}
+
+```python
+#!/usr/bin/env python3
+"""
+Self-contained reproduction + self-check of the CFNTT Radix-2/4 NTT accelerator,
+built ONLY from the scene spec.
+
+What is modeled as plain Python:
+  * Barrett modular reduction (mu=21843, k=28, <=2 corrections) -> the shared
+    reduction spine; used as the datapath's modular multiplier.
+  * radix-2 butterfly  (u=x0, v=w*x1 -> u+v, u-v)            -> config_radix_selector spec
+  * radix-4 butterfly  (3 twiddles W1,W2,W3 + j-rotator)     -> r4_fuse_* / ex_* spec
+  * negacyclic NTT/INTT with psi=1945, omega=10302, j=psi^512, N^-1=12277
+  * conflict-free storage map b(i)=(i+(i>>3))%8, o(i)=i>>3   -> addr_gen_unit spec
+
+Verification strategy:
+  * Barrett: z3 EXHAUSTIVE proof over all products x in [0, q^2).
+  * radix-2 / radix-4 NTT == independent direct-sum DFT golden.
+  * negacyclic forward == direct golden sum a[i]*psi^(i(2k+1)).
+  * INTT . NTT == identity ; transform-domain mult == schoolbook negacyclic conv.
+  * constants psi/omega/j/N^-1/g self-consistency mod q.
+  * storage map is a (bank,offset) bijection.
+Prints exactly "VERIFIED" / exits 0 on success, else "FAIL: ...".
+"""
+
+import random
+
+Q   = 12289
+MU  = 21843     # floor(2^28 / q)
+KSH = 28
+PSI = 1945      # g^6, g=11 ; order 2048 (negacyclic)
+OMEGA = PSI * PSI % Q          # = 10302, order 1024
+N_INV = pow(1024, Q - 2, Q)    # = 12277
+
+
+# ---------- Barrett reduction (the modular-reduction spine) ----------
+def barrett(x):
+    # x is a nonnegative product < q^2
+    t = (x * MU) >> KSH
+    r = x - t * Q
+    if r >= Q:
+        r -= Q
+    if r >= Q:
+        r -= Q
+    return r
+
+def mm(a, b):
+    return barrett(a * b)   # modular multiply via Barrett
+
+
+# ---------- radix-2 datapath (recursive Cooley-Tukey, DIT) ----------
+def ntt2(a, root):
+    n = len(a)
+    if n == 1:
+        return a[:]
+    sub = mm(root, root)
+    ev = ntt2(a[0::2], sub)
+    od = ntt2(a[1::2], sub)
+    out = [0] * n
+    w = 1
+    h = n // 2
+    for k in range(h):
+        t = mm(w, od[k])               # v = w * x1   (radix-2 butterfly)
+        out[k]     = (ev[k] + t) % Q   # y0 = u + v
+        out[k + h] = (ev[k] - t) % Q   # y1 = u - v
+        w = mm(w, root)
+    return out
+
+
+# ---------- radix-4 datapath (the headline fused BU) ----------
+def ntt4(a, root):
+    n = len(a)
+    if n == 1:
+        return a[:]
+    sub = mm(mm(root, root), mm(root, root))      # root^4
+    A0 = ntt4(a[0::4], sub)
+    A1 = ntt4(a[1::4], sub)
+    A2 = ntt4(a[2::4], sub)
+    A3 = ntt4(a[3::4], sub)
+    M = n // 4
+    j = pow(root, n // 4, Q)                       # j = root^(N/4), j^2 = -1
+    out = [0] * n
+    w1 = 1
+    for k in range(M):
+        w2 = mm(w1, w1)
+        w3 = mm(w2, w1)
+        x0 = A0[k]
+        b  = mm(w1, A1[k])     # W1*x1
+        c  = mm(w2, A2[k])     # W2*x2
+        d  = mm(w3, A3[k])     # W3*x3
+        jb = mm(j, b)
+        jd = mm(j, d)
+        out[k]         = (x0 + b + c + d) % Q
+        out[k + M]     = (x0 + jb - c - jd) % Q
+        out[k + 2 * M] = (x0 - b + c - d) % Q
+        out[k + 3 * M] = (x0 - jb - c + jd) % Q
+        w1 = mm(w1, root)
+    return out
+
+
+# ---------- iterative radix-2 (embodies the stage/block FSM loop) ----------
+def bit_reverse(a):
+    n = len(a)
+    out = a[:]
+    j = 0
+    for i in range(1, n):
+        bit = n >> 1
+        while j & bit:
+            j ^= bit
+            bit >>= 1
+        j |= bit
+        if i < j:
+            out[i], out[j] = out[j], out[i]
+    return out
+
+def ntt2_iter(a, root):
+    n = len(a)
+    a = bit_reverse(a)
+    length = 2
+    while length <= n:
+        wlen = pow(root, n // length, Q)
+        for start in range(0, n, length):
+            w = 1
+            half = length // 2
+            for k in range(half):
+                u = a[start + k]
+                v = mm(a[start + k + half], w)
+                a[start + k] = (u + v) % Q
+                a[start + k + half] = (u - v) % Q
+                w = mm(w, wlen)
+        length <<= 1
+    return a
+
+
+# ---------- independent golden: direct-sum DFT ----------
+def dft_direct(a, root):
+    n = len(a)
+    rp = [1] * n
+    for k in range(1, n):
+        rp[k] = rp[k - 1] * root % Q
+    out = [0] * n
+    for k in range(n):
+        s = 0
+        for i in range(n):
+            s += a[i] * rp[(i * k) % n]
+        out[k] = s % Q
+    return out
+
+
+# ---------- negacyclic wrappers ----------
+def neg_ntt(a, ntt_fn):
+    n = len(a)
+    at = [a[i] * pow(PSI, i, Q) % Q for i in range(n)]
+    return ntt_fn(at, OMEGA)
+
+def neg_intt(A, ntt_fn):
+    n = len(A)
+    inv_omega = pow(OMEGA, Q - 2, Q)
+    b = ntt_fn(A, inv_omega)
+    inv_psi = pow(PSI, Q - 2, Q)
+    return [b[i] * N_INV % Q * pow(inv_psi, i, Q) % Q for i in range(n)]
+
+def neg_forward_golden(a):
+    n = len(a)
+    psipow = [pow(PSI, e, Q) for e in range(2 * n)]
+    out = [0] * n
+    for k in range(n):
+        s = 0
+        e = (2 * k + 1)
+        for i in range(n):
+            s += a[i] * psipow[(i * e) % (2 * n)]
+        out[k] = s % Q
+    return out
+
+def negacyclic_conv(a, b):
+    n = len(a)
+    c = [0] * n
+    for i in range(n):
+        if a[i] == 0:
+            continue
+        for jj in range(n):
+            p = a[i] * b[jj] % Q
+            idx = i + jj
+            if idx < n:
+                c[idx] = (c[idx] + p) % Q
+            else:
+                c[idx - n] = (c[idx - n] - p) % Q   # x^N = -1
+    return c
+
+
+# ---------- conflict-free storage map (addr_gen_unit) ----------
+def bank(i):   return (i + (i >> 3)) % 8
+def offset(i): return i >> 3
+
+def storage_bijection(n):
+    seen = set()
+    for i in range(n):
+        key = (bank(i), offset(i))
+        if key in seen:
+            return False
+        seen.add(key)
+    return True
+
+def conflicting_strides(n):
+    bad = []
+    s = 0
+    while (1 << s) < n:
+        stride = 1 << s
+        if any(bank(i) == bank(i + stride) for i in range(n - stride)):
+            bad.append(stride)
+        s += 1
+    return bad
+
+
+# ----------------------------- checks -----------------------------
+def fail(msg):
+    print("FAIL: " + msg)
+    raise SystemExit(1)
+
+
+def check_barrett_z3():
+    try:
+        from z3 import BitVec, LShR, If, UGE, ULT, URem, Solver, Or, sat
+    except Exception as e:
+        fail("z3 unavailable: %r" % (e,))
+    x = BitVec('x', 64)
+    t = LShR(x * MU, KSH)
+    r = x - t * Q
+    r = If(UGE(r, Q), r - Q, r)
+    r = If(UGE(r, Q), r - Q, r)
+    s = Solver()
+    s.add(ULT(x, Q * Q))
+    s.add(Or(r != URem(x, Q), UGE(r, Q)))   # counterexample: wrong value or not in [0,q)
+    res = s.check()
+    if res == sat:
+        m = s.model()
+        xv = m[x].as_long()
+        fail("Barrett wrong at x=%d : barrett=%d expected=%d" % (xv, barrett(xv), xv % Q))
+
+
+def check_constants():
+    if OMEGA != 10302:
+        fail("omega=%d != 10302" % OMEGA)
+    if pow(11, 6, Q) != PSI:
+        fail("g=11 -> 11^6=%d != psi=1945" % pow(11, 6, Q))
+    if pow(PSI, 2048, Q) != 1:
+        fail("psi^2048 != 1")
+    if pow(PSI, 1024, Q) != Q - 1:
+        fail("psi^1024 != -1 (not negacyclic)")
+    j = pow(PSI, 512, Q)
+    if (j * j) % Q != Q - 1:
+        fail("j=psi^512 : j^2 != -1")
+    if (1024 * N_INV) % Q != 1:
+        fail("N^-1 wrong: 1024*%d mod q = %d" % (N_INV, (1024 * N_INV) % Q))
+    if N_INV != 12277:
+        fail("N_inv=%d != 12277" % N_INV)
+
+
+def check_butterflies(rng):
+    # radix-2 and radix-4 each equal the direct-sum DFT, at two sizes.
+    for n in (64, 1024):
+        root = pow(OMEGA, 1024 // n, Q)   # primitive n-th root
+        a = [rng.randrange(Q) for _ in range(n)]
+        gold = dft_direct(a, root)
+        if ntt2(a, root) != gold:
+            fail("radix-2 NTT != DFT golden at N=%d" % n)
+        if ntt4(a, root) != gold:
+            fail("radix-4 NTT != DFT golden at N=%d (radix-4 butterfly eqs wrong)" % n)
+        if ntt2_iter(a, root) != gold:
+            fail("iterative radix-2 (FSM loop) != DFT golden at N=%d" % n)
+
+
+def check_negacyclic(rng):
+    n = 1024
+    a = [rng.randrange(Q) for _ in range(n)]
+    gold = neg_forward_golden(a)
+    if neg_ntt(a, ntt4) != gold:
+        fail("negacyclic forward (radix-4) != golden sum a[i]*psi^(i(2k+1))")
+    if neg_ntt(a, ntt2) != gold:
+        fail("negacyclic forward (radix-2) != golden")
+
+    # INTT . NTT == identity (radix-2 and radix-4 paths)
+    for fn, name in ((ntt2, "r2"), (ntt4, "r4")):
+        b = [rng.randrange(Q) for _ in range(n)]
+        rec = neg_intt(neg_ntt(b, fn), fn)
+        if rec != b:
+            i = next(k for k in range(n) if rec[k] != b[k])
+            fail("INTT.NTT != identity (%s) at i=%d : %d vs %d" % (name, i, rec[i], b[i]))
+
+    # transform-domain multiply == schoolbook negacyclic convolution
+    x = [rng.randrange(Q) for _ in range(n)]
+    y = [rng.randrange(Q) for _ in range(n)]
+    Xf = neg_ntt(x, ntt4)
+    Yf = neg_ntt(y, ntt4)
+    prod = [mm(Xf[i], Yf[i]) for i in range(n)]
+    got = neg_intt(prod, ntt4)
+    want = negacyclic_conv(x, y)
+    if got != want:
+        i = next(k for k in range(n) if got[k] != want[k])
+        fail("NTT-domain mult != negacyclic conv at i=%d : %d vs %d" % (i, got[i], want[i]))
+
+
+def check_storage():
+    if not storage_bijection(1024):
+        fail("storage map (bank,offset) not a bijection over N=1024")
+    # The spec asserts this map is *conflict-free*; it is not. We confirm the
+    # known failure exists so the model's understanding is honest (not gated).
+    bad = conflicting_strides(1024)
+    expected_bad = [64, 128, 256, 512]
+    if bad != expected_bad:
+        fail("conflict analysis changed: bad strides=%s expected=%s" % (bad, expected_bad))
+
+
+def main():
+    rng = random.Random(20220194)
+    check_barrett_z3()
+    check_constants()
+    check_butterflies(rng)
+    check_negacyclic(rng)
+    check_storage()
+    print("VERIFIED")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+The script verifies the functional datapath that the spec actually pins down (Barrett, radix-2/4 butterflies, negacyclic NTT/INTT, the constants) and **proves Barrett correct exhaustively with z3**. The headline conflict-free memory claim is the one place the spec is not just underspecified but *wrong*: the supplied map `b(i)=(i+(i>>3))%8` collides at strides 64/128/256/512, so `check_storage` records that failure as a deliberate finding rather than pretending it holds.

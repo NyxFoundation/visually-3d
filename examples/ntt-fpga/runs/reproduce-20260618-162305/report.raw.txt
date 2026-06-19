@@ -1,0 +1,50 @@
+{
+  "reproducibility": 42,
+  "verdict": "underspecified",
+  "divergences": [
+    "Output ordering / decimation form: Impl1 uses radix-2 DIT with bit-reversed input → natural output plus a recursive radix-4 split; Impl2 uses DIT with natural-order output and a standard 4-point CT combine — the spec fixes neither stage order nor decimation direction beyond 'no bit-reversal stage'.",
+    "Radix-4 cost model: Impl1 concedes the textbook radix-4 butterfly gives ~25% fewer mults / 0% fewer add-sub (not the paper's 33%/20%) and treats the paper's schedule as unverifiable; Impl2 just builds the standard CT radix-4 — neither reproduces the spec's quantified reductions because the schedule is never enumerated.",
+    "Both had to GUESS the exact modulus q=12289 identically — agreement here is luck/convention, not specification.",
+    "Cyclic vs negacyclic: both independently assumed plain CYCLIC NTT (x^N−1), each flagging that lattice PQC normally wants negacyclic (psi 2N-th root); the spec never states which, so this is an open choice both resolved the same arbitrary way.",
+    "Barrett internals (k=28, mu, 2 corrections) were guessed identically — the spec gives only 'q-multiply then shift/subtract+correct', so the exact mu, shift, and correction count are spec-open."
+  ],
+  "missing_fields": [
+    { "item": "Exact modulus q (only '14-bit NTT-friendly prime' given; no concrete value)", "kind": "param", "where": "global" },
+    { "item": "Transform flavor: cyclic vs negacyclic (and psi 2N-th-root twist location)", "kind": "operation", "where": "global" },
+    { "item": "Primitive root / twiddle-factor values, ROM depth, contents and addressing", "kind": "param", "where": "twiddle_rom" },
+    { "item": "Barrett parameters: bit-width k, precomputed mu, shift amount, number of conditional corrections", "kind": "param", "where": "mod_red_mult" },
+    { "item": "Conflict-free address-generation equations (bank-index and offset functions) — the paper's headline contribution, only asserted as a property", "kind": "control", "where": "crossbar_network" },
+    { "item": "Schedule/FSM state set and the 'rearranged loop order' that yields the 33% mult / 20% add-sub savings", "kind": "control", "where": "schedule_controller" },
+    { "item": "Radix-2/4 selector semantics and how 8 lanes map onto 4-input radix-4 butterflies", "kind": "control", "where": "config_radix_selector" },
+    { "item": "Pipeline depth / latency of multiplier, adder/subtractor, reduction stage and the array", "kind": "timing", "where": "bu_array_base" },
+    { "item": "FIFO depths, port widths, and handshake (valid/ready) protocol", "kind": "port", "where": "input_fifo" },
+    { "item": "Crossbar / operand-read / operand-return bus signal widths and directions", "kind": "port", "where": "read_bus" },
+    { "item": "Datapath widths beyond the 14-bit coefficient (28-bit product, ~42-bit Barrett intermediate)", "kind": "width", "where": "global" }
+  ],
+  "fidelity": 48,
+  "fidelity_report": {
+    "parameter_fidelity": [
+      { "param": "Transform size N", "reference_value": "1024", "impl_value": "1024", "match": true, "where": "global" },
+      { "param": "Parallel butterfly units", "reference_value": "8", "impl_value": "8 (modeled functionally)", "match": true, "where": "global" },
+      { "param": "Radix support", "reference_value": "scalable radix-2 / radix-4", "impl_value": "both radix-2 and radix-4 implemented", "match": true, "where": "global" },
+      { "param": "Coefficient width", "reference_value": "14-bit", "impl_value": "14-bit", "match": true, "where": "global" },
+      { "param": "Modulus q", "reference_value": "unstated (14-bit NTT-friendly prime)", "impl_value": "12289 (guessed)", "match": true, "where": "global" },
+      { "param": "Reduction algorithm", "reference_value": "Barrett: q-multiply then shift/subtract+correct", "impl_value": "Barrett, k=28, mu=floor(2^28/q), 2 corrections", "match": true, "where": "mod_red_mult" },
+      { "param": "Transform flavor (cyclic vs negacyclic)", "reference_value": "unstated (PQC context implies negacyclic)", "impl_value": "cyclic", "match": false, "where": "global" }
+    ],
+    "property_checks": [
+      { "property": "Conflict-free memory mapping (arbitrary radix/#BU, no bank conflict)", "status": "unverifiable", "evidence": "Both impls model banking as numerically inert; no address-generation equations implemented, so the headline scheme is not actually exhibited.", "where": "crossbar_network" },
+      { "property": "No bit-reversal stage (natural-order output)", "status": "satisfied", "evidence": "Both produce natural-order output without a separate bit-reversal pass.", "where": "output_fifo" },
+      { "property": "Radix-4 uses 33% fewer mults / 20% fewer add-sub", "status": "violated", "evidence": "Impl1 explicitly gets ~25%/0% from the textbook butterfly; neither reproduces the paper's scheduled 33%/20% because the schedule is absent.", "where": "schedule_controller" },
+      { "property": "~50% butterfly hardware saved via symmetric operators", "status": "unverifiable", "evidence": "Symmetric add/sub sharing one product is modeled functionally, but no hardware-count/area model exists to demonstrate the saving.", "where": "bu_array_base" },
+      { "property": "Twiddle-factor reuse / broadcast across 8 multipliers", "status": "satisfied", "evidence": "Each root computed once per stage and reused; functionally inert but consistent with the claim.", "where": "twiddle_rom" },
+      { "property": "NTT followed by INTT (with N^-1) is the identity", "status": "satisfied", "evidence": "Both check INTT(NTT(x))==x with final N^-1 scaling; z3 proves the modular primitives.", "where": "intt_scale" }
+    ],
+    "structural_findings": [
+      "Implementations are purely functional/numerical: the conflict-free crossbar, interleaved BRAM banking, FIFOs, FSM schedule, and pipeline registers from the reference architecture are not modeled as structure — only the NTT math is.",
+      "The defining algorithm-hardware co-design (conflict-free address generation + the rearranged loop schedule giving the 33%/20% savings) is absent, so the impls are generic correct NTT cores rather than the specific CFNTT datapath.",
+      "Both default to cyclic NTT; the reference targets lattice PQC / HE where negacyclic (psi 2N-th-root) convolution is the norm, a likely structural mismatch in the transform definition."
+    ]
+  },
+  "summary": "Biggest reproducibility gap: the spec pins the functional parameters (N=1024, 8 BUs, 14-bit, Barrett) but omits the exact modulus q, twiddle/root values, Barrett constants, the conflict-free address-generation equations, and the FSM schedule — so both teams had to guess q and the transform flavor and could only rebuild a behaviorally-correct round-trip, not the same hardware. Biggest fidelity gap: the reference's two signature contributions — the conflict-free memory mapping and the quantified 33%/20% radix-4 reductions — are not actually realized (one impl even shows the textbook butterfly yields 25%/0%), and both chose cyclic over the PQC-typical negacyclic transform, making these generic correct NTT cores rather than the specific CFNTT architecture."
+}

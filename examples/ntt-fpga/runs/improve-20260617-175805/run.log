@@ -1,0 +1,54 @@
+self-improve: /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             history -> /home/gohan/.visually-3d/runs/ntt-fpga-20260617-175805
+             driver   -> claude (visual feedback enabled)
+             up to 3 iteration(s)
+
+──────── iteration 1 / 3 ────────
+render-scene: 29 parts, 808 triangles -> /home/gohan/.visually-3d/runs/ntt-fpga-20260617-175805/iter-01-render.png (1128x1128)
+  rendered -> iter-01-render.png
+  claude done (thinking trace: iter-01-events.jsonl, 69 events)
+  parts: 38   score: 84/100
+  critique: In the ISO render the 16x12 board is an oversized flat slab (bounds.radius ~10, over the ~9 limit) so the floorplan reads as a dark featureless plate with low parts crouching on it; the TOP view is the only legible angle. The four butterfly clusters used a single opaque 'housing' box per cluster — a build-test failure because the paper's whole point is the symmetric add/sub operators and the DSP multiplier, which were collapsed into one ALU box rather than modeled as distinct members. The conflict-free schedule controller (the central algorithmic contribution) was missing entirely, and primitives were almost all boxes.
+  + Shrank board to 14x0.4x9 (bounds.radius 10 -> 8.3) and re-pitched all eight BRAM banks to fit, fixing the proportional violation
+  + Replaced each opaque butterfly 'housing' with a thin open baseplate so internals are fully exposed in ISO (X-ray test)
+  + Split every butterfly cluster into four real members — DSP modular multiplier, symmetric modular adder, symmetric modular subtractor, and a pipeline register — modeled 4x with distinct ids
+  + Added the Conflict-Free Schedule/FSM Controller (the loop-reordering contribution) on the right cluster
+  + Raised component heights and tightened the connection graph into a clean assembly order rooted at the PCB
+  · gap: Add an exploded copy of one butterfly cluster floating ~2.5 m above the board to make the radix-4 datapath unmistakable from ISO
+  · gap: Add an FPGA die/package outline plus a heatsink so the silhouette reads instantly as an FPGA accelerator, not a generic PCB
+  · gap: Differentiate a forward-NTT vs inverse-NTT (INTT) annotation/path and vary primitives further (e.g. capsule pipeline FIFOs) for the geometry axis
+
+──────── iteration 2 / 3 ────────
+render-scene: 38 parts, 916 triangles -> /home/gohan/.visually-3d/runs/ntt-fpga-20260617-175805/iter-02-render.png (1128x1128)
+  rendered -> iter-02-render.png
+  claude done (thinking trace: iter-02-events.jsonl, 110 events)
+  parts: 49   score: 92/100  (prev 84)
+  critique: The TOP view is now genuinely legible — eight blue BRAM banks, four butterfly clusters with copper DSP multipliers and grey symmetric add/sub pairs, the reduction spine, twiddle ROM and controllers all read cleanly. But in ISO the scene still reads as a generic populated PCB, not an FPGA accelerator: there is no silicon-die outline and no heatsink, the previous iteration's top two gaps. The paper's headline contribution — the radix-4 butterfly datapath — is legible only in plan; an orbiting viewer cannot see the multiply->add/sub->register flow from ISO because every cluster lies flat. There is also no distinct inverse-NTT element, so forward and inverse passes are indistinguishable.
+  + Added an exploded radix-4 butterfly cluster floating directly above cluster 1 (ex_base/ex_mult/ex_add/ex_sub/ex_reg) so the DSP-multiply -> symmetric add/sub -> pipeline-register datapath is unmistakable from the ISO render
+  + Added an FPGA silicon-die outline plate (fpga_die) framing the floorplan plus an exploded aluminum heatsink (heatsink_base + 3 distinct fins) above the package so the silhouette reads as an FPGA accelerator
+  + Added a dedicated inverse-NTT N^-1 scaling unit (intt_scale) on the output side and re-annotated the input FIFO as the forward-NTT path, differentiating NTT vs INTT
+  + Varied primitives: converted both FIFOs from boxes to Z-axis capsules; kept DSP multipliers and PLL as cylinders
+  + Updated assembly_instructions and the connection graph to include the die, heatsink, INTT unit and exploded view
+  · gap: The exploded butterfly cluster and heatsink necessarily float in the FRONT/SIDE elevations; consider faint riser stubs or a die-frame rail set to make the exploded relationship unambiguous and recover the last ~2 geometry points
+  · gap: Model the second four butterfly units (paper uses up to 8) as a mirrored array, or add a clear '4 of 8 modeled' ghost, to fully match the benchmark configuration
+  · gap: Differentiate Barrett vs Montgomery internals inside the reduction spine (currently one tall box) by splitting it into a multiplier + shift/subtract member to remove the last near-opaque block
+
+──────── iteration 3 / 3 ────────
+render-scene: 49 parts, 2468 triangles -> /home/gohan/.visually-3d/runs/ntt-fpga-20260617-175805/iter-03-render.png (1128x1128)
+  rendered -> iter-03-render.png
+  claude done (thinking trace: iter-03-events.jsonl, 33 events)
+  parts: 53   score: 94/100  (prev 92)
+  critique: The render now reads clearly as an FPGA accelerator: the FRONT view shows the exploded heatsink fins above the package, the TOP view is fully legible with eight blue BRAM banks, copper DSP multipliers, the symmetric add/sub clusters, the reduction spine and the right-edge controllers, and the ISO exploded butterfly cluster makes the radix-4 datapath orbit-visible. Two carried-over defects survived this render: the shared modular-reduction unit is still one tall welded-steel wall (a near-opaque block hiding its Barrett internals), and the exploded butterfly cluster and heatsink float free in the FRONT/SIDE elevations with no visible riser, so the exploded relationship is ambiguous. Only 4 of the benchmark's 8 butterfly units are modeled, so the array still under-represents the headline parallel configuration.
+  + Split the single opaque modular_reduction_unit wall into two adjacent thinner members — a Barrett q-multiplier (mod_red_mult) and a shift/subtract+conditional-correction member (mod_red_subshift) — removing the last near-opaque block and exposing the reduction internals (closes carried-over gap 3)
+  + Added two thin brushed-steel riser posts (ex_riser_a/ex_riser_b) physically linking the exploded butterfly cluster baseplate to its source baseplate bu_base_1, so the exploded relationship is unambiguous in the FRONT/SIDE elevations (closes carried-over gap 1, exploded cluster)
+  + Added a heatsink riser stub (heatsink_riser) from the silicon die up to the heatsink baseplate so the lifted heatsink is grounded to the package in elevation (closes carried-over gap 1, heatsink)
+  + Rewired the datapath so each pipeline register feeds mod_red_mult, mod_red_mult feeds mod_red_subshift, and mod_red_subshift returns to the crossbar — a legible reduction assembly order
+  + Updated assembly_instructions, pcb_substrate/crossbar connection lists, and the facts note to reflect the split reduction unit and riser supports
+  · gap: Model the remaining four butterfly units (paper benchmarks 8 parallel BUs) as a second mirrored cluster array — e.g. interleave 8 narrower clusters across the 9 m depth or stack a second row — to match the headline configuration and recover ~2 structural/proportional points; the current scene still only shows 4 of 8
+  · gap: The two reduction members (mod_red_mult, mod_red_subshift) are still abstract boxes; consider giving the Barrett multiplier a cylindrical DSP silhouette to distinguish it from the subtract member at a glance
+  · gap: Add a faint dashed/ghost connector or arrow geometry from each pipeline register into the crossbar to make the operand-return path readable in ISO, not just inferable from the connection graph
+
+self-improve: done. Improved scene written to /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             full history: /home/gohan/.visually-3d/runs/ntt-fpga-20260617-175805
+             review change: git diff -- /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             revert:        cp /home/gohan/.visually-3d/runs/ntt-fpga-20260617-175805/iter-00.json /home/gohan/.visually-3d/scenes/ntt-fpga.json

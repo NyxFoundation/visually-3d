@@ -1,0 +1,375 @@
+PART 1 — metadata:
+
+{
+  "language": "python",
+  "guessed": [
+    "Decimation convention -> DIT (spec marks DIT as a reproduction choice; DIF not excluded)",
+    "Natural-order/no-bit-reversal realization -> implemented with an internal bit-reversal permutation (mathematically equivalent); the spec's conflict-free natural-order memory map is admitted broken/ungiven, so not used for the functional result",
+    "Negacyclic transform definition -> forward X[k]=sum_i x[i]*psi^i*omega^(i k) (pre-twist by psi^i), inverse post-twist by psi^-i then scale by N^-1; spec says 'negacyclic' but gives no explicit pre/post-twist convention",
+    "Cyclic kernel direction -> forward uses omega, inverse uses omega^-1 (standard, not stated)",
+    "Radix-2 butterfly twiddle iteration order -> standard Cooley-Tukey per-stage wlen=omega^(N/len) (spec gives only the per-butterfly u/v equation, not the stage schedule)",
+    "Barrett correction count -> spec says <=2 conditional subtractions; I proved <=1 actually suffices for 28-bit inputs and kept 2 (safe)",
+    "Radix-4 stage fusion into the global transform -> NOT realized as a full radix-4 NTT; only the radix-4 butterfly equation is verified (equals two radix-2 stages with j=psi^512 on the odd path)",
+    "j-rotator sign convention -> j=psi^512 used as +i (multiply-by-i); spec flags the sign convention as reproduction-chosen",
+    "Host DMA / PCIe / FIFO protocol -> abstracted to plain in-memory coefficient arrays (widths/handshake are timing/IO, not functional)",
+    "Pipeline latencies (mult 3 / add-sub 1 / Barrett 4 / reg 1) -> not modeled; they affect cycle timing, not the computed values"
+  ],
+  "underspecified": [
+    "The actual conflict-free bank-index/offset functions (the candidate b(i)=(i+(i>>3)) mod 8 is admitted to COLLIDE for radix-2 strides 2^6..2^9) — the paper's Sec. III map is not transcribed",
+    "The crossbar per-stage permutation sigma_s and the radix-4 4-operand routing are reproduction candidates, not the verified paper map",
+    "Twiddle-ROM address function f(stage s, block) and the low/high-half negacyclic storage layout",
+    "DIT vs DIF, the global butterfly/stage ordering, and per-stage cycle counts",
+    "The exact modulus: source gives only '14-bit NTT-friendly prime'; q=12289 is a reproduction fix (no distinct paper benchmark modulus recoverable)",
+    "Transform flavor (negacyclic vs cyclic) is inferred from PQC/HE context, not stated",
+    "The primitive root / generator (g=11 -> psi=1945) is reproduction-chosen, not from source",
+    "Which two radix-2 stages fuse per radix-4 BU is reproduction-chosen and pending source confirmation"
+  ],
+  "confidence": 55
+}
+
+PART 2 — runnable self-checking program:
+
+```python
+#!/usr/bin/env python3
+"""
+Self-checking reproduction of the CFNTT Radix-2/4 NTT multiplication accelerator
+(TCHES 2022, Chen et al.) implemented from the scene spec ALONE.
+
+What is actually pinned by the spec (and therefore implemented + verified here):
+  - q = 12289, N = 1024, psi = 1945 (order 2048, negacyclic), omega = psi^2 = 10302,
+    N^-1 = 12277, Barrett mu = 21843, k = 28.
+  - Barrett reduction: t = (x*mu)>>k ; r = x - t*q ; while r>=q: r-=q   (<=2 corr).
+  - Radix-2 (Cooley-Tukey) butterfly: u=x0, v=w*x1 -> (u+v, u-v) mod q.
+  - Radix-4 butterfly: b'=w*x1, c'=w^2*x2, d'=w^3*x3, j=psi^512 ->
+        y0=x0+b'+c'+d', y1=x0+j b'-c'-j d', y2=x0-b'+c'-d', y3=x0-j b'-c'+j d'.
+  - NTT followed by INTT (with N^-1 scaling) is the identity; it is a negacyclic
+    polynomial-multiplication engine.
+
+Verification strategy:
+  1. z3: prove the Barrett reducer == x mod q over ALL 28-bit inputs (the arithmetic
+     core; products of two sub-q operands are < q^2 < 2^28).
+  2. Property/edge tests: the radix-2 iterative NTT (using the Barrett modmul)
+     matches an independent O(N^2) negacyclic golden DFT; INTT inverts NTT exactly;
+     the full NTT-pointwise-INTT pipeline equals schoolbook negacyclic convolution.
+  3. The radix-4 butterfly equals two composed radix-2 butterflies (the "fuse two
+     stages" claim) and equals a direct 4-point DFT with kernel j.
+
+The conflict-free memory map / crossbar permutation is NOT exercised: the spec
+itself flags its candidate map as NOT conflict-free for strides 2^6..2^9, so it is
+not a faithful functional artifact and would only add a known-broken layer.
+"""
+
+import sys
+import random
+
+# ---------------------------------------------------------------------------
+# Parameters (spec-authoritative)
+# ---------------------------------------------------------------------------
+Q   = 12289
+N   = 1024
+PSI = 1945
+MU  = 21843
+K   = 28
+
+
+def fail(msg):
+    print("FAIL: " + msg)
+    sys.exit(1)
+
+
+# Sanity-check the spec's claimed constants; if any is wrong the spec is wrong.
+if pow(PSI, 2048, Q) != 1:
+    fail("psi^2048 != 1 mod q (psi=%d not order-2048)" % PSI)
+if pow(PSI, 1024, Q) != Q - 1:
+    fail("psi^1024 != -1 mod q (not a negacyclic 2N-th root)")
+OMEGA = pow(PSI, 2, Q)
+if OMEGA != 10302:
+    fail("omega=psi^2 = %d, spec claims 10302" % OMEGA)
+if pow(OMEGA, N, Q) != 1 or pow(OMEGA, N // 2, Q) != Q - 1:
+    fail("omega is not a primitive N-th root of unity")
+NINV = pow(N, Q - 2, Q)
+if NINV != 12277:
+    fail("N^-1 = %d, spec claims 12277" % NINV)
+PSIINV = pow(PSI, Q - 2, Q)
+J = pow(PSI, 512, Q)            # constant radix-4 rotator (j^2 == -1)
+if (J * J) % Q != Q - 1:
+    fail("j=psi^512 does not satisfy j^2 == -1 mod q")
+if MU != (1 << K) // Q:
+    fail("Barrett mu=%d != floor(2^28/q)=%d" % (MU, (1 << K) // Q))
+
+
+# ---------------------------------------------------------------------------
+# Implementation: modular arithmetic via Barrett (the chip's reduction stage)
+# ---------------------------------------------------------------------------
+def barrett_reduce(x):
+    """Reduce x in [0, 2^28) to x mod q. Mirrors mod_red_mult + mod_red_subshift."""
+    t = (x * MU) >> K
+    r = x - t * Q
+    while r >= Q:          # spec: up to 2 conditional subtractions
+        r -= Q
+    return r
+
+
+def modmul(a, b):
+    # a,b in [0,q) -> a*b < q^2 < 2^28, valid Barrett input.
+    return barrett_reduce(a * b)
+
+
+def modadd(a, b):
+    s = a + b
+    return s - Q if s >= Q else s
+
+
+def modsub(a, b):
+    d = a - b
+    return d + Q if d < 0 else d
+
+
+# ---------------------------------------------------------------------------
+# Implementation: iterative radix-2 (Cooley-Tukey, DIT) cyclic NTT
+# ---------------------------------------------------------------------------
+def bit_reverse_copy(a):
+    n = len(a)
+    logn = n.bit_length() - 1
+    res = [0] * n
+    for i in range(n):
+        r = 0
+        for b in range(logn):
+            if (i >> b) & 1:
+                r |= 1 << (logn - 1 - b)
+        res[r] = a[i]
+    return res
+
+
+def ntt_cyclic(a, w):
+    """A[k] = sum_i a[i] * w^(i*k) mod q, with w a primitive len-root of order n."""
+    n = len(a)
+    A = bit_reverse_copy(a)
+    length = 2
+    while length <= n:
+        wlen = pow(w, n // length, Q)
+        half = length >> 1
+        for start in range(0, n, length):
+            wn = 1
+            for k in range(half):
+                u = A[start + k]
+                v = modmul(A[start + k + half], wn)
+                A[start + k] = modadd(u, v)
+                A[start + k + half] = modsub(u, v)
+                wn = modmul(wn, wlen)
+        length <<= 1
+    return A
+
+
+def ntt(x):
+    """Forward negacyclic NTT: pre-twist by psi^i, then cyclic NTT with omega."""
+    a = [modmul(x[i], pow(PSI, i, Q)) for i in range(N)]
+    return ntt_cyclic(a, OMEGA)
+
+
+def intt(X):
+    """Inverse negacyclic NTT: cyclic INTT with omega^-1, scale N^-1, post-twist psi^-i."""
+    omega_inv = pow(OMEGA, Q - 2, Q)
+    B = ntt_cyclic(X, omega_inv)            # B[i] = sum_k X[k] omega^(-ik)
+    return [modmul(modmul(B[i], NINV), pow(PSIINV, i, Q)) for i in range(N)]
+
+
+# ---------------------------------------------------------------------------
+# Implementation: radix-2 and radix-4 butterflies (config_radix_selector spec)
+# ---------------------------------------------------------------------------
+def radix2_butterfly(x0, x1, w):
+    v = modmul(w, x1)
+    return modadd(x0, v), modsub(x0, v)
+
+
+def radix4_butterfly(x0, x1, x2, x3, w):
+    w2 = modmul(w, w)
+    w3 = modmul(w2, w)
+    b = modmul(w, x1)
+    c = modmul(w2, x2)
+    d = modmul(w3, x3)
+    jb = modmul(J, b)
+    jd = modmul(J, d)
+    y0 = modadd(modadd(x0, b), modadd(c, d))
+    y1 = modsub(modsub(modadd(x0, jb), c), jd)
+    y2 = modadd(modsub(x0, b), modsub(c, d))
+    y3 = modadd(modsub(modsub(x0, jb), c), jd)
+    return y0, y1, y2, y3
+
+
+# ---------------------------------------------------------------------------
+# Independent golden / reference models
+# ---------------------------------------------------------------------------
+# psi power table for the naive negacyclic DFT (psi has order 2048).
+_PSITAB = [1] * 2048
+for _i in range(1, 2048):
+    _PSITAB[_i] = (_PSITAB[_i - 1] * PSI) % Q
+
+
+def ntt_golden(x):
+    """Naive O(N^2) negacyclic NTT: X[k] = sum_i x[i] * psi^(i*(2k+1)) mod q."""
+    out = [0] * N
+    for k in range(N):
+        s = 0
+        c = (2 * k + 1)
+        for i in range(N):
+            s += x[i] * _PSITAB[(i * c) % 2048]
+        out[k] = s % Q
+    return out
+
+
+def negconv_golden(a, b):
+    """Schoolbook negacyclic convolution: c = a*b mod (X^N + 1, q)."""
+    c = [0] * N
+    for i in range(N):
+        ai = a[i]
+        if ai == 0:
+            continue
+        for j in range(N):
+            v = ai * b[j]
+            k = i + j
+            if k < N:
+                c[k] += v
+            else:
+                c[k - N] -= v
+    return [v % Q for v in c]
+
+
+def radix4_golden_two_stage(x0, x1, x2, x3, w):
+    """Two composed radix-2 stages (the 'fuse two stages' claim)."""
+    b = modmul(w, x1)
+    c = modmul(modmul(w, w), x2)
+    d = modmul(modmul(modmul(w, w), w), x3)
+    e0, e1 = modadd(x0, c), modsub(x0, c)      # DFT2 on even (x0, c)
+    o0, o1 = modadd(b, d), modsub(b, d)        # DFT2 on odd  (b, d)
+    jo1 = modmul(J, o1)
+    return (modadd(e0, o0), modadd(e1, jo1),
+            modsub(e0, o0), modsub(e1, jo1))
+
+
+# ---------------------------------------------------------------------------
+# z3 proof of the Barrett reducer over ALL 28-bit inputs
+# ---------------------------------------------------------------------------
+def prove_barrett():
+    from z3 import BitVec, BitVecVal, LShR, UGE, ULT, URem, If, Solver, sat, Not, And
+    bits = 64
+    x = BitVec('x', bits)
+    muv = BitVecVal(MU, bits)
+    qv = BitVecVal(Q, bits)
+    t = LShR(x * muv, K)
+    r0 = x - t * qv
+    r1 = If(UGE(r0, qv), r0 - qv, r0)
+    r2 = If(UGE(r1, qv), r1 - qv, r1)      # <=2 conditional subtractions
+    spec = URem(x, qv)
+    s = Solver()
+    s.add(ULT(x, BitVecVal(1 << 28, bits)))           # all 28-bit inputs
+    s.add(Not(And(r2 == spec, ULT(r2, qv))))          # negation of correctness
+    if s.check() == sat:
+        m = s.model()
+        xv = m[x].as_long()
+        return False, "barrett(%d)=%d but %d mod %d = %d" % (
+            xv, barrett_reduce(xv), xv, Q, xv % Q)
+    return True, None
+
+
+# ---------------------------------------------------------------------------
+# Test driver
+# ---------------------------------------------------------------------------
+def edge_vectors():
+    vs = []
+    vs.append([0] * N)
+    vs.append([Q - 1] * N)
+    d0 = [0] * N; d0[0] = 1; vs.append(d0)
+    d1 = [0] * N; d1[1] = 1; vs.append(d1)
+    dl = [0] * N; dl[N - 1] = Q - 1; vs.append(dl)
+    vs.append([i % Q for i in range(N)])
+    return vs
+
+
+def main():
+    rng = random.Random(1234)
+
+    # 1) z3: Barrett reduction correct for every 28-bit input.
+    ok, why = prove_barrett()
+    if not ok:
+        fail("Barrett reduction wrong: " + why)
+
+    # 2) radix-4 butterfly == two radix-2 stages == direct 4-point DFT(kernel j).
+    for _ in range(4000):
+        x0, x1, x2, x3 = (rng.randrange(Q) for _ in range(4))
+        w = rng.randrange(Q)
+        got = radix4_butterfly(x0, x1, x2, x3, w)
+        ref = radix4_golden_two_stage(x0, x1, x2, x3, w)
+        if got != ref:
+            fail("radix4 butterfly != two radix-2 stages for "
+                 "x=(%d,%d,%d,%d) w=%d : got %s ref %s"
+                 % (x0, x1, x2, x3, w, got, ref))
+    # also check the direct matrix form (j as primitive 4th root) once with a known w
+    for x0, x1, x2, x3, w in [(0, 0, 0, 0, 1), (1, 0, 0, 0, 5),
+                              (3, 7, 9, 4, 12), (Q - 1, 1, Q - 2, 2, 1234)]:
+        b = modmul(w, x1); c = modmul(modmul(w, w), x2)
+        d = modmul(modmul(modmul(w, w), w), x3)
+        mat = (
+            (x0 + b + c + d) % Q,
+            (x0 + J * b - c - J * d) % Q,
+            (x0 - b + c - d) % Q,
+            (x0 - J * b - c + J * d) % Q,
+        )
+        if radix4_butterfly(x0, x1, x2, x3, w) != mat:
+            fail("radix4 butterfly != direct 4-point DFT for x=(%d,%d,%d,%d) w=%d"
+                 % (x0, x1, x2, x3, w))
+
+    # 3) radix-2 butterfly matches its golden definition.
+    for _ in range(4000):
+        x0, x1, w = rng.randrange(Q), rng.randrange(Q), rng.randrange(Q)
+        got = radix2_butterfly(x0, x1, w)
+        v = (w * x1) % Q
+        ref = ((x0 + v) % Q, (x0 - v) % Q)
+        if got != ref:
+            fail("radix2 butterfly wrong for x0=%d x1=%d w=%d" % (x0, x1, w))
+
+    # 4) iterative NTT == naive O(N^2) negacyclic golden.
+    test_vecs = edge_vectors() + [[rng.randrange(Q) for _ in range(N)]
+                                  for _ in range(3)]
+    for x in test_vecs:
+        if ntt(x) != ntt_golden(x):
+            # find a differing index for the message
+            a, b = ntt(x), ntt_golden(x)
+            idx = next(i for i in range(N) if a[i] != b[i])
+            fail("NTT != golden at k=%d (impl=%d golden=%d)" % (idx, a[idx], b[idx]))
+
+    # 5) INTT inverts NTT exactly (round trip identity).
+    for x in test_vecs:
+        if intt(ntt(x)) != x:
+            r = intt(ntt(x))
+            idx = next(i for i in range(N) if r[i] != x[i])
+            fail("INTT(NTT(x)) != x at i=%d (got %d want %d)" % (idx, r[idx], x[idx]))
+        # forward of inverse too
+        if ntt(intt(x)) != x:
+            fail("NTT(INTT(x)) != x")
+
+    # 6) full engine: NTT -> pointwise mult -> INTT == schoolbook negacyclic conv.
+    for _ in range(2):
+        a = [rng.randrange(Q) for _ in range(N)]
+        b = [rng.randrange(Q) for _ in range(N)]
+        A, B = ntt(a), ntt(b)
+        C = [modmul(A[i], B[i]) for i in range(N)]
+        got = intt(C)
+        ref = negconv_golden(a, b)
+        if got != ref:
+            idx = next(i for i in range(N) if got[i] != ref[i])
+            fail("polymul via NTT != schoolbook at i=%d (got %d want %d)"
+                 % (idx, got[idx], ref[idx]))
+
+    print("VERIFIED")
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as e:  # pragma: no cover
+        fail("unexpected exception: %r" % (e,))
+```

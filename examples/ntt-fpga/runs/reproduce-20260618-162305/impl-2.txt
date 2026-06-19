@@ -1,0 +1,362 @@
+PART 1 — metadata:
+
+{
+  "language": "python",
+  "guessed": [
+    "Exact modulus q -> 12289 (the spec only says 'a 14-bit NTT-friendly prime'; 12289 = 1 + 6*2048 is the canonical 14-bit prime supporting a 1024-pt NTT, q ≡ 1 mod 2N)",
+    "Twiddle factors / primitive root -> computed g = smallest primitive root mod q, then w_N = g^((q-1)/N) (spec gives no ROM contents)",
+    "Barrett parameters -> single-word Barrett with k = 2*ceil(log2 q) = 28 and mu = floor(2^28/q) = 21843 (spec says only 'q-multiply then shift/subtract+correct')",
+    "Number of correction subtractions -> 2 (provably sufficient for x < q^2)",
+    "Transform kind -> plain CYCLIC NTT with N-th root (spec says 'NTT', does not state negacyclic/psi-2N-th-root, even though lattice crypto usually wants negacyclic)",
+    "Transform convention -> DIT, natural-order output, X[k] = sum_j x[j]·w^{jk}",
+    "8 parallel butterfly units / conflict-free bank mapping -> modeled purely functionally (parallelism and bank-interleaving do not change the math); no address-generation equation was given",
+    "INTT -> same datapath with w^{-1} = w^{q-2} and a final N^-1 = N^{q-2} scaling (the intt_scale unit)",
+    "Radix-4 butterfly -> derived standard 4-point CT combine (t_s = w^{s·k0}·X_s, then 4-pt DFT with I = w^{N/4}); spec gives no equations",
+    "Pipeline depth / FSM schedule sequence -> not modeled (treated as combinational functional behavior)"
+  ],
+  "underspecified": [
+    "The exact modulus q (only 'a 14-bit NTT-friendly prime')",
+    "Whether the transform is negacyclic (psi 2N-th root) — decisive for polynomial multiplication in lattice PQC, but not stated",
+    "The conflict-free memory-mapping / address-generation function — the paper's headline contribution — has no equations in the spec",
+    "The FSM state set and the rearranged loop/schedule order that yields the 20% add/sub and 33% mult reductions",
+    "Barrett mu, shift amount k, and correction-step count",
+    "Twiddle ROM depth/contents and addressing; FIFO depths/ordering",
+    "DSP multiplier latency, pipeline-register depth, datapath/accumulator widths beyond the 14-bit coefficient width",
+    "Exact radix-4 butterfly equations and per-lane twiddle assignment"
+  ],
+  "confidence": 55
+}
+
+PART 2 — runnable program:
+
+```python
+#!/usr/bin/env python3
+"""
+CFNTT Radix-2/4 NTT Multiplication Accelerator (FPGA) — reverse-implemented
+from its scene spec alone.  Self-contained, self-checking.
+
+What is implemented (from the spec's functional fields):
+  * 14-bit coefficient datapath, N = 1024, 8 lanes (modeled functionally).
+  * Barrett modular reduction = q-multiply (quotient estimate) then
+    shift/subtract + conditional correction  (mod_red_mult + mod_red_subshift).
+  * Symmetric modular adder / subtractor sharing operands (the butterfly).
+  * Scalable radix-2 AND radix-4 NTT/INTT datapaths.
+  * Twiddle-factor reuse (each root computed once per stage, broadcast to lanes).
+  * INTT = inverse-root transform + N^-1 scaling (the intt_scale unit).
+  * The accelerator's purpose: NTT-based cyclic convolution (polynomial mult).
+
+Verification:
+  * z3 proves the bit-bounded primitives over ALL inputs:
+      - mod_add(a,b)  == (a+b) mod q   for a,b in [0,q)
+      - mod_sub(a,b)  == (a-b) mod q   for a,b in [0,q)
+      - barrett(x)    == x   mod q     for ALL x in [0, q^2)
+  * The full radix-2 and radix-4 NTT datapaths are checked against an
+    INDEPENDENT naive O(N^2) DFT golden, plus the INTT(NTT(x))==x identity,
+    plus NTT-based convolution vs a naive cyclic-convolution golden.
+"""
+
+import sys
+import random
+
+try:
+    from z3 import (BitVec, BitVecVal, Solver, ULT, UGE, LShR, If, URem, unsat)
+    HAVE_Z3 = True
+except Exception:
+    HAVE_Z3 = False
+
+
+# ---------------------------------------------------------------------------
+# Parameters.  GUESSED where the spec did not pin them down.
+# ---------------------------------------------------------------------------
+N = 1024                       # spec: metadata.spec.params.N
+COEFF_BITS = 14                # spec: metadata.spec.widths.coefficient
+Q = 12289                      # GUESS: 14-bit NTT-friendly prime, q = 1 + 6*2048
+N_BITS = Q.bit_length()        # 14
+BARRETT_K = 2 * N_BITS         # 28  (GUESS: classic single-word Barrett, k = 2n)
+BARRETT_MU = (1 << BARRETT_K) // Q     # floor(2^k / q) = 21843
+
+
+def fail(msg):
+    print("FAIL: " + msg)
+    sys.exit(1)
+
+
+# ---------------------------------------------------------------------------
+# Hardware-faithful modular primitives (the butterfly + reduction members).
+# ---------------------------------------------------------------------------
+def mod_add(a, b):
+    """Symmetric modular adder: conditional subtract of q.  a,b in [0,q)."""
+    s = a + b
+    return s - Q if s >= Q else s
+
+
+def mod_sub(a, b):
+    """Symmetric modular subtractor: conditional add of q.  a,b in [0,q)."""
+    d = a - b
+    return d + Q if d < 0 else d
+
+
+def barrett_reduce(x):
+    """Barrett reduction for 0 <= x < q^2.
+    mod_red_mult  -> quotient estimate floor(x*mu / 2^k)
+    mod_red_subshift -> shift/subtract then conditional correction (<= 2x)."""
+    q_hat = (x * BARRETT_MU) >> BARRETT_K     # quotient multiply + shift
+    r = x - q_hat * Q                         # subtract
+    if r >= Q:                                # conditional correction
+        r -= Q
+    if r >= Q:
+        r -= Q
+    return r
+
+
+def barrett_mul(a, b):
+    """DSP modular multiplier: full multiply then Barrett reduce."""
+    return barrett_reduce(a * b)
+
+
+# ---------------------------------------------------------------------------
+# Twiddle factors (Twiddle-Factor ROM contents). GUESSED: derived from a
+# computed primitive root; the spec stores no concrete factors.
+# ---------------------------------------------------------------------------
+def _find_primitive_root(q):
+    phi = q - 1
+    factors, m, d = set(), q - 1, 2
+    while d * d <= m:
+        while m % d == 0:
+            factors.add(d)
+            m //= d
+        d += 1
+    if m > 1:
+        factors.add(m)
+    for g in range(2, q):
+        if all(pow(g, phi // f, q) != 1 for f in factors):
+            return g
+    raise RuntimeError("no primitive root mod %d" % q)
+
+
+G = _find_primitive_root(Q)
+W_N = pow(G, (Q - 1) // N, Q)          # primitive N-th root of unity (twiddle base)
+W_N_INV = pow(W_N, Q - 2, Q)           # inverse root for the INTT pass
+N_INV = pow(N, Q - 2, Q)               # N^-1 mod q  (intt_scale unit)
+assert pow(W_N, N, Q) == 1 and pow(W_N, N // 2, Q) != 1, "bad N-th root"
+
+
+# ---------------------------------------------------------------------------
+# Scalable radix-2 / radix-4 NTT datapaths (natural-order output, no
+# bit-reversal stage).  Each stage computes its twiddle once and reuses it.
+# ---------------------------------------------------------------------------
+def ntt_radix2(x, w):
+    """Recursive radix-2 DIT NTT; w is the n-th root for this sub-transform."""
+    n = len(x)
+    if n == 1:
+        return [x[0] % Q]
+    w2 = barrett_mul(w, w)
+    even = ntt_radix2(x[0::2], w2)
+    odd = ntt_radix2(x[1::2], w2)
+    out = [0] * n
+    half = n // 2
+    wk = 1                                     # twiddle reused across the stage
+    for k in range(half):
+        t = barrett_mul(wk, odd[k])            # DSP modular multiply
+        out[k] = mod_add(even[k], t)           # symmetric adder (sum path)
+        out[k + half] = mod_sub(even[k], t)    # symmetric subtractor (diff path)
+        wk = barrett_mul(wk, w)
+    return out
+
+
+def ntt_radix4(x, w):
+    """Recursive radix-4 DIT NTT; len a power of 4 (falls back to radix-2)."""
+    n = len(x)
+    if n == 1:
+        return [x[0] % Q]
+    if n == 2:
+        return ntt_radix2(x, w)
+    m = n // 4
+    w2 = barrett_mul(w, w)
+    w4 = barrett_mul(w2, w2)                    # w^4 for the four sub-transforms
+    A = ntt_radix4(x[0::4], w4)
+    B = ntt_radix4(x[1::4], w4)
+    C = ntt_radix4(x[2::4], w4)
+    D = ntt_radix4(x[3::4], w4)
+    I = pow(w, m, Q)                           # primitive 4th root; I^2 == -1
+    I2 = barrett_mul(I, I)
+    I3 = barrett_mul(I2, I)
+    out = [0] * n
+    wk = 1
+    for k0 in range(m):
+        w2k = barrett_mul(wk, wk)
+        w3k = barrett_mul(w2k, wk)
+        t0 = A[k0]
+        t1 = barrett_mul(wk, B[k0])
+        t2 = barrett_mul(w2k, C[k0])
+        t3 = barrett_mul(w3k, D[k0])
+        # 4-point DFT with root I: X[k0 + r*m] = sum_s t_s * I^{s r}
+        out[k0]          = mod_add(mod_add(t0, t1), mod_add(t2, t3))
+        out[k0 + m]      = mod_add(mod_add(t0, barrett_mul(I, t1)),
+                                   mod_add(barrett_mul(I2, t2), barrett_mul(I3, t3)))
+        out[k0 + 2 * m]  = mod_add(mod_add(t0, barrett_mul(I2, t1)),
+                                   mod_add(t2, barrett_mul(I2, t3)))
+        out[k0 + 3 * m]  = mod_add(mod_add(t0, barrett_mul(I3, t1)),
+                                   mod_add(barrett_mul(I2, t2), barrett_mul(I, t3)))
+        wk = barrett_mul(wk, w)
+    return out
+
+
+def ntt(x, kind="radix2"):
+    return ntt_radix4(x, W_N) if kind == "radix4" else ntt_radix2(x, W_N)
+
+
+def intt(X, kind="radix2"):
+    """Inverse NTT: inverse-root transform then N^-1 scaling."""
+    y = ntt_radix4(X, W_N_INV) if kind == "radix4" else ntt_radix2(X, W_N_INV)
+    return [barrett_mul(v, N_INV) for v in y]
+
+
+def ntt_multiply(a, b, kind="radix2"):
+    """The accelerator's job: cyclic convolution via NTT (pointwise) then INTT."""
+    A = ntt(a, kind)
+    B = ntt(b, kind)
+    pointwise = [barrett_mul(A[i], B[i]) for i in range(len(a))]
+    return intt(pointwise, kind)
+
+
+# ---------------------------------------------------------------------------
+# INDEPENDENT golden models.
+# ---------------------------------------------------------------------------
+def naive_ntt(x):
+    """Direct O(N^2) DFT over Z_q: X[k] = sum_j x[j] * W_N^{jk} mod q."""
+    n = len(x)
+    out = []
+    for k in range(n):
+        wk = pow(W_N, k, Q)
+        acc, wjk = 0, 1
+        for j in range(n):
+            acc = (acc + x[j] * wjk) % Q
+            wjk = (wjk * wk) % Q
+        out.append(acc)
+    return out
+
+
+def naive_cyclic_conv(a, b):
+    n = len(a)
+    c = [0] * n
+    for i in range(n):
+        ai = a[i]
+        for j in range(n):
+            c[(i + j) % n] = (c[(i + j) % n] + ai * b[j]) % Q
+    return c
+
+
+# ---------------------------------------------------------------------------
+# z3 exhaustive proofs of the bit-bounded primitives.
+# ---------------------------------------------------------------------------
+def prove_mod_add():
+    a, b = BitVec('a', 32), BitVec('b', 32)
+    q = BitVecVal(Q, 32)
+    s = a + b
+    impl = If(UGE(s, q), s - q, s)
+    sv = Solver()
+    sv.add(ULT(a, q), ULT(b, q), impl != URem(a + b, q))
+    return (True, None) if sv.check() == unsat else (False, sv.model())
+
+
+def prove_mod_sub():
+    a, b = BitVec('a', 32), BitVec('b', 32)
+    q = BitVecVal(Q, 32)
+    impl = If(UGE(a, b), a - b, a + q - b)
+    golden = URem(a + q - b, q)         # a,b<q => a+q-b in (0,2q)
+    sv = Solver()
+    sv.add(ULT(a, q), ULT(b, q), impl != golden)
+    return (True, None) if sv.check() == unsat else (False, sv.model())
+
+
+def prove_barrett():
+    x = BitVec('x', 64)
+    mu = BitVecVal(BARRETT_MU, 64)
+    q = BitVecVal(Q, 64)
+    q_hat = LShR(x * mu, BARRETT_K)
+    r = x - q_hat * q
+    r1 = If(UGE(r, q), r - q, r)
+    r2 = If(UGE(r1, q), r1 - q, r1)
+    sv = Solver()
+    sv.add(ULT(x, BitVecVal(Q * Q, 64)), r2 != URem(x, q))
+    return (True, None) if sv.check() == unsat else (False, sv.model())
+
+
+# ---------------------------------------------------------------------------
+# Self-check driver.
+# ---------------------------------------------------------------------------
+def main():
+    rnd = random.Random(20220101)
+
+    if HAVE_Z3:
+        ok, cex = prove_mod_add()
+        if not ok:
+            fail("mod_add != (a+b) mod q; counterexample %s" % cex)
+        ok, cex = prove_mod_sub()
+        if not ok:
+            fail("mod_sub != (a-b) mod q; counterexample %s" % cex)
+        ok, cex = prove_barrett()
+        if not ok:
+            fail("barrett_reduce(x) != x mod q for some x < q^2; counterexample %s" % cex)
+    else:
+        # Deterministic fallback if z3 is unavailable.
+        for _ in range(300000):
+            x = rnd.randrange(0, Q * Q)
+            if barrett_reduce(x) != x % Q:
+                fail("barrett_reduce(%d)=%d != %d" % (x, barrett_reduce(x), x % Q))
+        for _ in range(150000):
+            a, b = rnd.randrange(Q), rnd.randrange(Q)
+            if mod_add(a, b) != (a + b) % Q:
+                fail("mod_add(%d,%d)" % (a, b))
+            if mod_sub(a, b) != (a - b) % Q:
+                fail("mod_sub(%d,%d)" % (a, b))
+
+    # Functional datapath: radix-2 / radix-4 NTT vs independent naive DFT,
+    # the INTT(NTT)=identity claim, and edge cases.
+    vectors = [
+        [i % Q for i in range(N)],          # ramp
+        [0] * N,                            # zeros
+        [1] + [0] * (N - 1),                # impulse -> all ones
+        [Q - 1] * N,                        # all max coefficient
+        [rnd.randrange(Q) for _ in range(N)],
+        [rnd.randrange(Q) for _ in range(N)],
+    ]
+    for vec in vectors:
+        golden = naive_ntt(vec)
+        r2 = ntt(vec, "radix2")
+        if r2 != golden:
+            i = next(k for k in range(N) if r2[k] != golden[k])
+            fail("radix-2 NTT mismatch at %d: %d != %d" % (i, r2[i], golden[i]))
+        r4 = ntt(vec, "radix4")
+        if r4 != golden:
+            i = next(k for k in range(N) if r4[k] != golden[k])
+            fail("radix-4 NTT mismatch at %d: %d != %d" % (i, r4[i], golden[i]))
+        ref = [v % Q for v in vec]
+        back2 = intt(r2, "radix2")
+        if back2 != ref:
+            i = next(k for k in range(N) if back2[k] != ref[k])
+            fail("radix-2 INTT(NTT(x)) != x at %d: %d != %d" % (i, back2[i], ref[i]))
+        back4 = intt(r4, "radix4")
+        if back4 != ref:
+            i = next(k for k in range(N) if back4[k] != ref[k])
+            fail("radix-4 INTT(NTT(x)) != x at %d: %d != %d" % (i, back4[i], ref[i]))
+
+    # The accelerator's purpose: NTT-based cyclic convolution vs naive golden.
+    a = [rnd.randrange(Q) for _ in range(N)]
+    b = [rnd.randrange(Q) for _ in range(N)]
+    conv_golden = naive_cyclic_conv(a, b)
+    for kind in ("radix2", "radix4"):
+        conv = ntt_multiply(a, b, kind)
+        if conv != conv_golden:
+            i = next(k for k in range(N) if conv[k] != conv_golden[k])
+            fail("%s NTT convolution mismatch at %d: %d != %d"
+                 % (kind, i, conv[i], conv_golden[i]))
+
+    print("VERIFIED")
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
+```

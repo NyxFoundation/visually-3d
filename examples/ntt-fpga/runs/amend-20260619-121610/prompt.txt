@@ -1,0 +1,192 @@
+You are closing the loop of a "visioned self-improvement" system. A scene
+descriptor doubles as the SPEC for a real system (a circuit, an algorithm, a
+machine, a building). Independent engineers tried to rebuild the system from
+this spec alone and a verifier ran their implementations. They found exactly
+which facts the spec FAILED to pin down. Your job: return a SMALL SPEC PATCH
+that writes those facts back into the scene's functional spec so the spec becomes
+reproducible — WITHOUT generating or modifying the full scene.
+
+THE SPEC SUBSTRATE (this is the ONLY thing you grow):
+- Each part may carry `spec`: { params?, widths?, ports?[ {name,dir,width} ],
+  ops?[], fsm?[], notes? }. Top-level `metadata.spec` holds the same shape for
+  system-level facts (clocking, global params, handshake, FSM).
+- Geometry (shape/position/size/rotation/material), connections, part ids,
+  machine_name, roles, and assembly text are NOT available to you and MUST NOT
+  appear in your answer. The host program will merge your patch into the real
+  scene deterministically.
+- You may only ADD/refine `metadata.spec` and `parts[].spec` for existing part
+  ids. Unknown part ids are ignored.
+
+THE SOURCE this system comes from (paper/datasheet metadata — QUOTE it to pin
+the SPECIFIC system's real values; do NOT invent values it does not support):
+```json
+{
+ "reference": "https://tches.iacr.org/index.php/TCHES/article/view/9291",
+ "domain": "cryptographic-hardware",
+ "info": {
+  "japanese_name": "CFNTT スケーラブル基数2/4 NTT 乗算アーキテクチャ (FPGA)",
+  "english_name": "CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture",
+  "summary": "An FPGA accelerator for the Number Theoretic Transform that combines a conflict-free memory mapping scheme with parallel radix-4 butterfly units, the polynomial-multiplication engine behind lattice post-quantum cryptography and homomorphic encryption.",
+  "description": "CFNTT is an algorithm-hardware co-designed NTT core proposed by Chen et al. (Tsinghua University) in TCHES 2022. Its central contribution is a conflict-free memory mapping scheme that lets an arbitrary radix and an arbitrary number of parallel butterfly units access an interleaved BRAM system without bank conflicts, removing the bit-reversal cost and reducing memory footprint by reusing twiddle factors across a rearranged loop structure.",
+  "description2": "Built on this scheme, the architecture realizes a scalable radix-2 / radix-4 datapath. A dedicated schedule cuts radix-4 modular additions/subtractions by 20% and modular multiplications by 33%, while exploiting symmetric operators saves nearly 50% of the butterfly hardware. For a 1024-point, 14-bit NTT with 8 parallel butterfly units, the radix-4 core achieves roughly 2.2x/1.2x/1.1x/1.9x lower LUT/FF/DSP/BRAM area-time product than the radix-2 core.",
+  "facts": [
+   {
+    "label": "Transform",
+    "value": "Number Theoretic Transform (NTT/INTT)"
+   },
+   {
+    "label": "Benchmark size",
+    "value": "1024 points, 14-bit modulus (q=12289 repro.)"
+   },
+   {
+    "label": "Parallel butterfly units",
+    "value": "8 (8 modeled, 1.1 m bank/lane pitch)"
+   },
+   {
+    "label": "Radix-4 mult reduction",
+    "value": "33% fewer modular multiplications (3->2)"
+   },
+   {
+    "label": "Radix-4 add/sub reduction",
+    "value": "20% fewer modular add/sub"
+   },
+   {
+    "label": "Hardware saving",
+    "value": "~50% via symmetric operators"
+   },
+   {
+    "label": "Reduction",
+    "value": "Barrett: mu=21843, k=28, shift/subtract"
+   },
+   {
+    "label": "Pipeline latency",
+    "value": "9 cycles/lane (mult 3 + add/sub 1 + Barrett 4 + reg 1)"
+   },
+   {
+    "label": "ATP advantage (LUT)",
+    "value": "~2.2x lower vs radix-2"
+   },
+   {
+    "label": "Twiddle root",
+    "value": "psi=1945 (negacyclic, order 2048), omega=10302, N^-1=12277"
+   }
+  ],
+  "sources": [
+   {
+    "title": "CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture (TCHES 2022)",
+    "url": "https://tches.iacr.org/index.php/TCHES/article/view/9291"
+   },
+   {
+    "title": "CFNTT PDF (IACR TCHES)",
+    "url": "https://tches.iacr.org/index.php/TCHES/article/download/9291/8857"
+   },
+   {
+    "title": "DOI 10.46586/tches.v2022.i1.94-126",
+    "url": "https://doi.org/10.46586/tches.v2022.i1.94-126"
+   }
+  ]
+ }
+}
+```
+
+MISSING FIELDS the spec must now carry (each says which part's spec to write):
+- [operation] Exact conflict-free bank-index and bank-offset functions (the paper's Sec. III headline map), not a reconstructed XOR-fold → write into metadata.spec
+- [connection] Per-stage crossbar permutation sigma_s routing table → write into metadata.spec
+- [operation] Twiddle-ROM address function under the rearranged reuse loop → write into metadata.spec
+- [control] Radix-4 full-transform index/stride schedule and how 8 radix-2 lanes reconfigure into 4 radix-4 BUs per stage → write into metadata.spec
+- [control] Complete schedule/FSM state list and transition table → write into metadata.spec
+- [timing] Cycle-accurate model relating the 9-cycle/lane latency to the 8-lane issue schedule (pipeline-register/stall timing, clock frequency) → write into metadata.spec
+- [operation] Exact butterfly equations (forward CT/DIT and inverse GS/DIF merged-negacyclic) — convention named but equations not given → write into metadata.spec
+- [operation] Number of Barrett correction subtractions (output bound: <2q vs <3q) → write into metadata.spec
+- [param] Naive-radix-4 add/sub baseline that anchors the 20% claim (spec assumes 10, flagged as reconstructed) → write into metadata.spec
+- [control] Host DMA/PCIe framing and back-pressure/FIFO handshake semantics → write into metadata.spec
+
+WHERE INDEPENDENT IMPLEMENTATIONS DIVERGED (the spec was ambiguous here — you
+must COMMIT to ONE concrete value to remove the ambiguity, and record it):
+- Conflict-free bank/offset map: both reconstruct an XOR-fold (bank(i)=(i^(i>>3)^(i>>6)^(i>>9))&7, offset=i>>3) but the spec admits this is untranscribed, so two engineers can pick different valid maps
+- Radix-4 full-transform schedule: Impl 1 attempts the consolidated FSM/stage reconfiguration of 8 radix-2 lanes into 4 radix-4 BUs; Impl 2 only verifies a SINGLE fused BU as local equivalence and does not implement the end-to-end radix-4 index/stride schedule
+- Per-stage crossbar permutation sigma_s: neither models it; spec leaves the routing table unspecified so both skip it differently
+- Twiddle-ROM address function f(stage,block): Impl 1 commits f=(1<<stage)+block as a reproduction choice; Impl 2 ignores the address function and generates the full psi-power table directly
+- Barrett correction depth: Impl 1 proves r lands in [0,2q) with <=2 conditional subtracts; the exact number of correction subtractions is a chosen interpretation, not pinned
+- Small-N structural cross-checks: Impl 1 uses test primitive roots via g=11; Impl 2 uses a self-chosen field q=17 — the spec gives no small-N verification recipe
+- FSM state list/transitions: both reconstruct the schedule controller graph differently; spec says the state machine is reconstructed, not published
+
+VERIFIER COUNTEREXAMPLES (hard evidence — the spec/impl was actually wrong here;
+fix the spec so the intended behavior is unambiguous):
+- impl 2: FAIL: round-trip failed at n=2
+
+FIDELITY GAPS — the impls drifted from the SPECIFIC system the SOURCE/paper
+describes. Pin the source's truth into the spec so the scene stops being a
+generic "a-correct-one" and becomes the actual system:
+
+  Parameter mismatches (write the SOURCE value, not the impls' guess):
+- pipeline latency: source says "9 cycles/lane (3+1+4+1)" but impls used "documentary only, not behaviorally modeled" → record the source value in metadata.spec
+
+  Named properties not clearly satisfied (record them so they are explicit and
+  checkable — e.g. spec.properties: ["conflict-free memory mapping", ...]):
+- [unverifiable] "Conflict-free memory mapping (arbitrary radix / #BU, no bank conflict)" — Both use a reconstructed XOR-fold map, not the paper's actual bank/offset functions; only operand-pair distinctness and (bank,offset) bijectivity checked — the paper's specific scheme is not realized → record this named property in metadata.spec.properties
+- [unverifiable] "No bit-reversal / natural-order output" — Achieved only functionally via an internal bit-reversed intermediate undone by the GS inverse; hardware natural-order ordering not structurally realized → record this named property in metadata.spec.properties
+- [unverifiable] "~50% butterfly hardware saved via symmetric operators" — Resource/area claim not expressible in a functional model; recorded but not verified → record this named property in metadata.spec.properties
+- [unverifiable] "ATP advantage 2.2x/1.2x/1.1x/1.9x (LUT/FF/DSP/BRAM) vs radix-2" — FPGA resource-time metric, outside functional reproduction → record this named property in metadata.spec.properties
+
+  Structural divergences from the source's described architecture:
+- The paper's central contribution — the specific conflict-free bank/offset mapping — is replaced by a reconstructed XOR-fold in both impls; the actual scheme is not reproduced
+- The per-stage crossbar permutation network (sigma_s) is unmodeled in both
+- Radix-4 datapath is verified only at the single-BU level (Impl 2) or as a reconstructed FSM (Impl 1); the end-to-end radix-4 full-transform stage fusion / scheduling is not faithfully realized
+- Pipeline structure (9-cycle/lane, 8-lane issue schedule) is documentary, not a cycle-accurate hardware model — the FPGA timing architecture is not reproduced
+- Host DMA/PCIe I/O and FIFO handshaking are reproduction-invented, not from the source
+
+RULES for choosing values:
+1. For every missing field, write a CONCRETE value into the named part's `spec`
+   (or metadata.spec for "global"). Never leave it as a description of what is
+   missing — pick the actual width/param/op/port/state.
+2. To resolve a divergence, pick the value the passing / highest-confidence
+   implementation used; if it is genuinely a free choice, pick the standard,
+   well-known convention for this kind of system and note the choice in
+   `spec.notes`. The point is to make the bad (ambiguous) state unrepresentable.
+3. Be specific and numeric. "14-bit" → `widths: { coeff: 14 }`; a modulus →
+   `params: { q: 12289 }`; an FSM → `fsm: ["IDLE","LOAD","RUN","DRAIN"]`.
+4. DERIVED CONSTANTS — do not trust your own mental arithmetic. For any value you
+   COMPUTE (a modular inverse, a modular power, a floor/round, a precomputed table
+   entry), WRITE IT AS A VERIFIABLE EXPRESSION the value is derived from, e.g.
+   "12277 = 1024^-1 mod 12289", "1945 = 11^6 mod 12289", "21843 = floor(2^28 / 12289)".
+   These are MACHINE-CHECKED after you answer and a wrong result is auto-corrected,
+   so an arithmetically false constant is worse than useless — get the arithmetic
+   right or leave the operands symbolic. A self-inconsistent counterexample above
+   (e.g. "spec N != computed N") MUST be fixed at its numeric source, not annotated.
+5. PROVENANCE — for each fact you commit, mark where it came from in `spec.notes`
+   using a tag: `[src]` quoted/derived from the SOURCE above, `[conv]` a
+   convention you chose to break a tie (not stated by the source), `[calc]` a
+   value you derived by computation. `[conv]` facts are reproducibility aids, NOT
+   claims about the real system — never present a guessed value as the source's.
+6. CEILING — if a missing field is genuinely NOT determinable from the source and
+   is NOT a free convention (it is specific architectural detail the scene simply
+   lacks), do not fabricate it. Record what is needed in `spec.notes` prefixed
+   `[source-missing]` so the gap is visible instead of papered over.
+
+Existing part ids you may target: pcb_substrate, fpga_die, host_edge, host_phy, bram_0, bram_1, bram_2, bram_3, bram_4, bram_5, bram_6, bram_7, input_fifo, output_fifo, crossbar_network, intt_scale, bu_array_base, bu_rail_left, bu_rail_right, bu_xbrace, r4_fuse_01, r4_fuse_23, r4_fuse_45, r4_fuse_67, twiddle_post, read_post, bu_mult_0, bu_add_0, bu_sub_0, bu_reg_0, bu_mult_1, bu_add_1, bu_sub_1, bu_reg_1, bu_mult_2, bu_add_2, bu_sub_2, bu_reg_2, bu_mult_3, bu_add_3, bu_sub_3, bu_reg_3, bu_mult_4, bu_add_4, bu_sub_4, bu_reg_4, bu_mult_5, bu_add_5, bu_sub_5, bu_reg_5, bu_mult_6, bu_add_6, bu_sub_6, bu_reg_6, bu_mult_7, bu_add_7, bu_sub_7, bu_reg_7, twiddle_rail, twiddle_feeder, read_bus, read_arrow, ex_base, ex_riser_a, ex_riser_b, ex_mult_w1, ex_mult_w2, ex_jrot, ex_add, ex_sub, ex_reg, mod_red_mult, mod_red_subshift, return_post, return_bus, return_arrow, twiddle_rom, addr_gen_unit, config_radix_selector, schedule_controller, clock_pll, heatsink_base, heatsink_riser, heatsink_fin_0, heatsink_fin_1, heatsink_fin_2, heatsink_fin_3, heatsink_fin_4, heatsink_fin_5, heatsink_fin_6, heatsink_fin_7, heatsink_fin_8, heatsink_fin_9
+
+Return ONLY this JSON object — no markdown fences, no prose before or after:
+{
+  "metadata_spec": {
+    "params": { "<global parameter>": "<number/string/boolean>" },
+    "widths": { "<global width name>": <number> },
+    "ports": [{ "name": "<port>", "dir": "in|out|inout", "width": <number> }],
+    "ops": ["<global operation>"],
+    "fsm": ["<state or transition>"],
+    "properties": ["<named global property>"],
+    "notes": "<provenance-tagged global notes>"
+  },
+  "part_specs": {
+    "<existing part id>": {
+      "params": {},
+      "widths": {},
+      "ports": [],
+      "ops": [],
+      "fsm": [],
+      "properties": [],
+      "notes": "<provenance-tagged part notes>"
+    }
+  },
+  "rationale": ["<brief why each patch entry exists>"]
+}

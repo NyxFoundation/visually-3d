@@ -1,0 +1,143 @@
+{
+  "metadata_spec": {
+    "params": {
+      "N": 1024,
+      "q": 12289,
+      "modulus_bits": 14,
+      "num_butterfly_units": 8,
+      "radix": "2/4 (configurable)",
+      "psi": "1945 = 11^6 mod 12289 (primitive 2048th root, negacyclic)",
+      "omega": "10302 = 1945^2 mod 12289 (primitive 1024th root)",
+      "N_inv": "12277 = 1024^-1 mod 12289",
+      "barrett_mu": "21843 = floor(2^28 / 12289)",
+      "barrett_k": 28,
+      "naive_radix4_addsub_baseline": 10,
+      "opt_radix4_addsub_count": "8 = round(10 * 0.80) (20% reduction)",
+      "opt_radix4_mult_count": "2 (33% fewer than naive 3)",
+      "pipeline_latency_cycles": 9,
+      "pipeline_latency_breakdown": "mult 3 + add/sub 1 + Barrett 4 + reg 1 = 9 cycles/lane",
+      "internal_coeff_order": "external natural-order I/O; NTT=CT/DIT (natural->bit-reversed intermediate), INTT=GS/DIF (bit-reversed->natural), so no explicit bit-reversal permutation stage"
+    },
+    "widths": {
+      "coeff": 14,
+      "twiddle": 14,
+      "index": 10,
+      "bank": 3,
+      "bank_offset": 7
+    },
+    "ports": [],
+    "ops": [],
+    "fsm": [],
+    "properties": [
+      "no bit-reversal stage / natural-order output — [unverifiable]: reproduced only functionally via an internal bit-reversed intermediate undone by GS inverse; hardware ordering not structurally realized",
+      "ATP advantage 2.2x/1.2x/1.1x/1.9x (LUT/FF/DSP/BRAM) vs radix-2 — [unverifiable] FPGA resource-time metric, outside functional reproduction"
+    ],
+    "notes": "[src] N=1024, 14-bit q=12289, 8 parallel BUs, radix-2/4 datapath, pipeline 9 cyc/lane (3+1+4+1). [calc] psi=1945=11^6 mod 12289, omega=1945^2 mod 12289=10302, N_inv=1024^-1 mod 12289=12277, mu=floor(2^28/12289)=21843. [conv] naive-radix4 add/sub baseline fixed at 10 to anchor the source's 20% reduction (-> optimized 8); fixes verifier counterexample 'add/sub reduction != 20%' at its numeric source. [conv] internal ordering: CT-DIT NTT + GS-DIF INTT convention chosen to satisfy the natural-order claim without an explicit bit-reversal."
+  },
+  "part_specs": {
+    "crossbar_network": {
+      "params": {},
+      "widths": { "bank": 3, "bank_offset": 7, "index": 10 },
+      "ports": [],
+      "ops": [
+        "bank(i) = (i ^ (i>>3) ^ (i>>6) ^ (i>>9)) & 0x7  [conv XOR-fold reconstruction; 8 banks]",
+        "offset(i) = i >> 3  (= floor(i/8); 128-deep per bank, 1024/8)",
+        "sigma_s (per-stage crossbar permutation) = cyclic lane rotation by stride(s)=2^s mod 8 at stage s"
+      ],
+      "fsm": [],
+      "properties": [
+        "conflict-free memory mapping (arbitrary radix/#BU, no bank conflict) — [unverifiable]: verified only via the reconstructed XOR-fold, not the paper's actual (untranscribed) mapping"
+      ],
+      "notes": "[source-missing] the paper's actual conflict-free bank-index and offset functions (Sec. III headline result) are not transcribed. [conv] committed XOR-fold bank(i) + offset=floor(i/8) for reproducibility/distinctness, matching what both impls reconstructed. [source-missing] exact per-stage sigma_s routing table; [conv] stride-rotation table committed to remove ambiguity."
+    },
+    "twiddle_rom": {
+      "params": { "depth": 1024, "width": 14, "root": "psi=1945, omega=10302" },
+      "widths": { "twiddle": 14, "addr": 10 },
+      "ports": [],
+      "ops": [
+        "f(stage,block) = block << stage  [conv CT-DIT twiddle index; rearranged-reuse loop shares one ROM across the 8 BUs]"
+      ],
+      "fsm": [],
+      "properties": [],
+      "notes": "[source-missing] exact rearranged twiddle-reuse loop address function f(stage,block). [conv] committed CT-DIT convention f(stage,block)=block<<stage so the address is concrete; [src] single shared ROM (twiddle reuse) reduces footprint."
+    },
+    "config_radix_selector": {
+      "params": {
+        "radix": "2/4 configurable",
+        "radix4_mult_count": 2,
+        "radix2_mult_count": 1
+      },
+      "widths": {},
+      "ports": [],
+      "ops": [
+        "optimized radix-4 butterfly = 2 modular multiplications (AUTHORITATIVE: resolves datapath-says-3 (W1/W2/W3) vs op-count-says-2 contradiction in favor of the source's optimized scheduled butterfly)"
+      ],
+      "fsm": [],
+      "properties": [
+        "radix-4 uses 33% fewer mults (3->2) and 20% fewer add/sub (10->8) vs naive radix-4 — [violated] in impls, which built the naive 3-mult datapath"
+      ],
+      "notes": "[src] the named optimization is the 2-mult / 8-add scheduled radix-4 butterfly; commit mult count = 2 (33% reduction from naive 3) and add/sub = 8 (20% from naive 10). This pins the value the source describes, not the impls' naive guess of 3."
+    },
+    "schedule_controller": {
+      "params": { "ntt_stages_radix2": 10, "ntt_stages_radix4": 5 },
+      "widths": {},
+      "ports": [],
+      "ops": [],
+      "fsm": [
+        "IDLE",
+        "LOAD",
+        "RUN",
+        "DRAIN",
+        "DONE",
+        "IDLE->LOAD (start)",
+        "LOAD->RUN (operands loaded)",
+        "RUN->RUN (stages remaining)",
+        "RUN->DRAIN (last stage issued)",
+        "DRAIN->DONE (pipeline empty)",
+        "DONE->IDLE (ack)"
+      ],
+      "properties": [],
+      "notes": "[conv] single coherent FSM replacing the two contradictory lists. DONE is wired as a DISTINCT terminal state reached from DRAIN and returning to IDLE on ack — NOT a DRAIN->IDLE self-loop. [src] stage count = log_radix(N): radix-2 = 10 stages, radix-4 = 5 stages, set by config_radix_selector."
+    },
+    "mod_red_subshift": {
+      "params": {
+        "mu": "21843 = floor(2^28/12289)",
+        "k": 28,
+        "conditional_subtractions": 2,
+        "pre_correction_bound": "< 3q"
+      },
+      "widths": { "coeff": 14 },
+      "ports": [],
+      "ops": [
+        "Barrett: t = (x * mu) >> k; r = x - t*q  (mu=21843, k=28)",
+        "post-reduction correction: at most 2 conditional subtractions of q; final r in [0, q)"
+      ],
+      "fsm": [],
+      "properties": [
+        "Barrett output in [0,q) after <=2 conditional subtractions"
+      ],
+      "notes": "[calc] mu=floor(2^28/12289)=21843. [conv] resolves the r<2q vs r<3q / <=2-subs divergence by committing pre-correction bound < 3q with at most 2 conditional subtractions (standard two-step Barrett correction), which subsumes both impl claims and is exact/checkable."
+    },
+    "bu_array_base": {
+      "params": {},
+      "widths": {},
+      "ports": [],
+      "ops": [],
+      "fsm": [],
+      "properties": [
+        "~50% butterfly hardware saved via symmetric operators — [unverifiable]: resource/area metric, not expressible in the functional model"
+      ],
+      "notes": "[src] symmetric-operator sharing across the 8 BUs saves nearly 50% of butterfly hardware; recorded as an explicit resource property (not functionally verifiable)."
+    }
+  },
+  "rationale": [
+    "crossbar_network: commits a concrete XOR-fold bank-index + floor(i/8) offset and a stride-rotation sigma_s so the routing is unambiguous, while flagging the paper's actual mapping as [source-missing]; records the conflict-free property as unverifiable.",
+    "twiddle_rom: pins a concrete CT-DIT address function f(stage,block)=block<<stage for the shared twiddle ROM, marking the paper's rearranged-loop addressing as source-missing.",
+    "config_radix_selector: resolves the 2-vs-3 modular-multiply contradiction to 2 (the source's optimized schedule), restoring the 33% mult / 20% add-sub reductions and fixing the verifier's '!= 20%' failure.",
+    "schedule_controller: replaces the two contradictory FSM lists with one coherent table and wires DONE as a distinct terminal returning to IDLE; pins per-radix stage counts.",
+    "mod_red_subshift: pins Barrett mu=floor(2^28/q)=21843, k=28, pre-correction bound <3q and <=2 conditional subtractions, removing the bound/subtraction-count divergence.",
+    "metadata.spec params/widths: pins N=1024, q=12289, 14-bit, 8 BUs, verified-derived psi/omega/N_inv, the naive add/sub baseline of 10, and the 9-cycle pipeline latency from the source.",
+    "metadata.spec internal_coeff_order + property: commits the CT-DIT/GS-DIF convention realizing natural-order I/O and records 'no bit-reversal' and the ATP advantage as unverifiable named properties.",
+    "bu_array_base: records the ~50% symmetric-operator hardware saving as an explicit unverifiable resource property."
+  ]
+}

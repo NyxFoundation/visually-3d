@@ -1,0 +1,30 @@
+{
+  "scores": {
+    "recognizability": 9,
+    "internal_legibility": 19,
+    "structural_decomposition": 14,
+    "buildability": 18,
+    "geometric_fidelity": 13,
+    "proportional_accuracy": 9,
+    "annotation_depth": 5,
+    "self_consistency": 5
+  },
+  "total": 92,
+  "verdict": "improve",
+  "critique": "The render passes both acceptance tests: the ISO reads instantly as an open-frame FPGA NTT card — eight glass BRAM banks down the back edge, the copper DSP-multiplier column, the symmetric add/sub pairs in an open rail-and-floor frame, the exploded radix-4 BU and the ten-fin heatsink both lifted clear on visible risers, and FRONT/SIDE show nothing sunk below or floating off the ground line; the prior heatsink-clearance worry is resolved (the fins sit well clear of the Barrett spine and the +X register column). The one real, fixable defect is NOT geometric but an internal annotation contradiction the prior pass flagged: the scene simultaneously committed the GF(2) XOR-fold conflict-free map (which fixes the stride-512 collision) AND still literally cited the buggy additive map b(i)=(i+(i>>3)) mod 8 in crossbar_network/addr_gen_unit/bram role+params, so a rebuilder reading the human-facing text would implement the colliding map. The remaining deficits are source-transcription gaps (the paper's actual Sec. III bank/offset functions, sigma_s routing, twiddle-ROM addressing and DIT/DIF ordering are reproduction reconstructions, not the untranscribed source) which the evidence/amend loop must pin, plus sub-2-pt polish in the dense central plan view.",
+  "changelog": [
+    "Harmonized the conflict-free memory map to the single COMMITTED GF(2)-linear XOR-fold bank(i)=(i&7)^((i>>3)&7)^((i>>6)&7)^((i>>9)&7), offset o(i)=i>>3, across crossbar_network.params, addr_gen_unit role+params, and bram_0/bram_1.addressing — removing every lingering citation of the buggy additive map b(i)=(i+(i>>3)) mod 8 that collided at stride 512, so the rebuildable text now matches the verifier-passing spec",
+    "Re-shaped the 8 per-lane symmetric adders and 8 subtractors (bu_add_0..7, bu_sub_0..7) and the two exploded add/sub trees (ex_add, ex_sub) from plain box to bevelled 'complex' so the sum/difference operators read as machined DSP-adjacent logic rather than generic blocks",
+    "Enlarged the exploded radix-4 BU's three twiddle multipliers (ex_mult_w1/w2/w3) from r=0.32 to r=0.36 so the W1/W2/W3 -> j -> y0..y3 dataflow is more legible in the ISO without colliding with the j-rotator or trees",
+    "Preserved every spec block, metadata.spec, info, thumbnail_camera and all positions unchanged; no parts dropped"
+  ],
+  "remaining_gaps": [
+    "Source fidelity (needs the paper PDF, via the evidence/amend loop): transcribe CFNTT's ACTUAL conflict-free bank-index and offset functions from Sec. III. The committed XOR-fold realizes the named per-stage distinctness property and is now consistent everywhere, but it is a reproduction construction, not the paper's specific map — do NOT invent a replacement; pin from source.",
+    "Source fidelity: the crossbar per-stage permutation sigma_s (logical operand index -> physical bank/lane port) in crossbar_network.spec is a reproduction rotation map; transcribe the paper's actual routing table.",
+    "Source fidelity: confirm the twiddle-ROM address function f(stage s, block) and the negacyclic low/high-half storage layout in twiddle_rom against the source (currently the committed CT/DIT convention).",
+    "Source fidelity: confirm DIT vs DIF and the global butterfly/stage ordering in schedule_controller (currently a reproduction choice).",
+    "Source fidelity: the naive-radix-4 add/sub baseline (assumed 10) anchoring the 20% reduction is reconstructed; re-pin if the paper defines it differently.",
+    "Geometric polish (<2 pts): the central add/sub + multiplier array is still dense in the TOP plan view; a future pass with budget could fan the 8 lanes apart in Z or thin the add/sub depth so each lane's mult->add/sub->reg chain is individually traceable from straight above without changing the elevation legibility.",
+    "Once the source-fidelity map/routing/ordering is transcribed and re-pinned (or confirmed to match the committed reproduction), this scene is a legitimate converge candidate — the render already confirms zero datapath occlusion and both acceptance tests pass."
+  ]
+}

@@ -1,0 +1,6 @@
+pass=false ran=true
+--- stdout ---
+FAIL: N^-1 mismatch: spec 8857 != 12277
+
+--- stderr ---
+Command failed: uv run --with z3-solver python3 /home/gohan/.visually-3d/runs/ntt-fpga/reproduce-20260618-164625/check.py

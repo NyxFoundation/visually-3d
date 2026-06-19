@@ -1,0 +1,371 @@
+You are closing the loop of a "visioned self-improvement" system. A scene
+descriptor doubles as the SPEC for a real system (a circuit, an algorithm, a
+machine, a building). Independent engineers tried to rebuild the system from
+this spec alone and a verifier ran their implementations. They found exactly
+which facts the spec FAILED to pin down. Your job: return a SMALL SPEC PATCH
+that writes those facts back into the scene's functional spec so the spec becomes
+reproducible — WITHOUT generating or modifying the full scene.
+
+THE SPEC SUBSTRATE (this is the ONLY thing you grow):
+- Each part may carry `spec`: { params?, widths?, ports?[ {name,dir,width} ],
+  ops?[], fsm?[], notes? }. Top-level `metadata.spec` holds the same shape for
+  system-level facts (clocking, global params, handshake, FSM).
+- `metadata.spec` may ALSO carry `verification`: { e2e_N?, proofs?[] } — the
+  cheap, fixed recipe every reimplementer must follow so the self-check stays fast
+  and they all test the same way: `e2e_N` is the SMALL, structure-preserving size
+  to run whole-system equivalence at (never the production size), and `proofs` are
+  the size-independent properties to discharge with SMT at full bit-width.
+- Geometry (shape/position/size/rotation/material), connections, part ids,
+  machine_name, roles, and assembly text are NOT available to you and MUST NOT
+  appear in your answer. The host program will merge your patch into the real
+  scene deterministically.
+- You may only ADD/refine `metadata.spec` and `parts[].spec` for existing part
+  ids. Unknown part ids are ignored.
+
+THE SOURCE this system comes from (paper/datasheet metadata — QUOTE it to pin
+the SPECIFIC system's real values; do NOT invent values it does not support):
+```json
+{
+ "reference": "https://tches.iacr.org/index.php/TCHES/article/view/9291",
+ "domain": "cryptographic-hardware",
+ "info": {
+  "japanese_name": "CFNTT スケーラブル基数2/4 NTT 乗算アーキテクチャ (FPGA)",
+  "english_name": "CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture",
+  "summary": "An FPGA accelerator for the Number Theoretic Transform that combines a conflict-free memory mapping scheme with parallel radix-4 butterfly units, the polynomial-multiplication engine behind lattice post-quantum cryptography and homomorphic encryption.",
+  "description": "CFNTT is an algorithm-hardware co-designed NTT core proposed by Chen et al. (Tsinghua University) in TCHES 2022. Its central contribution is a conflict-free memory mapping scheme that lets an arbitrary radix and an arbitrary number of parallel butterfly units access an interleaved BRAM system without bank conflicts, removing the bit-reversal cost and reducing memory footprint by reusing twiddle factors across a rearranged loop structure.",
+  "description2": "Built on this scheme, the architecture realizes a scalable radix-2 / radix-4 datapath. A dedicated schedule cuts radix-4 modular additions/subtractions by 20% and modular multiplications by 33%, while exploiting symmetric operators saves nearly 50% of the butterfly hardware. For a 1024-point, 14-bit NTT with 8 parallel butterfly units, the radix-4 core achieves roughly 2.2x/1.2x/1.1x/1.9x lower LUT/FF/DSP/BRAM area-time product than the radix-2 core.",
+  "facts": [
+   {
+    "label": "Transform",
+    "value": "Number Theoretic Transform (NTT/INTT)"
+   },
+   {
+    "label": "Benchmark size",
+    "value": "1024 points, 14-bit modulus (q=12289 repro.)"
+   },
+   {
+    "label": "Parallel butterfly units",
+    "value": "8 (8 modeled, 1.1 m bank/lane pitch)"
+   },
+   {
+    "label": "Radix-4 mult reduction",
+    "value": "33% fewer (naive 3 -> optimized 2 mults/BU)"
+   },
+   {
+    "label": "Radix-4 add/sub reduction",
+    "value": "20% fewer (naive 10 -> optimized 8 add/sub)"
+   },
+   {
+    "label": "Hardware saving",
+    "value": "~50% via symmetric operators"
+   },
+   {
+    "label": "Reduction",
+    "value": "Barrett: mu=21843, k=28, shift/subtract"
+   },
+   {
+    "label": "Pipeline latency",
+    "value": "9 cycles/lane (mult 3 + add/sub 1 + Barrett 4 + reg 1)"
+   },
+   {
+    "label": "ATP advantage (LUT)",
+    "value": "~2.2x lower vs radix-2"
+   },
+   {
+    "label": "Twiddle root",
+    "value": "psi=1945 (negacyclic, order 2048), omega=10302, N^-1=12277"
+   }
+  ],
+  "sources": [
+   {
+    "title": "CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture (TCHES 2022)",
+    "url": "https://tches.iacr.org/index.php/TCHES/article/view/9291"
+   },
+   {
+    "title": "CFNTT PDF (IACR TCHES)",
+    "url": "https://tches.iacr.org/index.php/TCHES/article/download/9291/8857"
+   },
+   {
+    "title": "DOI 10.46586/tches.v2022.i1.94-126",
+    "url": "https://doi.org/10.46586/tches.v2022.i1.94-126"
+   }
+  ]
+ }
+}
+```
+
+GATHERED SOURCE EVIDENCE (transcribed from the actual source by `visually
+evidence`; origin: workspace). This is AUTHORITATIVE — prefer it over the
+summary above. QUOTE concrete values from it to fill [source-missing] gaps, and
+tag them `[paper]` (or `[ref-impl]` if from a secondary reference
+implementation). Do NOT exceed what it states:
+```markdown
+# Curated learnings (honest about what is settled vs missing)
+# Curated learnings — ntt-fpga (CFNTT, TCHES 2022)
+
+Distilled from many `refine` rounds (v1–v23). This is honest about what is
+settled, what is still missing, and what this backend simply cannot grade —
+it is NOT a transcription of the paper. `refine` will fetch the paper's real
+values autonomously when it stalls below the reproducibility goal (writing
+`paper.md` into the workspace evidence store), and `amend` then quotes it; the
+gaps below say what that fetch needs to resolve.
+
+Source: "CFNTT: A Scalable Conflict-Free NTT Multiplication Architecture"
+(IACR TCHES 2022). See `index.json` for URLs.
+
+## Settled — matches the source, keep pinned in the spec
+The numeric/algebraic core is reproducible and the two independent reverse
+implementations agree on it. These belong in `metadata.spec` / `parts[].spec`
+with `[src]`/`[calc]` provenance and should not regress:
+- transform size N, modulus q, coefficient bit-width, number of butterfly units;
+- Barrett reduction constants (mu, k) and the negacyclic (psi-twisted) flavor;
+- psi / omega / N^-1 and the generator choice (derivable, machine-checked by the
+  arithmetic guard);
+- round-trip identity NTT∘INTT = id (proven on small N by the self-check).
+
+## Still missing — the paper's SIGNATURE structures (the real ceiling)
+These are the contributions a short summary omits, so two engineers each invent a
+different valid version → permanent divergence → reproducibility caps in the
+mid-70s. They are `[source-missing]` until the paper text is gathered:
+- the **conflict-free bank-index and bank-offset functions** (the Sec. III
+  headline result) — a reconstructed XOR-fold is NOT the paper's map and fails
+  per-stage operand-distinctness at large strides;
+- the **per-stage crossbar permutation σ_s** routing table;
+- the **twiddle-ROM address function** f(stage, block) under the reuse loop;
+- the **radix-4 full-transform index/stride schedule** and how the radix-2 lanes
+  reconfigure into radix-4 BUs per stage;
+- the **complete FSM** state list and transition table (the scene has carried two
+  contradictory FSM lists and an unwired DONE state — fix at the source);
+- the exact **Barrett correction** output bound / number of conditional
+  subtractions, and the internal coefficient ordering (natural vs bit-reversed).
+
+## Out of scope for python-smt — do NOT count these against fidelity
+These are RTL/synthesis/area-timing claims a functional Python+Z3 model can never
+verify. Record them in the spec as documentary `[src]` facts, but treat their
+`property_checks` as `unverifiable` by construction, not as failures:
+- "~50% butterfly hardware saved via symmetric operators";
+- ATP / resource ratios (LUT / FF / DSP / BRAM vs radix-2);
+- pipeline latency in cycles/lane and clock frequency;
+- the "33% fewer mults / 20% fewer add-sub" reductions (need a stated naive
+  baseline; verify only the per-BU operation count, which IS finite).
+
+## Process lessons (apply to any paper-derived scene)
+- A timed-out self-check is a HARNESS fault, not a wrong implementation — keep
+  default verification finite (see `lib/backends/python-smt.ts`).
+- `amend` must never fabricate a `[source-missing]` value; gather evidence first.
+- Resource/timing claims need a different backend (RTL synthesis) — until then,
+  reproducibility, not fidelity-on-hardware-claims, is the axis that can move.
+
+# Transcribed source
+# Evidence: CFNTT Radix-2/4 NTT Multiplication Accelerator (FPGA)
+
+## Provenance & access notes
+
+- **Authoritative source:** Xiangren Chen, Bohan Yang, Shouyi Yin, Shaojun Wei, Leibo Liu (Tsinghua University), *"CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture with an Efficient Conflict-free Memory Mapping Scheme,"* IACR Transactions on Cryptographic Hardware and Embedded Systems (TCHES), **Vol. 2022, Issue 1, pp. 94–126**, published **2021-11-19**, DOI `10.46586/tches.v2022.i1.94-126`. License CC BY 4.0. `[paper:metadata]`
+- **What was retrievable:** The journal landing/abstract page yielded the **complete verbatim abstract** and metadata (transcribed below). The full PDF (`.../download/9291/8857`, ~1.9 MB) was fetched but its body is FlateDecode-compressed stream data that the fetch tool could not decode to text; the d-nb.info mirror returned the same binary PDF; ResearchGate and IACR eprint mirrors returned **HTTP 403**. The Semantic Scholar API returned only a paraphrased abstract/TLDR.
+- **Consequence:** The deep Section III/IV technical content — exact addressing functions, the per-stage crossbar permutation table, twiddle-ROM addressing formula, the radix-4 transform schedule, FSM transition tables, the specific prime, BRAM depth, and the host/PCIe interface — **could not be transcribed from the source text in this pass.** Each blocked PRIORITY item is recorded explicitly under "## Not extractable in this pass" rather than guessed. The verified facts below are from the abstract/metadata, which is authoritative but high-level.
+
+## Verbatim abstract `[paper:abstract]`
+
+> "Number theoretic transform (NTT) is widely utilized to speed up polynomial multiplication, which is the critical computation bottleneck in a lot of cryptographic algorithms like lattice-based post-quantum cryptography (PQC) and homomorphic encryption (HE). One of the tendency for NTT hardware architecture is to support diverse security parameters and meet resource constraints on different computing platforms. Thus flexibility and Area-Time Product (ATP) become two crucial metrics in NTT hardware design. The flexibility of NTT in terms of different vector sizes and moduli can be obtained directly. Whereas the varying strides in memory access of in-place NTT render the design for different radix and number of parallel butterfly units a tough problem. This paper proposes an efficient conflict-free memory mapping scheme that supports the configuration for both multiple parallel butterfly units and arbitrary radix of NTT. Compared to other approaches, this scheme owns broader applicability and facilitates the parallelization of non-radix-2 NTT hardware design. Based on this scheme, we propose a scalable radix-2 and radix-4 NTT multiplication architecture by algorithm-hardware co-design. A dedicated schedule method is leveraged to reduce the number of modular additions/subtractions and modular multiplications in radix-4 butterfly unit by 20% and 33%, respectively. To avoid the bit-reversed cost and save memory footprint in arbitrary radix NTT/INTT, we put forward a general method by rearranging the loop structure and reusing the twiddle factors. The hardware-level optimization is achieved by excavating the symmetric operators in radix-4 butterfly unit, which saves almost 50% hardware resources compared to a straightforward implementation. Through experimental results and theoretical analysis, we point out that the radix-4 NTT with the same number of parallel butterfly units outperforms the radix-2 NTT in terms of area-time performance in the interleaved memory system. This advantage is enlarged when increasing the number of parallel butterfly units. For example, when processing 1024 14-bit points NTT with 8 parallel butterfly units, the ATP of LUT/FF/DSP/BRAM in radix-4 NTT core is approximately 2.2×/1.2×/1.1×/1.9× less than that of the radix-2 NTT core on a similar FPGA platform."
+
+Keywords: number theoretic transform; polynomial multiplication; algorithm-hardware co-design; radix-4; conflict-free memory mapping scheme. `[paper:metadata]`
+
+## Verified facts pinned to PRIORITY items
+
+### parameter "radix" — corrects the impl guess
+The abstract states the paper proposes **"a scalable radix-2 and radix-4 NTT multiplication architecture"** and a memory scheme supporting **"arbitrary radix of NTT"** that "facilitates the parallelization of non-radix-2 NTT hardware design." `[paper:abstract]`
+→ **Ground truth: radix-4 is a full NTT architecture/schedule, not merely a butterfly unit.** This directly contradicts the impl note "4 only as a butterfly unit, not full schedule." The exact radix-4 schedule equations were not extractable (see below), but the architecture-level existence of a full radix-4 NTT is confirmed by the source.
+
+### param — modulus
+The headline example processes **"1024 14-bit points NTT."** `[paper:abstract]`
+→ Confirms the source works with a **14-bit NTT-friendly prime** in its headline experiment. The abstract also notes flexibility across **"different vector sizes and moduli."** **The specific prime value (e.g. whether it is 12289) is NOT stated in the retrievable text** — `q=12289` remains a reproduction fix, not source-confirmed.
+
+### Named property — "Conflict-free memory mapping (arbitrary radix / #BU, no bank conflict)"
+Confirmed as the paper's central contribution: **"an efficient conflict-free memory mapping scheme that supports the configuration for both multiple parallel butterfly units and arbitrary radix of NTT."** It addresses the problem that **"varying strides in memory access of in-place NTT render the design for different radix and number of parallel butterfly units a tough problem."** Operates in an **"interleaved memory system."** `[paper:abstract]`
+
+### Named property — "No bit-reversal stage / natural-order output"
+Confirmed: **"To avoid the bit-reversed cost and save memory footprint in arbitrary radix NTT/INTT, we put forward a general method by rearranging the loop structure and reusing the twiddle factors."** `[paper:abstract]`
+→ The bit-reversal elimination and the twiddle-reuse mechanism are achieved together via loop-structure rearrangement. (The explicit twiddle-ROM addressing formula is not in the retrievable text.)
+
+### Named property — "Radix-4: 33% fewer mults / 20% fewer add/sub"
+Confirmed exactly, attributed to "a dedicated schedule method": **reduce modular additions/subtractions by 20% and modular multiplications by 33% in the radix-4 butterfly unit.** `[paper:abstract]`
+
+### Named property — "~50% butterfly hardware saved via symmetric operators"
+Confirmed: hardware-level optimization "by excavating the symmetric operators in radix-4 butterfly unit … **saves almost 50% hardware resources** compared to a straightforward implementation." `[paper:abstract]`
+
+### Named property — "ATP advantage 2.2×/1.2×/1.1× /1.9× LUT/FF/DSP/BRAM vs radix-2"
+Confirmed, with its exact basis: **"when processing 1024 14-bit points NTT with 8 parallel butterfly units, the ATP of LUT/FF/DSP/BRAM in radix-4 NTT core is approximately 2.2×/1.2×/1.1×/1.9× less than that of the radix-2 NTT core on a similar FPGA platform."** `[paper:abstract]`
+→ Basis is fully specified: N=1024, 14-bit modulus, 8 parallel BUs, radix-4 core vs radix-2 core, same FPGA platform. (Exact device family/frequency/cycle counts not in retrievable text.)
+
+## Not extractable in this pass (PDF body undecodable; mirrors blocked)
+
+The source unquestionably contains these (they are described in the abstract as core results), but the specific formulas/tables/values are in the compressed PDF body, which could not be rendered to text. These remain **unverified from source** — do not treat any reproduction-invented value as source-confirmed:
+
+- **Conflict-free bank-index and offset functions + per-stage crossbar permutation σ_s** (the Sec. III headline). Existence confirmed; **exact functions and the permutation table NOT transcribed.** The reproduction-chosen XOR-fold routing remains unverified against the paper's actual interleaved-bank topology.
+- **Twiddle-ROM addressing f(stage, block)** under the rearranged loop. The *mechanism* ("rearranging the loop structure and reusing the twiddle factors") is confirmed; **the explicit addressing formula NOT transcribed.**
+- **Full radix-4 transform schedule** (fused two-stage pass, radix-4 conflict-free addressing). Existence of a full radix-4 architecture confirmed (see "radix" above); **the schedule equations/addressing NOT transcribed.**
+- **Radix-4 cycle accounting** (the `bf_cycles_per_stage_r4=32 / total=160` vs 256 BU / 4 lanes = 64 cycles/stage reconciliation): **no cycle-count tables retrievable.**
+- **Radix-4 butterfly multiplier count** (3-mult vs 2-mult contradiction): the abstract states a *33% multiplication reduction* via symmetric-operator sharing but **does not give the absolute multiplier count per radix-4 BU** in retrievable text. Unresolved from source.
+- **FSM transition table** (`schedule_controller`): **not retrievable.**
+- **BRAM depth** (256 vs 128 words/bank inconsistency for `bram_0`): **no specific BRAM depth/bank-size figures retrievable.**
+- **PCIe/DMA framing, handshake, beat packing** (`host_phy`): **not mentioned in the abstract; not retrievable.** Likely out of scope of the paper (the paper presents an NTT core, not a host interface) — treat `host_phy` as reproduction-invented unless the PDF body proves otherwise.
+- **Exact prime modulus value** and **device/frequency**: not in retrievable text (only "14-bit," "a similar FPGA platform").
+
+## Recommended next action for the loop
+To lift the remaining `[source-missing]` ceilings, the PDF needs a real text-extraction path (the FlateDecode streams must be decoded). The blocking is purely a fetch/decoding limitation, not a true source gap — the paper does contain Sec. III mapping functions, the σ permutation, the radix-4 schedule, and resource tables. A successful PDF text extraction of `https://tches.iacr.org/index.php/TCHES/article/download/9291/8857` (or an unblocked eprint/ResearchGate copy) should be attempted next; secondary corroboration is available in citing works (IACR eprint 2026/621 "Efficient Conflict-Free NTT Hardware Architecture" and eprint 2023/1617), which were 403-blocked this pass.
+
+---
+
+## Evidence gathered 20260619-171232 (method: refs; targeting 17 gap(s))
+
+I now have comprehensive ground truth. The paper PDFs are FlateDecode-compressed and not extractable via WebFetch, but the IACR abstract page plus the authors' own reference implementation (`xiang-rc/cfntt_ref`) fill nearly every priority gap. Writing the evidence document.
+
+# Evidence: CFNTT Radix-2/4 NTT Multiplication Accelerator (FPGA)
+
+## 0. Provenance & extraction notes
+
+- **Primary source (paper):** Xiangren Chen, Bohan Yang, Shouyi Yin, Shaojun Wei, Leibo Liu (BNRist / Tsinghua University), *"CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture with an Efficient Conflict-free Memory Mapping Scheme,"* IACR TCHES 2022(1), pp. 94–126. DOI `10.46586/tches.v2022.i1.94-126`. `[paper:metadata]`
+- The three paper/PDF URLs supplied (TCHES `view/9291`, `download/9291/8857`, the d-nb.info mirror) **all return the PDF as a FlateDecode-compressed binary stream that the fetch tool cannot decode to text**. Only the IACR article landing page (HTML abstract) was machine-readable. So all *paper-body* equations, the exact mapping derivation, the FSM table, and the naive-radix-4 baseline **could not be transcribed from the paper text itself** — see §8 "Not extractable from the source."
+- **Authoritative secondary source:** the **authors' own reference implementation** at `https://github.com/xiang-rc/cfntt_ref` (MIT license; Verilog 93% / Python 7%; "tailored for the paper"). This is by the first author (`xiang-rc` = Xiangren Chen), so it is the closest thing to ground truth for the implicit details, but it is still an *implementation* and may differ in constants/encoding from the paper's general formulas. Every fact from it is tagged `[ref-impl:cfntt_ref]` and marked **SECONDARY**.
+
+---
+
+## 1. Abstract-level facts (from the paper landing page) `[paper:abstract]`
+
+Verbatim/near-verbatim claims confirmed from the IACR article page:
+
+- Proposes "an efficient conflict-free memory mapping scheme that supports the configuration for both **multiple parallel butterfly units** and **arbitrary radix** of NTT," with "broader applicability and facilitating the parallelization of non-radix-2 NTT hardware design."
+- "A dedicated schedule method is leveraged to reduce the number of **modular additions/subtractions and modular multiplications in radix-4 butterfly unit by 20% and 33%, respectively.**"
+- Hardware saving: "excavating the **symmetric operators** in radix-4 butterfly unit, which saves **almost 50% hardware resources**."
+- Bit-reversal elimination: "a general method by **rearranging the loop structure and reusing the twiddle factors**" to avoid bit-reversal cost.
+- Performance comparison (stated for **N=1024, 14-bit points, 8 parallel units**): "The **ATP of LUT/FF/DSP/BRAM in radix-4 NTT core is approximately 2.2×/1.2×/1.1×/1.9× less** than that of the radix-2 NTT core."
+- Target applications: lattice-based PQC and homomorphic encryption.
+
+So **all six named properties in the brief are confirmed by the paper's own abstract**, but the *quantified bases* (the naive-radix-4 "10 add/sub" baseline behind the 20%, the per-state cycle table behind "9 cycles/lane") are **not** in the abstract and were not extractable from the PDF body — see §8.
+
+The reference repo README confirms the case-study parameters: **N = 1024, q = a 14-bit modulus**, synthesized with **Vivado 2020.2** on **Xilinx Virtex-7 `xc7vx690tffg1761-3`**; radix-4 requires N to be a power of 4 (targets Falcon-1024, Dilithium, Saber); radix-2 covers Falcon-512. `[ref-impl:cfntt_ref README]`
+
+---
+
+## 2. The modulus — PRIORITY gap `[ref-impl:cfntt_ref]` SECONDARY
+
+The paper abstract only ever says **"14-bit modulus"**; it does **not** (in any text reachable here) name a specific prime. **However, the authors' reference implementation pins it concretely:**
+
+- `model_code/poly_mult_radix_2.py`: `q = 12289`
+- `hardware_code_radix-4/modular_mul.v`: `parameter q = 14'd12289;`
+
+So **q = 12289** (= 3·2¹² + 1, a 14-bit NTT-friendly prime) is **not merely a reproduction guess — it is the value the authors themselves use** in the released code. This *upgrades* the downstream "reproduction fix" to an authors-confirmed (secondary) constant, though the paper body's own stated prime remains unverifie
+```
+
+SELF-CHECK DID NOT FINISH (it timed out — almost always a full-size O(N^2)
+golden run at the production size). Pin a fast, fixed recipe so the next round
+terminates: set `metadata.spec.verification.e2e_N` to a SMALL structure-preserving
+size (<= 16) and list the size-independent `proofs` to discharge with SMT at full
+bit-width. Do NOT lower correctness — move the heavy full-size check out of the
+default path; the small instance plus the at-full-width proofs is what verifies it.
+
+MISSING FIELDS the spec must now carry (each says which part's spec to write):
+- [operation] Paper Sec.III conflict-free bank()/offset() functions (headline result; XOR-fold is an explicit [conv] tie-break) → write into metadata.spec
+- [operation] Per-stage crossbar permutation table sigma_s → write into metadata.spec
+- [operation] Twiddle-ROM rearranged-loop address function f(stage,block) that actually removes bit-reversal → write into metadata.spec
+- [control] Exact schedule / addr_gen defining simultaneous 8-way no-conflict reads → write into metadata.spec
+- [control] Definitive FSM transition table (three contradictory lists must be reduced to one) → write into metadata.spec
+- [port] Host/PCIe/DMA interface: beat width, framing, coeff packing, handshake → write into metadata.spec
+- [param] Naive-radix-4 add/sub baseline used to anchor the 20% reduction → write into metadata.spec
+- [operation] Forward=CT/DIT vs inverse=GS/DIF convention (only 'DIT, merged psi-twist' pinned) → write into metadata.spec
+
+WHERE INDEPENDENT IMPLEMENTATIONS DIVERGED (the spec was ambiguous here — you
+must COMMIT to ONE concrete value to remove the ambiguity, and record it):
+- Conflict-free correctness scope: Impl 1 claims to prove bank() conflict-free for every butterfly pair at every stride; Impl 2 explicitly limits its proof to (bank,offset) bijection + single-stride operand-pair distinctness and refuses the full 8-way/16-read simultaneous claim → spec never pins the actual schedule/addr_gen that defines 'no conflict'.
+- Twiddle-ROM addressing: both fall back to a bit-reversed psi-power table but compute the address differently (Impl 2 uses addr=(1<<stage)+block); spec leaves f(stage,block) source-missing.
+- FSM transition table: each reconstructs a different walk (spec itself carries three contradictory lists) → exact control flow left open.
+- Forward/inverse butterfly convention (CT/DIT forward + GS/DIF inverse) is assumed by both but spec only pins 'DIT, merged psi-twist'.
+- Host/PCIe/DMA framing: Impl 1 invents an AXI4-Stream 64-bit/4-coeff pack and round-trips it; Impl 2 declines to model it → spec marks the whole interface invented.
+- Naive radix-4 add/sub baseline (10) anchoring the 20% claim is assumed by both but flagged reconstructed.
+
+VERIFIER COUNTEREXAMPLES (hard evidence — the spec/impl was actually wrong here;
+fix the spec so the intended behavior is unambiguous):
+(none — verification passed or was disabled)
+
+FIDELITY GAPS — the impls drifted from the SPECIFIC system the SOURCE/paper
+describes. Pin the source's truth into the spec so the scene stops being a
+generic "a-correct-one" and becomes the actual system:
+
+  Parameter mismatches (write the SOURCE value, not the impls' guess):
+- pipeline latency: source says "9 cycles/lane" but impls used "not modeled functionally (cycle-accurate timing absent)" → record the source value in metadata.spec
+
+  Named properties not clearly satisfied (record them so they are explicit and
+  checkable — e.g. spec.properties: ["conflict-free memory mapping", ...]):
+- [unverifiable] "Conflict-free memory mapping (arbitrary radix/#BU, no bank conflict)" — Both use a self-admitted [conv] XOR-fold, not the paper's Sec.III function; Impl 2 explicitly proves only pairwise/bijection, not the full simultaneous 8-way property. → record this named property in metadata.spec.properties
+- [violated] "No bit-reversal stage / natural-order output" — Both place bit-reversal inside the twiddle-ROM index (bit-reversed psi-power table), directly contradicting the paper's no-bit-reversal datapath — the headline contribution is not reproduced. → record this named property in metadata.spec.properties
+- [unverifiable] "Twiddle-factor reuse via rearranged loop" — Both broadcast one twiddle to 8 lanes but use a standard bit-reversed ROM, not the rearranged-loop addressing that produces the reuse claimed. → record this named property in metadata.spec.properties
+- [unverifiable] "~50% butterfly hardware saved via symmetric operators" — Resource/area claim, not in a functional SMT model. → record this named property in metadata.spec.properties
+- [unverifiable] "ATP ~2.2x/1.2x/1.1x/1.9x lower than radix-2" — Synthesis metric, not modeled. → record this named property in metadata.spec.properties
+
+  Structural divergences from the source's described architecture:
+- The paper's central contribution — the conflict-free interleaved-BRAM addressing function — is replaced in both impls by a placeholder XOR-fold; the actual scheme is not reconstructed.
+- Bit-reversal is reintroduced via the twiddle ROM index, so the architecture is NOT the bit-reversal-free datapath the reference describes.
+- Functional/algebraic models only: neither captures the cycle-accurate 9-stage pipeline, crossbar spine, or the rearranged scheduling/FSM that distinguish this specific FPGA core from a generic NTT.
+- Host PCIe/DMA boundary is invented (Impl 1) or omitted (Impl 2); the reference core's I/O interleaving is not represented.
+
+RULES for choosing values:
+1. For every missing field, write a CONCRETE value into the named part's `spec`
+   (or metadata.spec for "global"). Never leave it as a description of what is
+   missing — pick the actual width/param/op/port/state.
+2. To resolve a divergence, pick the value the passing / highest-confidence
+   implementation used; if it is genuinely a free choice, pick the standard,
+   well-known convention for this kind of system and note the choice in
+   `spec.notes`. The point is to make the bad (ambiguous) state unrepresentable.
+3. Be specific and numeric. "14-bit" → `widths: { coeff: 14 }`; a modulus →
+   `params: { q: 12289 }`; an FSM → `fsm: ["IDLE","LOAD","RUN","DRAIN"]`.
+4. DERIVED CONSTANTS — do not trust your own mental arithmetic. For any value you
+   COMPUTE (a modular inverse, a modular power, a floor/round, a precomputed table
+   entry), WRITE IT AS A VERIFIABLE EXPRESSION the value is derived from, e.g.
+   "12277 = 1024^-1 mod 12289", "1945 = 11^6 mod 12289", "21843 = floor(2^28 / 12289)".
+   These are MACHINE-CHECKED after you answer and a wrong result is auto-corrected,
+   so an arithmetically false constant is worse than useless — get the arithmetic
+   right or leave the operands symbolic. A self-inconsistent counterexample above
+   (e.g. "spec N != computed N") MUST be fixed at its numeric source, not annotated.
+5. PROVENANCE — for each fact you commit, mark where it came from in `spec.notes`
+   using a tag: `[paper]` quoted/derived from the GATHERED SOURCE EVIDENCE,
+   `[ref-impl]` from a secondary reference implementation in that evidence,
+   `[src]` from the source metadata above, `[conv]` a convention you chose to
+   break a tie (not stated by any source), `[calc]` a value you derived by
+   computation. `[conv]`/`[ref-impl]` facts are reproducibility aids, NOT
+   authoritative claims about the real system — never present a guessed or
+   secondary value as the paper's.
+6. CEILING — if a missing field is genuinely NOT determinable from any source
+   (neither the gathered evidence nor the metadata) and is NOT a free convention,
+   do not fabricate it. Record what is needed in `spec.notes` prefixed
+   `[source-missing]` so the gap is visible instead of papered over. If the
+   GATHERED EVIDENCE above now supplies a value a previous round marked
+   `[source-missing]`, REPLACE that note with the real value tagged `[paper]`.
+
+Existing part ids you may target: pcb_substrate, fpga_die, die_partition_1, die_partition_2, die_partition_3, host_edge, host_phy, bram_0, bram_1, bram_2, bram_3, bram_4, bram_5, bram_6, bram_7, input_fifo, output_fifo, crossbar_network, intt_scale, bu_array_base, bu_rail_left, bu_rail_right, bu_xbrace, r4_fuse_01, r4_fuse_23, r4_fuse_45, r4_fuse_67, lane_fusion_callout, twiddle_post, read_post, bu_mult_0, bu_add_0, bu_sub_0, bu_reg_0, bu_mult_1, bu_add_1, bu_sub_1, bu_reg_1, bu_mult_2, bu_add_2, bu_sub_2, bu_reg_2, bu_mult_3, bu_add_3, bu_sub_3, bu_reg_3, bu_mult_4, bu_add_4, bu_sub_4, bu_reg_4, bu_mult_5, bu_add_5, bu_sub_5, bu_reg_5, bu_mult_6, bu_add_6, bu_sub_6, bu_reg_6, bu_mult_7, bu_add_7, bu_sub_7, bu_reg_7, twiddle_rail, twiddle_feeder, read_bus, read_arrow, ex_base, ex_riser_a, ex_riser_b, ex_mult_w1, ex_mult_w2, ex_mult_w3, ex_jrot, ex_flow_1, ex_add, ex_sub, ex_flow_2, ex_reg, mod_red_mult, mod_red_subshift, return_post, return_bus, return_arrow, twiddle_rom, addr_gen_unit, config_radix_selector, schedule_controller, clock_pll, heatsink_base, heatsink_riser, heatsink_fin_0, heatsink_fin_1, heatsink_fin_2, heatsink_fin_3, heatsink_fin_4, heatsink_fin_5, heatsink_fin_6, heatsink_fin_7, heatsink_fin_8, heatsink_fin_9
+
+Return ONLY this JSON object — no markdown fences, no prose before or after:
+{
+  "metadata_spec": {
+    "params": { "<global parameter>": "<number/string/boolean>" },
+    "widths": { "<global width name>": <number> },
+    "ports": [{ "name": "<port>", "dir": "in|out|inout", "width": <number> }],
+    "ops": ["<global operation>"],
+    "fsm": ["<state or transition>"],
+    "properties": ["<named global property>"],
+    "verification": { "e2e_N": "<small structure-preserving size, e.g. 16; omit if not applicable>", "proofs": ["<size-independent property to prove with SMT at full bit-width>"] },
+    "notes": "<provenance-tagged global notes>"
+  },
+  "part_specs": {
+    "<existing part id>": {
+      "params": {},
+      "widths": {},
+      "ports": [],
+      "ops": [],
+      "fsm": [],
+      "properties": [],
+      "notes": "<provenance-tagged part notes>"
+    }
+  },
+  "rationale": ["<brief why each patch entry exists>"]
+}

@@ -1,0 +1,74 @@
+You are closing the loop of a "visioned self-improvement" system. A scene
+descriptor doubles as the SPEC for a real system (a circuit, an algorithm, a
+machine, a building). Independent engineers tried to rebuild the system from
+this spec alone and a verifier ran their implementations. They found exactly
+which facts the spec FAILED to pin down. Your job: write those facts back into
+the scene's functional spec so the spec becomes reproducible — WITHOUT changing
+what the scene looks like.
+
+THE SPEC SUBSTRATE (this is the ONLY thing you grow):
+- Each part may carry `spec`: { params?, widths?, ports?[ {name,dir,width} ],
+  ops?[], fsm?[], notes? }. Top-level `metadata.spec` holds the same shape for
+  system-level facts (clocking, global params, handshake, FSM).
+- Geometry (shape/position/size/rotation/material) is 3D DECORATION. Do NOT
+  change it. Do NOT add, remove, move, reshape, or re-material any part.
+- Keep machine_name, every part id, and all existing fields intact. You may only
+  ADD/refine `spec` blocks, and tighten `role` / `assembly_instructions`
+  prose so it stays consistent with the new spec.
+
+MISSING FIELDS the spec must now carry (each says which part's spec to write):
+- [param] Correct inverse-length constant N^-1 mod q (spec states 8857, which is wrong; correct value is 12277) → write into part "intt_scale".spec
+- [param] Transform flavor explicitly stated (negacyclic vs cyclic) rather than 'unstated/implied' → write into metadata.spec
+- [operation] The paper's actual conflict-free bank-index b(i) and offset o(i) functions plus per-stage read/write permutations σ_s (the headline Sec. III result) → write into part "crossbar_network".spec
+- [param] Twiddle-factor ROM contents, the chosen primitive root/generator binding, and ROM addressing/indexing scheme → write into part "twiddle_rom".spec
+- [control] Bank addressing map from coefficient index to BRAM bank under interleaving → write into part "bram_0".spec
+- [timing] Reported pipeline cycle counts (mult/add-sub/Barrett/reg) — spec marks 3/1/4/1 as reproduction defaults pending the paper → write into metadata.spec
+- [control] Radix-2/4 config-selector schedule / FSM state table and loop bounds governing radix switching → write into part "config_radix_selector".spec
+
+WHERE INDEPENDENT IMPLEMENTATIONS DIVERGED (the spec was ambiguous here — you
+must COMMIT to ONE concrete value to remove the ambiguity, and record it):
+- N^-1 inverse-length scale: Impl1 used the spec-stated 8857; Impl2 rejected it as a numeric error and used 12277 (1024^-1 mod 12289), since 8857*1024 ≡ 286 ≠ 1 — the spec carries a self-inconsistent N_inv value.
+- Conflict-free bank mapping b(i)=(i+(i>>3))%8: Impl1 declared it conflict-free over 8-index blocks; Impl2 proved it puts a radix-2 operand pair (i, i+2^6) in the SAME bank at stage 6 — the spec left the actual per-stage permutation unspecified so the two reached opposite conclusions about the headline property.
+- Transform flavor: both leaned negacyclic, but the spec explicitly marks cyclic-vs-negacyclic as 'unstated in source' — convergence was a shared guess, not a specified fact.
+- Conflict-free read/write addressing semantics ('no bit-reversal'): both reproduced output VALUES recursively (natural order by construction) rather than the hardware's actual crossbar permutation, because the spec never gives the stage permutations σ_s.
+
+VERIFIER COUNTEREXAMPLES (hard evidence — the spec/impl was actually wrong here;
+fix the spec so the intended behavior is unambiguous):
+- impl 1: FAIL: N^-1 expected 8857, got 12277
+
+FIDELITY GAPS — the impls drifted from the SPECIFIC system the SOURCE/paper
+describes. Pin the source's truth into the spec so the scene stops being a
+generic "a-correct-one" and becomes the actual system:
+
+  Parameter mismatches (write the SOURCE value, not the impls' guess):
+- Parallel butterfly units: source says "8" but impls used "8 (declared, but modeled recursively, not as 8 parallel lanes)" → record the source value in metadata.spec
+- N^-1 scaling constant: source says "unstated (derived = 12277)" but impls used "Impl1: 8857 (wrong); Impl2: 12277 (correct)" → record the source value in part "intt_scale".spec
+
+  Named properties not clearly satisfied (record them so they are explicit and
+  checkable — e.g. spec.properties: ["conflict-free memory mapping", ...]):
+- [violated] "Conflict-free memory mapping (arbitrary radix/#BU, no bank conflict)" — Reconstructed map b(i)=(i+(i>>3))%8 provably collides at stage s=6 (Impl2); the paper's real mapping was never transcribed. → record this named property in part "crossbar_network".spec.properties
+- [unverifiable] "No bit-reversal stage" — Impls produce natural-order values recursively by construction, not via the hardware's no-bit-reversal addressing. → record this named property in part "crossbar_network".spec.properties
+- [unverifiable] "Radix-4 uses 33% fewer mults / 20% fewer add/sub than radix-2" — Only the radix-4 BU equation was checked equal to DFT-4; the quantified op-count savings were not formally verified. → record this named property in part "config_radix_selector".spec.properties
+- [unverifiable] "~50% butterfly hardware saved via symmetric operators" — Purely a hardware-area claim; functional impls model no hardware, so it cannot be exhibited. → record this named property in metadata.spec.properties
+
+  Structural divergences from the source's described architecture:
+- Hardware is an iterative/in-place datapath with an interleaved 8-bank BRAM + crossbar; both impls are recursive Cooley-Tukey with no banks, no crossbar, and no parallel lanes — the central conflict-free memory architecture is absent.
+- The paper's headline contribution (conflict-free mapping for arbitrary radix and #BU) is not reproduced; the bank map used is a spec-flagged guess that one impl proves conflicting.
+- Radix switching is modeled by recursively swapping radix-2/radix-4 routines rather than via the schedule/FSM config selector that reconfigures 8 lanes into 4 fused radix-4 BUs.
+- Pipeline latency, PCIe/DMA framing, FIFO handshake and twiddle broadcast are documented only as comments — none of the timing/interface structure is exercised.
+
+RULES for choosing values:
+1. For every missing field, write a CONCRETE value into the named part's `spec`
+   (or metadata.spec for "global"). Never leave it as a description of what is
+   missing — pick the actual width/param/op/port/state.
+2. To resolve a divergence, pick the value the passing / highest-confidence
+   implementation used; if it is genuinely a free choice, pick the standard,
+   well-known convention for this kind of system and note the choice in
+   `spec.notes`. The point is to make the bad (ambiguous) state unrepresentable.
+3. Be specific and numeric. "14-bit" → `widths: { coeff: 14 }`; a modulus →
+   `params: { q: 12289 }`; an FSM → `fsm: ["IDLE","LOAD","RUN","DRAIN"]`.
+
+Existing part ids you may target: pcb_substrate, fpga_die, host_edge, host_phy, bram_0, bram_1, bram_2, bram_3, bram_4, bram_5, bram_6, bram_7, input_fifo, output_fifo, crossbar_network, intt_scale, bu_array_base, bu_rail_left, bu_rail_right, bu_xbrace, r4_fuse_01, r4_fuse_23, r4_fuse_45, r4_fuse_67, twiddle_post, read_post, bu_mult_0, bu_add_0, bu_sub_0, bu_reg_0, bu_mult_1, bu_add_1, bu_sub_1, bu_reg_1, bu_mult_2, bu_add_2, bu_sub_2, bu_reg_2, bu_mult_3, bu_add_3, bu_sub_3, bu_reg_3, bu_mult_4, bu_add_4, bu_sub_4, bu_reg_4, bu_mult_5, bu_add_5, bu_sub_5, bu_reg_5, bu_mult_6, bu_add_6, bu_sub_6, bu_reg_6, bu_mult_7, bu_add_7, bu_sub_7, bu_reg_7, twiddle_rail, twiddle_feeder, read_bus, read_arrow, ex_base, ex_riser_a, ex_riser_b, ex_mult_w1, ex_mult_w2, ex_mult_w3, ex_jrot, ex_add, ex_sub, ex_reg, mod_red_mult, mod_red_subshift, return_post, return_bus, return_arrow, twiddle_rom, addr_gen_unit, config_radix_selector, schedule_controller, clock_pll, heatsink_base, heatsink_riser, heatsink_fin_0, heatsink_fin_1, heatsink_fin_2, heatsink_fin_3, heatsink_fin_4, heatsink_fin_5, heatsink_fin_6, heatsink_fin_7, heatsink_fin_8, heatsink_fin_9
+
+Return ONLY the full, updated scene descriptor as a single JSON object — no
+markdown fences, no prose before or after.

@@ -1,0 +1,24 @@
+I've hit a real blocker I should surface rather than work around.
+
+The task asks me to return the **full, updated scene descriptor** — which requires me to start from the existing scene JSON (all ~70 parts with their geometry, materials, and existing `spec`/`role`/`assembly_instructions` fields) and only *add/refine* `spec` blocks. The prompt gave me the list of part ids and the catalog of missing/divergent fields, but **not the actual contents of the scene file**.
+
+And in this environment I have no filesystem access tools — no Read, Write, Grep, Glob, or Bash. The tools I do have are LSP (code intelligence only) plus a set of MCP connectors (Figma, Gmail, Calendar, Drive, Hugging Face, Notion, Three.js). LSP can enumerate code symbols but can't hand me the raw JSON of a scene asset, and I can't `curl` the local `serve` endpoint either.
+
+So I can't honestly emit the "full" descriptor: I'd have to fabricate the geometry/material of every part, which violates the core rule (*do not change what the scene looks like; keep every part and field intact*). A reconstructed-from-memory scene would silently corrupt the very thing I'm told to preserve.
+
+**What I need from you** — any one of these unblocks me immediately:
+
+1. Paste the current scene JSON here (the file behind ids like `twiddle_rom`, `crossbar_network`, `bu_array_base`…), or
+2. Tell me its path and enable a file-read tool, or
+3. Confirm you only want the **`spec`-block patch** — i.e. the exact `metadata.spec` plus the per-part `spec` objects to merge in — and I'll produce those precisely, leaving you (or the CLI's `improve` step) to splice them into the untouched scene.
+
+I already have the full plan worked out from the divergence report. For reference, here is what I'd commit (option 3 — the additive spec layer only, no geometry touched):
+
+- **`metadata.spec`** — `params: { q: 12289, N: 1024, logN: 10 }`; `widths: { coeff: 14, product: 28, barrettIntermediate: 42 }`; `ops: ["negacyclic-NTT (x^N+1), psi 2N-th-root twist folded into twiddles on the forward stage; omega = psi^2"]`; `fsm: ["IDLE","LOAD","RUN","DRAIN"]`; `notes: source is PQC/HE context → negacyclic chosen over the impls' cyclic guess; q=12289 (= 12·1024+1, a 14-bit NTT-friendly prime) committed.`
+- **`twiddle_rom.spec`** — `params: { psi: 7 (primitive 2N-th root of 12289), omega: 49, romDepth: 1024, addressing: "bit-reversed index → twiddle" }`.
+- **`mod_red_mult.spec`** — `params: { algo:"Barrett", k: 28, mu: floor(2^28/12289)=21843, shift: 28, corrections: 2 }`.
+- **`crossbar_network.spec`** — `ops`/`properties` with the conflict-free bank-index `b = (i + j) mod #banks` and offset `o = i mod (N/#banks)` equations; `properties: ["conflict-free memory mapping (arbitrary radix/#BU, no bank conflict)"]`.
+- **`schedule_controller.spec`** — `fsm` + the rearranged loop order; `properties: ["radix-4 schedule: 33% fewer mults / 20% fewer add-sub (paper claim — unverified by impls; recorded as target)"]`.
+- **`config_radix_selector.spec`**, **`bu_array_base.spec`** (pipeline depths + `"~50% butterfly hw via symmetric operators"` property), **`input_fifo.spec`** (depths/valid-ready), **`read_bus.spec`** (bus widths/dirs) — all as itemized.
+
+Which option do you want? If it's #3, say so and I'll output the clean spec patch.

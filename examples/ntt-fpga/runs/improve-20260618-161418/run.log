@@ -1,0 +1,36 @@
+self-improve: /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             history -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-161418
+             driver   -> claude (visual feedback enabled)
+             up to 2 iteration(s)
+
+──────── iteration 1 / 2 ────────
+render-scene: 76 parts, 3608 triangles -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-161418/iter-01-render.png (1128x1128)
+  rendered -> iter-01-render.png
+  claude done (thinking trace: iter-01-events.jsonl, 99 events)
+  parts: 80   score: 92/100
+  critique: The render already passes both acceptance tests: ISO shows an open, fully populated eight-lane board with no opaque block swallowing a subsystem, TOP confirms all eight blue BRAM banks, the copper DSP multiplier column as a vertical row of dots, the cylindrical Barrett spine plus the boxy shift/subtract member, the brass twiddle feeder L, both white FIFOs, and the seven-fin exploded heatsink; SIDE shows the exploded butterfly lane riding on its risers. The carried-over gaps (8 BUs, cylindrical Barrett) are now closed in the input scene. The two real weaknesses left are geometric: the butterfly array is still one monolithic open plate rather than a frame of real members, and the elevated return bus floats over the array in the SIDE/FRONT elevations with no visible standoff. There is also a minor annotation inconsistency — the exploded heatsink's role claims it cools the DSP array while it sits over the right-edge control cluster.
+  + Decomposed the single bu_array_base plate into an open frame: thinned the floor to 0.1 m and added two longitudinal welded-steel rails (bu_rail_left/right) plus one mid-span cross-brace (bu_xbrace) in the lane-3/4 gap, so the array reads as a real chassis of members instead of one box while keeping every lane exposed from above
+  + Grounded the floating operand-return bus with a short welded-steel standoff post (return_post) tying the bus down onto the shift/subtract reduction member, so the overhead return routing no longer reads as floating in the SIDE/FRONT elevations
+  + Fixed the heatsink_base role text to state it clamps the full FPGA package lid over the whole die (not specifically the DSP array), removing the geometry/annotation inconsistency
+  + Wired the new frame members into the connection graph (pcb_substrate -> rails -> brace; subshift -> return_post -> return_bus) so the scene stays rooted with no dangling ids
+  · gap: Add short standoff posts under the twiddle broadcast rail and the read bus as well (only the return bus is grounded now) so all three overhead routing channels are supported in the elevation views and the read/twiddle/return triad reads as physical wiring rather than floating lines
+  · gap: Consider moving the exploded heatsink stack slightly toward the array center (x ~2) so its die-coverage claim is spatially closer to the logic it cools, but only if it can be done without the lifted fins occluding the multiplier column in ISO
+  · gap: Verify against the next render that the new low side rails (height 0.5 m) do not visually merge with the dark reduction spine in TOP; if they do, recolor the rails to a lighter brushed steel to keep the open frame legible
+
+──────── iteration 2 / 2 ────────
+render-scene: 80 parts, 3748 triangles -> /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-161418/iter-02-render.png (1128x1128)
+  rendered -> iter-02-render.png
+  claude done (thinking trace: iter-02-events.jsonl, 37 events)
+  parts: 82   score: 94/100  (prev 92)
+  critique: The render passes both acceptance tests. ISO shows an open, fully populated eight-lane board with no opaque block swallowing a subsystem; TOP confirms eight blue BRAM banks, both white FIFO capsules, the copper DSP multiplier column as a vertical row of dots, the brass twiddle feeder/rail L, the dark reduction spine pair, and the right-edge control cluster; SIDE shows the exploded butterfly lane riding on its two risers and the elevated routing channels; FRONT shows the seven-fin exploded heatsink lifted on its stub. The only real residual defect carried from the prior pass was geometric: of the three overhead routing channels only the return bus was grounded, leaving the brass twiddle broadcast rail and the copper operand-read bus reading as floating lines in the SIDE/FRONT elevations. That is now fixed with two short standoff posts, so all three channels read as physical wiring tied to the array frame.
+  + Added twiddle_post: a short welded-steel standoff in the central lane-3/4 gap (x=-1.1, z=0) grounding the brass twiddle broadcast rail down onto the open array frame, so the twiddle fan-out no longer floats in the elevation views
+  + Added read_post: a short copper standoff (x=-1.6, z=0) tying the elevated operand-read bus down onto the array frame between its crossbar seat and the multiplier-column arrow, completing the physical support of the read/twiddle/return triad
+  + Wired both new posts into the connection graph (bu_array_base -> twiddle_post -> twiddle_rail; bu_array_base -> read_post -> read_bus) so the scene stays rooted with no dangling ids
+  + Both posts placed at z=0 in the empty central gap so they cross no lane and occlude no multiplier/operator in plan or ISO
+
+self-improve: model reports convergence — stopping.
+
+self-improve: done. Improved scene written to /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             full history: /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-161418
+             review change: git diff -- /home/gohan/.visually-3d/scenes/ntt-fpga.json
+             revert:        cp /home/gohan/.visually-3d/runs/ntt-fpga/improve-20260618-161418/iter-00.json /home/gohan/.visually-3d/scenes/ntt-fpga.json
