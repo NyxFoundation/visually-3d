@@ -239,6 +239,22 @@ export function readIndex(id: string): EvidenceIndex | null {
 
 export type EvidenceMethod = 'paper' | 'refs';
 
+// What (if anything) still needs fetching for a scene, given its attempt log.
+// Pure, so visualize's decision is testable and idempotent: a paper-only scene
+// (e.g. fetched under the old ladder, or hand-seeded) still gets its SOURCE topped
+// up rather than being treated as "fully fetched" just because paper.md exists.
+export function pendingEvidenceFetch(
+  attempts: { method?: EvidenceMethod }[],
+  hasWorkspacePaper: boolean,
+  wantRefs: boolean,
+): EvidenceMethod | null {
+  const tried = new Set(attempts.map((a) => a.method));
+  const havePaper = tried.has('paper') || hasWorkspacePaper;
+  if (!havePaper) return 'paper';        // nothing fetched yet → primary source (+refs)
+  if (wantRefs && !tried.has('refs')) return 'refs'; // paper only → top up the source code
+  return null;                           // complete (or refs not wanted)
+}
+
 // Run ONE gathering pass and ACCUMULATE it: append the transcription to paper.md
 // (never overwrite) and record the attempt in index.json so the policy can
 // escalate next time. Returns how many chars were added (0 = nothing usable).

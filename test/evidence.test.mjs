@@ -12,7 +12,7 @@ process.env.VISUALLY_HOME = HOME;
 
 const {
   EvidenceIndexSchema, sceneSources, buildEvidencePrompt,
-  loadEvidence, evidenceExcerpt, hasEvidence, readIndex,
+  loadEvidence, evidenceExcerpt, hasEvidence, readIndex, pendingEvidenceFetch,
 } = await import('../lib/evidence.js');
 const { evidenceDir } = await import('../lib/paths.js');
 const { mkdirSync: mkdir, writeFileSync: write } = await import('node:fs');
@@ -112,6 +112,19 @@ test('buildEvidencePrompt injects the open gaps as PRIORITY targets', () => {
   assert.ok(p.includes('PRIORITY'));
   assert.ok(p.includes('the FSM transition table'));
   assert.ok(p.includes('the twiddle ROM address fn'));
+});
+
+test('pendingEvidenceFetch tops up a paper-only scene with the SOURCE', () => {
+  // nothing fetched → start with the primary source (paper + refs in one pass)
+  assert.equal(pendingEvidenceFetch([], false, true), 'paper');
+  // paper recorded but no refs → the compatibility fix: still fetch the source
+  assert.equal(pendingEvidenceFetch([{ method: 'paper' }], true, true), 'refs');
+  // old scene: paper.md on disk but no index attempts → still top up the source
+  assert.equal(pendingEvidenceFetch([], true, true), 'refs');
+  // both fetched → complete, no-op
+  assert.equal(pendingEvidenceFetch([{ method: 'paper' }, { method: 'refs' }], true, true), null);
+  // paper present and refs not wanted (--no-refs) → done
+  assert.equal(pendingEvidenceFetch([{ method: 'paper' }], true, false), null);
 });
 
 test('readIndex round-trips a persisted attempt log', () => {

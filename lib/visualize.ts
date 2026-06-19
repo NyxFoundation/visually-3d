@@ -15,7 +15,7 @@ import { writeFileSync, mkdtempSync, readFileSync } from 'node:fs';
 import { improve } from './improve.js';
 import { resolveScene, sceneIdFromPath } from './paths.js';
 import { hasFindings } from './amend.js';
-import { gatherEvidence, loadEvidence, sourceGrounding, sceneSources, type LoadedEvidence } from './evidence.js';
+import { gatherEvidence, loadEvidence, sourceGrounding, sceneSources, readIndex, pendingEvidenceFetch, type LoadedEvidence } from './evidence.js';
 
 export interface ImproveSeed { source: string; remaining_gaps: string[]; notes: string[] }
 
@@ -79,24 +79,32 @@ export interface VisualizeOpts {
   refs?: boolean; // default true: also fetch the reference source code (GitHub)
 }
 
-// Stage 0: make sure the reference + source are cached. Fetches once (paper +
-// refs); a later call is a no-op once workspace evidence exists. No-op when the
-// scene cites no source or evidence is opted out.
+// Stage 0: make sure the reference + source are cached. Decides what is still
+// missing from the attempt log (not merely "does paper.md exist"), so a
+// paper-only scene gets its SOURCE topped up and a complete one is a no-op. No-op
+// when the scene cites no source or evidence is opted out.
 export async function ensureGroundTruth(
   id: string,
   opts: { noEvidence?: boolean; refs?: boolean; model?: string } = {},
 ): Promise<void> {
   if (opts.noEvidence) return;
-  if (loadEvidence(id).origin === 'workspace') return; // already fetched
+  const wantRefs = opts.refs !== false;
+  const haveWorkspacePaper = loadEvidence(id).origin === 'workspace';
+  const need = pendingEvidenceFetch(readIndex(id)?.attempts ?? [], haveWorkspacePaper, wantRefs);
+  if (!need) return; // reference + (optionally) source already cached
   const target = resolveScene(id);
   let sources: { url?: string }[] = [];
   if (target) {
     try { sources = sceneSources(JSON.parse(readFileSync(target, 'utf8'))); } catch { /* ignore */ }
   }
   if (!sources.length) return;
-  console.log('  ▶ fetching ground-truth evidence (reference paper + real source code)…');
+  console.log(need === 'refs'
+    ? '  ▶ topping up ground-truth SOURCE code (paper already cached)…'
+    : '  ▶ fetching ground-truth evidence (reference paper + real source code)…');
   try {
-    await gatherEvidence(id, { method: 'paper', refs: opts.refs !== false, model: opts.model });
+    // 'paper' fetches the primary source (+refs in the same pass); 'refs' adds
+    // only the source code, appended to the existing paper.md.
+    await gatherEvidence(id, { method: need, refs: need === 'paper' ? wantRefs : true, model: opts.model });
   } catch (err) {
     console.log(`  ⚠ evidence gathering stopped: ${(err as Error).message}`);
   }

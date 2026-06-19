@@ -420,6 +420,16 @@ the gap-targeted escalation machinery (`ensureEvidence` / `planEvidence` /
 The TUI offers the same three actions; infra commands (`serve` / `check` /
 `upload`) are unchanged.
 
+**Back-compat with existing scenes.** `visualize` decides what to fetch from the
+`index.json` attempt log, not from "does `paper.md` exist", via the pure
+`pendingEvidenceFetch`. So a scene fetched under the old ladder with only the
+paper (or hand-seeded with a `paper.md` and no index) gets its SOURCE code topped
+up on the next `visualize` (appended, not re-fetched) instead of being wrongly
+treated as complete; a fully-fetched scene (paper + refs, e.g. ntt-fpga) is a
+no-op. The run-dir layout is unchanged — `visualize`/`verify` reuse the existing
+`improve`/`evidence`/`reproduce`/`amend` loggers — so revisions/history parsing
+and the canonical impl store stay consistent with pre-existing runs.
+
 ## References
 
 The hardening borrows directly from prior recursive-self-improvement work:
