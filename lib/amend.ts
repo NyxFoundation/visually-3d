@@ -251,6 +251,20 @@ ${excerpt}
 \`\`\`\n`
     : '';
 
+  // If the self-check did not finish (timed out), the spec should pin a small,
+  // fixed verification size so the NEXT round's check terminates — recording the
+  // recipe in the spec, not leaving it to each engineer to re-guess.
+  const vf = (report?.verify_findings || []) as { kind?: string }[];
+  const timedOut = vf.some((v) => v?.kind === 'timeout');
+  const verifyHealthBlock = timedOut
+    ? `\nSELF-CHECK DID NOT FINISH (it timed out — almost always a full-size O(N^2)
+golden run at the production size). Pin a fast, fixed recipe so the next round
+terminates: set \`metadata.spec.verification.e2e_N\` to a SMALL structure-preserving
+size (<= 16) and list the size-independent \`proofs\` to discharge with SMT at full
+bit-width. Do NOT lower correctness — move the heavy full-size check out of the
+default path; the small instance plus the at-full-width proofs is what verifies it.\n`
+    : '';
+
   return `You are closing the loop of a "visioned self-improvement" system. A scene
 descriptor doubles as the SPEC for a real system (a circuit, an algorithm, a
 machine, a building). Independent engineers tried to rebuild the system from
@@ -263,6 +277,11 @@ THE SPEC SUBSTRATE (this is the ONLY thing you grow):
 - Each part may carry \`spec\`: { params?, widths?, ports?[ {name,dir,width} ],
   ops?[], fsm?[], notes? }. Top-level \`metadata.spec\` holds the same shape for
   system-level facts (clocking, global params, handshake, FSM).
+- \`metadata.spec\` may ALSO carry \`verification\`: { e2e_N?, proofs?[] } — the
+  cheap, fixed recipe every reimplementer must follow so the self-check stays fast
+  and they all test the same way: \`e2e_N\` is the SMALL, structure-preserving size
+  to run whole-system equivalence at (never the production size), and \`proofs\` are
+  the size-independent properties to discharge with SMT at full bit-width.
 - Geometry (shape/position/size/rotation/material), connections, part ids,
   machine_name, roles, and assembly text are NOT available to you and MUST NOT
   appear in your answer. The host program will merge your patch into the real
@@ -275,7 +294,7 @@ the SPECIFIC system's real values; do NOT invent values it does not support):
 \`\`\`json
 ${sourceBlock}
 \`\`\`
-${evidenceBlock}
+${evidenceBlock}${verifyHealthBlock}
 MISSING FIELDS the spec must now carry (each says which part's spec to write):
 ${missing || '(none reported)'}
 
@@ -345,6 +364,7 @@ Return ONLY this JSON object — no markdown fences, no prose before or after:
     "ops": ["<global operation>"],
     "fsm": ["<state or transition>"],
     "properties": ["<named global property>"],
+    "verification": { "e2e_N": "<small structure-preserving size, e.g. 16; omit if not applicable>", "proofs": ["<size-independent property to prove with SMT at full bit-width>"] },
     "notes": "<provenance-tagged global notes>"
   },
   "part_specs": {

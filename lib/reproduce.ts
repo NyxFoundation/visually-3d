@@ -278,6 +278,34 @@ ${script}
 Return ONLY the corrected program in ONE fenced ${lang.fence} code block.`;
 }
 
+// A self-check that TIMED OUT carries no verdict either — but the cause is a
+// too-expensive check (typically a full-size O(N^2) golden), not a typo. Ask the
+// model to make it terminate by SHRINKING the work, NOT by weakening what is
+// proven: keep the size-independent properties at full bit-width, but run the
+// whole-system equivalence only at the smallest structure-preserving instance.
+function fixTimeoutPrompt(lang: { label: string; fence: string }, script: string): string {
+  return `The ${lang.label} self-checking program below TIMED OUT — it did not finish, so
+it produced no verdict. The cause is an over-expensive check (almost always a
+full-size or O(N^2) golden / exhaustive pass run at the production size). Make it
+TERMINATE FAST (well under ~60s) WITHOUT weakening what is verified:
+- Keep SIZE-INDEPENDENT properties and PROVE them with z3 at the real bit-widths
+  / over every stride or stage class (these already hold for all N).
+- Run WHOLE-SYSTEM equivalence against the golden ONLY at the smallest instance
+  that preserves the structure (e.g. N <= 16, a small valid modulus). Do NOT build
+  an O(N^2) golden, exhaustive full-state search, or all-input simulation at the
+  production size, EVEN IF N is pinned large — move any such deep check behind
+  os.environ.get("DEEP_VERIFY") == "1".
+Keep the SAME contract: print exactly "VERIFIED" and exit 0 on success, or
+"FAIL: <reason and a concrete counterexample>" and exit 1 on mismatch.
+
+PROGRAM:
+\`\`\`${lang.fence}
+${script}
+\`\`\`
+
+Return ONLY the corrected program in ONE fenced ${lang.fence} code block.`;
+}
+
 async function runAgent(
   prompt: string,
   model: string | undefined,
@@ -388,15 +416,20 @@ export async function reproduce(argv: string[]): Promise<any> {
     let verdict = '';
     if (avail.ok && im && typeof im.script === 'string') {
       let res = await backend.verify(im.script, runDir);
-      // ⑤ Harness recovery: a syntax/exception failure produced no verdict.
-      // Repair it once so a codegen typo doesn't masquerade as a wrong impl.
-      if (res.kind === 'syntax' || res.kind === 'error') {
-        console.log(`  impl ${i + 1}: self-check ${res.kind} error — attempting one harness repair…`);
+      // ⑤ Harness recovery: a check that produced NO verdict gets one repair pass.
+      // A syntax/exception failure is a codegen typo — fix only what stops it
+      // running. A timeout is an over-expensive check — shrink the whole-system
+      // pass to a small instance (keeping the size-independent proofs) so it can
+      // terminate. Either way, one retry, so a non-verdict doesn't masquerade as
+      // a wrong implementation.
+      if (res.kind === 'syntax' || res.kind === 'error' || res.kind === 'timeout') {
+        const how = res.kind === 'timeout' ? 'timed out — attempting one shrink-and-retry' : `${res.kind} error — attempting one harness repair`;
+        console.log(`  impl ${i + 1}: self-check ${how}…`);
         try {
-          const { text } = await runClaudeStreaming({
-            prompt: fixHarnessPrompt(lang, im.script, res.kind, res.stderr || ''),
-            model: opts.model, quiet: true,
-          });
+          const prompt = res.kind === 'timeout'
+            ? fixTimeoutPrompt(lang, im.script)
+            : fixHarnessPrompt(lang, im.script, res.kind, res.stderr || '');
+          const { text } = await runClaudeStreaming({ prompt, model: opts.model, quiet: true });
           const fixed = deescapeIfNeeded(extractFencedCode(text));
           if (fixed && fixed.trim()) {
             const res2 = await backend.verify(fixed, runDir);

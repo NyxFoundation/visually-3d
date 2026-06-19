@@ -156,6 +156,23 @@ are just one instantiation of the pattern; the backend prompt
 (`lib/backends/python-smt.ts`) states it for any subject so a timed-out heroic
 check never masquerades as "implementation broken".
 
+**Two tiers, made explicit.** The crucial split — and the source of *generality*,
+not just speed — is between (Tier 1) **size-independent** properties, proved with
+SMT **at the real bit-widths / over every stride or stage class** so they hold for
+all N, and (Tier 2) **whole-system equivalence**, run only at the *smallest
+structure-preserving instance* (`N ≤ 16`). The expensive end-to-end check is the
+only size-dependent part, so it stays tiny; the at-full-width proofs are what
+actually cover large-N-only bugs (overflow, address wrap, stride collisions).
+Building an `O(N^2)` golden at the spec's *production* size — even when `N` is
+pinned large (e.g. 1024) — is forbidden by default; it is the #1 timeout cause.
+Three safeguards keep this honest: the backend prompt enforces the two tiers; when
+a self-check times out, `amend` pins `metadata.spec.verification.e2e_N` (a small
+fixed size) + the `proofs` list into the spec so every later reimplementer
+verifies the same cheap way; and `reproduce` gives a timed-out check **one
+shrink-and-retry** (move the whole-system pass to the small instance, keep the
+proofs) before recording a non-verdict — the same recovery it already does for a
+syntax/exception error.
+
 ### 3.3a Source evidence — lifting the `[source-missing]` ceiling (`lib/evidence.ts`)
 
 A scene carries only a paper URL plus a short summary, so the source's *signature*

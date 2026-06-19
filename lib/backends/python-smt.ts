@@ -84,37 +84,41 @@ export const pythonSmtBackend: Backend = {
     return `The runnable program must be a SINGLE self-contained, self-checking Python 3
 script (only stdlib + z3 allowed). Whatever the subject is — an algorithm, a
 digital circuit, a data structure, a protocol — verify it with the SAME thinking
-pattern: turn correctness into a few SMALL, FINITE obligations and discharge each
-with the cheapest SOUND check, so the run always terminates with a real verdict
-instead of timing out. Concretely the script:
-- implements the system as plain Python functions;
-- builds an INDEPENDENT golden/reference model of the intended behavior (derived
-  from the spec, NOT a copy of the implementation);
-- VERIFIES the implementation against that golden with FAST, FINITE checks. First
-  DECOMPOSE correctness into the handful of local properties that, together, pin
-  it down — the invariants, equivalences, value ranges, and round-trip identities
-  the system must satisfy — then discharge each the cheapest way that stays sound:
-  * prove local reusable facts with z3 over bounded domains whenever a property
-    is finitely expressible — one element / stage / transition generalizes. The
-    SAME tactic spans subjects, e.g.: decode(encode(x)) == x for a codec; a sort
-    output is a permutation AND ordered; one reducer over its legal input range;
-    one butterfly / ALU op mod q; one address/bank mapping is conflict-free; one
-    FSM transition; one data-structure invariant preserved by an operation;
-  * else enumerate EXHAUSTIVELY over a small finite space, or run end-to-end
-    equivalence against the golden only on reduced instances small enough to
-    finish quickly (for example N <= 16 or N <= 32);
-  * for production-size parameters, check structural invariants and use
-    O(N log N) round-trip / edge-case / randomized tests only;
-  * DO NOT run default O(N^2) golden algorithms, exhaustive full-size state
-    searches, or all-input simulations for large N. If such a deep check is
-    useful, put it behind os.environ.get("DEEP_VERIFY") == "1" and skip it by
-    default;
-- prints exactly "VERIFIED" and exits 0 on success, or prints "FAIL: <reason and
-  a concrete counterexample>" and exits 1 on any mismatch.
-Default verification must be deterministic and finish within ~60s on a cold run.
-Only print "VERIFIED" after all default fast checks have run; never print it
-before a required check has completed, and never enable expensive optional deep
-checks by default.`;
+pattern, split into TWO TIERS, so the run always terminates fast with a real
+verdict instead of timing out:
+
+TIER 1 — SIZE-INDEPENDENT properties (this is where real generality comes from).
+DECOMPOSE correctness into the local facts that must hold for EVERY size, and
+prove each with z3 over bounded domains AT THE REAL BIT-WIDTHS / over every stride
+or stage class — NOT at a toy size. Proven once, they hold for all N. The SAME
+tactic spans subjects, e.g.: decode(encode(x)) == x for a codec; a sort step
+preserves a permutation; one reducer over its full legal input range; one
+butterfly / ALU op mod q; one FSM transition; one address/bank mapping is
+conflict-free for every power-of-two stride; a data-structure invariant preserved
+by an operation. These FAST, FINITE checks are exactly where large-N-only bugs
+(overflow, address wrap, stride collisions) are caught — at full width,
+symbolically, instead of by running big sizes.
+
+TIER 2 — WHOLE-SYSTEM equivalence against an INDEPENDENT golden/reference model.
+This is the only part whose cost grows with size, so run it ONLY at the SMALLEST
+instance that still preserves the structure (valid roots, >= 2 stages, >= 2
+banks/lanes) — a reduced N <= 16 (N <= 32 at most), with a small valid modulus if
+needed. If the spec carries metadata.spec.verification.e2e_N, use THAT exact size.
+NEVER build an O(N^2) golden — nor an exhaustive full-state search, nor an
+all-input simulation — at the spec's PRODUCTION size, EVEN WHEN N is pinned large
+(e.g. 1024). That is the #1 cause of timeouts and is forbidden by default.
+
+PRODUCTION size: only structural invariants plus O(N log N) round-trip /
+edge-case / randomized tests. Any genuinely full-size O(N^2)+ deep check must be
+gated behind os.environ.get("DEEP_VERIFY") == "1" and skipped by default.
+
+The script implements the system as plain Python functions, builds the
+INDEPENDENT golden (derived from the spec, NOT copied from the implementation),
+runs Tier 1 then Tier 2, and prints exactly "VERIFIED" and exits 0 once ALL
+default checks pass, or "FAIL: <reason and a concrete counterexample>" and exits 1
+at the first mismatch. Default verification must be deterministic and must
+finish within ~60s on a cold run; never print "VERIFIED" before a required check
+has completed, and never enable the expensive optional deep checks by default.`;
   },
 
   // Write the script and run it; pass = it printed VERIFIED and exited 0.

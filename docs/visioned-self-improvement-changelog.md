@@ -334,6 +334,41 @@ without losing coherence:
   same three presets (auto / GitHub-upfront / no-web). Default in both:
   paper-first, auto-escalate to GitHub only if the paper doesn't close the gaps.
 
+## 13. Two-tier verification — small-N e2e + at-full-width proofs
+
+Re-running `ntt-fpga` with evidence enabled regressed the self-check from PASS to
+**timeout**: the now richer, more "authoritative"-looking spec nudged the
+reimplementers back into a full-size `O(N^2)` schoolbook golden at `N = 1024`
+(`impl-1.py` literally hard-codes `N = 1024` and an `O(N^2)` reference). The
+verification philosophy was right; one tier had collapsed into a heroic check.
+
+The fix makes the two tiers explicit and adds teeth, three ways:
+
+- **Backend prompt (`python-smt`).** Restated as TIER 1 — *size-independent*
+  properties proved with z3 **at the real bit-widths / over every stride class**
+  (these hold for all N and are where large-N-only bugs are actually caught) — and
+  TIER 2 — whole-system equivalence **only at the smallest structure-preserving
+  instance** (`N ≤ 16`, honoring `metadata.spec.verification.e2e_N` if set).
+  Building an `O(N^2)` golden at the production size is forbidden by default
+  *even when N is pinned large*.
+- **Recorded recipe (`amend`).** When the report shows a timed-out self-check,
+  `amend` pins `metadata.spec.verification = { e2e_N, proofs[] }` into the spec, so
+  the next round's engineers all verify the same cheap, fixed way instead of each
+  re-guessing the test size.
+- **Timeout recovery (`reproduce`).** The harness-recovery that already repairs a
+  syntax/exception check now also handles `timeout`: one shrink-and-retry that
+  moves the whole-system pass to a small instance (keeping the at-full-width
+  proofs) before a non-verdict is recorded — so a too-heavy check no longer
+  masquerades as a failing implementation.
+
+Why this is the general discipline, not an NTT patch: every subject splits the
+same way — local invariants that are size-independent (prove once, symbolically)
+plus a composition checkable at small scale. "Verify small" is right *because*
+the at-full-width proofs carry the generality; small-N alone would only be
+"tested small". What this still cannot touch is synthesis-only fidelity
+(resource/area/ATP/timing) — a separate axis from functional/structural
+correctness.
+
 ## References
 
 The hardening borrows directly from prior recursive-self-improvement work:

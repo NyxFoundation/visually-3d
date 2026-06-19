@@ -90,6 +90,22 @@ test('python-smt instructions state a subject-agnostic decomposition pattern', (
   assert.ok(/butterfly|reducer|FSM/.test(instructions));
 });
 
+// The verifier must be a TWO-TIER recipe: size-independent proofs at full
+// bit-width + a whole-system check only at a small structure-preserving size.
+// This is what stops a richer/pinned spec from reintroducing an O(N^2) golden at
+// the production size (the regression we saw at N=1024).
+test('python-smt instructions enforce the two-tier (proofs + small-N e2e) recipe', () => {
+  const instructions = getBackend('python-smt').implementInstructions();
+  assert.ok(instructions.includes('TIER 1'));
+  assert.ok(instructions.includes('TIER 2'));
+  assert.ok(/SIZE-INDEPENDENT/.test(instructions));
+  assert.ok(instructions.includes('full bit-width') || instructions.includes('REAL BIT-WIDTHS'));
+  // honor a spec-pinned verification size
+  assert.ok(instructions.includes('metadata.spec.verification.e2e_N'));
+  // forbid a production-size golden even when N is pinned large
+  assert.ok(/EVEN WHEN N is pinned large/.test(instructions));
+});
+
 test('available() returns a well-shaped result', async () => {
   for (const id of listBackends()) {
     const a = await getBackend(id).available();

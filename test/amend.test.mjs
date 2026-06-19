@@ -95,6 +95,21 @@ test('buildAmendPrompt omits the evidence block when there is none', () => {
   assert.ok(!p.includes(EVIDENCE_BLOCK_MARKER));
 });
 
+test('buildAmendPrompt pins a small verification recipe when the self-check timed out', () => {
+  const timedOut = { ...report(), verify_findings: [{ impl: 1, kind: 'timeout' }, { impl: 2, kind: 'timeout' }] };
+  const p = buildAmendPrompt(baseScene(), timedOut);
+  assert.ok(p.includes('SELF-CHECK DID NOT FINISH'));
+  assert.ok(p.includes('metadata.spec.verification.e2e_N'));
+  // the JSON template offers a verification slot to write it into
+  assert.ok(p.includes('"verification"'));
+});
+
+test('buildAmendPrompt omits the timeout directive when the check ran', () => {
+  const ran = { ...report(), verify_findings: [{ impl: 1, kind: 'pass' }] };
+  const p = buildAmendPrompt(baseScene(), ran);
+  assert.ok(!p.includes('SELF-CHECK DID NOT FINISH'));
+});
+
 test('applyAmendPatch only merges metadata.spec and existing part specs', () => {
   const scene = baseScene();
   const patch = {
