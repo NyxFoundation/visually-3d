@@ -261,6 +261,45 @@ work that is still open. The same reproduce-findings seed that already steered t
 visual pass (`seedFromReport`) is what makes the reactive pass *feedback-driven*
 rather than a blind re-render.
 
+## 11. Source evidence — fixing the information ceiling, not the loop
+
+Running `ntt-fpga` to v23 showed the loop working correctly yet stuck:
+`reproducibility` oscillated 62 → 74 → 70 and never reached 80, while the
+self-check finally PASSED (the timeout was gone). The cause was not a loop bug —
+it was an **information ceiling**. The scene held only the CFNTT paper's URL and a
+summary, so the paper's signature structures (the conflict-free bank/offset map,
+the per-stage crossbar permutation, the twiddle-ROM addressing, the radix-4
+schedule and FSM) were never in the loop. Two reverse-implementers each invented a
+different valid reconstruction → permanent divergence → reproducibility capped;
+`amend` could not help because it (correctly) will not fabricate a
+`[source-missing]` value.
+
+The fix is to give the loop the missing information instead of asking it to invent
+more:
+
+- **`visually evidence <scene>` (`lib/evidence.ts`).** Fetches the scene's
+  `metadata.info.sources` with web tools, transcribes the technical sections to
+  Markdown, and caches them under `~/.visually-3d/evidence/<id>/`. `--refs` also
+  searches GitHub for reference implementations, kept strictly secondary
+  (`[ref-impl]`). This is the **only tool-enabled step**; `runClaudeStreaming` now
+  takes a `tools` option, and the rest of the loop stays tool-less and
+  deterministic.
+- **Checked-in seed (`examples/<id>/`).** Curated learnings ship with the package
+  and are the fallback when no evidence has been fetched. `examples/ntt-fpga/`
+  distills the v1–v23 trial-and-error honestly: what is settled and matches the
+  source, what is still `[source-missing]`, and which resource/ATP/timing claims
+  a functional backend can *never* verify.
+- **`amend` quotes the evidence.** `buildAmendPrompt` injects the gathered
+  evidence and a provenance scheme (`[paper]` authoritative, `[ref-impl]`
+  secondary, `[src]`/`[conv]`/`[calc]` as before); a value the evidence supplies
+  for a prior `[source-missing]` note is promoted to `[paper]`.
+
+**Invariant preserved.** Evidence enters `amend` ONLY. reproduce's
+reverse-implementers still see the spec alone, so reproducibility keeps measuring
+the spec's completeness — evidence enriches the spec, then reproduce grades the
+richer spec. What evidence cannot lift (synthesis-only resource/ATP/timing claims)
+is documented as out-of-scope for `python-smt` rather than counted as failure.
+
 ## References
 
 The hardening borrows directly from prior recursive-self-improvement work:

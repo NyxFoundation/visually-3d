@@ -1,0 +1,20 @@
+{
+  "id": "ntt-fpga",
+  "sources": [
+    {
+      "title": "CFNTT: Scalable Conflict-Free NTT Multiplication Architecture (TCHES 2022)",
+      "url": "https://tches.iacr.org/index.php/TCHES/article/view/9291"
+    },
+    {
+      "title": "CFNTT PDF (IACR TCHES)",
+      "url": "https://tches.iacr.org/index.php/TCHES/article/download/9291/8857"
+    },
+    {
+      "title": "DOI 10.46586/tches.v2022.i1.94-126",
+      "url": "https://doi.org/10.46586/tches.v2022.i1.94-126"
+    }
+  ],
+  "items": [
+    { "kind": "notes", "title": "Curated learnings (v1–v23)", "file": "notes.md" }
+  ]
+}

@@ -78,6 +78,23 @@ test('buildAmendPrompt is robust to an empty report', () => {
   assert.ok(typeof p === 'string' && p.length > 200);
 });
 
+// The injected block carries this distinctive header; rule #5 mentions
+// "GATHERED SOURCE EVIDENCE" unconditionally, so key off the header instead.
+const EVIDENCE_BLOCK_MARKER = 'transcribed from the actual source by';
+
+test('buildAmendPrompt injects gathered evidence and asks to quote it as [paper]', () => {
+  const ev = { id: 'x', paper: '# Evidence\n[paper:Sec III] bank(i)=(i^(i>>3)) mod 8', notes: null, origin: 'workspace' };
+  const p = buildAmendPrompt(baseScene(), report(), ev);
+  assert.ok(p.includes(EVIDENCE_BLOCK_MARKER));
+  assert.ok(p.includes('bank(i)=(i^(i>>3)) mod 8'));
+  assert.ok(p.includes('[paper]'));
+});
+
+test('buildAmendPrompt omits the evidence block when there is none', () => {
+  const p = buildAmendPrompt(baseScene(), report(), { id: 'x', paper: null, notes: null, origin: 'none' });
+  assert.ok(!p.includes(EVIDENCE_BLOCK_MARKER));
+});
+
 test('applyAmendPatch only merges metadata.spec and existing part specs', () => {
   const scene = baseScene();
   const patch = {

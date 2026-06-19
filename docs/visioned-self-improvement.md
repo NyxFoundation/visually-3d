@@ -156,6 +156,38 @@ are just one instantiation of the pattern; the backend prompt
 (`lib/backends/python-smt.ts`) states it for any subject so a timed-out heroic
 check never masquerades as "implementation broken".
 
+### 3.3a Source evidence — lifting the `[source-missing]` ceiling (`lib/evidence.ts`)
+
+A scene carries only a paper URL plus a short summary, so the source's *signature*
+structures (an exact memory map, an addressing function, an FSM) are absent.
+`reproduce` then finds two engineers each inventing a different valid version, and
+`amend` correctly refuses to fabricate, tagging the gap `[source-missing]`. No
+number of rounds can climb past this — the information genuinely isn't in the
+loop.
+
+`visually evidence <scene>` closes that gap: it fetches the scene's
+`metadata.info.sources` with **web tools** (the one tool-enabled step;
+`runClaudeStreaming({ tools: ['WebFetch','WebSearch'] })`), transcribes the
+technical sections to Markdown, and caches them under
+`~/.visually-3d/evidence/<id>/` — falling back to a checked-in `examples/<id>/`
+seed. `--refs` also searches GitHub for reference implementations, tagged
+secondary (`[ref-impl]`, never authoritative over the paper).
+
+**Invariant: evidence flows into `amend` ONLY.** reproduce's reverse-implementers
+never see it, because reproduce measures *"can you rebuild from the SPEC alone"* —
+handing them the paper would measure paper-completeness instead. The flow is:
+
+```
+evidence(paper.md) → amend QUOTES it ([paper]) → spec gains the real values
+                   → next reproduce grades the richer spec → divergence falls
+                   → reproducibility & fidelity rise
+```
+
+What evidence *cannot* fix: claims that need synthesis (resource/area/ATP/timing,
+e.g. "~50% hardware saved", LUT/FF ratios). A functional `python-smt` model
+cannot verify those at all; they stay `unverifiable` by construction and must not
+be counted as fidelity failures.
+
 ### 3.4 Automatic backend selection (`lib/backends/index.ts`)
 
 The verification substrate is chosen from **what the subject is**, so no manual

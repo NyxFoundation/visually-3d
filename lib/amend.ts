@@ -21,6 +21,7 @@ import { runClaudeStreaming } from './runner.js';
 import { extractScene, parseScene, validateScene, specCoverage } from './scene.js';
 import { repairArithmeticClaims } from './arith-audit.js';
 import { reproduce } from './reproduce.js';
+import { loadEvidence, evidenceExcerpt, type LoadedEvidence } from './evidence.js';
 
 interface AmendOpts {
   positional: string[];
@@ -185,9 +186,12 @@ export function hasFindings(report: any): boolean {
 }
 
 // Build the prompt that asks the model to MERGE verification findings into the
-// scene's spec substrate. Pure (no I/O) so it is unit-testable.
+// scene's spec substrate. Pure (no I/O) so it is unit-testable. When `ev` is
+// present, the gathered source evidence is injected so the model can QUOTE the
+// real paper/datasheet instead of guessing — the only way to pin the specific
+// system's structures and raise FIDELITY, not just reproducibility.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function buildAmendPrompt(scene: any, report: any): string {
+export function buildAmendPrompt(scene: any, report: any, ev?: LoadedEvidence): string {
   type MissingField = { kind?: string; item?: string; where?: string };
   type VerifyFinding = { impl?: number; counterexample?: string };
   type ParamFidelity = { param?: string; reference_value?: string; impl_value?: string; match?: boolean; where?: string };
@@ -232,6 +236,21 @@ export function buildAmendPrompt(scene: any, report: any): string {
     null, 1,
   ).slice(0, 4000);
 
+  // Gathered ground-truth evidence (from `visually evidence`), if any. This is
+  // the authoritative transcription of the SOURCE — quoting it is how a
+  // [source-missing] gap finally gets filled with the paper's real value.
+  const excerpt = ev ? evidenceExcerpt(ev) : '';
+  const evidenceBlock = excerpt
+    ? `\nGATHERED SOURCE EVIDENCE (transcribed from the actual source by \`visually
+evidence\`; origin: ${ev?.origin}). This is AUTHORITATIVE — prefer it over the
+summary above. QUOTE concrete values from it to fill [source-missing] gaps, and
+tag them \`[paper]\` (or \`[ref-impl]\` if from a secondary reference
+implementation). Do NOT exceed what it states:
+\`\`\`markdown
+${excerpt}
+\`\`\`\n`
+    : '';
+
   return `You are closing the loop of a "visioned self-improvement" system. A scene
 descriptor doubles as the SPEC for a real system (a circuit, an algorithm, a
 machine, a building). Independent engineers tried to rebuild the system from
@@ -256,7 +275,7 @@ the SPECIFIC system's real values; do NOT invent values it does not support):
 \`\`\`json
 ${sourceBlock}
 \`\`\`
-
+${evidenceBlock}
 MISSING FIELDS the spec must now carry (each says which part's spec to write):
 ${missing || '(none reported)'}
 
@@ -301,14 +320,19 @@ RULES for choosing values:
    right or leave the operands symbolic. A self-inconsistent counterexample above
    (e.g. "spec N != computed N") MUST be fixed at its numeric source, not annotated.
 5. PROVENANCE — for each fact you commit, mark where it came from in \`spec.notes\`
-   using a tag: \`[src]\` quoted/derived from the SOURCE above, \`[conv]\` a
-   convention you chose to break a tie (not stated by the source), \`[calc]\` a
-   value you derived by computation. \`[conv]\` facts are reproducibility aids, NOT
-   claims about the real system — never present a guessed value as the source's.
-6. CEILING — if a missing field is genuinely NOT determinable from the source and
-   is NOT a free convention (it is specific architectural detail the scene simply
-   lacks), do not fabricate it. Record what is needed in \`spec.notes\` prefixed
-   \`[source-missing]\` so the gap is visible instead of papered over.
+   using a tag: \`[paper]\` quoted/derived from the GATHERED SOURCE EVIDENCE,
+   \`[ref-impl]\` from a secondary reference implementation in that evidence,
+   \`[src]\` from the source metadata above, \`[conv]\` a convention you chose to
+   break a tie (not stated by any source), \`[calc]\` a value you derived by
+   computation. \`[conv]\`/\`[ref-impl]\` facts are reproducibility aids, NOT
+   authoritative claims about the real system — never present a guessed or
+   secondary value as the paper's.
+6. CEILING — if a missing field is genuinely NOT determinable from any source
+   (neither the gathered evidence nor the metadata) and is NOT a free convention,
+   do not fabricate it. Record what is needed in \`spec.notes\` prefixed
+   \`[source-missing]\` so the gap is visible instead of papered over. If the
+   GATHERED EVIDENCE above now supplies a value a previous round marked
+   \`[source-missing]\`, REPLACE that note with the real value tagged \`[paper]\`.
 
 Existing part ids you may target: ${ids}
 
@@ -362,7 +386,14 @@ export async function amendScene(
   writeFileSync(path.join(dir, 'prev.json'), JSON.stringify(scene, null, 2));
   writeFileSync(path.join(dir, 'report.json'), JSON.stringify(report, null, 2));
 
-  const prompt = buildAmendPrompt(scene, report);
+  // Load any gathered source evidence so amend can QUOTE the real source. This
+  // is the ONLY place evidence enters the loop — reproduce's engineers never see
+  // it, so reproducibility keeps measuring the SPEC, not the paper.
+  const ev = loadEvidence(id);
+  if (ev.origin !== 'none') {
+    console.log(`  ↳ using source evidence (${ev.origin}) to ground the spec`);
+  }
+  const prompt = buildAmendPrompt(scene, report, ev);
   writeFileSync(path.join(dir, 'prompt.txt'), prompt);
   const { text } = await runClaudeStreaming({ prompt, model: opts.model, quiet: true });
   writeFileSync(path.join(dir, 'raw.txt'), text);

@@ -65,8 +65,8 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
 
 - `bin/visually.ts` — command dispatcher. Bare `visually` in a TTY launches the
   Ink TUI; otherwise/with args it routes to subcommands (`serve`, `create`,
-  `improve`, `reproduce`, `check`, `upload`). Keeps a `#!/usr/bin/env node`
-  shebang (preserved through tsc emit).
+  `improve`, `reproduce`, `amend`, `evidence`, `refine`, `check`, `upload`).
+  Keeps a `#!/usr/bin/env node` shebang (preserved through tsc emit).
 - `lib/tui/app.ts` — Ink + htm control panel (JSX without a build step). htm
   template markup is opaque to the type-checker; put real types on component
   props, hooks, and effects.
@@ -80,11 +80,19 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
   `defaultBackendFor(mode)` picks one (algorithm→python-smt, else→sim).
 - `lib/impls.ts` — canonical per-scene impl store under
   `~/.visually-3d/impls/<id>/` (`impl.<ext>` + `verify.txt` + `meta.json`).
+- `lib/evidence.ts` — `visually evidence <scene>`: fetch the scene's source
+  (paper/datasheet URLs in `metadata.info.sources`) via the runner's web tools
+  and cache a Markdown transcription under `~/.visually-3d/evidence/<id>/`,
+  falling back to the checked-in `examples/<id>/` seed. **Invariant: evidence
+  feeds `amend` ONLY, never reproduce's reverse-implementers** — reproduce must
+  keep grading the SPEC, not the paper. This is the only tool-enabled step
+  (`runClaudeStreaming({ tools: [...] })`); the rest of the loop is tool-less.
 - `lib/serve.ts` — static GUI server + SSE bridge to the local CLI. Endpoints:
   `/api/health`, `/api/analyze/stream`, `/samples/...`, `/api/impl/<id>`,
   `POST /api/impl/<id>/verify` (streams a live backend run).
 - `lib/paths.ts` — package vs workspace paths. Workspace is `$VISUALLY_HOME`
-  (default `~/.visually-3d`): `scenes/`, `runs/`, `impls/`.
+  (default `~/.visually-3d`): `scenes/`, `runs/`, `impls/`, `evidence/`. Curated
+  seed evidence ships checked-in under the package's `examples/<id>/`.
 
 ## Web app (`src/`)
 

@@ -27,9 +27,13 @@ Usage:
   visually amend <scene>                  fold reproduce's findings back into the
        [--n 2] [--model <m>]              scene's functional spec (parts[].spec /
        [--backend <id>] [--no-verify]     metadata.spec) so it becomes reproducible
+  visually evidence <scene>               fetch the scene's source (paper/datasheet)
+       [--refs] [--model <m>]             via web tools, cache it as Markdown so
+                                          amend can QUOTE it (--refs: also search
+                                          GitHub for reference implementations)
   visually refine <scene>                 closed 3D ⇄ implementation loop: each
        [--rounds 3] [--visual 90]         round runs improve → reproduce → amend
-       [--repro 80] [--iters 2]           until the visual score and reproducibility
+       [--repro 80] [--iters 1]           until the visual score and reproducibility
        [--backend <id>] [--no-amend]      both clear their thresholds (or max rounds)
   visually check <scene> [--png]          inspect a scene (browser, or PNG contact sheet)
        [--out <file.png>] [--no-open]
@@ -73,6 +77,8 @@ async function main() {
       return (await import('../lib/reproduce.js')).reproduce(rest);
     case 'amend':
       return (await import('../lib/amend.js')).amend(rest);
+    case 'evidence':
+      return (await import('../lib/evidence.js')).gatherEvidence(rest);
     case 'refine':
       return (await import('../lib/refine.js')).refine(rest);
     case 'check':

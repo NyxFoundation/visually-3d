@@ -25,10 +25,17 @@ export interface RunOptions {
   model?: string;
   runDir?: string;
   quiet?: boolean;
+  // Tools to enable for THIS run. The core loop (reproduce/judge/amend) runs
+  // tool-less (deterministic, sandboxed) — leave unset. The evidence-gathering
+  // step opts into web access by passing e.g. ['WebFetch', 'WebSearch'].
+  tools?: string[];
+  // Permission mode when tools are enabled (default 'bypassPermissions', the
+  // same non-interactive mode the visual pass uses to Read its render).
+  permissionMode?: string;
 }
 
 // Run claude in streaming mode. Returns { text, hadResult }.
-export function runClaudeStreaming({ prompt, model, runDir, quiet = false }: RunOptions): Promise<RunResult> {
+export function runClaudeStreaming({ prompt, model, runDir, quiet = false, tools, permissionMode }: RunOptions): Promise<RunResult> {
   const bin = process.env.CLAUDE_BIN || 'claude';
   const args = [
     '-p', prompt,
@@ -36,8 +43,14 @@ export function runClaudeStreaming({ prompt, model, runDir, quiet = false }: Run
     '--output-format', 'stream-json',
     '--verbose',
     '--include-partial-messages',
-    '--tools', '',
   ];
+  if (tools && tools.length) {
+    // Web access (or any tool) requires a non-interactive permission mode, or
+    // the CLI blocks waiting for approval and the run hangs.
+    args.push('--tools', ...tools, '--permission-mode', permissionMode || 'bypassPermissions');
+  } else {
+    args.push('--tools', '');
+  }
 
   const streamLog = runDir ? createWriteStream(`${runDir}/stream.jsonl`, { flags: 'a' }) : null;
   const reasonLog = runDir ? createWriteStream(`${runDir}/reasoning.log`, { flags: 'a' }) : null;

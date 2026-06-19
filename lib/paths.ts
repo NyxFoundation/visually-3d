@@ -16,6 +16,11 @@ export const PKG_ROOT = path.join(here, '..');
 export const DIST = path.join(PKG_ROOT, 'dist');
 export const SCRIPTS = path.join(PKG_ROOT, 'scripts');
 export const PROMPTS = path.join(PKG_ROOT, 'prompts');
+// Checked-in, curated SEED evidence shipped with the package: examples/<id>/
+// (paper.md / notes.md / index.json). The evidence loader falls back to this
+// when a scene has no fetched evidence in the workspace yet, so the distilled
+// learnings for a sample (e.g. ntt-fpga) travel with a clone/install.
+export const EXAMPLES = path.join(PKG_ROOT, 'examples');
 export const BUNDLED_SAMPLES = path.join(DIST, 'samples');
 // Run history shipped alongside the gallery samples (contributed via `upload`),
 // so a clone/install can scrub a sample's evolution without the original
@@ -33,13 +38,30 @@ export const IMPLS_DIR = path.join(VISUALLY_HOME, 'impls');
 // On-the-fly rendered thumbnails / contact sheets for workspace scenes that
 // have no bundled static image. Cached, keyed by the scene's mtime.
 export const THUMBS_DIR = path.join(VISUALLY_HOME, 'thumbs');
+// Fetched source evidence per scene: evidence/<id>/ (paper.md / notes.md /
+// refs / index.json). `visually evidence` writes here; `amend` reads it to
+// QUOTE the real source instead of guessing. Distinct from impls/ (code) and
+// runs/ (history) — this is the ground-truth substrate the spec is graded
+// against, so it must never be writable by the core reproduce/judge loop.
+export const EVIDENCE_DIR = path.join(VISUALLY_HOME, 'evidence');
 
 export function ensureWorkspace(): void {
   fs.mkdirSync(SCENES_DIR, { recursive: true });
   fs.mkdirSync(RUNS_DIR, { recursive: true });
   fs.mkdirSync(IMPLS_DIR, { recursive: true });
   fs.mkdirSync(THUMBS_DIR, { recursive: true });
+  fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
   migrateLegacyRuns();
+}
+
+// The workspace evidence dir for a scene (where `visually evidence` writes).
+export function evidenceDir(id: string): string {
+  return path.join(EVIDENCE_DIR, id);
+}
+
+// The checked-in seed evidence for a scene, if the package ships one.
+export function packagedExampleDir(id: string): string {
+  return path.join(EXAMPLES, id);
 }
 
 // All runs for a scene live under runs/<id>/ (one folder per scene), each run a

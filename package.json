@@ -12,6 +12,7 @@
     "server",
     "scripts",
     "prompts",
+    "examples",
     "docs/schema.json",
     "dist"
   ],
