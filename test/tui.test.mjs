@@ -14,7 +14,7 @@ test('TUI mounts and renders the main menu', async () => {
   const frame = lastFrame();
   unmount();
   assert.match(frame, /visually-3d/);
-  assert.match(frame, /Create new scene/);
+  assert.match(frame, /New scene/);
   assert.match(frame, /Continue existing/);
   assert.match(frame, /Quit/);
 });

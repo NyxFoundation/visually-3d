@@ -95,8 +95,8 @@ function Runner({ args, onBack }: { args: string[]; onBack: () => void }) {
 // ── screens ──────────────────────────────────────────────────────────────────
 function Menu({ onPick }: { onPick: (value: string) => void }) {
   const items = [
-    { label: '✦  Create new scene', value: 'create' },
-    { label: '↻  Continue existing  (view / improve / reproduce / push)', value: 'scenes' },
+    { label: '✦  New scene  (visualize from a name + paper URL)', value: 'create' },
+    { label: '↻  Continue existing  (visualize / verify / refine / push)', value: 'scenes' },
     { label: '◉  Open web gallery in the browser', value: 'gallery' },
     { label: '✕  Quit', value: 'quit' },
   ];
@@ -147,42 +147,20 @@ function SceneList({ onPick, onBack }: { onPick: (id: string) => void; onBack: (
     </${Box}>`;
 }
 
-function SceneAction({ id, onRun, onRefine, onBack }: { id: string; onRun: (args: string[]) => void; onRefine: () => void; onBack: () => void }) {
+function SceneAction({ id, onRun, onBack }: { id: string; onRun: (args: string[]) => void; onBack: () => void }) {
   useInput((_input: string, key: { escape: boolean }) => { if (key.escape) onBack(); });
-  type Act = string[] | 'back' | 'refine';
-  const items: { label: string; value: Act }[] = [
-    { label: 'View    — open in the browser', value: ['check', id] },
-    { label: 'Refine  — 3D ⇄ implementation loop (improve + verify)', value: 'refine' },
-    { label: 'Push    — open a PR to the gallery', value: ['upload', id] },
+  const items: { label: string; value: string[] | 'back' }[] = [
+    { label: 'Visualize — fetch source (ref + code) and build the grounded 3D model', value: ['visualize', id] },
+    { label: 'Verify    — formal check (z3/SMT or sim) + fold findings into the spec', value: ['verify', id] },
+    { label: 'Refine    — the closed loop: visualize → verify, ratcheting on the best', value: ['refine', id] },
+    { label: 'View      — open in the browser', value: ['check', id] },
+    { label: 'Push      — open a PR to the gallery', value: ['upload', id] },
     { label: 'Back', value: 'back' },
   ];
-  const pick = (it: { value: Act }): void => {
-    if (it.value === 'back') onBack();
-    else if (it.value === 'refine') onRefine();
-    else onRun(it.value);
-  };
   return html`
     <${Box} flexDirection="column">
       <${Text}>Scene: <${Text} color="cyan" bold>${id}</${Text}></${Text}>
-      <${Box} marginTop=${1}><${SelectInput} items=${items} onSelect=${pick} /></${Box}>
-    </${Box}>`;
-}
-
-// Refine sub-menu: pick how the closed loop should gather source evidence when it
-// stalls (the CLI's --evidence-refs / --no-evidence as selectable presets).
-function RefineOptions({ id, onRun, onBack }: { id: string; onRun: (args: string[]) => void; onBack: () => void }) {
-  useInput((_input: string, key: { escape: boolean }) => { if (key.escape) onBack(); });
-  const items: { label: string; value: string[] | 'back' }[] = [
-    { label: 'Auto evidence   — paper first, escalate to GitHub if needed (default)', value: ['refine', id] },
-    { label: 'GitHub upfront  — also search reference implementations from the start', value: ['refine', id, '--evidence-refs'] },
-    { label: 'No web evidence — refine from the spec alone (offline)', value: ['refine', id, '--no-evidence'] },
-    { label: 'Back', value: 'back' },
-  ];
-  return html`
-    <${Box} flexDirection="column">
-      <${Text}>Refine <${Text} color="cyan" bold>${id}</${Text}> — source evidence policy</${Text}>
       <${Box} marginTop=${1}><${SelectInput} items=${items} onSelect=${(it: { value: string[] | 'back' }) => (it.value === 'back' ? onBack() : onRun(it.value))} /></${Box}>
-      <${Box} marginTop=${1}><${Text} dimColor>Evidence is cached &amp; reused across runs; it only feeds amend, never the reproduce graders.</${Text}></${Box}>
     </${Box}>`;
 }
 
@@ -203,15 +181,11 @@ function App() {
     }} />`;
   } else if (screen === 'create') {
     body = html`<${CreateForm} onBack=${() => setScreen('menu')}
-      onStart=${(name: string, url: string) => { setRunArgs(['create', name, ...(url ? ['--url', url] : [])]); setScreen('running'); }} />`;
+      onStart=${(name: string, url: string) => { setRunArgs(['visualize', name, ...(url ? ['--url', url] : [])]); setScreen('running'); }} />`;
   } else if (screen === 'scenes') {
     body = html`<${SceneList} onBack=${() => setScreen('menu')} onPick=${(id: string) => { setPicked(id); setScreen('sceneAction'); }} />`;
   } else if (screen === 'sceneAction') {
     body = html`<${SceneAction} id=${picked} onBack=${() => setScreen('scenes')}
-      onRefine=${() => setScreen('refineOpts')}
-      onRun=${(args: string[]) => { setRunArgs(args); setScreen('running'); }} />`;
-  } else if (screen === 'refineOpts') {
-    body = html`<${RefineOptions} id=${picked} onBack=${() => setScreen('sceneAction')}
       onRun=${(args: string[]) => { setRunArgs(args); setScreen('running'); }} />`;
   } else if (screen === 'running') {
     body = html`<${Runner} args=${runArgs} onBack=${() => setScreen('menu')} />`;

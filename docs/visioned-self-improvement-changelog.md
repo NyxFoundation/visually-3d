@@ -395,6 +395,31 @@ The new shape of the loop:
   SOTA-search** task driven by the now-faithful 3D model. Zero-from-scratch
   implementation and RTL generation are dropped as goals.
 
+## 15. Three-command loop — visualize · verify · refine
+
+The command surface is carved to match the pivot: a clean three-command loop,
+loosely coupled, with the redundant commands and the now-dead escalation code
+removed.
+
+- **`visualize`** (`lib/visualize.ts`) — Stage 0+1 in one leg: fetch the
+  ground-truth evidence (reference paper + the real **source code**) UP FRONT,
+  then build/improve the 3D model GROUNDED in it. Births a draft (via `create`,
+  dynamically imported to avoid a cycle) if the scene is new.
+- **`verify`** (`lib/verify.ts`) — `reproduce` (backend formal check) + `amendScene`
+  (fold findings into the spec) behind one `verifyStep`.
+- **`refine`** (`lib/refine.ts`) — the closed loop: each round calls
+  `visualizeStep` then `verifyStep`, keeping only the loop concerns (visual-budget
+  taper, goal check, best-scene ratchet). It no longer inlines improve/reproduce/
+  amend, so the legs are reusable on their own.
+
+Removed: the standalone `create` / `improve` / `reproduce` / `amend` commands
+(their modules remain as internal building blocks); the `amend()` CLI wrapper; and
+the gap-targeted escalation machinery (`ensureEvidence` / `planEvidence` /
+`summarizeGaps` / `hasSourceGaps`) — evidence is now fetched up front by
+`visualize` (paper + refs in one pass), so the stall-driven ladder is unnecessary.
+The TUI offers the same three actions; infra commands (`serve` / `check` /
+`upload`) are unchanged.
+
 ## References
 
 The hardening borrows directly from prior recursive-self-improvement work:

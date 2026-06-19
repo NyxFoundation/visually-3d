@@ -125,24 +125,6 @@ export function sourceGrounding(ev: LoadedEvidence, limit = 4000): string {
   return evidenceExcerpt(ev, limit);
 }
 
-// True when a reproduce report still shows SOURCE-DEPENDENT gaps — missing
-// fields or fidelity mismatches that only the real paper/datasheet can resolve
-// (as opposed to a self-check counterexample, which amend can fix from the
-// findings alone). This is the signal refine uses to decide, autonomously, that
-// gathering source evidence is worth it.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function hasSourceGaps(report: any): boolean {
-  if (!report || typeof report !== 'object') return false;
-  const missing = Array.isArray(report.missing_fields) ? report.missing_fields.length : 0;
-  const fr = report.fidelity_report || {};
-  const paramMiss = Array.isArray(fr.parameter_fidelity)
-    ? fr.parameter_fidelity.filter((p: { match?: unknown }) => p?.match === false).length : 0;
-  const propBad = Array.isArray(fr.property_checks)
-    ? fr.property_checks.filter((p: { status?: unknown }) => p?.status && p.status !== 'satisfied').length : 0;
-  const struct = Array.isArray(fr.structural_findings) ? fr.structural_findings.length : 0;
-  return missing + paramMiss + propBad + struct > 0;
-}
-
 // ── source extraction from a scene ───────────────────────────────────────────
 export interface SourceRef { title?: string; url?: string }
 
@@ -239,32 +221,6 @@ remarks). Start with "# Evidence: ${subject}". Use clear section headings. This
 text is saved verbatim and APPENDED to any evidence already gathered.`;
 }
 
-// One-line, human descriptions of the SOURCE-dependent gaps a report still has —
-// fed to the gatherer as priorities and recorded with the attempt.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function summarizeGaps(report: any): string[] {
-  const out: string[] = [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  for (const m of (report?.missing_fields || []) as any[]) {
-    if (m?.item) out.push(`[${m.kind || 'fact'}] ${m.item}${m.where && m.where !== 'global' ? ` (part ${m.where})` : ''}`);
-  }
-  const fr = report?.fidelity_report || {};
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  for (const p of (fr.parameter_fidelity || []) as any[]) {
-    if (p?.match === false) out.push(`parameter "${p.param}" — the source's real value (impls guessed "${p.impl_value}")`);
-  }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  for (const p of (fr.property_checks || []) as any[]) {
-    if (p?.status && p.status !== 'satisfied') out.push(`evidence for the named property "${p.property}"`);
-  }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  for (const s of (fr.structural_findings || []) as any[]) {
-    if (typeof s === 'string') out.push(`the source's actual structure for: ${s}`);
-  }
-  // de-dupe, keep order
-  return [...new Set(out)];
-}
-
 function stamp(): string {
   const d = new Date();
   const p = (n: number): string => String(n).padStart(2, '0');
@@ -282,22 +238,6 @@ export function readIndex(id: string): EvidenceIndex | null {
 }
 
 export type EvidenceMethod = 'paper' | 'refs';
-export interface EvidencePlan { method: EvidenceMethod | null; openGaps: string[]; reason: string }
-
-// Decide, from the persistent attempt log, WHAT to gather next (or that we are
-// done). Escalation ladder: primary sources (paper) → reference implementations
-// (refs) → exhausted. Never repeats a method, so re-running `refine` advances the
-// ladder instead of re-fetching the same source.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function planEvidence(id: string, scene: any, report: any): EvidencePlan {
-  const openGaps = summarizeGaps(report);
-  const sources = sceneSources(scene);
-  if (!sources.length) return { method: null, openGaps, reason: 'the scene cites no source URL to fetch' };
-  const tried = new Set((readIndex(id)?.attempts || []).map((a) => a.method));
-  if (!tried.has('paper')) return { method: 'paper', openGaps, reason: 'no primary source fetched yet' };
-  if (!tried.has('refs')) return { method: 'refs', openGaps, reason: 'primary source did not close the gaps — widening to reference implementations' };
-  return { method: null, openGaps, reason: 'all source-gathering methods exhausted; remaining gaps are genuinely unobtainable' };
-}
 
 // Run ONE gathering pass and ACCUMULATE it: append the transcription to paper.md
 // (never overwrite) and record the attempt in index.json so the policy can
@@ -358,31 +298,6 @@ function persistAttempt(
   if (!items.some((it) => it.file === 'paper.md')) items.push({ kind: 'paper', file: 'paper.md' });
   const index = EvidenceIndexSchema.parse({ id, fetchedAt: at, sources, items, attempts });
   writeFileSync(path.join(dir, 'index.json'), JSON.stringify(index, null, 2) + '\n');
-}
-
-// The autonomous entry point `refine` calls when it stalls. Consults the cache /
-// attempt log, decides whether (and what) to gather, and accumulates it. Loosely
-// coupled: refine never reaches into the store directly.
-export async function ensureEvidence(
-  id: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  opts: { report: any; model?: string; refs?: boolean },
-): Promise<{ gathered: boolean; method: EvidenceMethod | null; reason: string; added?: number }> {
-  const target = resolveScene(id);
-  if (!target) return { gathered: false, method: null, reason: `no such scene: ${id}` };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const scene: any = JSON.parse(readFileSync(target, 'utf8'));
-  const plan = planEvidence(id, scene, opts.report);
-  if (!plan.method) return { gathered: false, method: null, reason: plan.reason };
-  console.log(`  ↳ ${plan.reason} → fetching (${plan.method === 'refs' ? 'GitHub reference impls' : 'primary source'}, web tools enabled)…`);
-  if (plan.openGaps.length) console.log(`    targeting ${plan.openGaps.length} open gap(s), e.g. ${plan.openGaps[0]}`);
-  const res = await gatherEvidence(id, { method: plan.method, openGaps: plan.openGaps, refs: opts.refs, model: opts.model });
-  if (res.added > 0) {
-    console.log(`  ✓ evidence accumulated (+${res.added} chars; methods so far: ${res.methodsDone.join('+')}) — amend can now quote it`);
-    return { gathered: true, method: plan.method, reason: plan.reason, added: res.added };
-  }
-  console.log('  · no usable evidence returned this pass (attempt recorded; will escalate next stall)');
-  return { gathered: false, method: plan.method, reason: 'no usable evidence returned', added: 0 };
 }
 
 // List the evidence files present for a scene (used by tests / inspection).

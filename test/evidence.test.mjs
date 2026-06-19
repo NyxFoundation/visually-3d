@@ -12,20 +12,10 @@ process.env.VISUALLY_HOME = HOME;
 
 const {
   EvidenceIndexSchema, sceneSources, buildEvidencePrompt,
-  loadEvidence, evidenceExcerpt, hasEvidence,
-  summarizeGaps, planEvidence, readIndex,
+  loadEvidence, evidenceExcerpt, hasEvidence, readIndex,
 } = await import('../lib/evidence.js');
 const { evidenceDir } = await import('../lib/paths.js');
 const { mkdirSync: mkdir, writeFileSync: write } = await import('node:fs');
-
-const reportWithGaps = {
-  missing_fields: [{ item: 'conflict-free bank map', kind: 'operation', where: 'crossbar' }],
-  fidelity_report: {
-    parameter_fidelity: [{ param: 'q', impl_value: '7681', match: false }],
-    property_checks: [{ property: 'conflict-free mapping', status: 'violated' }],
-    structural_findings: ['crossbar permutation per stage'],
-  },
-};
 
 const scene = {
   machine_name: 'CFNTT Radix-2/4 NTT Accelerator (FPGA)',
@@ -117,39 +107,11 @@ test('loadEvidence prefers the workspace paper but KEEPS the seed notes (merge)'
   assert.ok(ev.notes && ev.notes.includes('CFNTT'));
 });
 
-test('summarizeGaps turns a report into source-hunting targets', () => {
-  const g = summarizeGaps(reportWithGaps);
-  assert.ok(g.some((x) => x.includes('conflict-free bank map')));
-  assert.ok(g.some((x) => x.includes('parameter "q"')));
-  assert.ok(g.some((x) => x.includes('conflict-free mapping')));
-  assert.ok(g.some((x) => x.includes('crossbar permutation')));
-});
-
 test('buildEvidencePrompt injects the open gaps as PRIORITY targets', () => {
   const p = buildEvidencePrompt(scene, sceneSources(scene), { refs: false, openGaps: ['the FSM transition table', 'the twiddle ROM address fn'] });
   assert.ok(p.includes('PRIORITY'));
   assert.ok(p.includes('the FSM transition table'));
   assert.ok(p.includes('the twiddle ROM address fn'));
-});
-
-test('planEvidence escalates paper → refs → exhausted via the attempt log', () => {
-  const id = 'plan-test';
-  const dir = evidenceDir(id);
-  mkdir(dir, { recursive: true });
-  // no index yet → fetch the primary source
-  assert.equal(planEvidence(id, scene, reportWithGaps).method, 'paper');
-
-  write(path.join(dir, 'index.json'), JSON.stringify({ id, attempts: [{ method: 'paper', at: 't' }] }));
-  assert.equal(planEvidence(id, scene, reportWithGaps).method, 'refs');
-
-  write(path.join(dir, 'index.json'), JSON.stringify({ id, attempts: [{ method: 'paper', at: 't' }, { method: 'refs', at: 't' }] }));
-  assert.equal(planEvidence(id, scene, reportWithGaps).method, null);
-});
-
-test('planEvidence will not fetch when the scene cites no source', () => {
-  const plan = planEvidence('plan-test-2', { machine_name: 'x', metadata: {}, parts: [] }, reportWithGaps);
-  assert.equal(plan.method, null);
-  assert.ok(/no source/.test(plan.reason));
 });
 
 test('readIndex round-trips a persisted attempt log', () => {

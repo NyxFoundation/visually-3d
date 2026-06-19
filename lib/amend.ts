@@ -16,34 +16,11 @@
 
 import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { resolveScene, sceneIdFromPath, runDir as makeRunDir, ensureWorkspace } from './paths.js';
+import { sceneIdFromPath, runDir as makeRunDir, ensureWorkspace } from './paths.js';
 import { runClaudeStreaming } from './runner.js';
 import { extractScene, parseScene, validateScene, specCoverage } from './scene.js';
 import { repairArithmeticClaims } from './arith-audit.js';
-import { reproduce } from './reproduce.js';
 import { loadEvidence, evidenceExcerpt, type LoadedEvidence } from './evidence.js';
-
-interface AmendOpts {
-  positional: string[];
-  model?: string;
-  backend?: string;
-  noVerify?: boolean;
-  n?: number;
-}
-
-function parseArgs(argv: string[]): AmendOpts {
-  const opts: AmendOpts = { positional: [] };
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-    if (a === '--model') opts.model = argv[++i];
-    else if (a === '--backend') opts.backend = argv[++i];
-    else if (a === '--n') opts.n = Number(argv[++i]);
-    else if (a === '--no-verify') opts.noVerify = true;
-    else if (a.startsWith('--')) throw new Error(`unknown flag: ${a}`);
-    else opts.positional.push(a);
-  }
-  return opts;
-}
 
 function stamp(): string {
   const d = new Date();
@@ -472,32 +449,4 @@ export async function amendScene(
   writeFileSync(target, serialized);
   writeFileSync(path.join(dir, 'amended.json'), serialized);
   return { applied: true, before, after };
-}
-
-// CLI entry: run a fresh reproduce, then fold its findings back into the scene.
-export async function amend(argv: string[]): Promise<void> {
-  const opts = parseArgs(argv);
-  const ref = opts.positional[0];
-  if (!ref) {
-    throw new Error('usage: visually amend <scene> [--n 2] [--model <m>] [--backend <id>] [--no-verify]');
-  }
-  const target = resolveScene(ref);
-  if (!target) throw new Error(`no such scene: ${ref}`);
-
-  console.log(`visually amend: ${sceneIdFromPath(target)} — verify, then fold findings into the spec`);
-  const reproArgs = [ref];
-  if (opts.model) reproArgs.push('--model', opts.model);
-  if (opts.backend) reproArgs.push('--backend', opts.backend);
-  if (opts.noVerify) reproArgs.push('--no-verify');
-  if (opts.n !== undefined && Number.isFinite(opts.n)) reproArgs.push('--n', String(opts.n));
-  const report = await reproduce(reproArgs);
-
-  console.log('\n▶ folding verification findings into the spec…');
-  const res = await amendScene(target, report, { model: opts.model });
-  if (res.applied) {
-    console.log(`  ✓ spec grown: ${res.before} → ${res.after} fields written back into the scene.`);
-    console.log('  re-run `visually reproduce` (or `visually refine`) — reproducibility should now rise.');
-  } else {
-    console.log(`  · no change: ${res.reason}`);
-  }
 }

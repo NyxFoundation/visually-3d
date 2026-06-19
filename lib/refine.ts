@@ -1,34 +1,22 @@
-// `visually refine <scene>` — the unified, CLOSED 3D ⇄ implementation
-// self-improvement loop ("visioned self-improvement"). Each round:
+// `visually refine <scene>` — the REFINE leg: the closed loop that drives a scene
+// toward the goals (and, ultimately, toward a better / SOTA design). Each round:
 //
-//   1. improve   — render → VLM critique → rewrite the scene (visual axis),
-//                  seeded with the previous round's verification findings so the
-//                  annotations stay consistent with what must be reproducible;
-//   2. reproduce — N engineers reverse-implement the scene from the spec alone
-//                  and a backend (SMT for algorithms/circuits, physics sim for
-//                  machines) actually runs each implementation's self-check;
-//   3. amend     — fold the verification findings (missing fields, divergences,
-//                  counterexamples) BACK into the scene's functional spec.
+//   1. visualize — fetch/keep the ground-truth evidence and improve the 3D model
+//                  GROUNDED in the real source (lib/visualize.ts);
+//   2. verify    — formally check it with the backend and fold the findings back
+//                  into the spec (lib/verify.ts).
 //
-// Step 3 is the edge the old loop lacked: without it, improve wrote geometry and
-// reproduce read semantics, so the reproducibility score could never move. With
-// it, each round writes verified facts into the spec, the next reproduce reads
-// them, the independent implementations converge, and reproducibility climbs.
-//
-// It stays mode/backend-agnostic, so it behaves the same for hardware,
-// algorithm, and architecture scenes — only the verification backend differs.
+// refine owns only the LOOP concerns: the visual-budget taper, the goal check,
+// and the ratchet that never lets the scene end worse than the best round seen.
+// The two legs are reusable on their own (`visualize` / `verify` commands).
 
-import os from 'node:os';
-import path from 'node:path';
-import { writeFileSync, mkdtempSync, readFileSync } from 'node:fs';
-import { improve } from './improve.js';
-import { reproduce } from './reproduce.js';
-import { amendScene, hasFindings } from './amend.js';
+import { writeFileSync, readFileSync } from 'node:fs';
+import { visualizeStep } from './visualize.js';
+import { verifyStep } from './verify.js';
 import { latestVisualScore } from './history.js';
 import { specCoverage } from './scene.js';
 import { repairArithmeticClaims } from './arith-audit.js';
 import { resolveScene, sceneIdFromPath } from './paths.js';
-import { ensureEvidence, hasSourceGaps, loadEvidence, sourceGrounding } from './evidence.js';
 
 interface RefineOpts {
   positional: string[];
@@ -42,7 +30,7 @@ interface RefineOpts {
   noVerify?: boolean;
   noAmend?: boolean;
   noEvidence?: boolean;
-  evidenceRefs?: boolean;
+  noRefs?: boolean;
 }
 
 function parseArgs(argv: string[]): RefineOpts {
@@ -59,74 +47,18 @@ function parseArgs(argv: string[]): RefineOpts {
     else if (a === '--no-verify') opts.noVerify = true;
     else if (a === '--no-amend') opts.noAmend = true;
     else if (a === '--no-evidence') opts.noEvidence = true;
-    else if (a === '--evidence-refs') opts.evidenceRefs = true;
+    else if (a === '--no-refs') opts.noRefs = true;
     else if (a.startsWith('--')) throw new Error(`unknown flag: ${a}`);
     else opts.positional.push(a);
   }
   return opts;
 }
 
-// Turn a reproduce report into a seed "reflection" the next improve round reads
-// as carried-over gaps — so the visual pass keeps the scene's annotations and
-// spec consistent with what verification said is missing. Written in the shape
-// improve already consumes (see history.ts → PriorReflection / self-improve.sh).
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function seedFromReport(report: any): { source: string; remaining_gaps: string[]; notes: string[] } | null {
-  if (!hasFindings(report)) return null;
-  const gaps: string[] = [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  for (const m of (report.missing_fields || []) as any[]) {
-    const where = m.where && m.where !== 'global' ? ` (part "${m.where}")` : '';
-    gaps.push(`Make reproducible — record the ${m.kind || 'fact'}: ${m.item}${where}`);
-    if (gaps.length >= 8) break;
-  }
-  // Fidelity gaps: keep the scene faithful to the SPECIFIC source, not a generic
-  // correct version. These ride alongside the reproducibility gaps.
-  const fr = report.fidelity_report || {};
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  for (const p of (fr.parameter_fidelity || []) as any[]) {
-    if (p?.match === false && gaps.length < 12) {
-      gaps.push(`Match the source — ${p.param} should be "${p.reference_value}" (impls used "${p.impl_value}")`);
-    }
-  }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  for (const s of (fr.structural_findings || []) as any[]) {
-    if (gaps.length < 14) gaps.push(`Match the source's architecture — ${s}`);
-  }
-  const notes = [
-    'These gaps come from the reproducibility check: engineers could not rebuild the system from the scene alone. Keep the scene\'s spec/annotations consistent with the values amend writes in.',
-  ];
-  return { source: 'reproduce findings', remaining_gaps: gaps, notes };
-}
-
-interface ImproveSeed { source: string; remaining_gaps: string[]; notes: string[] }
-
-// The seed handed to the visual improve pass. Merges (a) the prior round's
-// verification gaps with (b) SOURCE GROUNDING from gathered evidence — so the 3D
-// model is improved to depict the REAL architecture (modules, memory, datapath,
-// control) the source describes, not a guess. Returns null only when there is
-// neither, so grounding alone (e.g. round 1, before any report) still seeds it.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function buildImproveSeed(report: any, ev: ReturnType<typeof loadEvidence>): ImproveSeed | null {
-  const base = seedFromReport(report);
-  const grounding = ev && ev.origin !== 'none' ? sourceGrounding(ev) : '';
-  if (!base && !grounding) return null;
-  const remaining_gaps = base ? [...base.remaining_gaps] : [];
-  const notes = base ? [...base.notes] : [];
-  if (grounding) {
-    remaining_gaps.unshift(
-      'Make the 3D structure FAITHFUL to the authoritative source architecture below — depict the real modules, memory banks, datapath and control as the source describes them; do not invent structure it contradicts.',
-    );
-    notes.push(`AUTHORITATIVE SOURCE ARCHITECTURE (ground the 3D model in this real implementation):\n${grounding}`);
-  }
-  return { source: base?.source ?? 'source evidence', remaining_gaps, notes };
-}
-
 export async function refine(argv: string[]): Promise<void> {
   const opts = parseArgs(argv);
   const ref = opts.positional[0];
   if (!ref) {
-    throw new Error('usage: visually refine <scene> [--rounds N] [--visual 90] [--repro 80] [--iters 1] [--driver claude|codex] [--model <m>] [--backend <id>] [--no-verify] [--no-amend] [--no-evidence] [--evidence-refs]');
+    throw new Error('usage: visually refine <scene> [--rounds N] [--visual 90] [--repro 80] [--iters 1] [--driver claude|codex] [--model <m>] [--backend <id>] [--no-verify] [--no-amend] [--no-evidence] [--no-refs]');
   }
   const target = resolveScene(ref);
   if (!target) throw new Error(`no such scene: ${ref}`);
@@ -137,7 +69,7 @@ export async function refine(argv: string[]): Promise<void> {
   const reproGoal = Number.isFinite(opts.repro) ? (opts.repro as number) : 80;
   const iters = opts.iters && opts.iters > 0 ? opts.iters : 1;
 
-  console.log(`visually refine: ${id} — closed 3D ⇄ implementation loop (improve → reproduce → amend)`);
+  console.log(`visually refine: ${id} — closed loop (visualize → verify)`);
   console.log(`  goals: visual ≥ ${visualGoal}/100, reproducibility ≥ ${reproGoal}/100, self-check passing`);
   console.log(`  up to ${maxRounds} round(s)\n`);
 
@@ -146,100 +78,69 @@ export async function refine(argv: string[]): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let lastReport: any = null;
 
-  // Feedback-driven visual budget: the visual pass is the most token-heavy step
-  // (it attaches a render and rewrites the WHOLE scene), so we don't spend it on
-  // a fixed per-round schedule. Instead:
-  //   - while visual is still BELOW its goal, run one improving pass per round;
-  //   - once it CLEARS the goal, stop running visual on its own — only run it
-  //     REACTIVELY, when the previous round produced spec/impl feedback that
-  //     actually changed the scene (amend grew the spec). That single pass folds
-  //     the new facts into the visual annotations; if nothing changed, visual is
-  //     skipped entirely and the whole budget goes to reproduce/amend.
-  // `visualCleared` tracks the goal; `lastAmendApplied` tracks whether last round
-  // left new feedback the visual layer should catch up to.
+  // Feedback-driven visual budget: the visual pass is the most token-heavy step,
+  // so it is not run on a fixed schedule. Below the goal → one improving pass per
+  // round; at/above the goal → run ONLY when last round's verify changed the spec
+  // (so the visual layer folds in the new feedback), else skip entirely.
   let visualCleared = false;
   let lastAmendApplied = false;
 
-  // Autonomous source-evidence gathering happens inside the round loop via
-  // ensureEvidence (lib/evidence.ts): when the loop stalls below the
-  // reproducibility goal on SOURCE-dependent gaps, it consults the accumulated
-  // cache and the attempt log, then fetches the primary source / escalates to
-  // reference implementations / stops when exhausted — accumulating, not
-  // overwriting. `--no-evidence` opts out; `--evidence-refs` also searches GitHub.
-
-  // ④ Ratchet: keep the highest-scoring scene seen, so a round that regresses
-  // (reproducibility dropped, self-check broke) never leaves the canonical scene
-  // worse than the best round already achieved. A passing self-check dominates
-  // the raw reproducibility number. Mirrors the program-archive idea in
-  // evolutionary self-improvement (FunSearch / AlphaEvolve / Darwin Gödel
-  // Machine): only the best individual survives selection.
+  // Ratchet: keep the highest-scoring scene seen, so a regressing round never
+  // leaves the canonical scene worse than the best round already achieved. A
+  // passing self-check dominates the raw reproducibility number. (FunSearch /
+  // AlphaEvolve / Darwin Gödel Machine: only the best individual survives.)
   let best: { score: number; snapshot: string; round: number; visual: number | null; repro: number | null } | null = null;
-  let roundScore: number | null = null; // the most recent round's score (for the end-of-loop ratchet)
+  let roundScore: number | null = null;
 
   for (let round = 1; round <= maxRounds; round++) {
     console.log(`\n════════ refine round ${round}/${maxRounds} ════════`);
 
-    // 1. Visual self-improvement, seeded with the prior round's verification
-    // findings (carried-over gaps). Tolerate a failed pass (e.g. a render
-    // hiccup): the saved scene is intact and the loop can still verify it.
-    //
-    // Budget: below the goal → one improving pass; at/above the goal → run ONLY
-    // when last round's amend changed the spec (so the visual layer folds in the
-    // new feedback), otherwise skip the pass entirely.
+    // 1. VISUALIZE — ground-truth evidence (fetched once, then cached) + a
+    // source-grounded visual pass. Budget: below the goal → one pass; at/above →
+    // only when last round's spec changed; otherwise skip.
     const roundIters = !visualCleared ? iters : (lastAmendApplied ? Math.min(1, iters) : 0);
     if (roundIters > 0) {
-      console.log(`\n▶ visual self-improvement (${roundIters} iteration(s))…` +
+      console.log(`\n▶ visualize (${roundIters} iteration(s))…` +
         (visualCleared ? `  [feedback-driven — last round's spec changes to fold in]` : ''));
-      const seed = buildImproveSeed(lastReport, loadEvidence(id));
-      if (seed && seed.source === 'source evidence') console.log('  grounding the 3D pass in the gathered source architecture');
-      const prevSeedEnv = process.env.VISUALLY_SEED_REVIEW;
       try {
-        if (seed) {
-          const seedDir = mkdtempSync(path.join(os.tmpdir(), 'visually-refine-seed-'));
-          const seedPath = path.join(seedDir, 'seed-review.json');
-          writeFileSync(seedPath, JSON.stringify(seed, null, 2));
-          process.env.VISUALLY_SEED_REVIEW = seedPath;
-          console.log(`  seeding visual pass with ${seed.remaining_gaps.length} verification gap(s) from last round`);
-        }
-        const improveArgs = [id, String(roundIters)];
-        if (opts.driver) improveArgs.push('--driver', opts.driver);
-        if (opts.model) improveArgs.push('--model', opts.model);
-        await improve(improveArgs);
+        await visualizeStep(id, {
+          iters: roundIters,
+          model: opts.model,
+          driver: opts.driver,
+          report: lastReport,
+          noEvidence: opts.noEvidence,
+          refs: !opts.noRefs,
+        });
       } catch (err) {
-        console.log(`  ⚠ visual pass stopped: ${(err as Error).message}`);
-      } finally {
-        // Restore the caller's env so we don't leak the seed into later rounds.
-        if (seed) {
-          if (prevSeedEnv === undefined) delete process.env.VISUALLY_SEED_REVIEW;
-          else process.env.VISUALLY_SEED_REVIEW = prevSeedEnv;
-        }
+        console.log(`  ⚠ visualize stopped: ${(err as Error).message}`);
       }
     } else {
-      console.log(`\n▶ visual self-improvement — skipped (visual ≥ ${visualGoal}, no new spec/impl feedback to fold in)`);
+      console.log(`\n▶ visualize — skipped (visual ≥ ${visualGoal}, no new spec feedback to fold in)`);
     }
     visual = latestVisualScore(id);
-    // Gate the NEXT round: re-clearing the goal keeps visual on demand; a
-    // feedback pass that regressed below the goal restores the per-round pass.
     visualCleared = visual != null && visual >= visualGoal;
 
     // Snapshot the scene exactly as it is about to be SCORED (post-visual,
-    // pre-verify). This is the version `reproduce` measures, so it is the unit
-    // the ratchet keeps or rolls back to.
+    // pre-verify) — the unit the ratchet keeps or rolls back to.
     let scoredSnapshot = '';
     try { scoredSnapshot = readFileSync(target, 'utf8'); } catch { /* ignore */ }
 
-    // 2. Implementation verification.
-    console.log(`\n▶ implementation verification…`);
+    // 2. VERIFY — formal check + fold findings back into the spec.
+    console.log(`\n▶ verify…`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let report: any = null;
     try {
-      const reproArgs = [id];
-      if (opts.model) reproArgs.push('--model', opts.model);
-      if (opts.backend) reproArgs.push('--backend', opts.backend);
-      if (opts.noVerify) reproArgs.push('--no-verify');
-      report = await reproduce(reproArgs);
+      const r = await verifyStep(id, {
+        model: opts.model,
+        backend: opts.backend,
+        noVerify: opts.noVerify,
+        noAmend: opts.noAmend,
+      });
+      report = r.report;
+      lastAmendApplied = r.amendApplied;
     } catch (err) {
-      console.log(`  ⚠ verification stopped: ${(err as Error).message}`);
+      console.log(`  ⚠ verify stopped: ${(err as Error).message}`);
+      lastAmendApplied = false;
     }
     const prevRepro = repro;
     repro = report && Number.isFinite(Number(report.reproducibility)) ? Number(report.reproducibility) : null;
@@ -248,38 +149,6 @@ export async function refine(argv: string[]): Promise<void> {
     const ev = report?.executable_verification;
     const verifyEnabled = !!ev?.enabled;
     const verifyPass = verifyEnabled ? ev.passed > 0 && ev.passed === ev.total : null;
-
-    // 2b. Autonomous evidence gathering. When we're below the reproducibility
-    // goal on SOURCE-dependent gaps (only the paper can settle them), hand off to
-    // ensureEvidence: it consults the cache / attempt log and decides whether to
-    // fetch the primary source, escalate to reference implementations, or stop
-    // (all exhausted) — accumulating into the store so THIS round's amend can
-    // already quote it. Loosely coupled: refine owns only the trigger condition.
-    if (!opts.noEvidence && report && repro != null && repro < reproGoal && hasSourceGaps(report)) {
-      console.log(`\n▶ reproducibility ${repro} < ${reproGoal} on source-dependent gaps — consulting source evidence…`);
-      try {
-        await ensureEvidence(id, { report, model: opts.model, refs: opts.evidenceRefs });
-      } catch (err) {
-        console.log(`  ⚠ evidence gathering stopped: ${(err as Error).message}`);
-      }
-    }
-
-    // 3. The return edge: fold the findings back into the scene's spec so the
-    // next round's reproduce reads verified facts and the score can climb.
-    // Whether amend actually changed the spec is the trigger for next round's
-    // feedback-driven visual pass (see the budget logic above).
-    lastAmendApplied = false;
-    if (report && !opts.noAmend) {
-      console.log(`\n▶ folding verification findings into the spec…`);
-      try {
-        const res = await amendScene(target, report, { model: opts.model });
-        lastAmendApplied = res.applied;
-        if (res.applied) console.log(`  ✓ spec grown: ${res.before} → ${res.after} fields written back`);
-        else console.log(`  · spec unchanged (${res.reason})`);
-      } catch (err) {
-        console.log(`  ⚠ amend stopped: ${(err as Error).message}`);
-      }
-    }
 
     const visualOk = visual != null && visual >= visualGoal;
     const reproOk = repro != null && repro >= reproGoal;
@@ -306,10 +175,8 @@ export async function refine(argv: string[]): Promise<void> {
       return;
     }
 
-    // ④ Ratchet: remember the best-scoring SCORED scene (a clean self-check
-    // outweighs the raw reproducibility number). We don't roll back mid-loop —
-    // each round keeps building, but the end-of-loop restore below guarantees we
-    // never finish worse than the best round actually measured.
+    // Ratchet: remember the best-scoring SCORED scene (a clean self-check
+    // outweighs the raw reproducibility number).
     if (report && scoredSnapshot) {
       roundScore = (verifyOk ? 1000 : 0) + (repro ?? 0);
       if (!best || roundScore > best.score) {
@@ -319,9 +186,7 @@ export async function refine(argv: string[]): Promise<void> {
     }
   }
 
-  // Don't END worse than the best round. If the final round regressed versus an
-  // earlier one, restore that best (measured) scene; otherwise keep the latest
-  // scene — its amend growth is the natural continuation, not a regression.
+  // Don't END worse than the best round.
   console.log(`\n△ refine: reached ${maxRounds} round(s) without clearing every threshold.`);
   if (best && roundScore != null && roundScore < best.score) {
     writeSceneSanitized(target, best.snapshot);

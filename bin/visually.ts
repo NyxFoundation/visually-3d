@@ -12,37 +12,33 @@ import { serve } from '../lib/serve.js';
 
 const HELP = `visually-3d — interactive 3D machinery visualization, driven by your local Claude/Codex CLI
 
+The loop is three commands: visualize → verify → refine.
+
 Usage:
   visually                                interactive TUI control panel (in a terminal)
   visually serve [--no-open]              start the local web GUI
-  visually create "<machine name>"        generate a new scene
-       [--hint <text>] [--url <url>] [--mode hardware|algorithm|architecture]
-       [--refine N | --no-refine] [--driver claude|codex] [--id <id>] [--force]
-  visually improve <scene> [iters]        recursively self-improve a scene
-       [--driver codex|claude] [--model <m>]
-  visually reproduce <scene>              measure if the scene is a reproducible
-       [--n 2] [--model <m>]              spec: AI reverse-implements it (Verilog/
-       [--backend <id>] [--no-verify]     Python) from the descriptor alone and
-                                          scores what's missing to rebuild it
-  visually amend <scene>                  fold reproduce's findings back into the
-       [--n 2] [--model <m>]              scene's functional spec (parts[].spec /
-       [--backend <id>] [--no-verify]     metadata.spec) so it becomes reproducible
-  visually refine <scene>                 closed 3D ⇄ implementation loop: each
-       [--rounds 3] [--visual 90]         round runs improve → reproduce → amend.
-       [--repro 80] [--iters 1]           When it stalls below the reproducibility
-       [--backend <id>] [--no-amend]      goal on source-dependent gaps, it auto-
-       [--no-evidence] [--evidence-refs]  gathers the source (paper) via web tools
-                                          so amend can quote it (--no-evidence off)
+  visually visualize <scene | "name">     fetch ground-truth evidence (reference
+       [--url <paper-url>] [--iters N]     paper + real SOURCE CODE) and build/
+       [--driver claude|codex] [--model m] improve the 3D model GROUNDED in it.
+       [--no-evidence] [--no-refs]         Births a draft first if it doesn't exist.
+  visually verify <scene>                 formally check it with the backend (z3/SMT
+       [--n 2] [--model <m>]              for circuits & algorithms, physics sim for
+       [--backend <id>] [--no-verify]     machines) and fold the findings into the
+       [--no-amend]                       spec. Assumes visualize already ran.
+  visually refine <scene>                 the closed loop: each round runs
+       [--rounds 3] [--visual 90]         visualize → verify, ratcheting on the best
+       [--repro 80] [--iters 1]           scene, until visual + reproducibility +
+       [--backend <id>] [--no-amend]      self-check all clear (or max rounds).
+       [--no-evidence] [--no-refs]
   visually check <scene> [--png]          inspect a scene (browser, or PNG contact sheet)
        [--out <file.png>] [--no-open]
   visually upload <scene>                 open a PR adding the scene to the gallery
        [--repo owner/name] [--title <t>] [--dry-run]
 
-Mode is auto-detected from the subject (override with --mode), and the
+Mode is auto-detected from the subject (override at creation), and the
 verification backend is auto-selected from what the subject IS (digital/compute
-→ SMT, physical machine → sim). After generating, create runs ≥3 closed-loop
-rounds (improve → reproduce → amend; --no-refine to skip). Every run streams the
-model's reasoning live and is logged under ~/.visually-3d/runs/.
+→ SMT, physical machine → sim). Every run streams the model's reasoning live and
+is logged under ~/.visually-3d/runs/.
 
 Scenes created locally live under ~/.visually-3d/scenes (override with $VISUALLY_HOME).
 `;
@@ -67,14 +63,10 @@ async function main() {
       return (await import('../lib/tui/app.js')).runTui();
     case 'serve':
       return serve(rest);
-    case 'create':
-      return (await import('../lib/create.js')).create(rest);
-    case 'improve':
-      return (await import('../lib/improve.js')).improve(rest);
-    case 'reproduce':
-      return (await import('../lib/reproduce.js')).reproduce(rest);
-    case 'amend':
-      return (await import('../lib/amend.js')).amend(rest);
+    case 'visualize':
+      return (await import('../lib/visualize.js')).visualize(rest);
+    case 'verify':
+      return (await import('../lib/verify.js')).verify(rest);
     case 'refine':
       return (await import('../lib/refine.js')).refine(rest);
     case 'check':

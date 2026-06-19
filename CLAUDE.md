@@ -64,15 +64,24 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
 ## Architecture map
 
 - `bin/visually.ts` — command dispatcher. Bare `visually` in a TTY launches the
-  Ink TUI; otherwise/with args it routes to subcommands (`serve`, `create`,
-  `improve`, `reproduce`, `amend`, `refine`, `check`, `upload`). Keeps a
-  `#!/usr/bin/env node` shebang (preserved through tsc emit).
+  Ink TUI; otherwise/with args it routes to subcommands. The loop is THREE
+  commands — `visualize` → `verify` → `refine` — plus infra (`serve`, `check`,
+  `upload`, `tui`). Keeps a `#!/usr/bin/env node` shebang (preserved through tsc).
+- `lib/visualize.ts` — the VISUALIZE leg: fetch ground-truth evidence (reference
+  paper + real source code) up front, then build/improve the 3D model GROUNDED in
+  it (`visualizeStep`); births a draft via `create` if the scene is new.
+- `lib/verify.ts` — the VERIFY leg: run the backend's formal check and fold the
+  findings into the spec (`verifyStep` = `reproduce` + `amendScene`).
+- `lib/refine.ts` — the REFINE leg: the closed loop that runs visualize → verify
+  each round, with the visual-budget taper and the best-scene ratchet.
 - `lib/tui/app.ts` — Ink + htm control panel (JSX without a build step). htm
   template markup is opaque to the type-checker; put real types on component
   props, hooks, and effects.
 - `lib/scene.ts` — zod schemas + `parseScene`/`validateScene`/`extractScene`.
-- `lib/reproduce.ts` — reverse-implements a scene from its spec with N agents,
-  verifies via a backend, and distils the best impl into the impl store.
+- `lib/create.ts`, `lib/improve.ts`, `lib/reproduce.ts`, `lib/amend.ts` — internal
+  building blocks (no longer standalone commands): create drafts, run the visual
+  self-improve pass, reverse-implement+verify, and fold findings into the spec.
+  `visualize`/`verify`/`refine` orchestrate them.
 - `lib/backends/` — composable verification backends behind the `Backend`
   interface (`available`/`implementInstructions`/`verify`). `python-smt`
   (Python+Z3 via `uv run --with z3-solver`) and `sim` (MuJoCo). Add backends by
@@ -81,22 +90,20 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
 - `lib/impls.ts` — canonical per-scene impl store under
   `~/.visually-3d/impls/<id>/` (`impl.<ext>` + `verify.txt` + `meta.json`).
 - `lib/evidence.ts` — accumulating, cache-first source-evidence substrate (no
-  standalone command). `refine` calls `ensureEvidence()` AUTONOMOUSLY when it
-  stalls below the reproducibility goal on source-dependent gaps. Policy:
+  standalone command). `visualize` fetches it UP FRONT (`gatherEvidence`, paper +
+  source code) the first time a scene with sources has none cached. Policy:
   reference the cache first (`~/.visually-3d/evidence/<id>/`, falling back to the
-  checked-in `examples/<id>/` seed); on a miss, fetch via the runner's web tools
-  **gap-targeted** (`summarizeGaps`), **appending** to `paper.md` (never
-  overwrite; seed `notes.md` always merged); escalate via a persistent
-  `index.json → attempts[]` log (`planEvidence`: `paper` → `refs` → exhausted),
-  never repeating a method. It captures the reference implementation's key source
+  checked-in `examples/<id>/` seed); on a miss, fetch (paper + GitHub refs) via the
+  runner's web tools, **appending** to `paper.md` (never overwrite; seed
+  `notes.md` always merged), with each pass logged in `index.json → attempts[]`.
+  It captures the reference implementation's key source
   files VERBATIM (ground truth, not just prose). Evidence feeds **`amend`** (quotes
-  it to ground the spec) and the **visual improve pass** (`refine`'s
-  `buildImproveSeed` injects `sourceGrounding` so the 3D model depicts the REAL
-  architecture) — but NOT reproduce's reverse-implementers, which must keep grading
-  the SPEC, not the paper. Only tool-enabled step (`runClaudeStreaming({ tools:
-  [...] })`); the rest is tool-less. (Direction: reproduce is being repointed from
-  reverse-implementation toward verifying the fetched source; zero-from-scratch
-  implementation/RTL generation is not a goal.)
+  it to ground the spec) and the **visual pass** (`visualize`'s `buildImproveSeed`
+  injects `sourceGrounding` so the 3D model depicts the REAL architecture) — but
+  NOT reproduce's reverse-implementers, which must keep grading the SPEC, not the
+  paper. Only tool-enabled step (`runClaudeStreaming({ tools: [...] })`); the rest
+  is tool-less. (Direction: zero-from-scratch implementation / RTL generation is
+  not a goal — the loop grounds on the real source instead.)
 - `lib/serve.ts` — static GUI server + SSE bridge to the local CLI. Endpoints:
   `/api/health`, `/api/analyze/stream`, `/samples/...`, `/api/impl/<id>`,
   `POST /api/impl/<id>/verify` (streams a live backend run).
