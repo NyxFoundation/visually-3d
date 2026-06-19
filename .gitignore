@@ -36,5 +36,6 @@ __pycache__/
 /lib/refine.js
 /lib/visualize.js
 /lib/verify.js
+/lib/sync.js
 /lib/runs.js
 /lib/revisions.js

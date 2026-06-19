@@ -74,6 +74,10 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
   findings into the spec (`verifyStep` = `reproduce` + `amendScene`).
 - `lib/refine.ts` — the REFINE leg: the closed loop that runs visualize → verify
   each round, with the visual-budget taper and the best-scene ratchet.
+- `lib/sync.ts` — `visually sync <id>`: mirror a scene's LOCAL workspace history
+  (scene + `runs/` + `evidence/` + impl) into the repo-tracked `examples/<id>/`
+  AS-IS, so a `git add examples && commit && push` carries it. Explicit (the loop
+  writes to `~/.visually-3d`, outside any repo); preserves a curated `notes.md`.
 - `lib/tui/app.ts` — Ink + htm control panel (JSX without a build step). htm
   template markup is opaque to the type-checker; put real types on component
   props, hooks, and effects.
