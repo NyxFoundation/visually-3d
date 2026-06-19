@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { applyAmendPatch, buildAmendPrompt, hasFindings } from '../lib/amend.js';
+import { applyAmendPatch, buildAmendPrompt, hasFindings, mergeNotes } from '../lib/amend.js';
 import { specCoverage, validateScene, parseScene } from '../lib/scene.js';
 
 const baseScene = () => ({
@@ -108,6 +108,19 @@ test('buildAmendPrompt omits the timeout directive when the check ran', () => {
   const ran = { ...report(), verify_findings: [{ impl: 1, kind: 'pass' }] };
   const p = buildAmendPrompt(baseScene(), ran);
   assert.ok(!p.includes('SELF-CHECK DID NOT FINISH'));
+});
+
+test('mergeNotes dedupes lines and bounds growth (anti-bloat)', () => {
+  // dedupe: re-merging the same note is a no-op
+  assert.equal(mergeNotes('[src] q=12289', '[src] q=12289'), '[src] q=12289');
+  // append a genuinely new line
+  assert.equal(mergeNotes('[src] q=12289', '[conv] radix=2'), '[src] q=12289\n[conv] radix=2');
+  // bounded: many distinct lines over many rounds cannot grow without limit
+  let notes = '';
+  for (let i = 0; i < 500; i++) notes = mergeNotes(notes, `[calc] derived constant number ${i} = ${i * 7} mod q`);
+  assert.ok(notes.length <= 1400, `notes should stay bounded, got ${notes.length}`);
+  // the most-recent provenance survives the cap
+  assert.ok(notes.includes('number 499'));
 });
 
 test('applyAmendPatch only merges metadata.spec and existing part specs', () => {

@@ -164,8 +164,14 @@ need **20–40 parts**. Add the iconic sub-features the current scene is missing
   are written by the reproducibility loop). **Never drop or weaken them.** Carry
   every `spec` field through unchanged, and make your `role`/`facts`/annotations
   *consistent* with them — the geometry is the visualization of this spec.
-- **No regression.** Never delete a correct, informative part to raise a
-  number. Part count and information should rise or hold across iterations.
+- **No regression, but DON'T inflate part count.** Never delete a correct,
+  informative part to game a number — but do NOT add parts to look busier. Fewer,
+  well-chosen parts beat many. Represent N identical units (memory banks, lanes,
+  butterfly sub-cells, heatsink fins, fasteners) as ONE parameterized part with a
+  `count`/`array` in its `spec`, NOT as N separate parts. Aim for the FEWEST parts
+  that convey the architecture clearly (typically ≤ ~40); consolidate decorative
+  or repeated geometry. Information density should rise; part *count* should stay
+  flat or shrink once the architecture is covered.
 - **Keep identity.** Same machine, same `machine_name`, same domain. You are
   refining a model, not replacing it. Carry `metadata.mode`,
   `metadata.reference`, `metadata.backend`, `metadata.info`, `metadata.spec` and
@@ -215,6 +221,11 @@ metalness/roughness): `welded steel` / `forged steel` / `brushed steel`,
 - Adding near-duplicate filler parts to push the count without adding
   information. Each part must be visible in the silhouette, an iconic named
   detail, or required to root the connection graph.
+- **Exploding one unit into many parts** — e.g. 10 separate `heatsink_fin_*`,
+  or splitting each butterfly unit into `bu_mult/bu_add/bu_sub/bu_reg`, or one
+  part per memory bank. Model the *array* as a SINGLE part with its multiplicity
+  in `spec` (e.g. `params: { banks: 8 }`). Repeated geometry is a count, not N
+  parts. If the scene already over-fragments this way, CONSOLIDATE it back down.
 - Claiming `"verdict": "converged"` while the render still shows opaque blocks
   hiding parts, or while parts still lack dimensional grounding.
 - Inflating `scores` past what the emitted scene supports.

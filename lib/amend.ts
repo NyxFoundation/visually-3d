@@ -71,11 +71,34 @@ function mergeSpecValue(base: unknown, patch: unknown, key = ''): unknown {
     return out;
   }
   if (key === 'notes' && typeof base === 'string' && typeof patch === 'string') {
-    if (!base.trim()) return patch;
-    if (!patch.trim() || base.includes(patch)) return base;
-    return `${base}\n${patch}`;
+    return mergeNotes(base, patch);
   }
   return patch;
+}
+
+// `notes` is the one spec field amend APPENDS to, so over many rounds it grows
+// without bound (a big driver of scene bloat). Merge line-wise: dedupe, and cap
+// the total — keeping the most RECENT lines (the latest round's provenance) so a
+// long-refined scene's notes stay bounded instead of ballooning.
+const NOTES_CAP = 1400;
+export function mergeNotes(base: string, patch: string): string {
+  const seen = new Set<string>();
+  const lines: string[] = [];
+  for (const block of [base, patch]) {
+    for (const ln of block.split('\n')) {
+      const key = ln.trim();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      lines.push(ln);
+    }
+  }
+  let out = lines.join('\n');
+  if (out.length > NOTES_CAP) {
+    out = out.slice(out.length - NOTES_CAP);
+    const nl = out.indexOf('\n');
+    if (nl > 0) out = out.slice(nl + 1); // drop the partial leading line
+  }
+  return out;
 }
 
 function specHasContent(v: unknown): boolean {
