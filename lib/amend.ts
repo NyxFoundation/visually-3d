@@ -50,6 +50,118 @@ function stamp(): string {
   return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
 }
 
+type JsonObject = Record<string, unknown>;
+
+type AmendPatch = {
+  metadata_spec?: unknown;
+  part_specs?: Record<string, unknown>;
+  rationale?: unknown;
+};
+
+const BLOCKED_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
+
+function isObject(v: unknown): v is JsonObject {
+  return !!v && typeof v === 'object' && !Array.isArray(v);
+}
+
+function sameJson(a: unknown, b: unknown): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function mergeArray(a: unknown[], b: unknown[]): unknown[] {
+  const out = [...a];
+  const seen = new Set(out.map((x) => JSON.stringify(x)));
+  for (const item of b) {
+    const key = JSON.stringify(item);
+    if (!seen.has(key)) {
+      seen.add(key);
+      out.push(item);
+    }
+  }
+  return out;
+}
+
+function mergeSpecValue(base: unknown, patch: unknown, key = ''): unknown {
+  if (patch == null) return base;
+  if (Array.isArray(base) && Array.isArray(patch)) return mergeArray(base, patch);
+  if (isObject(base) && isObject(patch)) {
+    const out: JsonObject = { ...base };
+    for (const [k, v] of Object.entries(patch)) {
+      if (BLOCKED_KEYS.has(k)) continue;
+      out[k] = mergeSpecValue(out[k], v, k);
+    }
+    return out;
+  }
+  if (key === 'notes' && typeof base === 'string' && typeof patch === 'string') {
+    if (!base.trim()) return patch;
+    if (!patch.trim() || base.includes(patch)) return base;
+    return `${base}\n${patch}`;
+  }
+  return patch;
+}
+
+function specHasContent(v: unknown): boolean {
+  if (v == null) return false;
+  if (Array.isArray(v)) return v.length > 0;
+  if (typeof v === 'string') return v.trim().length > 0;
+  if (typeof v === 'object') return Object.values(v as JsonObject).some(specHasContent);
+  return true;
+}
+
+// Merge a model-produced SPEC PATCH into a scene. This is intentionally narrow:
+// it can only grow/refine `metadata.spec` and existing `parts[].spec`, never
+// geometry, connections, materials, ids, or part counts.
+export function applyAmendPatch(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  scene: any,
+  patch: AmendPatch,
+): { scene: unknown; applied: number; ignored: string[] } {
+  // Clone before modifying so callers never observe a partial patch.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const next: any = JSON.parse(JSON.stringify(scene));
+  let applied = 0;
+  const ignored: string[] = [];
+
+  if (isObject(patch.metadata_spec)) {
+    const metadata = isObject(next.metadata) ? next.metadata : {};
+    const before = metadata.spec;
+    const merged = mergeSpecValue(isObject(before) ? before : {}, patch.metadata_spec);
+    if ((before !== undefined || specHasContent(merged)) && !sameJson(before, merged)) {
+      next.metadata = metadata;
+      next.metadata.spec = merged;
+      applied++;
+    }
+  }
+
+  const byId = new Map<string, JsonObject>();
+  if (Array.isArray(next.parts)) {
+    for (const p of next.parts) if (isObject(p) && typeof p.id === 'string') byId.set(p.id, p);
+  }
+
+  if (isObject(patch.part_specs)) {
+    for (const [id, specPatch] of Object.entries(patch.part_specs)) {
+      if (BLOCKED_KEYS.has(id)) continue;
+      const part = byId.get(id);
+      if (!part) {
+        ignored.push(id);
+        continue;
+      }
+      if (!isObject(specPatch)) {
+        ignored.push(id);
+        continue;
+      }
+      const before = part.spec;
+      const merged = mergeSpecValue(isObject(before) ? before : {}, specPatch);
+      if ((before !== undefined || specHasContent(merged)) && !sameJson(before, merged)) {
+        part.spec = merged;
+        applied++;
+      }
+    }
+  }
+
+  return { scene: next, applied, ignored };
+}
+
 // True when a reproduce report actually carries something to fold back in —
 // either a reproducibility gap (missing/ambiguous fields) or a fidelity gap (the
 // impls drifted from the SPECIFIC system the source describes).
@@ -124,19 +236,20 @@ export function buildAmendPrompt(scene: any, report: any): string {
 descriptor doubles as the SPEC for a real system (a circuit, an algorithm, a
 machine, a building). Independent engineers tried to rebuild the system from
 this spec alone and a verifier ran their implementations. They found exactly
-which facts the spec FAILED to pin down. Your job: write those facts back into
-the scene's functional spec so the spec becomes reproducible — WITHOUT changing
-what the scene looks like.
+which facts the spec FAILED to pin down. Your job: return a SMALL SPEC PATCH
+that writes those facts back into the scene's functional spec so the spec becomes
+reproducible — WITHOUT generating or modifying the full scene.
 
 THE SPEC SUBSTRATE (this is the ONLY thing you grow):
 - Each part may carry \`spec\`: { params?, widths?, ports?[ {name,dir,width} ],
   ops?[], fsm?[], notes? }. Top-level \`metadata.spec\` holds the same shape for
   system-level facts (clocking, global params, handshake, FSM).
-- Geometry (shape/position/size/rotation/material) is 3D DECORATION. Do NOT
-  change it. Do NOT add, remove, move, reshape, or re-material any part.
-- Keep machine_name, every part id, and all existing fields intact. You may only
-  ADD/refine \`spec\` blocks, and tighten \`role\` / \`assembly_instructions\`
-  prose so it stays consistent with the new spec.
+- Geometry (shape/position/size/rotation/material), connections, part ids,
+  machine_name, roles, and assembly text are NOT available to you and MUST NOT
+  appear in your answer. The host program will merge your patch into the real
+  scene deterministically.
+- You may only ADD/refine \`metadata.spec\` and \`parts[].spec\` for existing part
+  ids. Unknown part ids are ignored.
 
 THE SOURCE this system comes from (paper/datasheet metadata — QUOTE it to pin
 the SPECIFIC system's real values; do NOT invent values it does not support):
@@ -199,8 +312,30 @@ RULES for choosing values:
 
 Existing part ids you may target: ${ids}
 
-Return ONLY the full, updated scene descriptor as a single JSON object — no
-markdown fences, no prose before or after.`;
+Return ONLY this JSON object — no markdown fences, no prose before or after:
+{
+  "metadata_spec": {
+    "params": { "<global parameter>": "<number/string/boolean>" },
+    "widths": { "<global width name>": <number> },
+    "ports": [{ "name": "<port>", "dir": "in|out|inout", "width": <number> }],
+    "ops": ["<global operation>"],
+    "fsm": ["<state or transition>"],
+    "properties": ["<named global property>"],
+    "notes": "<provenance-tagged global notes>"
+  },
+  "part_specs": {
+    "<existing part id>": {
+      "params": {},
+      "widths": {},
+      "ports": [],
+      "ops": [],
+      "fsm": [],
+      "properties": [],
+      "notes": "<provenance-tagged part notes>"
+    }
+  },
+  "rationale": ["<brief why each patch entry exists>"]
+}`;
 }
 
 // Merge a reproduce report's findings into the scene at `target`, writing the
@@ -232,23 +367,34 @@ export async function amendScene(
   const { text } = await runClaudeStreaming({ prompt, model: opts.model, quiet: true });
   writeFileSync(path.join(dir, 'raw.txt'), text);
 
-  // Parse → validate at the boundary; a malformed amend must never corrupt the
-  // scene, so we only commit a scene that passes the same gate as create/improve.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let next: any;
+  // Parse → merge → validate at the boundary; a malformed amend must never
+  // corrupt the scene. The model returns only a spec patch, and the host merges
+  // it so geometry cannot be dropped or rewritten.
+  let patch: AmendPatch;
   try {
-    next = extractScene(text);
+    patch = extractScene(text) as AmendPatch;
   } catch (err) {
-    return { applied: false, before, after: before, reason: `no JSON returned: ${(err as Error).message}` };
+    return { applied: false, before, after: before, reason: `no JSON patch returned: ${(err as Error).message}` };
   }
+  const merged = applyAmendPatch(scene, patch);
+  if (!merged.applied) {
+    return {
+      applied: false,
+      before,
+      after: before,
+      reason: merged.ignored.length ? `patch did not target valid spec fields (ignored: ${merged.ignored.join(', ')})` : 'empty spec patch',
+    };
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let next: any = merged.scene;
   const errors = validateScene(next);
   if (errors.length) {
-    return { applied: false, before, after: before, reason: `invalid scene: ${errors[0]}` };
+    return { applied: false, before, after: before, reason: `merged patch produced invalid scene: ${errors[0]}` };
   }
   try {
     parseScene(next); // strict zod boundary
   } catch (err) {
-    return { applied: false, before, after: before, reason: `schema reject: ${(err as Error).message}` };
+    return { applied: false, before, after: before, reason: `merged patch schema reject: ${(err as Error).message}` };
   }
 
   // Guard against an amend that drops parts or renames the machine — it must

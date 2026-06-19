@@ -186,6 +186,81 @@ constant computation (have `amend` emit only the derivation and let the backend
 compute the value), and splitting the self-check's "matches the spec" from
 "mathematically correct" beyond what the arithmetic guard already separates.
 
+## 9. Third failure — practical verification, not heroic verification
+
+Another `ntt-fpga` refine produced versions v19/v20 but still failed the
+executable check. The generated verifier did not report a semantic
+counterexample; it timed out. The checks had drifted into full-size work such as
+1024-point NTT comparisons backed by `O(N^2)` reference convolution, so the
+default verifier could spend minutes without producing any verdict. At the same
+time, `amend` had regressed: it asked the model for a full updated scene while
+only providing report metadata, so the model refused and no `amended.json` was
+written.
+
+The fix is to make both loops smaller and more mechanical:
+
+- **Patch-based `amend`.** The model now returns only a spec patch
+  (`metadata_spec` and `part_specs` for existing part ids). The host program
+  merges it into the real scene, so geometry, part ids, connections, materials,
+  and assembly text cannot be dropped or rewritten.
+- **Fast default SMT checks.** The Python+Z3 backend now asks for bounded,
+  compositional checks by default: prove reducers, butterflies, bank mappings,
+  address schedules, and FSM steps locally; run end-to-end equivalence only on
+  small reduced instances; use `O(N log N)` production-size smoke checks.
+  Full-size exhaustive or `O(N^2)` checks must be guarded behind `DEEP_VERIFY=1`.
+
+For CFNTT specifically, the useful fast formal targets are the conflict-free
+bank-index/offset property per stage/lane, radix-2/radix-4 butterfly equivalence
+mod `q`, Barrett reduction range/correctness over the legal input interval, and
+twiddle address/schedule invariants. Those are precise, finite properties; a
+full 1024-point schoolbook convolution is a deep regression test, not the normal
+proof obligation for every refine round.
+
+### 9.1 Generalizing the pattern beyond NTT
+
+CFNTT was just the case that exposed the failure; the fix is not NTT-specific.
+The Python+Z3 backend prompt now states the verification method as a **single
+subject-agnostic thinking pattern**: *decompose correctness into a handful of
+small finite obligations, then discharge each with the cheapest sound check*.
+The decomposition examples deliberately span domains — a codec's
+`decode(encode(x)) == x`, a sort being a permutation *and* ordered, a
+data-structure invariant preserved by an operation — alongside the circuit
+targets (one reducer/butterfly/FSM transition). So any new subject a `refine`
+run encounters inherits the same "prove it small, terminate fast, gate the heavy
+full-size check behind `DEEP_VERIFY=1`" discipline, instead of the pattern being
+re-derived (or forgotten) per subject. `backends.test.mjs` pins this generality
+so a later edit cannot quietly narrow the prompt back to circuits-only.
+
+## 10. Feedback-driven visual budget
+
+The closed loop ran a fixed visual budget every round — `improve` re-rendered and
+rewrote the *whole* scene `--iters` (was 2) times, regardless of whether the
+scene's picture was already good. That is the loop's single most token-heavy step
+(a render attachment plus a full-scene regeneration), and once the visual score
+has cleared its goal the loop is really only chasing reproducibility. Spending two
+full visual passes per round on an already-convincing scene was pure waste — and,
+worse, an unprovoked rewrite can perturb a scene the spec work was not asking to
+change.
+
+The visual pass is now spent **reactively**, not on a schedule (`lib/refine.ts`):
+
+- **Below the goal** — one improving visual pass per round (`--iters`, default
+  lowered 2 → 1).
+- **At/above the goal** — the visual pass runs ONLY when the previous round's
+  `amend` actually changed the spec (`lastAmendApplied`). That one pass folds the
+  new spec/impl feedback into the visual annotations so the picture stays
+  consistent with what `amend` wrote. If the spec did not move, the visual pass is
+  **skipped entirely** and the whole budget goes to `reproduce`/`amend`.
+- **Self-correcting** — a reactive pass that regresses visual back below the goal
+  clears `visualCleared`, so the per-round improving pass resumes automatically.
+
+So the visual axis now behaves like the spec axis already does: it only grows when
+there is concrete feedback to fold in. Once both the picture and the spec
+stabilize, the loop spends nothing on visuals and converges on the implementation
+work that is still open. The same reproduce-findings seed that already steered the
+visual pass (`seedFromReport`) is what makes the reactive pass *feedback-driven*
+rather than a blind re-render.
+
 ## References
 
 The hardening borrows directly from prior recursive-self-improvement work:

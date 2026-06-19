@@ -82,15 +82,39 @@ export const pythonSmtBackend: Backend = {
   // — because embedding a whole program inside a JSON string mangles newlines.)
   implementInstructions() {
     return `The runnable program must be a SINGLE self-contained, self-checking Python 3
-script (only stdlib + z3 allowed) that:
+script (only stdlib + z3 allowed). Whatever the subject is — an algorithm, a
+digital circuit, a data structure, a protocol — verify it with the SAME thinking
+pattern: turn correctness into a few SMALL, FINITE obligations and discharge each
+with the cheapest SOUND check, so the run always terminates with a real verdict
+instead of timing out. Concretely the script:
 - implements the system as plain Python functions;
-- builds an INDEPENDENT golden/reference model of the intended behavior;
-- VERIFIES the implementation against that golden — for finite / bit-bounded
-  logic, prove equivalence over ALL inputs with z3 ("from z3 import *"); for
-  larger domains, run thorough randomized + edge-case property tests;
+- builds an INDEPENDENT golden/reference model of the intended behavior (derived
+  from the spec, NOT a copy of the implementation);
+- VERIFIES the implementation against that golden with FAST, FINITE checks. First
+  DECOMPOSE correctness into the handful of local properties that, together, pin
+  it down — the invariants, equivalences, value ranges, and round-trip identities
+  the system must satisfy — then discharge each the cheapest way that stays sound:
+  * prove local reusable facts with z3 over bounded domains whenever a property
+    is finitely expressible — one element / stage / transition generalizes. The
+    SAME tactic spans subjects, e.g.: decode(encode(x)) == x for a codec; a sort
+    output is a permutation AND ordered; one reducer over its legal input range;
+    one butterfly / ALU op mod q; one address/bank mapping is conflict-free; one
+    FSM transition; one data-structure invariant preserved by an operation;
+  * else enumerate EXHAUSTIVELY over a small finite space, or run end-to-end
+    equivalence against the golden only on reduced instances small enough to
+    finish quickly (for example N <= 16 or N <= 32);
+  * for production-size parameters, check structural invariants and use
+    O(N log N) round-trip / edge-case / randomized tests only;
+  * DO NOT run default O(N^2) golden algorithms, exhaustive full-size state
+    searches, or all-input simulations for large N. If such a deep check is
+    useful, put it behind os.environ.get("DEEP_VERIFY") == "1" and skip it by
+    default;
 - prints exactly "VERIFIED" and exits 0 on success, or prints "FAIL: <reason and
   a concrete counterexample>" and exits 1 on any mismatch.
-It must be deterministic and finish within ~60s.`;
+Default verification must be deterministic and finish within ~60s on a cold run.
+Only print "VERIFIED" after all default fast checks have run; never print it
+before a required check has completed, and never enable expensive optional deep
+checks by default.`;
   },
 
   // Write the script and run it; pass = it printed VERIFIED and exited 0.

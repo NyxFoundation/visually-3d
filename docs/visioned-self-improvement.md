@@ -132,6 +132,30 @@ LLM-judge scores two different things:
 > correctness is checked executably by the backend. See the discussion in the
 > project history for the full rationale.
 
+Executable checks are deliberately **bounded and layered**, and the layering is
+**subject-agnostic** — the same thinking pattern drives the verifier whether the
+scene is an NTT accelerator, a sorting network, a compression codec, a balanced
+tree, or a handshake protocol. The default verifier must finish quickly, so it:
+
+1. **decomposes** correctness into a handful of small finite obligations — the
+   invariants, equivalences, value ranges, and round-trip identities that
+   together pin the system down (e.g. `decode(encode(x)) == x`; a sort output is
+   a permutation *and* ordered; one reducer/butterfly/ALU op is correct over its
+   legal range; one address/bank map is conflict-free; one FSM transition; one
+   data-structure invariant);
+2. **discharges** each the cheapest *sound* way — SMT over a bounded domain when
+   the property is finitely expressible (one element/stage/transition
+   generalizes), else exhaustive enumeration of a small space, else end-to-end
+   equivalence on reduced instances (e.g. `N ≤ 16/32`);
+3. for **production size**, checks structural invariants plus `O(N log N)`
+   randomized/edge tests only.
+
+Full-size exhaustive or `O(N^2)` reference checks belong behind an explicit
+`DEEP_VERIFY=1` flag, not in the default `refine` path. The circuit terms above
+are just one instantiation of the pattern; the backend prompt
+(`lib/backends/python-smt.ts`) states it for any subject so a timed-out heroic
+check never masquerades as "implementation broken".
+
 ### 3.4 Automatic backend selection (`lib/backends/index.ts`)
 
 The verification substrate is chosen from **what the subject is**, so no manual
@@ -167,6 +191,17 @@ Each `refine` round:
 It stops when the visual score, reproducibility, and the self-check all clear
 their thresholds. It prints, per round: `visual · repro (▲/▼) · fidelity ·
 self-check · spec field count`.
+
+**Feedback-driven visual budget.** The visual pass is the most token-heavy step
+— it attaches a render and rewrites the *whole* scene — so it is not run on a
+fixed per-round schedule. While the scene is still **below** `visualGoal`, each
+round runs one improving visual pass (`--iters`, default 1). Once it **clears**
+the goal, the visual pass runs **only reactively**: when the previous round's
+`amend` actually changed the spec, one pass folds those new facts into the visual
+annotations; if the spec did not move, the visual pass is **skipped entirely** and
+the whole budget goes to reproduce/amend. A reactive pass that regresses visual
+back below the goal restores the per-round improving pass automatically. So once
+both the picture and the spec stabilize, the loop spends nothing on visuals.
 
 `create` now runs this **same** closed loop after generating the draft (≥3 rounds
 by default; `--no-refine` to skip, `--refine N` to set rounds), so a freshly

@@ -98,7 +98,7 @@ export async function refine(argv: string[]): Promise<void> {
   const opts = parseArgs(argv);
   const ref = opts.positional[0];
   if (!ref) {
-    throw new Error('usage: visually refine <scene> [--rounds N] [--visual 90] [--repro 80] [--iters 2] [--driver claude|codex] [--model <m>] [--backend <id>] [--no-verify] [--no-amend]');
+    throw new Error('usage: visually refine <scene> [--rounds N] [--visual 90] [--repro 80] [--iters 1] [--driver claude|codex] [--model <m>] [--backend <id>] [--no-verify] [--no-amend]');
   }
   const target = resolveScene(ref);
   if (!target) throw new Error(`no such scene: ${ref}`);
@@ -107,7 +107,7 @@ export async function refine(argv: string[]): Promise<void> {
   const maxRounds = opts.rounds && opts.rounds > 0 ? opts.rounds : 3;
   const visualGoal = Number.isFinite(opts.visual) ? (opts.visual as number) : 90;
   const reproGoal = Number.isFinite(opts.repro) ? (opts.repro as number) : 80;
-  const iters = opts.iters && opts.iters > 0 ? opts.iters : 2;
+  const iters = opts.iters && opts.iters > 0 ? opts.iters : 1;
 
   console.log(`visually refine: ${id} — closed 3D ⇄ implementation loop (improve → reproduce → amend)`);
   console.log(`  goals: visual ≥ ${visualGoal}/100, reproducibility ≥ ${reproGoal}/100, self-check passing`);
@@ -117,6 +117,20 @@ export async function refine(argv: string[]): Promise<void> {
   let repro: number | null = null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let lastReport: any = null;
+
+  // Feedback-driven visual budget: the visual pass is the most token-heavy step
+  // (it attaches a render and rewrites the WHOLE scene), so we don't spend it on
+  // a fixed per-round schedule. Instead:
+  //   - while visual is still BELOW its goal, run one improving pass per round;
+  //   - once it CLEARS the goal, stop running visual on its own — only run it
+  //     REACTIVELY, when the previous round produced spec/impl feedback that
+  //     actually changed the scene (amend grew the spec). That single pass folds
+  //     the new facts into the visual annotations; if nothing changed, visual is
+  //     skipped entirely and the whole budget goes to reproduce/amend.
+  // `visualCleared` tracks the goal; `lastAmendApplied` tracks whether last round
+  // left new feedback the visual layer should catch up to.
+  let visualCleared = false;
+  let lastAmendApplied = false;
 
   // ④ Ratchet: keep the highest-scoring scene seen, so a round that regresses
   // (reproducibility dropped, self-check broke) never leaves the canonical scene
@@ -133,31 +147,44 @@ export async function refine(argv: string[]): Promise<void> {
     // 1. Visual self-improvement, seeded with the prior round's verification
     // findings (carried-over gaps). Tolerate a failed pass (e.g. a render
     // hiccup): the saved scene is intact and the loop can still verify it.
-    console.log(`\n▶ visual self-improvement (${iters} iteration(s))…`);
-    const seed = seedFromReport(lastReport);
-    const prevSeedEnv = process.env.VISUALLY_SEED_REVIEW;
-    try {
-      if (seed) {
-        const seedDir = mkdtempSync(path.join(os.tmpdir(), 'visually-refine-seed-'));
-        const seedPath = path.join(seedDir, 'seed-review.json');
-        writeFileSync(seedPath, JSON.stringify(seed, null, 2));
-        process.env.VISUALLY_SEED_REVIEW = seedPath;
-        console.log(`  seeding visual pass with ${seed.remaining_gaps.length} verification gap(s) from last round`);
+    //
+    // Budget: below the goal → one improving pass; at/above the goal → run ONLY
+    // when last round's amend changed the spec (so the visual layer folds in the
+    // new feedback), otherwise skip the pass entirely.
+    const roundIters = !visualCleared ? iters : (lastAmendApplied ? Math.min(1, iters) : 0);
+    if (roundIters > 0) {
+      console.log(`\n▶ visual self-improvement (${roundIters} iteration(s))…` +
+        (visualCleared ? `  [feedback-driven — last round's spec changes to fold in]` : ''));
+      const seed = seedFromReport(lastReport);
+      const prevSeedEnv = process.env.VISUALLY_SEED_REVIEW;
+      try {
+        if (seed) {
+          const seedDir = mkdtempSync(path.join(os.tmpdir(), 'visually-refine-seed-'));
+          const seedPath = path.join(seedDir, 'seed-review.json');
+          writeFileSync(seedPath, JSON.stringify(seed, null, 2));
+          process.env.VISUALLY_SEED_REVIEW = seedPath;
+          console.log(`  seeding visual pass with ${seed.remaining_gaps.length} verification gap(s) from last round`);
+        }
+        const improveArgs = [id, String(roundIters)];
+        if (opts.driver) improveArgs.push('--driver', opts.driver);
+        if (opts.model) improveArgs.push('--model', opts.model);
+        await improve(improveArgs);
+      } catch (err) {
+        console.log(`  ⚠ visual pass stopped: ${(err as Error).message}`);
+      } finally {
+        // Restore the caller's env so we don't leak the seed into later rounds.
+        if (seed) {
+          if (prevSeedEnv === undefined) delete process.env.VISUALLY_SEED_REVIEW;
+          else process.env.VISUALLY_SEED_REVIEW = prevSeedEnv;
+        }
       }
-      const improveArgs = [id, String(iters)];
-      if (opts.driver) improveArgs.push('--driver', opts.driver);
-      if (opts.model) improveArgs.push('--model', opts.model);
-      await improve(improveArgs);
-    } catch (err) {
-      console.log(`  ⚠ visual pass stopped: ${(err as Error).message}`);
-    } finally {
-      // Restore the caller's env so we don't leak the seed into later rounds.
-      if (seed) {
-        if (prevSeedEnv === undefined) delete process.env.VISUALLY_SEED_REVIEW;
-        else process.env.VISUALLY_SEED_REVIEW = prevSeedEnv;
-      }
+    } else {
+      console.log(`\n▶ visual self-improvement — skipped (visual ≥ ${visualGoal}, no new spec/impl feedback to fold in)`);
     }
     visual = latestVisualScore(id);
+    // Gate the NEXT round: re-clearing the goal keeps visual on demand; a
+    // feedback pass that regressed below the goal restores the per-round pass.
+    visualCleared = visual != null && visual >= visualGoal;
 
     // Snapshot the scene exactly as it is about to be SCORED (post-visual,
     // pre-verify). This is the version `reproduce` measures, so it is the unit
@@ -188,10 +215,14 @@ export async function refine(argv: string[]): Promise<void> {
 
     // 3. The return edge: fold the findings back into the scene's spec so the
     // next round's reproduce reads verified facts and the score can climb.
+    // Whether amend actually changed the spec is the trigger for next round's
+    // feedback-driven visual pass (see the budget logic above).
+    lastAmendApplied = false;
     if (report && !opts.noAmend) {
       console.log(`\n▶ folding verification findings into the spec…`);
       try {
         const res = await amendScene(target, report, { model: opts.model });
+        lastAmendApplied = res.applied;
         if (res.applied) console.log(`  ✓ spec grown: ${res.before} → ${res.after} fields written back`);
         else console.log(`  · spec unchanged (${res.reason})`);
       } catch (err) {

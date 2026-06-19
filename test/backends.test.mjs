@@ -64,6 +64,32 @@ test('every backend implements the common interface', () => {
   }
 });
 
+test('python-smt instructions require fast finite verification by default', () => {
+  const instructions = getBackend('python-smt').implementInstructions();
+  assert.ok(instructions.includes('FAST, FINITE checks'));
+  assert.ok(instructions.includes('z3 over bounded domains'));
+  assert.ok(instructions.includes('reduced'));
+  assert.ok(instructions.includes('O(N^2)'));
+  assert.ok(instructions.includes('DEEP_VERIFY'));
+  assert.ok(instructions.includes('finish within ~60s'));
+});
+
+// The verification "thinking pattern" must read as subject-agnostic, not
+// NTT/circuit-specific: the same decompose-into-finite-obligations method has to
+// apply to algorithms, data structures, and protocols — otherwise refine only
+// generalizes the loop's plumbing, not how it actually verifies.
+test('python-smt instructions state a subject-agnostic decomposition pattern', () => {
+  const instructions = getBackend('python-smt').implementInstructions();
+  assert.ok(/SAME thinking\s+pattern/.test(instructions));
+  assert.ok(instructions.includes('DECOMPOSE'));
+  // examples must span beyond circuits
+  assert.ok(/algorithm/.test(instructions));
+  assert.ok(/data structure/.test(instructions));
+  assert.ok(instructions.includes('decode(encode(x)) == x'));
+  // and still keep at least one circuit example, so both domains are covered
+  assert.ok(/butterfly|reducer|FSM/.test(instructions));
+});
+
 test('available() returns a well-shaped result', async () => {
   for (const id of listBackends()) {
     const a = await getBackend(id).available();

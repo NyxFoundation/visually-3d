@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildAmendPrompt, hasFindings } from '../lib/amend.js';
+import { applyAmendPatch, buildAmendPrompt, hasFindings } from '../lib/amend.js';
 import { specCoverage, validateScene, parseScene } from '../lib/scene.js';
 
 const baseScene = () => ({
@@ -50,6 +50,9 @@ test('buildAmendPrompt routes each missing field to a part spec or metadata.spec
   assert.ok(p.includes('q=12289'), 'carries the divergence to resolve');
   assert.ok(p.includes('FAIL: q=12277'), 'carries the verifier counterexample');
   assert.ok(p.includes('mod_red, rom'), 'lists existing part ids');
+  assert.ok(p.includes('SMALL SPEC PATCH'), 'asks for a patch, not a full scene rewrite');
+  assert.ok(p.includes('"part_specs"'), 'declares the patch shape');
+  assert.ok(p.includes('Geometry') && p.includes('MUST NOT'), 'forbids geometry and other non-spec fields');
 });
 
 test('buildAmendPrompt surfaces fidelity gaps (parameter, property, structural)', () => {
@@ -73,6 +76,93 @@ test('buildAmendPrompt is robust to an empty report', () => {
   const p = buildAmendPrompt(baseScene(), {});
   assert.ok(p.includes('(none reported)'));
   assert.ok(typeof p === 'string' && p.length > 200);
+});
+
+test('applyAmendPatch only merges metadata.spec and existing part specs', () => {
+  const scene = baseScene();
+  const patch = {
+    machine_name: 'evil rename',
+    parts: [],
+    metadata_spec: {
+      params: { N: 1024 },
+      properties: ['NTT followed by INTT is identity'],
+      notes: '[src] system size is 1024',
+    },
+    part_specs: {
+      mod_red: {
+        params: { q: 12289 },
+        widths: { coeff: 14 },
+        ops: ['barrett_reduce'],
+        notes: '[src] 14-bit NTT prime',
+      },
+      missing_part: { params: { ignored: true } },
+    },
+  };
+
+  const { scene: merged, applied, ignored } = applyAmendPatch(scene, patch);
+  assert.equal(applied, 2);
+  assert.deepEqual(ignored, ['missing_part']);
+  assert.equal(merged.machine_name, scene.machine_name, 'cannot rename the scene');
+  assert.equal(merged.parts.length, scene.parts.length, 'cannot replace parts');
+  assert.deepEqual(merged.parts[0].position, scene.parts[0].position, 'keeps geometry untouched');
+  assert.equal(merged.parts[0].material, scene.parts[0].material, 'keeps material untouched');
+  assert.deepEqual(merged.metadata.spec.params, { N: 1024 });
+  assert.deepEqual(merged.parts[0].spec.params, { q: 12289 });
+  assert.deepEqual(merged.parts[0].spec.widths, { coeff: 14 });
+  assert.deepEqual(merged.parts[0].spec.ops, ['barrett_reduce']);
+  assert.equal(merged.parts[1].spec, undefined, 'unknown patch targets are ignored');
+});
+
+test('applyAmendPatch deep-merges arrays uniquely and appends notes', () => {
+  const scene = baseScene();
+  scene.metadata = {
+    spec: {
+      params: { q: 12289 },
+      properties: ['conflict-free memory mapping'],
+      notes: '[src] base',
+    },
+  };
+  scene.parts[0].spec = {
+    ops: ['add'],
+    notes: '[src] existing',
+  };
+
+  const { scene: merged } = applyAmendPatch(scene, {
+    metadata_spec: {
+      params: { N: 1024 },
+      properties: ['conflict-free memory mapping', 'no bit-reversal'],
+      notes: '[calc] stage count = 10',
+    },
+    part_specs: {
+      mod_red: {
+        ops: ['add', 'barrett_reduce'],
+        notes: '[conv] post-add reduction',
+      },
+    },
+  });
+
+  assert.deepEqual(merged.metadata.spec.params, { q: 12289, N: 1024 });
+  assert.deepEqual(merged.metadata.spec.properties, ['conflict-free memory mapping', 'no bit-reversal']);
+  assert.equal(merged.metadata.spec.notes, '[src] base\n[calc] stage count = 10');
+  assert.deepEqual(merged.parts[0].spec.ops, ['add', 'barrett_reduce']);
+  assert.equal(merged.parts[0].spec.notes, '[src] existing\n[conv] post-add reduction');
+});
+
+test('applyAmendPatch treats empty template patches as no-ops', () => {
+  const scene = baseScene();
+  const { scene: merged, applied, ignored } = applyAmendPatch(scene, {
+    metadata_spec: { params: {}, ops: [], notes: '' },
+    part_specs: {
+      mod_red: { params: {}, ports: [], notes: '' },
+      rom: {},
+    },
+  });
+
+  assert.equal(applied, 0);
+  assert.deepEqual(ignored, []);
+  assert.equal(merged.metadata, undefined);
+  assert.equal(merged.parts[0].spec, undefined);
+  assert.equal(merged.parts[1].spec, undefined);
 });
 
 test('specCoverage counts spec fields across parts and metadata', () => {
