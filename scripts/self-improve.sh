@@ -144,6 +144,10 @@ while [ "$i" -le "$MAX_ITERS" ]; do
   MESSAGE="$RUN_DIR/iter-$ii-message.txt"
   EVENTS="$RUN_DIR/iter-$ii-events.jsonl"
   MODEL_ERR="$RUN_DIR/iter-$ii-$DRIVER.err"
+  # Feed the prompt via STDIN, never as an argv: a large scene + source grounding
+  # makes the prompt exceed the OS single-argument limit (MAX_ARG_STRLEN, ~128KB)
+  # and the CLI dies with "Argument list too long". Both CLIs read the prompt from
+  # stdin when none is given positionally.
   if [ "$DRIVER" = "codex" ]; then
     if ! "$CODEX_BIN" exec \
           --json \
@@ -151,7 +155,7 @@ while [ "$i" -le "$MAX_ITERS" ]; do
           --skip-git-repo-check \
           --image "$RENDER_PNG" \
           --output-last-message "$MESSAGE" \
-          "$(cat "$PROMPT_TXT")" > "$EVENTS" 2> "$MODEL_ERR"; then
+          < "$PROMPT_TXT" > "$EVENTS" 2> "$MODEL_ERR"; then
       die "Codex CLI failed on iteration $i — see $MODEL_ERR and $EVENTS"
     fi
   else
@@ -159,13 +163,14 @@ while [ "$i" -le "$MAX_ITERS" ]; do
     # acceptEdits) is required so it can actually read the PNG under the runs
     # dir (outside cwd); otherwise the visual critique is blind. --tools Read
     # keeps it restricted to reading only. stream-json carries the thinking
-    # trace; the trailing "result" event holds the final answer.
-    if ! "$CLAUDE_BIN" -p "$(cat "$PROMPT_TXT")" \
+    # trace; the trailing "result" event holds the final answer. `-p` + piped
+    # stdin is print mode.
+    if ! "$CLAUDE_BIN" -p \
           --model "$CLAUDE_MODEL" \
           --tools Read \
           --permission-mode bypassPermissions \
           --output-format stream-json --verbose \
-          > "$EVENTS" 2> "$MODEL_ERR"; then
+          < "$PROMPT_TXT" > "$EVENTS" 2> "$MODEL_ERR"; then
       die "Claude CLI failed on iteration $i — see $MODEL_ERR and $EVENTS"
     fi
     node -e '

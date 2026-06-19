@@ -37,8 +37,12 @@ export interface RunOptions {
 // Run claude in streaming mode. Returns { text, hadResult }.
 export function runClaudeStreaming({ prompt, model, runDir, quiet = false, tools, permissionMode }: RunOptions): Promise<RunResult> {
   const bin = process.env.CLAUDE_BIN || 'claude';
+  // The prompt is fed via STDIN (written below), NOT as an argv: a large scene +
+  // evidence/grounding can exceed the OS single-arg limit (MAX_ARG_STRLEN, ~128KB)
+  // and spawn fails with E2BIG "Argument list too long". `-p` + piped stdin is
+  // print mode (the prompt is read from stdin).
   const args = [
-    '-p', prompt,
+    '-p',
     '--model', model || process.env.CLAUDE_MODEL || 'opus',
     '--output-format', 'stream-json',
     '--verbose',
@@ -58,7 +62,10 @@ export function runClaudeStreaming({ prompt, model, runDir, quiet = false, tools
   return new Promise<RunResult>((resolve, reject) => {
     let proc: ChildProcess;
     try {
-      proc = spawn(bin, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+      proc = spawn(bin, args, { stdio: ['pipe', 'pipe', 'pipe'] });
+      // Hand the (possibly large) prompt over stdin, then close it.
+      proc.stdin?.on('error', () => { /* ignore EPIPE if the child exits early */ });
+      proc.stdin?.end(prompt);
     } catch (err) {
       reject(new Error(`failed to spawn ${bin}: ${(err as Error).message}`));
       return;
