@@ -70,10 +70,13 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
 - `lib/visualize.ts` — the VISUALIZE leg: fetch ground-truth evidence (reference
   paper + real source code) up front, then build/improve the 3D model GROUNDED in
   it (`visualizeStep`); births a draft via `create` if the scene is new.
-- `lib/verify.ts` — the VERIFY leg: run the backend's formal check and fold the
-  findings into the spec (`verifyStep` = `reproduce` + `amendScene`).
+- `lib/verify.ts` — the VERIFY leg: formally verify the REAL gathered SOURCE with
+  the backend (`verifyStep` — one agent writes a z3/sim self-check grounded in the
+  source; the backend runs it). Errors if no source evidence exists (run
+  `visualize` first). This is NOT reverse-implementation from the spec.
 - `lib/refine.ts` — the REFINE leg: the closed loop that runs visualize → verify
-  each round, with the visual-budget taper and the best-scene ratchet.
+  each round; goal = visual ≥ goal AND the source verifies. Visual-budget taper +
+  best-scene ratchet.
 - `lib/upload.ts` — `visually upload <id>`: publish a scene into the WEB GALLERY
   `public/samples/` (what the site serves: `<id>.json` + `index.json` entry +
   `runs/<id>/` history; full as-is, `--scrub` for the lean set). ONE verb that
@@ -87,10 +90,13 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
   template markup is opaque to the type-checker; put real types on component
   props, hooks, and effects.
 - `lib/scene.ts` — zod schemas + `parseScene`/`validateScene`/`extractScene`.
-- `lib/create.ts`, `lib/improve.ts`, `lib/reproduce.ts`, `lib/amend.ts` — internal
-  building blocks (no longer standalone commands): create drafts, run the visual
-  self-improve pass, reverse-implement+verify, and fold findings into the spec.
-  `visualize`/`verify`/`refine` orchestrate them.
+- `lib/create.ts`, `lib/improve.ts` — internal building blocks (no standalone
+  commands): create drafts, run the visual self-improve pass. Used by `visualize`.
+- `lib/reproduce.ts`, `lib/amend.ts` — LEGACY (the old reverse-implement-from-spec
+  reproducibility loop). Not in the current loop: `verify` provides `parseImpl`'s
+  consumer but does source-grounded verification instead; `amend` is dormant. Kept
+  for now (helpers/tests); candidates for removal once the source-grounded path is
+  settled.
 - `lib/backends/` — composable verification backends behind the `Backend`
   interface (`available`/`implementInstructions`/`verify`). `python-smt`
   (Python+Z3 via `uv run --with z3-solver`) and `sim` (MuJoCo). Add backends by

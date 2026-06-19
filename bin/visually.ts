@@ -21,20 +21,19 @@ Usage:
        [--url <paper-url>] [--iters N]     paper + real SOURCE CODE) and build/
        [--driver claude|codex] [--model m] improve the 3D model GROUNDED in it.
        [--no-evidence] [--no-refs]         Births a draft first if it doesn't exist.
-  visually verify <scene>                 formally check it with the backend (z3/SMT
-       [--n 2] [--model <m>]              for circuits & algorithms, physics sim for
-       [--backend <id>] [--no-verify]     machines) and fold the findings into the
-       [--no-amend]                       spec. Assumes visualize already ran.
+  visually verify <scene>                 formally verify the REAL source with the
+       [--model <m>] [--backend <id>]     backend (z3/SMT for circuits & algorithms,
+                                          sim for machines). Needs gathered source
+                                          (run visualize first); else errors.
   visually refine <scene>                 the closed loop: each round runs
        [--rounds 3] [--visual 90]         visualize → verify, ratcheting on the best
-       [--repro 80] [--iters 1]           scene, until visual + reproducibility +
-       [--backend <id>] [--no-amend]      self-check all clear (or max rounds).
-       [--no-evidence] [--no-refs]
+       [--iters 1] [--backend <id>]       scene, until the visual goal is met AND the
+       [--no-evidence] [--no-refs]        source verifies (or max rounds).
   visually check <scene> [--png]          inspect a scene (browser, or PNG contact sheet)
        [--out <file.png>] [--no-open]
-  visually upload <scene>                 publish the scene + its full history into
-       [--repo owner/name] [--title <t>]  examples/<id>/. In a repo checkout: mirror,
-       [--no-push] [--dry-run]            commit, push to origin. Installed (npx):
+  visually upload <scene>                 publish the scene + history to the WEB
+       [--repo owner/name] [--title <t>]  GALLERY (public/samples). Repo checkout:
+       [--scrub] [--no-push] [--dry-run]  commit + push to origin. Installed (npx):
                                           fork + open a PR. Auto-detected.
 
 Mode is auto-detected from the subject (override at creation), and the

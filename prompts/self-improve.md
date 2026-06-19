@@ -164,14 +164,15 @@ need **20–40 parts**. Add the iconic sub-features the current scene is missing
   are written by the reproducibility loop). **Never drop or weaken them.** Carry
   every `spec` field through unchanged, and make your `role`/`facts`/annotations
   *consistent* with them — the geometry is the visualization of this spec.
-- **No regression, but DON'T inflate part count.** Never delete a correct,
-  informative part to game a number — but do NOT add parts to look busier. Fewer,
-  well-chosen parts beat many. Represent N identical units (memory banks, lanes,
-  butterfly sub-cells, heatsink fins, fasteners) as ONE parameterized part with a
-  `count`/`array` in its `spec`, NOT as N separate parts. Aim for the FEWEST parts
-  that convey the architecture clearly (typically ≤ ~40); consolidate decorative
-  or repeated geometry. Information density should rise; part *count* should stay
-  flat or shrink once the architecture is covered.
+- **No regression — keep meaningful structure, cut only the redundant.** Never
+  delete a correct, informative part to game a number. KEEP architecturally
+  meaningful multiplicity the source actually has (e.g. 8 distinct memory banks, 8
+  butterfly units) — showing them is faithful and reads well. But DON'T inflate
+  with redundancy: collapse PURE DECORATION repeated as many parts (e.g. 10
+  `heatsink_fin_*` → one finned heatsink) and OVER-DECOMPOSITION of one unit into
+  sub-parts (e.g. each butterfly unit split into `bu_mult/add/sub/reg` → one `bu`
+  part, with the internals in its `spec`). Information density should rise; only
+  the decorative/over-split parts should shrink.
 - **Keep identity.** Same machine, same `machine_name`, same domain. You are
   refining a model, not replacing it. Carry `metadata.mode`,
   `metadata.reference`, `metadata.backend`, `metadata.info`, `metadata.spec` and

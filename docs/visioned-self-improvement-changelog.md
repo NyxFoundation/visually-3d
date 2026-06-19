@@ -430,6 +430,30 @@ no-op. The run-dir layout is unchanged — `visualize`/`verify` reuse the existi
 `improve`/`evidence`/`reproduce`/`amend` loggers — so revisions/history parsing
 and the canonical impl store stay consistent with pre-existing runs.
 
+## 16. Simplify — verify the real source; retire reverse-implementation
+
+Under the source-grounding pivot, `reproduce` (N agents reverse-implement from the
+spec ALONE, judge scores reproducibility, divergence drives amend) is largely
+redundant: the real source is fetched, so there's no need to guess an
+implementation and measure spec completeness. The loop is simplified to match what
+it now actually does:
+
+- **`verify` = formal verification of the REAL source.** One agent writes a
+  z3/sim self-check grounded in the gathered source (the two-tier discipline lives
+  in the backend prompt); the backend runs it. No source → it errors (run
+  `visualize` first). No N-engineer reverse-implementation, no divergence, no
+  reproducibility/fidelity judge, no amend return-edge.
+- **`refine` goal = visual ≥ goal AND the source verifies.** Dropped the
+  reproducibility/fidelity targets and the amend step; the ratchet keeps the best
+  (verify-passing, highest-visual) scene.
+- **`reproduce.ts` / `amend.ts` are now legacy** (kept for `parseImpl` + tests),
+  not wired into the loop.
+- **Scene bloat, revisited.** Many parts ≠ redundant: architecturally-meaningful
+  multiplicity (8 banks, 8 butterfly units) is faithful and reads well. The visual
+  discipline now targets only the genuinely redundant — pure decoration repeated as
+  many parts (10 heatsink fins) and over-decomposition of one unit into sub-parts —
+  not a blanket part-count cap.
+
 ## References
 
 The hardening borrows directly from prior recursive-self-improvement work:

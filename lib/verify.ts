@@ -1,60 +1,123 @@
-// `visually verify <scene>` — the VERIFY leg of the loop. Formally checks the
-// system with the auto-selected backend (z3/SMT for circuits & algorithms, a
-// physics sim for machines) and folds the findings back into the scene's spec.
+// `visually verify <scene>` — the VERIFY leg. Formally checks the REAL system
+// using its gathered ground-truth SOURCE (the paper + reference code that
+// `visualize` cached) as the reference, via the auto-selected backend (z3/SMT for
+// circuits & algorithms, physics sim for machines).
 //
-// Assumes `visualize` has already cached the ground-truth evidence and built the
-// 3D model. Loosely coupled: refine calls verifyStep() per round; the CLI wrapper
-// adds resolve + a usage error.
+// This is NOT reverse-implementation from the spec: the source exists, so we
+// verify ITS properties directly. No source → error (run `visualize` first). One
+// agent writes the self-checking program grounded in the source; the backend runs
+// it (the two-tier z3 discipline lives in the backend's implementInstructions).
 
-import { reproduce } from './reproduce.js';
-import { amendScene } from './amend.js';
-import { resolveScene, sceneIdFromPath } from './paths.js';
+import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { resolveScene, sceneIdFromPath, runDir as makeRunDir, ensureWorkspace } from './paths.js';
+import { runClaudeStreaming } from './runner.js';
+import { parseImpl } from './reproduce.js';
+import { getBackend, selectBackend } from './backends/index.js';
+import { loadEvidence, evidenceExcerpt, type LoadedEvidence } from './evidence.js';
+import { saveImpl } from './impls.js';
 
-export interface VerifyStepOpts {
-  model?: string;
-  backend?: string;
-  n?: number;
-  noVerify?: boolean; // skip executable verification (judge-only)
-  noAmend?: boolean; // verify but do not fold findings back into the spec
+function stamp(): string {
+  const d = new Date();
+  const p = (n: number): string => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
 }
 
-// Run the verification pass and fold its findings into the spec. Returns the
-// report plus whether amend actually changed the spec (the loop uses the latter
-// to decide whether the visual layer needs to catch up next round).
+// Pure (no I/O) so it is unit-testable. Embeds the spec for naming/structure and
+// the REAL SOURCE as the ground truth to model the golden/properties on.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function buildSourceVerifyPrompt(scene: any, ev: LoadedEvidence, backendInstructions: string): string {
+  const spec = JSON.stringify({
+    machine_name: scene?.machine_name,
+    metadata: { spec: scene?.metadata?.spec },
+    parts: (scene?.parts || []).map((p: { id?: string; name?: string; role?: string; spec?: unknown }) =>
+      ({ id: p.id, name: p.name, role: p.role, spec: p.spec })),
+  }, null, 1).slice(0, 8000);
+  const source = evidenceExcerpt(ev, 16000);
+
+  return `You are FORMALLY VERIFYING a REAL, existing system. Its actual SOURCE — the
+paper and the reference implementation code — is given below as GROUND TRUTH. You
+are NOT reverse-implementing or guessing: model your golden/reference and the
+properties you check on the SOURCE's real functions, parameters, and equations,
+and confirm the system's key properties hold.
+
+${backendInstructions}
+
+SYSTEM (names / structure for context):
+\`\`\`json
+${spec}
+\`\`\`
+
+THE REAL SOURCE — ground truth (transcribe its actual maps/equations/parameters
+into your golden model and properties; do not invent beyond it):
+\`\`\`markdown
+${source}
+\`\`\``;
+}
+
+export interface VerifyStepOpts { model?: string; backend?: string }
+
+// Run source-grounded formal verification. Throws if there is no source yet.
 export async function verifyStep(
   id: string,
   opts: VerifyStepOpts = {},
+): Promise<{ pass: boolean; ran: boolean; kind: string; runDir: string }> {
+  const target = resolveScene(id);
+  if (!target) throw new Error(`no such scene: ${id}`);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<{ report: any; amendApplied: boolean }> {
-  const reproArgs = [id];
-  if (opts.model) reproArgs.push('--model', opts.model);
-  if (opts.backend) reproArgs.push('--backend', opts.backend);
-  if (opts.n !== undefined && Number.isFinite(opts.n)) reproArgs.push('--n', String(opts.n));
-  if (opts.noVerify) reproArgs.push('--no-verify');
-  const report = await reproduce(reproArgs);
+  const scene: any = JSON.parse(readFileSync(target, 'utf8'));
 
-  let amendApplied = false;
-  if (report && !opts.noAmend) {
-    const target = resolveScene(id);
-    if (target) {
-      console.log('\n▶ folding verification findings into the spec…');
-      try {
-        const res = await amendScene(target, report, { model: opts.model });
-        amendApplied = res.applied;
-        if (res.applied) console.log(`  ✓ spec grown: ${res.before} → ${res.after} fields written back`);
-        else console.log(`  · spec unchanged (${res.reason})`);
-      } catch (err) {
-        console.log(`  ⚠ amend stopped: ${(err as Error).message}`);
-      }
-    }
+  const ev = loadEvidence(id);
+  if (ev.origin === 'none') {
+    throw new Error(`no source evidence for "${id}" — run \`visually visualize ${id}\` (or add a paper/source URL to the scene) first; verify checks the REAL source.`);
   }
-  return { report, amendApplied };
+
+  const backend = getBackend(opts.backend || selectBackend(scene));
+  const avail = await backend.available();
+  if (!avail.ok) {
+    console.log(`  · verify backend unavailable: ${avail.reason}`);
+    return { pass: false, ran: false, kind: 'no-runner', runDir: '' };
+  }
+
+  ensureWorkspace();
+  const dir = makeRunDir(id, 'verify', stamp());
+  mkdirSync(dir, { recursive: true });
+  const prompt = buildSourceVerifyPrompt(scene, ev, backend.implementInstructions());
+  writeFileSync(path.join(dir, 'prompt.txt'), prompt);
+
+  console.log(`  verifying the real source with ${backend.label} (evidence: ${ev.origin})…`);
+  const { text } = await runClaudeStreaming({ prompt, model: opts.model, runDir: dir, quiet: true });
+  const impl = parseImpl(text);
+  if (typeof impl.script !== 'string' || !impl.script.trim()) {
+    console.log('  ✗ no verification program produced');
+    return { pass: false, ran: false, kind: 'no-script', runDir: dir };
+  }
+  const ext = backend.language === 'python' ? 'py' : 'v';
+  writeFileSync(path.join(dir, `check.${ext}`), impl.script);
+
+  const res = await backend.verify(impl.script, dir);
+  const kind = res.kind ?? (res.pass ? 'pass' : res.ran ? 'fail' : 'error');
+  const log = `pass=${res.pass} ran=${res.ran} kind=${kind}\n--- stdout ---\n${res.stdout || ''}\n--- stderr ---\n${(res.stderr || '').slice(0, 4000)}`;
+  writeFileSync(path.join(dir, 'verify.txt'), log);
+
+  try {
+    saveImpl(id, {
+      code: impl.script,
+      verifyLog: log,
+      meta: {
+        id, mode: scene?.metadata?.mode || 'hardware', language: backend.language, ext,
+        backend: backend.id, verified: { pass: res.pass, ran: res.ran },
+        savedAt: new Date().toISOString(), runDir: dir,
+      },
+    });
+  } catch { /* impl store is best-effort */ }
+
+  console.log(res.pass ? '  ✓ VERIFIED — the source\'s checked properties hold'
+    : `  ✗ ${kind === 'fail' ? 'FAIL (counterexample)' : `did not run (${kind})`}`);
+  return { pass: res.pass, ran: res.ran, kind, runDir: dir };
 }
 
-interface VerifyCliOpts {
-  positional: string[];
-  model?: string; backend?: string; n?: number; noVerify?: boolean; noAmend?: boolean;
-}
+interface VerifyCliOpts { positional: string[]; model?: string; backend?: string }
 
 function parseArgs(argv: string[]): VerifyCliOpts {
   const opts: VerifyCliOpts = { positional: [] };
@@ -62,9 +125,6 @@ function parseArgs(argv: string[]): VerifyCliOpts {
     const a = argv[i];
     if (a === '--model') opts.model = argv[++i];
     else if (a === '--backend') opts.backend = argv[++i];
-    else if (a === '--n') opts.n = Number(argv[++i]);
-    else if (a === '--no-verify') opts.noVerify = true;
-    else if (a === '--no-amend') opts.noAmend = true;
     else if (a.startsWith('--')) throw new Error(`unknown flag: ${a}`);
     else opts.positional.push(a);
   }
@@ -74,12 +134,10 @@ function parseArgs(argv: string[]): VerifyCliOpts {
 export async function verify(argv: string[]): Promise<void> {
   const opts = parseArgs(argv);
   const ref = opts.positional[0];
-  if (!ref) {
-    throw new Error('usage: visually verify <scene> [--n 2] [--model <m>] [--backend <id>] [--no-verify] [--no-amend]');
-  }
+  if (!ref) throw new Error('usage: visually verify <scene> [--model <m>] [--backend <id>]');
   const target = resolveScene(ref);
   if (!target) throw new Error(`no such scene: ${ref}`);
   const id = sceneIdFromPath(target);
-  console.log(`visually verify: ${id} — formal verification + fold findings into the spec`);
+  console.log(`visually verify: ${id} — formal verification of the real source`);
   await verifyStep(id, opts);
 }
