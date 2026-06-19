@@ -369,6 +369,32 @@ the at-full-width proofs carry the generality; small-N alone would only be
 (resource/area/ATP/timing) — a separate axis from functional/structural
 correctness.
 
+## 14. Strategic pivot — ground on the real source, stop implementing from zero
+
+Pushing the loop toward RTL made the ceiling clear: auto-generating synthesizable
+RTL (and matching a paper's synthesized resource/ATP numbers) from a 3D scene is
+not realistic without a large hardware corpus and a synthesis backend. The
+self-check we *can* build is a behavioral/golden-reference model — useful, but not
+the silicon the paper presents. So the goal shifts: **stop trying to implement the
+system from zero; treat the paper's real source as ground truth and build on it.**
+The new shape of the loop:
+
+- **Stage 0 — "cheat" the source.** `evidence` already fetches the paper + the
+  authors' reference implementation; it now also CAPTURES the key source files
+  VERBATIM (RTL/model), headed `// file: <path>`, so the real code is cached as
+  ground truth rather than only described.
+- **Stage 1 — ground the 3D model in the source.** `refine` now seeds the visual
+  improve pass with that gathered architecture (`buildImproveSeed` merges the
+  prior round's verification gaps with `sourceGrounding(evidence)`), so the 3D
+  model is improved to depict the REAL modules / memory / datapath / control —
+  even on round 1, before any report. This is a legitimate fidelity raiser: the
+  picture matches the actual implementation instead of a guess.
+- **Next (planned).** Split the downstream into (B1) **formal verification of the
+  fetched source** — `reproduce` repointed from "reverse-implement from the spec"
+  to "verify the real source's properties" — and (B2) an **algorithm-improvement /
+  SOTA-search** task driven by the now-faithful 3D model. Zero-from-scratch
+  implementation and RTL generation are dropped as goals.
+
 ## References
 
 The hardening borrows directly from prior recursive-self-improvement work:

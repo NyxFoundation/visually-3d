@@ -118,6 +118,13 @@ export function evidenceExcerpt(ev: LoadedEvidence, limit = 18000): string {
   return parts.join('\n\n').slice(0, limit);
 }
 
+// A smaller, architecture-framed excerpt used to GROUND the 3D-improvement pass
+// in the real source, so the visualization depicts the actual modules / memory /
+// datapath / control instead of a guess. '' when there is no evidence.
+export function sourceGrounding(ev: LoadedEvidence, limit = 4000): string {
+  return evidenceExcerpt(ev, limit);
+}
+
 // True when a reproduce report still shows SOURCE-DEPENDENT gaps — missing
 // fields or fidelity mismatches that only the real paper/datasheet can resolve
 // (as opposed to a self-check counterexample, which amend can fix from the
@@ -188,7 +195,12 @@ ${gaps.map((g) => `- ${g}`).join('\n')}` : '';
 ALSO, search for REFERENCE IMPLEMENTATIONS (e.g. on GitHub) of "${subject}". For
 each promising repository:
 - give the repo URL and the file/function that is relevant;
-- summarize ONLY the algorithmic/architectural choices it makes for the pieces
+- CAPTURE THE KEY SOURCE FILES VERBATIM in fenced code blocks, each headed by a
+  comment line \`// file: <repo-relative path>\`, so the REAL code (RTL/model) is
+  preserved as ground truth — not only described. Prefer the modules that realize
+  the architecture (memory mapping, address/twiddle generators, FSM, butterfly /
+  reducer datapath, top-level wiring);
+- summarize the algorithmic/architectural choices these files make for the pieces
   the paper leaves implicit (memory mapping, addressing, scheduling, FSM, exact
   butterfly/datapath equations, parameter values);
 - mark these clearly as SECONDARY. A reference implementation may DIFFER from the

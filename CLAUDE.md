@@ -88,10 +88,15 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
   **gap-targeted** (`summarizeGaps`), **appending** to `paper.md` (never
   overwrite; seed `notes.md` always merged); escalate via a persistent
   `index.json → attempts[]` log (`planEvidence`: `paper` → `refs` → exhausted),
-  never repeating a method. **Invariant: evidence feeds `amend` ONLY, never
-  reproduce's reverse-implementers** — reproduce must keep grading the SPEC, not
-  the paper. This is the only tool-enabled step (`runClaudeStreaming({ tools:
-  [...] })`); the rest of the loop is tool-less.
+  never repeating a method. It captures the reference implementation's key source
+  files VERBATIM (ground truth, not just prose). Evidence feeds **`amend`** (quotes
+  it to ground the spec) and the **visual improve pass** (`refine`'s
+  `buildImproveSeed` injects `sourceGrounding` so the 3D model depicts the REAL
+  architecture) — but NOT reproduce's reverse-implementers, which must keep grading
+  the SPEC, not the paper. Only tool-enabled step (`runClaudeStreaming({ tools:
+  [...] })`); the rest is tool-less. (Direction: reproduce is being repointed from
+  reverse-implementation toward verifying the fetched source; zero-from-scratch
+  implementation/RTL generation is not a goal.)
 - `lib/serve.ts` — static GUI server + SSE bridge to the local CLI. Endpoints:
   `/api/health`, `/api/analyze/stream`, `/samples/...`, `/api/impl/<id>`,
   `POST /api/impl/<id>/verify` (streams a live backend run).

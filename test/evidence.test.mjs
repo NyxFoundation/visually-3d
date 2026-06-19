@@ -85,6 +85,17 @@ test('buildEvidencePrompt --refs adds a secondary GitHub search, tagged ref-impl
   assert.ok(/REFERENCE IMPLEMENTATIONS/.test(p));
   assert.ok(p.includes('[ref-impl:'));
   assert.ok(p.includes('SECONDARY'));
+  // Stage 0 "cheat": capture the real source files verbatim, not just prose
+  assert.ok(/VERBATIM/.test(p));
+  assert.ok(p.includes('// file:'));
+});
+
+test('sourceGrounding returns the architecture excerpt, or empty for none', async () => {
+  const { sourceGrounding } = await import('../lib/evidence.js');
+  assert.equal(sourceGrounding({ id: 'x', paper: null, notes: null, origin: 'none' }), '');
+  const g = sourceGrounding({ id: 'x', paper: 'P', notes: 'CFNTT notes', origin: 'examples' }, 100);
+  assert.ok(g.includes('CFNTT notes'));
+  assert.ok(g.length <= 100);
 });
 
 test('loadEvidence falls back to the packaged example seed (origin=examples)', () => {

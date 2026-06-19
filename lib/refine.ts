@@ -28,7 +28,7 @@ import { latestVisualScore } from './history.js';
 import { specCoverage } from './scene.js';
 import { repairArithmeticClaims } from './arith-audit.js';
 import { resolveScene, sceneIdFromPath } from './paths.js';
-import { ensureEvidence, hasSourceGaps } from './evidence.js';
+import { ensureEvidence, hasSourceGaps, loadEvidence, sourceGrounding } from './evidence.js';
 
 interface RefineOpts {
   positional: string[];
@@ -99,6 +99,29 @@ function seedFromReport(report: any): { source: string; remaining_gaps: string[]
   return { source: 'reproduce findings', remaining_gaps: gaps, notes };
 }
 
+interface ImproveSeed { source: string; remaining_gaps: string[]; notes: string[] }
+
+// The seed handed to the visual improve pass. Merges (a) the prior round's
+// verification gaps with (b) SOURCE GROUNDING from gathered evidence — so the 3D
+// model is improved to depict the REAL architecture (modules, memory, datapath,
+// control) the source describes, not a guess. Returns null only when there is
+// neither, so grounding alone (e.g. round 1, before any report) still seeds it.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function buildImproveSeed(report: any, ev: ReturnType<typeof loadEvidence>): ImproveSeed | null {
+  const base = seedFromReport(report);
+  const grounding = ev && ev.origin !== 'none' ? sourceGrounding(ev) : '';
+  if (!base && !grounding) return null;
+  const remaining_gaps = base ? [...base.remaining_gaps] : [];
+  const notes = base ? [...base.notes] : [];
+  if (grounding) {
+    remaining_gaps.unshift(
+      'Make the 3D structure FAITHFUL to the authoritative source architecture below — depict the real modules, memory banks, datapath and control as the source describes them; do not invent structure it contradicts.',
+    );
+    notes.push(`AUTHORITATIVE SOURCE ARCHITECTURE (ground the 3D model in this real implementation):\n${grounding}`);
+  }
+  return { source: base?.source ?? 'source evidence', remaining_gaps, notes };
+}
+
 export async function refine(argv: string[]): Promise<void> {
   const opts = parseArgs(argv);
   const ref = opts.positional[0];
@@ -167,7 +190,8 @@ export async function refine(argv: string[]): Promise<void> {
     if (roundIters > 0) {
       console.log(`\n▶ visual self-improvement (${roundIters} iteration(s))…` +
         (visualCleared ? `  [feedback-driven — last round's spec changes to fold in]` : ''));
-      const seed = seedFromReport(lastReport);
+      const seed = buildImproveSeed(lastReport, loadEvidence(id));
+      if (seed && seed.source === 'source evidence') console.log('  grounding the 3D pass in the gathered source architecture');
       const prevSeedEnv = process.env.VISUALLY_SEED_REVIEW;
       try {
         if (seed) {
