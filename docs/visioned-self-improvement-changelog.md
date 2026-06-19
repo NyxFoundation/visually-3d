@@ -328,6 +328,11 @@ without losing coherence:
   source gaps) and calls `ensureEvidence`; the cache, policy, and accumulation
   live entirely in `lib/evidence.ts`. The evidence→amend-only invariant is
   unchanged.
+- **Control surface.** The policy is selectable both ways: CLI flags
+  `--evidence-refs` (search GitHub from the first pass) / `--no-evidence` (offline,
+  spec-only), and a TUI **Refine → source evidence policy** sub-menu offering the
+  same three presets (auto / GitHub-upfront / no-web). Default in both:
+  paper-first, auto-escalate to GitHub only if the paper doesn't close the gaps.
 
 ## References
 
