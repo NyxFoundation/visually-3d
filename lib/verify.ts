@@ -23,8 +23,10 @@ function stamp(): string {
   return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
 }
 
-// Pure (no I/O) so it is unit-testable. Embeds the spec for naming/structure and
-// the REAL SOURCE as the ground truth to model the golden/properties on.
+// Pure (no I/O) so it is unit-testable. Embeds the spec for naming/structure. The
+// REAL SOURCE is the ground truth: when a cloned reference tree exists, point the
+// agent at it (it has Read/Grep/Bash) so it reads the ACTUAL files; otherwise fall
+// back to the transcribed paper excerpt.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function buildSourceVerifyPrompt(scene: any, ev: LoadedEvidence, backendInstructions: string): string {
   const spec = JSON.stringify({
@@ -33,13 +35,25 @@ export function buildSourceVerifyPrompt(scene: any, ev: LoadedEvidence, backendI
     parts: (scene?.parts || []).map((p: { id?: string; name?: string; role?: string; spec?: unknown }) =>
       ({ id: p.id, name: p.name, role: p.role, spec: p.spec })),
   }, null, 1).slice(0, 8000);
-  const source = evidenceExcerpt(ev, 16000);
+
+  const sourceBlock = ev.sourceDir
+    ? `THE REAL SOURCE is a cloned reference checkout at:
+    ${ev.sourceDir}
+Use your tools to read it: \`ls -R\`, \`cat\`, and \`grep\` the actual modules
+(memory map, address/twiddle generators, FSM, butterfly/reducer datapath). Model
+your golden/reference and the properties you check on THOSE real files — do not
+invent beyond them.${ev.paper ? `\n\nHigh-level notes (transcribed paper):\n\`\`\`markdown\n${evidenceExcerpt({ ...ev, sourceDir: null }, 6000)}\n\`\`\`` : ''}`
+    : `THE REAL SOURCE — ground truth (transcribe its actual maps/equations/parameters
+into your golden model and properties; do not invent beyond it):
+\`\`\`markdown
+${evidenceExcerpt(ev, 16000)}
+\`\`\``;
 
   return `You are FORMALLY VERIFYING a REAL, existing system. Its actual SOURCE — the
-paper and the reference implementation code — is given below as GROUND TRUTH. You
-are NOT reverse-implementing or guessing: model your golden/reference and the
-properties you check on the SOURCE's real functions, parameters, and equations,
-and confirm the system's key properties hold.
+paper and the reference implementation code — is the GROUND TRUTH. You are NOT
+reverse-implementing or guessing: model your golden/reference and the properties
+you check on the SOURCE's real functions, parameters, and equations, and confirm
+the system's key properties hold.
 
 ${backendInstructions}
 
@@ -48,11 +62,7 @@ SYSTEM (names / structure for context):
 ${spec}
 \`\`\`
 
-THE REAL SOURCE — ground truth (transcribe its actual maps/equations/parameters
-into your golden model and properties; do not invent beyond it):
-\`\`\`markdown
-${source}
-\`\`\``;
+${sourceBlock}`;
 }
 
 export interface VerifyStepOpts { model?: string; backend?: string }
@@ -85,8 +95,10 @@ export async function verifyStep(
   const prompt = buildSourceVerifyPrompt(scene, ev, backend.implementInstructions());
   writeFileSync(path.join(dir, 'prompt.txt'), prompt);
 
-  console.log(`  verifying the real source with ${backend.label} (evidence: ${ev.origin})…`);
-  const { text } = await runClaudeStreaming({ prompt, model: opts.model, runDir: dir, quiet: true });
+  console.log(`  verifying the real source with ${backend.label} (evidence: ${ev.origin}${ev.sourceDir ? ', cloned repo' : ''})…`);
+  // When a cloned reference tree exists, let the agent read the ACTUAL files.
+  const tools = ev.sourceDir ? ['Read', 'Grep', 'Bash'] : undefined;
+  const { text } = await runClaudeStreaming({ prompt, model: opts.model, runDir: dir, quiet: true, tools });
   const impl = parseImpl(text);
   if (typeof impl.script !== 'string' || !impl.script.trim()) {
     console.log('  ✗ no verification program produced');

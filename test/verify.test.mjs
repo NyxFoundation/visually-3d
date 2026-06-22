@@ -22,7 +22,14 @@ test('buildSourceVerifyPrompt grounds on the REAL source, not reverse-implementa
   assert.ok(/FORMALLY VERIFYING a REAL/.test(p));
   assert.ok(p.includes('BACKEND-INSTRUCTIONS-HERE')); // backend's two-tier rules included
   assert.ok(p.includes('bank(i)=(i^(i>>3)) mod 8')); // the real source rides along
-  assert.ok(/NOT reverse-implementing/i.test(p));
+  assert.ok(/NOT\s+reverse-implementing/i.test(p));
+});
+
+test('buildSourceVerifyPrompt points at the CLONED tree when one exists', () => {
+  const ev = { id: 'x', paper: 'notes', notes: null, sourceDir: '/home/u/.visually-3d/evidence/x/source', origin: 'workspace' };
+  const p = buildSourceVerifyPrompt(scene, ev, 'BACKEND');
+  assert.ok(p.includes('/home/u/.visually-3d/evidence/x/source'));
+  assert.ok(/ls -R|grep|cat/.test(p)); // told to read the real files
 });
 
 test('verifyStep errors when there is no gathered source', async () => {

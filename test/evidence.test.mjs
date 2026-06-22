@@ -66,18 +66,22 @@ test('buildEvidencePrompt enables web fetch, forbids invention, lists the URLs',
   assert.ok(p.includes('NEVER invent'));
   assert.ok(p.includes('tches.iacr.org/index.php/TCHES/article/view/9291'));
   assert.ok(p.includes('[paper:'));
-  // without --refs, do not ask for GitHub reference implementations
-  assert.ok(!/REFERENCE IMPLEMENTATIONS/.test(p));
+  // without --refs, do not ask for the reference implementation
+  assert.ok(!/REFERENCE IMPLEMENTATION/.test(p));
 });
 
 test('buildEvidencePrompt --refs adds a secondary GitHub search, tagged ref-impl', () => {
   const p = buildEvidencePrompt(scene, sceneSources(scene), { refs: true });
-  assert.ok(/REFERENCE IMPLEMENTATIONS/.test(p));
+  assert.ok(p.includes('REFERENCE IMPLEMENTATION'));
   assert.ok(p.includes('[ref-impl:'));
   assert.ok(p.includes('SECONDARY'));
-  // Stage 0 "cheat": capture the real source files verbatim, not just prose
-  assert.ok(/VERBATIM/.test(p));
-  assert.ok(p.includes('// file:'));
+});
+
+test('buildEvidencePrompt --refs with a sourceDir tells the agent to git clone it', () => {
+  const p = buildEvidencePrompt(scene, sceneSources(scene), { refs: true, sourceDir: '/tmp/ev/ntt/source' });
+  assert.ok(p.includes('git clone'));
+  assert.ok(p.includes('/tmp/ev/ntt/source'));
+  assert.ok(/Bash/.test(p)); // Bash tool is advertised in the prompt
 });
 
 test('sourceGrounding returns the architecture excerpt, or empty for none', async () => {

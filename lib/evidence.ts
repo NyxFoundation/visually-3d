@@ -65,9 +65,21 @@ export interface LoadedEvidence {
   paper: string | null;
   // Curated, hand-written learnings shipped with an example (honest about gaps).
   notes: string | null;
+  // Absolute path to the CLONED reference source (a real git checkout), if the
+  // gatherer brought one wholesale — the ground-truth files verify can grep.
+  sourceDir: string | null;
   // Where it came from: the user's workspace (fetched), the package examples
   // (seed), or nothing at all.
   origin: 'workspace' | 'examples' | 'none';
+}
+
+// Where the gatherer clones reference repos for a scene (full source, on disk).
+export function evidenceSourceDir(id: string): string {
+  return path.join(evidenceDir(id), 'source');
+}
+
+function dirHasFiles(dir: string): boolean {
+  try { return readdirSync(dir).length > 0; } catch { return false; }
 }
 
 const PAPER_CAP = 24000; // chars kept from a fetched paper for prompt injection
@@ -96,12 +108,14 @@ export function loadEvidence(id: string): LoadedEvidence {
     ?? readIfExists(path.join(ex, 'paper.md'), PAPER_CAP);
   const notes = readIfExists(path.join(ws, 'notes.md'), NOTES_CAP)
     ?? readIfExists(path.join(ex, 'notes.md'), NOTES_CAP);
+  const srcDir = evidenceSourceDir(id);
+  const sourceDir = dirHasFiles(srcDir) ? srcDir : null;
   const origin: LoadedEvidence['origin'] =
-    existsSync(path.join(ws, 'paper.md')) ? 'workspace'
+    existsSync(path.join(ws, 'paper.md')) || sourceDir ? 'workspace'
       : (paper || notes) ? 'examples'
         : 'none';
-  if (origin === 'none') return { id, paper: null, notes: null, origin };
-  return { id, paper, notes, origin };
+  if (origin === 'none') return { id, paper: null, notes: null, sourceDir: null, origin };
+  return { id, paper, notes, sourceDir, origin };
 }
 
 export function hasEvidence(id: string): boolean {
@@ -153,7 +167,7 @@ export function sceneSources(scene: any): SourceRef[] {
 
 // ── the gathering prompt ─────────────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function buildEvidencePrompt(scene: any, sources: SourceRef[], opts: { refs: boolean; openGaps?: string[] }): string {
+export function buildEvidencePrompt(scene: any, sources: SourceRef[], opts: { refs: boolean; openGaps?: string[]; sourceDir?: string }): string {
   const subject = scene?.machine_name || scene?.metadata?.info?.english_name || 'the system';
   const domain = scene?.metadata?.domain ? ` (domain: ${scene.metadata.domain})` : '';
   const summary = typeof scene?.metadata?.info?.summary === 'string'
@@ -174,25 +188,25 @@ ${gaps.map((g) => `- ${g}`).join('\n')}` : '';
 
   const refsBlock = opts.refs ? `
 
-ALSO, search for REFERENCE IMPLEMENTATIONS (e.g. on GitHub) of "${subject}". For
-each promising repository:
-- give the repo URL and the file/function that is relevant;
-- CAPTURE THE KEY SOURCE FILES VERBATIM in fenced code blocks, each headed by a
-  comment line \`// file: <repo-relative path>\`, so the REAL code (RTL/model) is
-  preserved as ground truth — not only described. Prefer the modules that realize
-  the architecture (memory mapping, address/twiddle generators, FSM, butterfly /
-  reducer datapath, top-level wiring);
-- summarize the algorithmic/architectural choices these files make for the pieces
-  the paper leaves implicit (memory mapping, addressing, scheduling, FSM, exact
-  butterfly/datapath equations, parameter values);
-- mark these clearly as SECONDARY. A reference implementation may DIFFER from the
-  paper; never present its choices as the paper's. Tag every such fact
-  \`[ref-impl:<repo-url>]\`.` : '';
+ALSO bring the REFERENCE IMPLEMENTATION wholesale. Find the official/source
+repository for "${subject}" (WebSearch; prefer the authors' repo linked from the
+paper).${opts.sourceDir ? `
+- CLONE IT with git — bring the FULL real source, do not hand-copy fragments:
+    git clone --depth 1 <repo-url> "${opts.sourceDir}/<repo-name>"
+  (try a couple of likely repos; remove a failed/empty clone and try the next).
+  After cloning, you may \`ls\`/\`cat\`/\`grep\` the files to understand them. The
+  cloned tree is the ground truth the downstream tool will read directly.` : ''}
+- in your Markdown, list each cloned repo URL and a short MAP of which files
+  realize which part of the architecture (memory mapping, address/twiddle
+  generators, FSM, butterfly/reducer datapath, top-level wiring);
+- mark these as SECONDARY. A reference implementation may DIFFER from the paper;
+  never present its choices as the paper's. Tag such facts \`[ref-impl:<repo-url>]\`.` : '';
 
   return `You are gathering GROUND-TRUTH evidence about a specific engineered system so a
-downstream tool can pin its real parameters and structures. Use your web tools
-(WebFetch on each source URL; WebSearch when a URL is not enough). Then write a
-faithful Markdown transcription.
+downstream tool can pin its real parameters and structures. Use your tools:
+WebFetch (source URLs), WebSearch (find repos/mirrors), and Bash (\`git clone\` the
+reference repo, then \`ls\`/\`cat\`/\`grep\` it). Then write a faithful Markdown
+transcription.
 
 SUBJECT: ${subject}${domain}
 ${summary ? `\nScene summary (for context only — do NOT just repeat it):\n${summary}\n` : ''}
@@ -272,13 +286,21 @@ export async function gatherEvidence(
   ensureWorkspace();
   const dir = evidenceDir(id);
   mkdirSync(dir, { recursive: true });
+  // When gathering refs, give the agent a place to `git clone` the real repo so it
+  // brings the FULL source wholesale (not hand-copied fragments).
+  const srcDir = evidenceSourceDir(id);
+  if (doRefs) mkdirSync(srcDir, { recursive: true });
   const logDir = makeRunDir(id, 'evidence', stamp());
   mkdirSync(logDir, { recursive: true });
 
-  const prompt = buildEvidencePrompt(scene, sources, { refs: doRefs, openGaps: opts.openGaps });
+  const prompt = buildEvidencePrompt(scene, sources, {
+    refs: doRefs, openGaps: opts.openGaps, sourceDir: doRefs ? srcDir : undefined,
+  });
   writeFileSync(path.join(logDir, 'prompt.txt'), prompt);
   const { text } = await runClaudeStreaming({
-    prompt, model: opts.model, runDir: logDir, quiet: true, tools: ['WebFetch', 'WebSearch'],
+    prompt, model: opts.model, runDir: logDir, quiet: true,
+    // Bash enables `git clone` of the reference repo; web tools find/fetch it.
+    tools: doRefs ? ['WebFetch', 'WebSearch', 'Bash'] : ['WebFetch', 'WebSearch'],
   });
   writeFileSync(path.join(logDir, 'raw.md'), text);
 
@@ -299,8 +321,22 @@ export async function gatherEvidence(
     ? `${prior.replace(/\s+$/, '')}\n\n---\n\n${header}${md}\n`
     : `${md}\n`;
   writeFileSync(paperFile, body);
+  const clonedFiles = dirHasFiles(srcDir) ? countFiles(srcDir) : 0;
+  if (clonedFiles) console.log(`  ✓ cloned reference source: ${clonedFiles} file(s) → ${srcDir}`);
   persistAttempt(id, dir, sources, methodsDone, opts.openGaps, md.length);
   return { added: md.length, method: opts.method, methodsDone };
+}
+
+function countFiles(dir: string): number {
+  let n = 0;
+  try {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      if (e.name === '.git') continue;
+      if (e.isDirectory()) n += countFiles(path.join(dir, e.name));
+      else n++;
+    }
+  } catch { /* ignore */ }
+  return n;
 }
 
 function persistAttempt(
@@ -312,6 +348,10 @@ function persistAttempt(
   const attempts = [...(prev?.attempts || []), ...methods.map((m) => ({ method: m, at, gaps: gaps?.slice(0, 16), bytes }))];
   const items = [...(prev?.items || [])];
   if (!items.some((it) => it.file === 'paper.md')) items.push({ kind: 'paper', file: 'paper.md' });
+  // Record the cloned reference tree once it exists.
+  if (dirHasFiles(evidenceSourceDir(id)) && !items.some((it) => it.file === 'source')) {
+    items.push({ kind: 'ref-impl', file: 'source' });
+  }
   const index = EvidenceIndexSchema.parse({ id, fetchedAt: at, sources, items, attempts });
   writeFileSync(path.join(dir, 'index.json'), JSON.stringify(index, null, 2) + '\n');
 }

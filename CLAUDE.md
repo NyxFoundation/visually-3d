@@ -109,10 +109,11 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
   source code) the first time a scene with sources has none cached. Policy:
   reference the cache first (`~/.visually-3d/evidence/<id>/`, falling back to the
   checked-in `examples/<id>/` seed); on a miss, fetch (paper + GitHub refs) via the
-  runner's web tools, **appending** to `paper.md` (never overwrite; seed
+  runner's web tools **+ Bash**, **appending** to `paper.md` (never overwrite; seed
   `notes.md` always merged), with each pass logged in `index.json → attempts[]`.
-  It captures the reference implementation's key source
-  files VERBATIM (ground truth, not just prose). Evidence feeds **`amend`** (quotes
+  For refs it **`git clone`s the reference repo wholesale** into
+  `evidence/<id>/source/` (the real files, not hand-copied fragments) — `verify`
+  then reads that cloned tree directly (Read/Grep/Bash). Evidence feeds **`amend`** (quotes
   it to ground the spec) and the **visual pass** (`visualize`'s `buildImproveSeed`
   injects `sourceGrounding` so the 3D model depicts the REAL architecture) — but
   NOT reproduce's reverse-implementers, which must keep grading the SPEC, not the
