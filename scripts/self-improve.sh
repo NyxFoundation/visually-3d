@@ -165,7 +165,10 @@ while [ "$i" -le "$MAX_ITERS" ]; do
     # keeps it restricted to reading only. stream-json carries the thinking
     # trace; the trailing "result" event holds the final answer. `-p` + piped
     # stdin is print mode.
-    if ! "$CLAUDE_BIN" -p \
+    # Raise the output-token cap: re-emitting a whole scene is a large response
+    # and the default cap truncates it mid-JSON. Honor a caller override.
+    if ! CLAUDE_CODE_MAX_OUTPUT_TOKENS="${CLAUDE_CODE_MAX_OUTPUT_TOKENS:-64000}" \
+        "$CLAUDE_BIN" -p \
           --model "$CLAUDE_MODEL" \
           --tools Read \
           --permission-mode bypassPermissions \
@@ -173,17 +176,26 @@ while [ "$i" -le "$MAX_ITERS" ]; do
           < "$PROMPT_TXT" > "$EVENTS" 2> "$MODEL_ERR"; then
       die "Claude CLI failed on iteration $i — see $MODEL_ERR and $EVENTS"
     fi
+    # Assemble the answer from the assistant TEXT blocks (the full scene can span
+    # blocks; the final "result" event is sometimes just a trailing fragment).
+    # Prefer the assembled text; fall back to result. The applier then extracts
+    # the JSON object from it.
     node -e '
       const fs = require("fs");
       const lines = fs.readFileSync(process.argv[1], "utf8").trim().split("\n");
-      let result = "";
+      let result = "", asst = "";
       for (const line of lines) {
         try {
           const o = JSON.parse(line);
           if (o.type === "result" && typeof o.result === "string") result = o.result;
+          if (o.type === "assistant" && o.message && Array.isArray(o.message.content)) {
+            for (const b of o.message.content) {
+              if (b.type === "text" && typeof b.text === "string") asst += b.text;
+            }
+          }
         } catch { /* skip non-JSON lines */ }
       }
-      fs.writeFileSync(process.argv[2], result);
+      fs.writeFileSync(process.argv[2], asst.length > result.length ? asst : result);
     ' "$EVENTS" "$MESSAGE"
   fi
   [ -s "$MESSAGE" ] || die "$DRIVER produced no final message on iteration $i — see $EVENTS"

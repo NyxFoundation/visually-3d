@@ -62,7 +62,10 @@ export function runClaudeStreaming({ prompt, model, runDir, quiet = false, tools
   return new Promise<RunResult>((resolve, reject) => {
     let proc: ChildProcess;
     try {
-      proc = spawn(bin, args, { stdio: ['pipe', 'pipe', 'pipe'] });
+      // Raise the output-token cap so large answers (a transcription, a long
+      // self-check) aren't truncated mid-JSON. Honor a caller override.
+      const env = { ...process.env, CLAUDE_CODE_MAX_OUTPUT_TOKENS: process.env.CLAUDE_CODE_MAX_OUTPUT_TOKENS || '64000' };
+      proc = spawn(bin, args, { stdio: ['pipe', 'pipe', 'pipe'], env });
       // Hand the (possibly large) prompt over stdin, then close it.
       proc.stdin?.on('error', () => { /* ignore EPIPE if the child exits early */ });
       proc.stdin?.end(prompt);
