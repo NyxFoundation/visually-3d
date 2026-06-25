@@ -1616,3 +1616,11 @@ a.gallery__card { text-decoration: none; color: inherit; display: flex; flex-dir
   .srcb { max-height: none; }
 }
 .srcb--embedded .srcb__count { display: none; } /* the pane head already shows it */
+
+/* ── Studio: mobile pane tabs (avoid the cramped 3-up grid) ──────────────── */
+.studio__tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.studio__tab { flex: 1 1 0; min-width: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 6px; border: 1px solid var(--border); border-radius: 9px; background: var(--bg-elev); color: var(--text-dim); font-size: 13px; line-height: 1; cursor: pointer; }
+.studio__tab span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.studio__tab--active { color: var(--text); border-color: var(--accent); background: rgba(88,166,255,0.12); }
+.studio__panes--mobile { display: block; }
+@media (max-width: 899px) { .studio__eye { display: none; } }

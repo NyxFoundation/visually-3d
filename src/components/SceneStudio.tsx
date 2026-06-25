@@ -158,7 +158,19 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
   // evidence gatherer brought in). When it does, the implementation pane shows
   // THAT real source instead of the legacy generated reverse-implementation.
   const [refCount, setRefCount] = useState<number | null>(null);
+  // Mobile: one pane at a time via tabs instead of a cramped 3-up grid.
+  const [tab, setTab] = useState<PaneKey>('model');
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 899px)').matches);
   const loadedRef = useRef(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(max-width: 899px)');
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -263,44 +275,68 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
     </button>
   );
 
+  const paneModel = (
+    <section className="studio__pane">
+      {head('model', rev ? <span className="studio__at">v{rev.version}</span> : null)}
+      <div className="studio__viewer"><SceneViewer url={sceneUrl} fallback={fallbackScene} selectedPartId={selectedPart?.id} onPartSelect={onPartSelect} /></div>
+    </section>
+  );
+  const paneShot = (
+    <section className="studio__pane">
+      {head('shot', rev ? <span className="studio__at">v{rev.version}</span> : null)}
+      <div className="studio__shot"><ShotImg key={renderUrl} url={renderUrl} /></div>
+    </section>
+  );
+  const paneImpl = (
+    <section className="studio__pane">
+      {refCount && refCount > 0
+        ? head('impl', <span className="studio__at">ground truth · {refCount} files</span>, 'reference source')
+        : head('impl', <>
+            {implVersion != null ? <span className="studio__at">v{implVersion}</span> : null}
+            {verif && impl?.pass != null ? <span className={`rd__verdict rd__verdict--${impl.pass ? 'pass' : 'fail'}`}>{impl.pass ? 'PASS ✓' : 'FAIL'}</span> : null}
+          </>)}
+      <div className="studio__impl">
+        {refCount && refCount > 0 ? (
+          <SourceBrowser id={id} embedded />
+        ) : (
+          <>
+            {implStale ? (
+              <div className="studio__stale">⚠ generated from v{implVersion}; the scene is now v{rev?.version}. Re-run <code>visually refine</code> to regenerate.</div>
+            ) : null}
+            {implUrl ? <CodeFile key={implUrl} url={implUrl} lang={impl?.lang} /> : <span className="impl-panel__hint">no reference source fetched — run <code>visually visualize {id}</code>.</span>}
+          </>
+        )}
+      </div>
+    </section>
+  );
+  const paneFor = (k: PaneKey) => (k === 'model' ? paneModel : k === 'shot' ? paneShot : paneImpl);
+
   return (
     <div className="studio">
-      <div className="studio__panes" data-cols={visibleCount}>
-        {show.model ? (
-          <section className="studio__pane">
-            {head('model', rev ? <span className="studio__at">v{rev.version}</span> : null)}
-            <div className="studio__viewer"><SceneViewer url={sceneUrl} fallback={fallbackScene} selectedPartId={selectedPart?.id} onPartSelect={onPartSelect} /></div>
-          </section>
-        ) : collapsed('model')}
-        {show.shot ? (
-          <section className="studio__pane">
-            {head('shot', rev ? <span className="studio__at">v{rev.version}</span> : null)}
-            <div className="studio__shot"><ShotImg key={renderUrl} url={renderUrl} /></div>
-          </section>
-        ) : collapsed('shot')}
-        {show.impl ? (
-          <section className="studio__pane">
-            {refCount && refCount > 0
-              ? head('impl', <span className="studio__at">ground truth · {refCount} files</span>, 'reference source')
-              : head('impl', <>
-                  {implVersion != null ? <span className="studio__at">v{implVersion}</span> : null}
-                  {verif && impl?.pass != null ? <span className={`rd__verdict rd__verdict--${impl.pass ? 'pass' : 'fail'}`}>{impl.pass ? 'PASS ✓' : 'FAIL'}</span> : null}
-                </>)}
-            <div className="studio__impl">
-              {refCount && refCount > 0 ? (
-                <SourceBrowser id={id} embedded />
-              ) : (
-                <>
-                  {implStale ? (
-                    <div className="studio__stale">⚠ generated from v{implVersion}; the scene is now v{rev?.version}. Re-run <code>visually refine</code> to regenerate.</div>
-                  ) : null}
-                  {implUrl ? <CodeFile key={implUrl} url={implUrl} lang={impl?.lang} /> : <span className="impl-panel__hint">no reference source fetched — run <code>visually visualize {id}</code>.</span>}
-                </>
-              )}
-            </div>
-          </section>
-        ) : collapsed('impl')}
-      </div>
+      {isMobile ? (
+        <>
+          <div className="studio__tabs" role="tablist">
+            {(['model', 'shot', 'impl'] as PaneKey[]).map((k) => (
+              <button
+                key={k}
+                role="tab"
+                aria-selected={tab === k}
+                className={`studio__tab${tab === k ? ' studio__tab--active' : ''}`}
+                onClick={() => setTab(k)}
+              >
+                <Icon name={PANE_META[k].icon} size={14} /> <span>{k === 'impl' && refCount && refCount > 0 ? 'reference' : PANE_META[k].label}</span>
+              </button>
+            ))}
+          </div>
+          <div className="studio__panes studio__panes--mobile">{paneFor(tab)}</div>
+        </>
+      ) : (
+        <div className="studio__panes" data-cols={visibleCount}>
+          {show.model ? paneModel : collapsed('model')}
+          {show.shot ? paneShot : collapsed('shot')}
+          {show.impl ? paneImpl : collapsed('impl')}
+        </div>
+      )}
 
       <div className="studio__readout">
         {frameUrl ? <FrameReadout key={frameUrl} url={frameUrl} />
