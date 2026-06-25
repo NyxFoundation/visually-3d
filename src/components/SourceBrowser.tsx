@@ -35,7 +35,7 @@ function SourceFile({ id, path }: { id: string; path: string }) {
   return <Code code={code} lang={langOf(path)} />;
 }
 
-export function SourceBrowser({ id }: { id: string }) {
+export function SourceBrowser({ id, embedded = false }: { id: string; embedded?: boolean }) {
   const [files, setFiles] = useState<SrcFile[] | null>(null);
   const [root, setRoot] = useState<string | null>(null);
   const [sel, setSel] = useState<string | null>(null);
@@ -56,31 +56,39 @@ export function SourceBrowser({ id }: { id: string }) {
 
   if (files === null || files.length === 0) return null; // loading or no clone → hide
 
+  const body = (
+    <div className="srcb__body">
+      <ul className="srcb__list">
+        {files.map((f) => (
+          <li key={f.path}>
+            <button
+              type="button"
+              className={`srcb__file${f.path === sel ? ' srcb__file--active' : ''}`}
+              onClick={() => setSel(f.path)}
+              title={`${f.path} · ${fmtSize(f.size)}`}
+            >
+              {f.path}
+            </button>
+          </li>
+        ))}
+      </ul>
+      <div className="srcb__code">
+        {sel ? <SourceFile key={sel} id={id} path={sel} /> : null}
+      </div>
+    </div>
+  );
+
+  // Embedded inside the studio's implementation pane — the pane supplies its own
+  // header, so render just the file list + viewer, filling the pane.
+  if (embedded) return <div className="srcb srcb--embedded">{body}</div>;
+
   return (
     <section className="srcb">
       <div className="srcb__head">
         <Icon name="code" size={14} /> Reference source
         <span className="diff__muted"> · {root} · {files.length} file{files.length === 1 ? '' : 's'} (fetched ground truth)</span>
       </div>
-      <div className="srcb__body">
-        <ul className="srcb__list">
-          {files.map((f) => (
-            <li key={f.path}>
-              <button
-                type="button"
-                className={`srcb__file${f.path === sel ? ' srcb__file--active' : ''}`}
-                onClick={() => setSel(f.path)}
-                title={`${f.path} · ${fmtSize(f.size)}`}
-              >
-                {f.path}
-              </button>
-            </li>
-          ))}
-        </ul>
-        <div className="srcb__code">
-          {sel ? <SourceFile key={sel} id={id} path={sel} /> : null}
-        </div>
-      </div>
+      {body}
     </section>
   );
 }

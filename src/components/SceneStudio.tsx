@@ -2,6 +2,7 @@ import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { LazyViewer } from './LazyViewer';
 import { PartInfo } from './PartInfo';
 import { Code } from './Code';
+import { SourceBrowser } from './SourceBrowser';
 import { Icon, type IconName } from './Icon';
 import type {
   FieldChange, FileRef, FrameDetail, Part, PartChange, RevisionEntry,
@@ -153,7 +154,20 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
   // Which of the three panes are shown. The grid reflows to the visible count
   // (hide two → one big column to focus on, e.g., the implementation).
   const [show, setShow] = useState({ model: true, shot: true, impl: true });
+  // Whether this scene has a cloned REFERENCE source (the ground-truth repo the
+  // evidence gatherer brought in). When it does, the implementation pane shows
+  // THAT real source instead of the legacy generated reverse-implementation.
+  const [refCount, setRefCount] = useState<number | null>(null);
   const loadedRef = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/source/${encodeURIComponent(id)}`)
+      .then((r) => (r.ok ? (r.json() as Promise<{ count: number }>) : Promise.reject(r)))
+      .then((d) => { if (!cancelled) setRefCount(d.count); })
+      .catch(() => { if (!cancelled) setRefCount(0); });
+    return () => { cancelled = true; };
+  }, [id]);
 
   useEffect(() => {
     if (loadedRef.current) return;
@@ -232,9 +246,9 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
 
   // Header: icon + label left-aligned, with the version/verdict and a hide (eye)
   // toggle pushed to the right.
-  const head = (k: PaneKey, right?: ReactNode) => (
+  const head = (k: PaneKey, right?: ReactNode, labelOverride?: string) => (
     <div className="studio__pane-head">
-      <span className="studio__head-l"><Icon name={PANE_META[k].icon} size={14} /> {PANE_META[k].label}</span>
+      <span className="studio__head-l"><Icon name={PANE_META[k].icon} size={14} /> {labelOverride ?? PANE_META[k].label}</span>
       <span className="studio__head-r">
         {right}
         <button className="studio__eye" title={`Hide ${PANE_META[k].label}`} aria-label={`Hide ${PANE_META[k].label}`} onClick={() => toggle(k)}><Icon name="eyeOff" size={14} /></button>
@@ -266,15 +280,23 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
         ) : collapsed('shot')}
         {show.impl ? (
           <section className="studio__pane">
-            {head('impl', <>
-              {implVersion != null ? <span className="studio__at">v{implVersion}</span> : null}
-              {verif && impl?.pass != null ? <span className={`rd__verdict rd__verdict--${impl.pass ? 'pass' : 'fail'}`}>{impl.pass ? 'PASS ✓' : 'FAIL'}</span> : null}
-            </>)}
+            {refCount && refCount > 0
+              ? head('impl', <span className="studio__at">ground truth · {refCount} files</span>, 'reference source')
+              : head('impl', <>
+                  {implVersion != null ? <span className="studio__at">v{implVersion}</span> : null}
+                  {verif && impl?.pass != null ? <span className={`rd__verdict rd__verdict--${impl.pass ? 'pass' : 'fail'}`}>{impl.pass ? 'PASS ✓' : 'FAIL'}</span> : null}
+                </>)}
             <div className="studio__impl">
-              {implStale ? (
-                <div className="studio__stale">⚠ generated from v{implVersion}; the scene is now v{rev?.version}. Re-run <code>visually reproduce</code> (or <code>refine</code>) to regenerate.</div>
-              ) : null}
-              {implUrl ? <CodeFile key={implUrl} url={implUrl} lang={impl?.lang} /> : <span className="impl-panel__hint">not implemented yet at this point — run <code>visually reproduce</code>.</span>}
+              {refCount && refCount > 0 ? (
+                <SourceBrowser id={id} embedded />
+              ) : (
+                <>
+                  {implStale ? (
+                    <div className="studio__stale">⚠ generated from v{implVersion}; the scene is now v{rev?.version}. Re-run <code>visually refine</code> to regenerate.</div>
+                  ) : null}
+                  {implUrl ? <CodeFile key={implUrl} url={implUrl} lang={impl?.lang} /> : <span className="impl-panel__hint">no reference source fetched — run <code>visually visualize {id}</code>.</span>}
+                </>
+              )}
             </div>
           </section>
         ) : collapsed('impl')}
