@@ -56,22 +56,30 @@ export function SourceBrowser({ id, embedded = false }: { id: string; embedded?:
 
   if (files === null || files.length === 0) return null; // loading or no clone → hide
 
+  // Strip the shared repo dir from option labels (it's the same for every file);
+  // it's shown once in the header/bar instead.
+  const repo = files.every((f) => f.path.startsWith(`${files[0].path.split('/')[0]}/`))
+    ? files[0].path.split('/')[0] : null;
+  const label = (p: string): string => (repo ? p.slice(repo.length + 1) : p);
+
+  // A dropdown (not a sidebar) keeps the code area wide and works as a native
+  // picker on mobile. Code fills the rest, full width.
   const body = (
     <div className="srcb__body">
-      <ul className="srcb__list">
-        {files.map((f) => (
-          <li key={f.path}>
-            <button
-              type="button"
-              className={`srcb__file${f.path === sel ? ' srcb__file--active' : ''}`}
-              onClick={() => setSel(f.path)}
-              title={`${f.path} · ${fmtSize(f.size)}`}
-            >
-              {f.path}
-            </button>
-          </li>
-        ))}
-      </ul>
+      <div className="srcb__bar">
+        {repo ? <span className="srcb__repo" title={root ?? undefined}>{repo}/</span> : null}
+        <select
+          className="srcb__select"
+          value={sel ?? ''}
+          onChange={(e) => setSel(e.target.value)}
+          aria-label="reference source file"
+        >
+          {files.map((f) => (
+            <option key={f.path} value={f.path}>{label(f.path)} · {fmtSize(f.size)}</option>
+          ))}
+        </select>
+        <span className="srcb__count">{files.length} files</span>
+      </div>
       <div className="srcb__code">
         {sel ? <SourceFile key={sel} id={id} path={sel} /> : null}
       </div>
@@ -79,7 +87,7 @@ export function SourceBrowser({ id, embedded = false }: { id: string; embedded?:
   );
 
   // Embedded inside the studio's implementation pane — the pane supplies its own
-  // header, so render just the file list + viewer, filling the pane.
+  // header, so render just the bar + viewer, filling the pane.
   if (embedded) return <div className="srcb srcb--embedded">{body}</div>;
 
   return (
