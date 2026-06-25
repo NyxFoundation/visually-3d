@@ -5,13 +5,14 @@
 
 import http from 'node:http';
 import fsp from 'node:fs/promises';
-import { mkdtempSync, rmSync, existsSync, statSync } from 'node:fs';
+import { mkdtempSync, rmSync, existsSync, statSync, readdirSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn, execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { streamAnalyze, claudeAvailable, buildPrompt } from '../server/analyst.js';
 import { DIST, BUNDLED_SAMPLES, SCENES_DIR, SCRIPTS, THUMBS_DIR, ensureWorkspace, resolveScene } from './paths.js';
+import { evidenceSourceDir } from './evidence.js';
 import { readImpl } from './impls.js';
 import { getBackend } from './backends/index.js';
 import { listRunsForScene, getRunDetail, resolveArtifact } from './runs.js';
@@ -168,6 +169,46 @@ function handleImplGet(res: http.ServerResponse, id: string): void {
   }
   res.setHeader('Content-Type', MIME['.json']);
   res.end(JSON.stringify(impl));
+}
+
+// GET /api/source/<id> — the cloned reference SOURCE tree (the real repo the
+// evidence gatherer brought in). Lists every file (excluding .git) so the web UI
+// can show the whole fetched codebase.
+function walkSource(dir: string, base: string, out: { path: string; size: number }[], cap: number): void {
+  let entries: import('node:fs').Dirent[];
+  try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+  for (const e of entries) {
+    if (e.name === '.git' || out.length >= cap) continue;
+    const full = path.join(dir, e.name);
+    const rel = base ? `${base}/${e.name}` : e.name;
+    if (e.isDirectory()) walkSource(full, rel, out, cap);
+    else { try { out.push({ path: rel, size: statSync(full).size }); } catch { /* skip */ } }
+  }
+}
+
+function handleSourceList(res: http.ServerResponse, id: string): void {
+  res.setHeader('Content-Type', MIME['.json']);
+  const root = evidenceSourceDir(id);
+  if (!existsSync(root)) { res.end(JSON.stringify({ root: null, count: 0, files: [] })); return; }
+  const files: { path: string; size: number }[] = [];
+  walkSource(root, '', files, 4000);
+  files.sort((a, b) => a.path.localeCompare(b.path));
+  res.end(JSON.stringify({ root: path.basename(root), count: files.length, files }));
+}
+
+// GET /api/source/<id>/file?path=<relpath> — one file's text content, sandboxed
+// to the scene's cloned source tree.
+async function handleSourceFile(res: http.ServerResponse, id: string, relpath: string): Promise<void> {
+  const root = path.resolve(evidenceSourceDir(id));
+  const target = path.resolve(root, relpath);
+  if (target !== root && !target.startsWith(root + path.sep)) { res.statusCode = 400; res.end('bad path'); return; }
+  let st;
+  try { st = statSync(target); } catch { res.statusCode = 404; res.end('not found'); return; }
+  if (!st.isFile()) { res.statusCode = 404; res.end('not a file'); return; }
+  if (st.size > 2 * 1024 * 1024) { res.setHeader('Content-Type', MIME['.txt'] || 'text/plain'); res.end('(file too large to display)'); return; }
+  const data = await fsp.readFile(target, 'utf8').catch(() => '(failed to read)');
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.end(data);
 }
 
 // POST /api/impl/<id>/verify — re-run the stored implementation's self-check
@@ -359,6 +400,18 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
 
   if (pathname === '/api/runs' || pathname.startsWith('/api/runs/')) {
     if (await handleRuns(req, res, url)) return;
+  }
+
+  if (pathname.startsWith('/api/source/')) {
+    const rest = pathname.slice('/api/source/'.length);
+    if (rest.endsWith('/file') && req.method === 'GET') {
+      await handleSourceFile(res, decodeURIComponent(rest.slice(0, -'/file'.length)), url.searchParams.get('path') || '');
+      return;
+    }
+    if (req.method === 'GET' && rest && !rest.includes('/')) {
+      handleSourceList(res, decodeURIComponent(rest));
+      return;
+    }
   }
 
   if (pathname.startsWith('/api/impl/')) {

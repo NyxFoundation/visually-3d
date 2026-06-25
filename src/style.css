@@ -1597,3 +1597,15 @@ a.gallery__card { text-decoration: none; color: inherit; display: flex; flex-dir
 /* let the pane background show through highlight.js's theme block */
 .studio__code.hljs { background: transparent; padding: 10px 12px; }
 .studio__code code { background: transparent; font-family: inherit; }
+
+/* ── Reference source browser (cloned ground-truth repo) ─────────────────── */
+.srcb { margin: 1.25rem 0 2rem; border: 1px solid var(--border, #30363d); border-radius: 10px; overflow: hidden; background: var(--panel, #0d1117); }
+.srcb__head { display: flex; align-items: center; gap: 0.4rem; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border, #30363d); font-weight: 600; font-size: 0.9rem; }
+.srcb__body { display: grid; grid-template-columns: minmax(180px, 280px) 1fr; min-height: 220px; max-height: 60vh; }
+.srcb__list { margin: 0; padding: 0.4rem; list-style: none; overflow: auto; border-right: 1px solid var(--border, #30363d); }
+.srcb__file { display: block; width: 100%; text-align: left; padding: 0.25rem 0.5rem; border: 0; background: transparent; color: var(--fg-dim, #9da7b3); font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; border-radius: 5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.srcb__file:hover { background: rgba(255,255,255,0.05); color: var(--fg, #e6edf3); }
+.srcb__file--active { background: rgba(56,139,253,0.18); color: var(--fg, #e6edf3); }
+.srcb__code { overflow: auto; }
+.srcb__code .studio__code { margin: 0; min-height: 100%; }
+@media (max-width: 720px) { .srcb__body { grid-template-columns: 1fr; } .srcb__list { max-height: 160px; border-right: 0; border-bottom: 1px solid var(--border, #30363d); } }
