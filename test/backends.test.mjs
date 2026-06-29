@@ -104,6 +104,9 @@ test('python-smt instructions enforce the two-tier (proofs + small-N e2e) recipe
   assert.ok(instructions.includes('metadata.spec.verification.e2e_N'));
   // forbid a production-size golden even when N is pinned large
   assert.ok(/EVEN WHEN N is pinned large/.test(instructions));
+  // z3 'unknown' must not be treated as a failure (decide it / fall back)
+  assert.ok(/unknown.*NOT a counterexample|never be treated as a failure/i.test(instructions));
+  assert.ok(/bit-blast/.test(instructions));
 });
 
 test('available() returns a well-shaped result', async () => {

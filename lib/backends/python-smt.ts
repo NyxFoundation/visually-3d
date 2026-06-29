@@ -98,6 +98,14 @@ conflict-free for every power-of-two stride; a data-structure invariant preserve
 by an operation. These FAST, FINITE checks are exactly where large-N-only bugs
 (overflow, address wrap, stride collisions) are caught — at full width,
 symbolically, instead of by running big sizes.
+  z3 'unknown' is NOT a counterexample and must NEVER be treated as a failure: it
+  means the encoding was too hard (common for a modular multiply / Barrett over
+  full width). When a proof returns unknown, make it decidable instead — pure
+  bit-vector obligations are decidable via bit-blasting, e.g.
+  \`s = Then('simplify','bit-blast','smt').solver()\` (or set the solver logic to
+  QF_BV and avoid Int/BV mixing) — or fall back to exhaustive enumeration of a
+  small space / a randomized + edge-case check over the domain. Only \`sat\` with a
+  concrete model that actually violates the property is a real FAIL.
 
 TIER 2 — WHOLE-SYSTEM equivalence against an INDEPENDENT golden/reference model.
 This is the only part whose cost grows with size, so run it ONLY at the SMALLEST
@@ -130,9 +138,13 @@ has completed, and never enable the expensive optional deep checks by default.`;
     }
     const file = path.join(dir, 'check.py');
     writeFileSync(file, script);
+    // Formal proofs (a bit-blasted modular multiply, conflict-free over a config
+    // space) can legitimately take minutes; allow more headroom than the fast
+    // loop's default, overridable via $VISUALLY_VERIFY_TIMEOUT_MS.
+    const timeout = Number(process.env.VISUALLY_VERIFY_TIMEOUT_MS) || 180000;
     try {
       const { stdout, stderr } = await exec(r.bin, [...r.pre, file],
-        { timeout: 180000, maxBuffer: 32 * 1024 * 1024 });
+        { timeout, maxBuffer: 32 * 1024 * 1024 });
       const pass = stdout.includes('VERIFIED');
       return { pass, ran: true, kind: pass ? 'pass' : 'fail', stdout, stderr, code: 0 };
     } catch (err) {
