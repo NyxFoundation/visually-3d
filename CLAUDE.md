@@ -79,7 +79,8 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
   best-scene ratchet.
 - `lib/upload.ts` — `visually upload <id>`: publish a scene into the WEB GALLERY
   `public/samples/` (what the site serves: `<id>.json` + `index.json` entry +
-  `runs/<id>/` history; full as-is, `--scrub` for the lean set). ONE verb that
+  `runs/<id>/` history; full as-is, `--scrub` for the lean set, `--web` for only
+  what the detail page's self-improvement timeline renders + its `manifest.json`). ONE verb that
   branches on `isRepoCheckout()` (does `PKG_ROOT` have a `.git`?): **repo checkout
   (dev/bun)** → write public/samples + commit those paths + `git push origin
   <branch>` (`--no-push`/`--dry-run` available); **installed (npx/npm)** →

@@ -52,3 +52,24 @@ verify. Record them in the spec as documentary `[src]` facts, but treat their
 - `amend` must never fabricate a `[source-missing]` value; gather evidence first.
 - Resource/timing claims need a different backend (RTL synthesis) — until then,
   reproducibility, not fidelity-on-hardware-claims, is the axis that can move.
+
+## The improvement arc (v24+, 2026-07): CFNTT-KRED — verified redesign
+The formal-verification epoch (source-grounded z3 + Yosys/SymbiYosys, see
+NyxFoundation/ntt-fpga-z3) found the released radix-2 RTL omits the per-stage
+INTT halving (`modular_half.v` shipped but instantiated nowhere → INTT output
+scaled 2^10; upstream issue #7), and that the Barrett multiplier spends THREE
+hardware multipliers where q = 12289 = 3*2^12+1 (Proth) needs ONE:
+- K-RED reduction (3*2^12 ≡ −1 mod q): two shift-add folds + one conditional
+  subtraction reduce the 28-bit product; unit returns 9ab mod q.
+- Fold the 9 away in the ROM (store W = 9^-1·w); the INTT twiddle is
+  op21(W) = (2·9)^-1·w derived from the SAME ROM word — which fuses the
+  multiply-path halving, fixing issue #7 at zero multiplier cost. Add path
+  gets one op21 gate. PWM double-passes the unit with the constant 81^-1.
+- Gains: multipliers/butterfly 3→1 (DSP −67%), mult −21% cells, butterfly
+  −10% cells while ADDING the fix. Same ports/latency — drop-in.
+- All machine-checked: z3 full-domain (divider-free linear congruence
+  identities — URem/`%` goldens DIVERGE in solvers, restate congruences as
+  nonneg linear identities), SymbiYosys compositional proofs (leaf-unit
+  equivalences justify behavioural abstractions), bit-exact e2e polymult,
+  mutation probes. The improvement history is published on this scene's
+  gallery page (public/samples/runs/ntt-fpga/, `--web` profile).

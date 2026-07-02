@@ -1,0 +1,25 @@
+{
+  "scores": {
+    "recognizability": 9,
+    "internal_legibility": 17,
+    "structural_decomposition": 14,
+    "buildability": 18,
+    "geometric_fidelity": 14,
+    "proportional_accuracy": 9,
+    "annotation_depth": 5,
+    "self_consistency": 5
+  },
+  "total": 91,
+  "verdict": "improve",
+  "critique": "The render reads convincingly as an FPGA NTT accelerator floorplan, but the exploded finned heatsink is oversized and centred over the +X control region, so in the TOP plan view it occludes the twiddle ROM, address-generation unit and schedule/FSM controller — the worst remaining X-ray failure. The shared Barrett reduction spine (mod_red_mult/subshift) is also partly hidden behind the +X pipeline-register column in ISO. Everything else (open array frame, 8 distinct banks/lanes, layered+arrowed dataflow buses, exploded radix-4 cutaway) is faithful and legible.",
+  "changelog": [
+    "Shrank the exploded heatsink footprint 3x0.95x3.9 -> 2.4x0.7x2.6 and raised+shifted it to x=4.9 y=4.0 so its z-extent (-1.3..1.3) no longer blankets the twiddle ROM (z=-2.5) or addr-gen (z=+2.5) in plan view, recovering control-cluster legibility",
+    "Lengthened the heatsink riser stub (height 3.0 -> 3.5, y=2.25) to keep the lifted baseplate grounded to the die after the raise",
+    "Reworded the heatsink role/spec to honestly describe it as the exploded package thermal lid over the +X die region (it never covered the whole die) and dropped fin_count 10 -> 8 to match the smaller baseplate"
+  ],
+  "remaining_gaps": [
+    "The shared Barrett reduction spine (mod_red_mult cylinder + mod_red_subshift) is partly occluded by the +X pipeline-register column in ISO; consider nudging the register column -X or raising the reduction spine slightly so both reduction members read in the X-ray.",
+    "Source-missing structures remain committed placeholders (conflict-free Sec.III bank()/offset() map, per-stage crossbar permutation sigma_s, rearranged-loop twiddle-ROM addressing f(stage,block), exact FSM transition table) — the PDF body is FlateDecode-undecodable, so these cannot be made paper-faithful until the paper text is gathered; they are correctly labelled [conv]/[source-missing] and out of scope for the functional axis.",
+    "The committed twiddle ROM still embeds a bit-reversed index, which is in tension with the headline natural-order/no-bit-reversal datapath claim; resolving this needs the paper's rearranged-loop addressing."
+  ]
+}

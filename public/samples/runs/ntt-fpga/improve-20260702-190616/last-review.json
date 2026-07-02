@@ -1,0 +1,29 @@
+{
+  "scores": {
+    "recognizability": 8,
+    "internal_legibility": 17,
+    "structural_decomposition": 13,
+    "buildability": 17,
+    "geometric_fidelity": 12,
+    "proportional_accuracy": 8,
+    "annotation_depth": 5,
+    "self_consistency": 5
+  },
+  "total": 85,
+  "verdict": "improve",
+  "critique": "The render shows a generic FPGA card with four look-alike carbon-fibre 'butterfly PE' boxes and two 'K-RED' boxes floating on a bare copper rod — this contradicts the authoritative source, which is a SINGLE radix-2 CFNTT butterfly (compact_bf_v2) whose contribution is (a) a K-RED modular multiplier with ONE 14×14→28 hardware multiplier plus two shift-add fold stages and one conditional subtraction, and (b) two op21/modular_half gates that fix the INTT 2^10-scaling bug — none of which were depicted. The old overlay also floated with no ground plane (parts hang in space in the elevation views) and modelled '4–16 parallel PEs' the design does not have. I replaced the whole overlay with the real datapath grounded on an exploded logic-floor plate: 2 conflict-free memory banks + address generators, a single shared 1023-word twiddle ROM, u/v/w input DFFs, the 4-stage K-RED multiplier pipeline as distinct stages, modular_add, both op21 gates, the NTT/INTT mux and a control FSM — each carrying source-quoted spec blocks.",
+  "changelog": [
+    "Removed the unfaithful '4 parallel Cooley–Tukey PEs' — the source is one radix-2 butterfly; replaced with the real compact_bf_v2 datapath.",
+    "Modelled the K-RED modular multiplier as its true 4-stage pipeline: single 14×14→28 multiplier (brass, prominent) → fold1 (3z+6q−z>>12) → fold2 (3d+q−d>>12) → conditional subtraction, each with the source equation in spec.ops.",
+    "Added the two modular_half (op21) gates (ROM-path and add-path) that fix the reference INTT 2^10-scaling bug, plus the NTT/INTT sel mux, plus a control FSM sequencing banks/ROM/sel.",
+    "Added a single shared 1023-word twiddle ROM storing W = 9^-1·w (2731), and a 2-bank conflict-free memory with address generators — matching the untouched memory system.",
+    "Grounded the whole exploded overlay on a thin glass 'logic floorplan' plate connected to the die so nothing floats; trimmed board decoration (dropped 4 DDR + 2 VRM, 4 fins→3, 4 caps→2) and shrank the PCB to 13×10 so bounds.radius < 9.",
+    "Rewrote assembly_instructions and every overlay role to describe the real dataflow and latencies (multiplier 4, butterfly 6)."
+  ],
+  "remaining_gaps": [
+    "Verify against the next render that the exploded datapath reads left-to-right (memory→DFF→multiplier→folds→csub→add→mux) and that the heatsink does not visually merge with the overlay; if it does, raise the logic plate higher.",
+    "Add geometric variety — most logic blocks are boxes; consider capsule/cylinder cues for the DSP multiplier and rounded gates to break the box-stack monotony (geometry axis).",
+    "Model the u/v/w DFF delay chains as their true multi-stage depth (w = 2 DFFs) with visibly distinct register stages rather than one lumped box each, to make pipeline latency (6) legible.",
+    "Consider a small explicit 'bug-fix' annotation node or contrasting material on the two op21 gates so a viewer immediately sees them as the correctness fix vs. the reference."
+  ]
+}

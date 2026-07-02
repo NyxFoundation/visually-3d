@@ -1,0 +1,25 @@
+{
+  "scores": {
+    "recognizability": 9,
+    "internal_legibility": 18,
+    "structural_decomposition": 13,
+    "buildability": 18,
+    "geometric_fidelity": 13,
+    "proportional_accuracy": 9,
+    "annotation_depth": 5,
+    "self_consistency": 5
+  },
+  "total": 90,
+  "verdict": "improve",
+  "critique": "The render reads well already — the ISO and TOP views clearly show the eight glass BRAM banks down the -X edge, the conflict-free crossbar spine, the copper multiplier column with its dark/steel symmetric add-sub pairs, the Barrett reduction spine, the twiddle ROM, the control cluster, and the exploded radix-4 legend lifted on +Z risers. The X-ray test passes (no subsystem is swallowed) and the elevation views show no stray floaters. The one clear constitution violation is the heatsink: ten separate `heatsink_fin_0..9` parts plus a baseplate model pure decoration as eleven parts — exactly the 'collapse 10 heatsink_fin_* → one finned heatsink' anti-pattern. The fin array carries no subsystem information and inflates the part count without raising information density.",
+  "changelog": [
+    "Consolidated heatsink_fin_0..9 (10 decorative fin parts) + the baseplate into ONE finned-heatsink part (`heatsink_base`), with fin_count=10 / pitch=0.3 / fin_height=0.85 recorded in its spec — removes 10 pure-decoration parts and raises information density per the anti-decoration rule.",
+    "Re-shaped the consolidated heatsink as a single box spanning the former fin envelope (size [3,0.95,3.9] at y=4.0) so it still reads as the exploded cooler floating above the die without the eleven-part fin comb.",
+    "Trimmed the now-dangling fin ids from heatsink_base.connections; the part still grounds via heatsink_riser onto fpga_die."
+  ],
+  "remaining_gaps": [
+    "Source-fidelity ceiling (cannot be closed in the visual pass): bank()/offset(), the per-stage crossbar permutation sigma_s, the twiddle-ROM rearranged-loop address f(stage,block), and the FSM transition table are committed [conv] placeholders, not the paper's Sec.III scheme — these must come from the verify/evidence leg, not the geometry.",
+    "Open question for next iteration: whether the 8 lanes' mult/add/sub/reg (32 parts) should collapse to 8 single `bu` parts per the over-decomposition rule. Kept this pass because the copper-multiplier / dark-adder / steel-subtractor color coding is the ONLY array-scale depiction of the symmetric-operator sharing (the exploded legend shows radix-4 internals, not the radix-2 lane); collapsing would lower internal legibility. Re-evaluate the trade.",
+    "The consolidated heatsink lost its finned silhouette (now a plain box); acceptable since the cooler is incidental hardware, not a machine subsystem, but a single low-fin-relief shape could recover a little recognizability cheaply."
+  ]
+}
