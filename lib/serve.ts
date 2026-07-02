@@ -385,8 +385,14 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   }
 
   if (pathname.startsWith('/samples/') && pathname.endsWith('.json')) {
-    const served = await serveSample(res, pathname.slice('/samples/'.length));
-    if (served) return;
+    const rel = pathname.slice('/samples/'.length);
+    // Only FLAT files are workspace-resolved scenes; nested paths (the
+    // published run history under /samples/runs/<id>/..., incl. its
+    // manifest.json) fall through to the static dist copy below.
+    if (!rel.includes('/')) {
+      const served = await serveSample(res, rel);
+      if (served) return;
+    }
   }
 
   if (pathname.startsWith('/samples/') && pathname.endsWith('.png')) {
