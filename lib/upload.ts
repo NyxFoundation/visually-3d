@@ -28,6 +28,22 @@ const DEFAULT_REPO = 'NyxFoundation/visually-3d';
 // Heavy raw traces the gallery never shows — skipped only with --scrub.
 const HISTORY_SKIP = /(-events\.jsonl|\.err|raw\.txt|raw\.md|prompt\.txt|reasoning\.log|report\.raw\.txt|stream\.jsonl|^impl-\d+\.txt)$/;
 
+// The lean set the STATIC gallery's history timeline actually renders
+// (iteration renders + reviews, verify logs + the self-check source): the
+// `web` publish profile keeps only these — ~1-2 MB for a long history
+// instead of tens of MB.
+const WEB_KEEP = /(-render\.png|-review\.json)$|^verify-\d+\.txt$|^check-\d+\.[a-z]+$/;
+
+// What of a run's history gets published: 'full' ships everything, 'scrub'
+// drops the heavy raw traces, 'web' keeps only what the static site shows.
+export type HistoryProfile = 'full' | 'scrub' | 'web';
+
+function keepInProfile(file: string, profile: HistoryProfile): boolean {
+  if (profile === 'web') return WEB_KEEP.test(file);
+  if (profile === 'scrub') return !HISTORY_SKIP.test(file);
+  return true;
+}
+
 async function run(cmd: string, args: string[], opts: { cwd?: string } = {}): Promise<string> {
   const { stdout } = await exec(cmd, args, { maxBuffer: 32 * 1024 * 1024, ...opts });
   return stdout.trim();
@@ -39,10 +55,9 @@ export function isRepoCheckout(root: string = PKG_ROOT): boolean {
   return existsSync(path.join(root, '.git'));
 }
 
-// Copy a scene's run history into <samplesDir>/runs/<id>/. Full as-is by default;
-// `scrub` drops the heavy raw traces (what the other gallery samples ship).
-// Returns the number of files written.
-export function publishHistory(id: string, samplesDir: string, scrub = false): number {
+// Copy a scene's run history into <samplesDir>/runs/<id>/ and (re)write its
+// manifest. Returns the number of files written.
+export function publishHistory(id: string, samplesDir: string, profile: HistoryProfile = 'full'): number {
   const src = path.join(RUNS_DIR, id);
   if (!existsSync(src)) return 0;
   const destRoot = path.join(samplesDir, 'runs', id);
@@ -52,7 +67,7 @@ export function publishHistory(id: string, samplesDir: string, scrub = false): n
     const runSrc = path.join(src, runName);
     try { if (!statSync(runSrc).isDirectory()) continue; } catch { continue; }
     for (const f of readdirSync(runSrc)) {
-      if (scrub && HISTORY_SKIP.test(f)) continue;
+      if (!keepInProfile(f, profile)) continue;
       const fileSrc = path.join(runSrc, f);
       try { if (!statSync(fileSrc).isFile()) continue; } catch { continue; }
       mkdirSync(path.join(destRoot, runName), { recursive: true });
@@ -60,7 +75,41 @@ export function publishHistory(id: string, samplesDir: string, scrub = false): n
       copied++;
     }
   }
+  if (copied > 0) writeHistoryManifest(id, samplesDir);
   return copied;
+}
+
+// A published run in <samplesDir>/runs/<id>/manifest.json — what the static
+// site's history timeline reads (static hosting cannot list directories).
+export interface HistoryRun { dir: string; kind: string; at: string; files: string[] }
+
+const RUN_STAMP = /(\d{8})-(\d{6})/;
+
+// Scan the PUBLISHED runs dir (not the workspace) so extra runs placed there
+// by hand are included, and (re)write manifest.json sorted chronologically.
+export function writeHistoryManifest(id: string, samplesDir: string): HistoryRun[] {
+  const destRoot = path.join(samplesDir, 'runs', id);
+  if (!existsSync(destRoot)) return [];
+  const runs: HistoryRun[] = [];
+  for (const dir of readdirSync(destRoot)) {
+    const abs = path.join(destRoot, dir);
+    try { if (!statSync(abs).isDirectory()) continue; } catch { continue; }
+    const files = readdirSync(abs).filter((f) => {
+      try { return statSync(path.join(abs, f)).isFile(); } catch { return false; }
+    }).sort();
+    if (files.length === 0) continue;
+    const stamp = RUN_STAMP.exec(dir);
+    const at = stamp
+      ? `${stamp[1].slice(0, 4)}-${stamp[1].slice(4, 6)}-${stamp[1].slice(6, 8)}T${stamp[2].slice(0, 2)}:${stamp[2].slice(2, 4)}:${stamp[2].slice(4, 6)}Z`
+      : '';
+    runs.push({ dir, kind: dir.split('-')[0] || 'other', at, files });
+  }
+  runs.sort((a, b) => (a.at + a.dir).localeCompare(b.at + b.dir));
+  writeFileSync(
+    path.join(destRoot, 'manifest.json'),
+    JSON.stringify({ id, runs }, null, 2) + '\n',
+  );
+  return runs;
 }
 
 // Write the scene + register it in index.json + copy its history into the gallery
@@ -71,7 +120,7 @@ export function publishToGallery(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   scene: any,
   samplesDir: string,
-  scrub: boolean,
+  profile: HistoryProfile,
 ): { runs: number; registered: boolean } {
   mkdirSync(samplesDir, { recursive: true });
   copyFileSync(sceneSrc, path.join(samplesDir, `${id}.json`));
@@ -88,14 +137,14 @@ export function publishToGallery(
     writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
     registered = true;
   }
-  const runs = publishHistory(id, samplesDir, scrub);
+  const runs = publishHistory(id, samplesDir, profile);
   return { runs, registered };
 }
 
 interface UploadOpts {
   positional: string[];
   repo?: string; title?: string; message?: string;
-  dryRun?: boolean; noPush?: boolean; scrub?: boolean;
+  dryRun?: boolean; noPush?: boolean; profile?: HistoryProfile;
 }
 
 function parseArgs(argv: string[]): UploadOpts {
@@ -107,7 +156,8 @@ function parseArgs(argv: string[]): UploadOpts {
     else if (a === '--message') opts.message = argv[++i];
     else if (a === '--dry-run') opts.dryRun = true;
     else if (a === '--no-push') opts.noPush = true;
-    else if (a === '--scrub') opts.scrub = true;
+    else if (a === '--scrub') opts.profile = 'scrub';
+    else if (a === '--web') opts.profile = 'web';
     else if (a.startsWith('--')) throw new Error(`unknown flag: ${a}`);
     else opts.positional.push(a);
   }
@@ -117,7 +167,7 @@ function parseArgs(argv: string[]): UploadOpts {
 export async function upload(argv: string[]): Promise<void> {
   const opts = parseArgs(argv);
   const ref = opts.positional[0];
-  if (!ref) throw new Error('usage: visually upload <scene> [--repo owner/name] [--title <t>] [--scrub] [--no-push] [--dry-run]');
+  if (!ref) throw new Error('usage: visually upload <scene> [--repo owner/name] [--title <t>] [--scrub|--web] [--no-push] [--dry-run]');
   const target = resolveScene(ref);
   if (!target) throw new Error(`no such scene: ${ref}`);
   const id = sceneIdFromPath(target);
@@ -139,8 +189,8 @@ async function uploadInRepo(id: string, target: string, scene: any, opts: Upload
   const samplesDir = path.join(PKG_ROOT, 'public', 'samples');
   if (!existsSync(samplesDir)) throw new Error(`no public/samples/ at ${PKG_ROOT} — is this the repo?`);
   console.log(`visually upload: ${id} → public/samples/ in this repo (web gallery, direct push)`);
-  const r = publishToGallery(id, target, scene, samplesDir, !!opts.scrub);
-  console.log(`  scene.json + index ${r.registered ? '(registered)' : '(updated)'}, history ${r.runs} file(s)${opts.scrub ? ' [scrubbed]' : ''}`);
+  const r = publishToGallery(id, target, scene, samplesDir, opts.profile ?? 'full');
+  console.log(`  scene.json + index ${r.registered ? '(registered)' : '(updated)'}, history ${r.runs} file(s)${opts.profile ? ` [${opts.profile}]` : ''}`);
 
   const paths = ['public/samples'];
   await run('git', ['add', '--', ...paths], { cwd: PKG_ROOT });
@@ -189,7 +239,7 @@ async function uploadViaPR(id: string, target: string, scene: any, opts: UploadO
 
     const samplesDir = path.join(cwd, 'public', 'samples');
     if (!existsSync(samplesDir)) throw new Error(`${upstream} has no public/samples/ — is this the right repo?`);
-    const r = publishToGallery(id, target, scene, samplesDir, !!opts.scrub);
+    const r = publishToGallery(id, target, scene, samplesDir, opts.profile ?? 'full');
     console.log(`  · public/samples/${id}.json + index ${r.registered ? '(registered)' : '(updated)'}, history ${r.runs} file(s)`);
 
     await run('git', ['add', '--', 'public/samples'], { cwd });

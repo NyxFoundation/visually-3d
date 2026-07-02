@@ -21,6 +21,12 @@ mkdirSync(run1, { recursive: true });
 writeFileSync(path.join(run1, 'iter-00.json'), '{}');
 writeFileSync(path.join(run1, 'iter-01-render.png'), 'PNG');
 writeFileSync(path.join(run1, 'iter-01-events.jsonl'), 'heavy'); // scrubbed away with --scrub
+writeFileSync(path.join(run1, 'iter-01-review.json'), '{"total":90}');
+const run2 = path.join(HOME, 'runs', id, 'verify-20260102-000000');
+mkdirSync(run2, { recursive: true });
+writeFileSync(path.join(run2, 'check-1.py'), 'print()');
+writeFileSync(path.join(run2, 'verify-1.txt'), 'pass=true');
+writeFileSync(path.join(run2, 'prompt-1.txt'), 'heavy prompt');
 
 test('isRepoCheckout: .git present vs absent', () => {
   const a = mkdtempSync(path.join(os.tmpdir(), 'vt-git-')); mkdirSync(path.join(a, '.git'));
@@ -31,7 +37,7 @@ test('isRepoCheckout: .git present vs absent', () => {
 
 test('publishToGallery writes <id>.json, registers index, copies full history', () => {
   const gallery = mkdtempSync(path.join(os.tmpdir(), 'vt-gal-'));
-  const r = publishToGallery(id, sceneSrc, scene, gallery, false);
+  const r = publishToGallery(id, sceneSrc, scene, gallery, 'full');
   assert.ok(existsSync(path.join(gallery, `${id}.json`)), 'scene json in gallery');
   assert.equal(r.registered, true);
   const idx = JSON.parse(readFileSync(path.join(gallery, 'index.json'), 'utf8'));
@@ -44,7 +50,7 @@ test('publishToGallery writes <id>.json, registers index, copies full history', 
 
 test('publishHistory --scrub drops heavy raw traces but keeps renders/versions', () => {
   const gallery = mkdtempSync(path.join(os.tmpdir(), 'vt-gal2-'));
-  publishHistory(id, gallery, true);
+  publishHistory(id, gallery, 'scrub');
   const runDir = path.join(gallery, 'runs', id, 'improve-20260101-000000');
   assert.ok(existsSync(path.join(runDir, 'iter-01-render.png')), 'render kept');
   assert.ok(existsSync(path.join(runDir, 'iter-00.json')), 'scene version kept');
@@ -54,8 +60,39 @@ test('publishHistory --scrub drops heavy raw traces but keeps renders/versions',
 test('publishToGallery does not double-register an existing id', () => {
   const gallery = mkdtempSync(path.join(os.tmpdir(), 'vt-gal3-'));
   writeFileSync(path.join(gallery, 'index.json'), JSON.stringify({ samples: [{ id }] }));
-  const r = publishToGallery(id, sceneSrc, scene, gallery, false);
+  const r = publishToGallery(id, sceneSrc, scene, gallery, 'full');
   assert.equal(r.registered, false);
   const idx = JSON.parse(readFileSync(path.join(gallery, 'index.json'), 'utf8'));
   assert.equal(idx.samples.filter((s) => s.id === id).length, 1);
+});
+
+test('publishHistory web profile keeps only what the timeline shows + writes a chronological manifest', () => {
+  const gallery = mkdtempSync(path.join(os.tmpdir(), 'vt-gal4-'));
+  publishHistory(id, gallery, 'web');
+  const impDir = path.join(gallery, 'runs', id, 'improve-20260101-000000');
+  const verDir = path.join(gallery, 'runs', id, 'verify-20260102-000000');
+  assert.ok(existsSync(path.join(impDir, 'iter-01-render.png')), 'render kept');
+  assert.ok(existsSync(path.join(impDir, 'iter-01-review.json')), 'review kept');
+  assert.ok(!existsSync(path.join(impDir, 'iter-00.json')), 'scene snapshot dropped in web profile');
+  assert.ok(!existsSync(path.join(impDir, 'iter-01-events.jsonl')), 'heavy trace dropped');
+  assert.ok(existsSync(path.join(verDir, 'verify-1.txt')), 'verify log kept');
+  assert.ok(existsSync(path.join(verDir, 'check-1.py')), 'self-check source kept');
+  assert.ok(!existsSync(path.join(verDir, 'prompt-1.txt')), 'prompt dropped');
+  const manifest = JSON.parse(readFileSync(path.join(gallery, 'runs', id, 'manifest.json'), 'utf8'));
+  assert.equal(manifest.id, id);
+  assert.deepEqual(manifest.runs.map((r) => r.kind), ['improve', 'verify'], 'chronological order');
+  assert.equal(manifest.runs[0].at, '2026-01-01T00:00:00Z');
+  assert.ok(manifest.runs[0].files.includes('iter-01-render.png'));
+});
+
+test('writeHistoryManifest picks up runs placed in the published dir by hand', async () => {
+  const { writeHistoryManifest } = await import('../lib/upload.js');
+  const gallery = mkdtempSync(path.join(os.tmpdir(), 'vt-gal5-'));
+  publishHistory(id, gallery, 'web');
+  const extra = path.join(gallery, 'runs', id, 'improve-20270101-000000');
+  mkdirSync(extra, { recursive: true });
+  writeFileSync(path.join(extra, 'iter-01-render.png'), 'PNG');
+  const runs = writeHistoryManifest(id, gallery);
+  assert.equal(runs.length, 3);
+  assert.equal(runs[2].dir, 'improve-20270101-000000', 'hand-placed run sorts last');
 });
