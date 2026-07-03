@@ -21,6 +21,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { resolveScene, sceneIdFromPath, RUNS_DIR, PKG_ROOT } from './paths.js';
 import { validateScene, deriveIndexEntry } from './scene.js';
+import { listTimeline, getFrameDetail } from './revisions.js';
+import type { FileRef } from './types.js';
 
 const exec = promisify(execFile);
 const DEFAULT_REPO = 'NyxFoundation/visually-3d';
@@ -28,21 +30,12 @@ const DEFAULT_REPO = 'NyxFoundation/visually-3d';
 // Heavy raw traces the gallery never shows — skipped only with --scrub.
 const HISTORY_SKIP = /(-events\.jsonl|\.err|raw\.txt|raw\.md|prompt\.txt|reasoning\.log|report\.raw\.txt|stream\.jsonl|^impl-\d+\.txt)$/;
 
-// The lean set the STATIC gallery's history timeline actually renders
-// (iteration renders + reviews, verify logs + the self-check source): the
-// `web` publish profile keeps only these — ~1-2 MB for a long history
-// instead of tens of MB.
-const WEB_KEEP = /(-render\.png|-review\.json)$|^verify-\d+\.txt$|^check-\d+\.[a-z]+$/;
-
 // What of a run's history gets published: 'full' ships everything, 'scrub'
-// drops the heavy raw traces, 'web' keeps only what the static site shows.
+// drops the heavy raw traces, 'web' precomputes the studio's /api/revisions
+// payloads (timeline + per-frame details + the referenced files) as static
+// assets, so the SceneStudio history bar / 3D / screenshot / implementation
+// panes render on the STATIC site exactly as they do under local `serve`.
 export type HistoryProfile = 'full' | 'scrub' | 'web';
-
-function keepInProfile(file: string, profile: HistoryProfile): boolean {
-  if (profile === 'web') return WEB_KEEP.test(file);
-  if (profile === 'scrub') return !HISTORY_SKIP.test(file);
-  return true;
-}
 
 async function run(cmd: string, args: string[], opts: { cwd?: string } = {}): Promise<string> {
   const { stdout } = await exec(cmd, args, { maxBuffer: 32 * 1024 * 1024, ...opts });
@@ -55,9 +48,10 @@ export function isRepoCheckout(root: string = PKG_ROOT): boolean {
   return existsSync(path.join(root, '.git'));
 }
 
-// Copy a scene's run history into <samplesDir>/runs/<id>/ and (re)write its
-// manifest. Returns the number of files written.
+// Copy a scene's run history into <samplesDir>/runs/<id>/.
+// Returns the number of files written.
 export function publishHistory(id: string, samplesDir: string, profile: HistoryProfile = 'full'): number {
+  if (profile === 'web') return publishStudioHistory(id, samplesDir);
   const src = path.join(RUNS_DIR, id);
   if (!existsSync(src)) return 0;
   const destRoot = path.join(samplesDir, 'runs', id);
@@ -67,7 +61,7 @@ export function publishHistory(id: string, samplesDir: string, profile: HistoryP
     const runSrc = path.join(src, runName);
     try { if (!statSync(runSrc).isDirectory()) continue; } catch { continue; }
     for (const f of readdirSync(runSrc)) {
-      if (!keepInProfile(f, profile)) continue;
+      if (profile === 'scrub' && HISTORY_SKIP.test(f)) continue;
       const fileSrc = path.join(runSrc, f);
       try { if (!statSync(fileSrc).isFile()) continue; } catch { continue; }
       mkdirSync(path.join(destRoot, runName), { recursive: true });
@@ -75,41 +69,51 @@ export function publishHistory(id: string, samplesDir: string, profile: HistoryP
       copied++;
     }
   }
-  if (copied > 0) writeHistoryManifest(id, samplesDir);
   return copied;
 }
 
-// A published run in <samplesDir>/runs/<id>/manifest.json — what the static
-// site's history timeline reads (static hosting cannot list directories).
-export interface HistoryRun { dir: string; kind: string; at: string; files: string[] }
+// Frame keys are "<runId>:<iter>"; make them filename-safe DETERMINISTICALLY —
+// the studio computes the same name client-side.
+export function safeFrameKey(key: string): string {
+  return key.replace(/[^A-Za-z0-9._-]/g, '_');
+}
 
-const RUN_STAMP = /(\d{8})-(\d{6})/;
-
-// Scan the PUBLISHED runs dir (not the workspace) so extra runs placed there
-// by hand are included, and (re)write manifest.json sorted chronologically.
-export function writeHistoryManifest(id: string, samplesDir: string): HistoryRun[] {
+// Precompute the studio's /api/revisions payloads as static files:
+//   runs/<id>/timeline.json          == GET /api/revisions?scene=<id>
+//   runs/<id>/frames/<key>.json      == GET /api/revisions?scene=<id>&rev=<key>
+//   runs/<id>/<runId>/<file>         == GET /api/runs/<id>/<runId>/file?path=<file>
+// Only the files the timeline actually references (scene snapshots, renders,
+// implementation code) are copied.
+export function publishStudioHistory(id: string, samplesDir: string): number {
   const destRoot = path.join(samplesDir, 'runs', id);
-  if (!existsSync(destRoot)) return [];
-  const runs: HistoryRun[] = [];
-  for (const dir of readdirSync(destRoot)) {
-    const abs = path.join(destRoot, dir);
-    try { if (!statSync(abs).isDirectory()) continue; } catch { continue; }
-    const files = readdirSync(abs).filter((f) => {
-      try { return statSync(path.join(abs, f)).isFile(); } catch { return false; }
-    }).sort();
-    if (files.length === 0) continue;
-    const stamp = RUN_STAMP.exec(dir);
-    const at = stamp
-      ? `${stamp[1].slice(0, 4)}-${stamp[1].slice(4, 6)}-${stamp[1].slice(6, 8)}T${stamp[2].slice(0, 2)}:${stamp[2].slice(2, 4)}:${stamp[2].slice(4, 6)}Z`
-      : '';
-    runs.push({ dir, kind: dir.split('-')[0] || 'other', at, files });
+  rmSync(destRoot, { recursive: true, force: true }); // never keep stale files
+  const entries = listTimeline(id);
+  if (entries.length === 0) return 0;
+  mkdirSync(path.join(destRoot, 'frames'), { recursive: true });
+  writeFileSync(path.join(destRoot, 'timeline.json'), JSON.stringify({ entries }, null, 2) + '\n');
+  let files = 1;
+  const refs: FileRef[] = [];
+  for (const e of entries) {
+    const detail = getFrameDetail(id, e.key);
+    if (detail) {
+      writeFileSync(path.join(destRoot, 'frames', `${safeFrameKey(e.key)}.json`), JSON.stringify(detail) + '\n');
+      files++;
+    }
+    if (e.kind === 'revision') {
+      refs.push(e.scene);
+      if (e.render) refs.push(e.render);
+    } else {
+      for (const impl of e.impls) refs.push({ runId: e.runId, file: impl.codeFile });
+    }
   }
-  runs.sort((a, b) => (a.at + a.dir).localeCompare(b.at + b.dir));
-  writeFileSync(
-    path.join(destRoot, 'manifest.json'),
-    JSON.stringify({ id, runs }, null, 2) + '\n',
-  );
-  return runs;
+  for (const ref of refs) {
+    const src = path.join(RUNS_DIR, id, ref.runId, ref.file);
+    try { if (!statSync(src).isFile()) continue; } catch { continue; }
+    mkdirSync(path.join(destRoot, ref.runId), { recursive: true });
+    copyFileSync(src, path.join(destRoot, ref.runId, ref.file));
+    files++;
+  }
+  return files;
 }
 
 // Write the scene + register it in index.json + copy its history into the gallery

@@ -1,0 +1,317 @@
+#!/usr/bin/env python3
+"""
+Reverse-implementation of the CFNTT Radix-2/4 NTT Multiplication Accelerator
+from its scene spec ALONE.
+
+Verified core (the functional substance the spec actually pins down):
+  * q = 12289, N = 1024, 14-bit coefficients.
+  * Barrett modular reduction: mu = floor(2^28/q) = 21843, k = 28, <=2 corrections.
+    -> PROVEN equal to (x mod q) for ALL x in [0,(q-1)^2] (the full domain of a
+       product of two sub-q operands) with z3.
+  * negacyclic NTT/INTT datapath (8-lane butterfly array modelled functionally):
+    -> INTT(NTT(a)) == a   (identity property the spec asserts)
+    -> NTT-based negacyclic multiply == independent schoolbook negacyclic multiply
+       (this is the actual polynomial-multiplication engine; the golden model is
+        fully independent of the transform)
+    -> forward transform == independent O(N^2) direct-evaluation golden (DFT def.)
+  * conflict-free storage map b(i)=(i+(i>>3)) mod 8, o(i)=i>>3
+    -> verified to be an injective (bank,offset) map and to scatter every
+       offset-group of 8 indices across 8 distinct banks.
+
+Prints exactly "VERIFIED" and exits 0 on success, or "FAIL: ..." and exits 1.
+"""
+
+import sys
+import random
+
+# ---------------------------------------------------------------------------
+# Spec-authoritative parameters
+# ---------------------------------------------------------------------------
+Q    = 12289          # modulus_q (spec)
+N    = 1024           # transform length (spec)
+COEF_BITS = 14        # widths.coefficient (spec)
+MU   = 21843          # Barrett mu (spec: floor(2^28/q))
+K    = 28             # Barrett shift (spec)
+BANKS = 8             # parallel_butterfly_units / interleaved BRAM banks (spec)
+LOGN = N.bit_length() - 1   # 10
+
+
+def fail(msg):
+    print("FAIL: " + msg)
+    sys.exit(1)
+
+
+# ---------------------------------------------------------------------------
+# Spec sanity: derived constants must match the values the spec records.
+# ---------------------------------------------------------------------------
+if MU != (1 << K) // Q:
+    fail(f"Barrett mu mismatch: spec mu={MU} but floor(2^{K}/{Q})={(1<<K)//Q}")
+
+NINV = pow(N, Q - 2, Q)            # N^-1 mod q
+if NINV != 8857:
+    fail(f"N^-1 mismatch: computed {NINV}, spec says 8857")
+
+
+def primitive_root(q):
+    # q-1 = 12288 = 2^12 * 3  -> prime factors {2,3}
+    factors = (2, 3)
+    for g in range(2, q):
+        if all(pow(g, (q - 1) // f, q) != 1 for f in factors):
+            return g
+    fail("no primitive root found")
+
+
+G   = primitive_root(Q)            # smallest primitive root (== 11 for 12289)
+PSI = pow(G, (Q - 1) // (2 * N), Q)  # primitive 2N-th root  (g^6)
+# spec twiddle_root_constraints: psi^2048 == 1, psi^1024 == -1
+if pow(PSI, 2 * N, Q) != 1 or pow(PSI, N, Q) != Q - 1:
+    fail(f"psi={PSI} fails the 2N-th primitive-root constraints")
+PSIINV = pow(PSI, Q - 2, Q)
+
+
+# ---------------------------------------------------------------------------
+# Barrett modular reduction (the shared reduction spine: q-multiply then
+# shift/subtract + correct).  Python model mirrors the z3 model exactly.
+# ---------------------------------------------------------------------------
+def barrett(x):
+    t = (x * MU) >> K          # mod_red_mult:  t = (x*mu) >> k
+    r = x - t * Q              # mod_red_subshift: r = x - t*q
+    if r >= Q:                 # up to 2 conditional subtractions
+        r -= Q
+    if r >= Q:
+        r -= Q
+    return r
+
+
+def mulmod(a, b):
+    return barrett(a * b)
+
+
+def modadd(a, b):              # symmetric modular adder (sum path)
+    s = a + b
+    return s - Q if s >= Q else s
+
+
+def modsub(a, b):              # symmetric modular subtractor (difference path)
+    d = a - b
+    return d + Q if d < 0 else d
+
+
+# ---------------------------------------------------------------------------
+# Twiddle tables in bit-reversed order (Longa-Naehrig).
+# ---------------------------------------------------------------------------
+def brv(x, bits):
+    r = 0
+    for _ in range(bits):
+        r = (r << 1) | (x & 1)
+        x >>= 1
+    return r
+
+
+PSI_REV    = [pow(PSI,    brv(k, LOGN), Q) for k in range(N)]
+PSIINV_REV = [pow(PSIINV, brv(k, LOGN), Q) for k in range(N)]
+
+
+# ---------------------------------------------------------------------------
+# Hardware-modelled datapath: 8-lane butterfly array, no bit-reversal stage.
+# Forward: Cooley-Tukey DIT (natural in, bit-reversed out).
+# ---------------------------------------------------------------------------
+def ntt_forward(a):
+    a = list(a)
+    t = N
+    m = 1
+    while m < N:
+        t //= 2
+        for i in range(m):
+            j1 = 2 * i * t
+            S = PSI_REV[m + i]                # one twiddle fetched once...
+            for j in range(j1, j1 + t):       # ...reused across the block (all lanes)
+                U = a[j]
+                V = mulmod(a[j + t], S)        # DSP modular multiplier
+                a[j]     = modadd(U, V)        # adder lane
+                a[j + t] = modsub(U, V)        # subtractor lane
+        m *= 2
+    return a
+
+
+# Inverse: Gentleman-Sande DIF (bit-reversed in, natural out) + N^-1 scaling.
+def ntt_inverse(a):
+    a = list(a)
+    t = 1
+    m = N
+    while m > 1:
+        j1 = 0
+        h = m // 2
+        for i in range(h):
+            S = PSIINV_REV[h + i]
+            for j in range(j1, j1 + t):
+                U = a[j]
+                V = a[j + t]
+                a[j]     = modadd(U, V)
+                a[j + t] = mulmod(modsub(U, V), S)
+            j1 += 2 * t
+        t *= 2
+        m //= 2
+    return [mulmod(x, NINV) for x in a]        # intt_scale: * N^-1 mod q
+
+
+def ntt_multiply(a, b):
+    """Negacyclic polynomial multiply via the accelerator (read-modify-write
+    loop: forward NTT both, pointwise multiply in transform domain, INTT)."""
+    A = ntt_forward(a)
+    B = ntt_forward(b)
+    C = [mulmod(A[i], B[i]) for i in range(N)]  # pointwise (bit-reversed domain)
+    return ntt_inverse(C)
+
+
+# ---------------------------------------------------------------------------
+# INDEPENDENT golden models.
+# ---------------------------------------------------------------------------
+PSI_POW = [pow(PSI, e, Q) for e in range(2 * N)]   # psi has order 2N
+
+
+def golden_forward(a):
+    """Direct evaluation: A[j] = a(psi^(2j+1)) = sum_i a[i] psi^{(2j+1) i}."""
+    out = []
+    for j in range(N):
+        acc = 0
+        step = (2 * j + 1) % (2 * N)
+        e = 0
+        for i in range(N):
+            acc += a[i] * PSI_POW[e]
+            e += step
+            if e >= 2 * N:
+                e -= 2 * N
+        out.append(acc % Q)
+    return out
+
+
+def golden_negmul(a, b):
+    """Schoolbook multiplication in Z_q[x]/(x^N + 1) (negacyclic)."""
+    c = [0] * N
+    for i in range(N):
+        ai = a[i]
+        if ai == 0:
+            continue
+        for j in range(N):
+            v = ai * b[j] % Q
+            k = i + j
+            if k < N:
+                c[k] = (c[k] + v) % Q
+            else:
+                c[k - N] = (c[k - N] - v) % Q
+    return c
+
+
+# ---------------------------------------------------------------------------
+# Conflict-free memory map (crossbar / addr_gen): b(i)=(i+(i>>3)) mod 8.
+# ---------------------------------------------------------------------------
+def bank_of(i):
+    return (i + (i >> 3)) % BANKS
+
+
+def offset_of(i):
+    return i >> 3
+
+
+# ===========================================================================
+# VERIFICATION
+# ===========================================================================
+def verify_barrett_with_z3():
+    try:
+        from z3 import BitVec, LShR, URem, UGE, ULE, If, Solver, unsat
+    except Exception as e:  # pragma: no cover
+        fail(f"z3 unavailable: {e}")
+    x = BitVec('x', 64)
+    t = LShR(x * MU, K)
+    r = x - t * Q
+    r = If(UGE(r, Q), r - Q, r)
+    r = If(UGE(r, Q), r - Q, r)
+    g = URem(x, Q)
+    s = Solver()
+    s.add(ULE(x, (Q - 1) * (Q - 1)))   # full domain of a product of two sub-q operands
+    s.add(r != g)                       # seek any input where Barrett != true mod
+    res = s.check()
+    if res == unsat:
+        return
+    if str(res) == "sat":
+        cx = s.model()[x]
+        fail(f"Barrett reduction != x mod q at x={cx} "
+             f"(domain [0,(q-1)^2]); k/mu/correction model wrong")
+    fail(f"z3 could not decide Barrett correctness (result={res})")
+
+
+def verify_bank_map():
+    # (bank, offset) must be injective over the used index range [0, N).
+    seen = {}
+    for i in range(N):
+        key = (bank_of(i), offset_of(i))
+        if key in seen:
+            fail(f"bank map collision: indices {seen[key]} and {i} both -> "
+                 f"bank {key[0]} offset {key[1]} (not conflict-free)")
+        seen[key] = i
+    # Each offset-group of 8 consecutive indices must hit 8 distinct banks.
+    for k in range(N // BANKS):
+        banks = sorted(bank_of(i) for i in range(8 * k, 8 * k + 8))
+        if banks != list(range(BANKS)):
+            fail(f"offset group {k} does not scatter across all 8 banks: {banks}")
+
+
+def verify_transform():
+    rng = random.Random(0xCFNTT)
+
+    edge_inputs = [
+        [0] * N,                                  # zero
+        [1] + [0] * (N - 1),                      # constant 1
+        [0, 1] + [0] * (N - 2),                   # x  (negacyclic shift)
+        [Q - 1] * N,                              # saturated
+        [(i * 37 + 5) % Q for i in range(N)],     # ramp
+    ]
+    rand_inputs = [[rng.randrange(Q) for _ in range(N)] for _ in range(3)]
+
+    # 1) forward transform == direct-evaluation golden (bit-reversed-out convention)
+    for a in edge_inputs[:3] + rand_inputs[:2]:
+        impl = ntt_forward(a)
+        gold = golden_forward(a)
+        for k in range(N):
+            if impl[k] != gold[brv(k, LOGN)]:
+                fail(f"forward NTT mismatch at out[{k}]: impl={impl[k]} "
+                     f"golden(natural[{brv(k, LOGN)}])={gold[brv(k, LOGN)]}")
+
+    # 2) identity: INTT(NTT(a)) == a
+    for a in edge_inputs + rand_inputs:
+        back = ntt_inverse(ntt_forward(a))
+        if back != a:
+            for idx in range(N):
+                if back[idx] != a[idx]:
+                    fail(f"INTT(NTT(a)) != a at index {idx}: got {back[idx]}, "
+                         f"expected {a[idx]}")
+
+    # 3) the engine: NTT-based negacyclic multiply == schoolbook negacyclic
+    pairs = [
+        (edge_inputs[1], rand_inputs[0]),         # 1 * b  == b
+        (edge_inputs[2], rand_inputs[1]),         # x * b  (negacyclic shift)
+        (rand_inputs[0], rand_inputs[1]),
+        (rand_inputs[2], rand_inputs[2]),
+        ([Q - 1] + [0] * (N - 1), rand_inputs[0]),
+    ]
+    for a, b in pairs:
+        got = ntt_multiply(a, b)
+        exp = golden_negmul(a, b)
+        if got != exp:
+            for idx in range(N):
+                if got[idx] != exp[idx]:
+                    fail(f"negacyclic multiply mismatch at coeff {idx}: "
+                         f"impl={got[idx]} golden={exp[idx]}")
+
+
+def main():
+    verify_barrett_with_z3()   # proves the reduction spine over its full domain
+    verify_bank_map()          # conflict-free storage mapping
+    verify_transform()         # NTT/INTT datapath + the multiplication engine
+    print("VERIFIED")
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()

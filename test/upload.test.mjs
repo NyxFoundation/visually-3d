@@ -66,33 +66,45 @@ test('publishToGallery does not double-register an existing id', () => {
   assert.equal(idx.samples.filter((s) => s.id === id).length, 1);
 });
 
-test('publishHistory web profile keeps only what the timeline shows + writes a chronological manifest', () => {
+test('publishHistory web profile precomputes the studio payloads + referenced files', async () => {
   const gallery = mkdtempSync(path.join(os.tmpdir(), 'vt-gal4-'));
-  publishHistory(id, gallery, 'web');
-  const impDir = path.join(gallery, 'runs', id, 'improve-20260101-000000');
-  const verDir = path.join(gallery, 'runs', id, 'verify-20260102-000000');
-  assert.ok(existsSync(path.join(impDir, 'iter-01-render.png')), 'render kept');
-  assert.ok(existsSync(path.join(impDir, 'iter-01-review.json')), 'review kept');
-  assert.ok(!existsSync(path.join(impDir, 'iter-00.json')), 'scene snapshot dropped in web profile');
-  assert.ok(!existsSync(path.join(impDir, 'iter-01-events.jsonl')), 'heavy trace dropped');
-  assert.ok(existsSync(path.join(verDir, 'verify-1.txt')), 'verify log kept');
-  assert.ok(existsSync(path.join(verDir, 'check-1.py')), 'self-check source kept');
-  assert.ok(!existsSync(path.join(verDir, 'prompt-1.txt')), 'prompt dropped');
-  const manifest = JSON.parse(readFileSync(path.join(gallery, 'runs', id, 'manifest.json'), 'utf8'));
-  assert.equal(manifest.id, id);
-  assert.deepEqual(manifest.runs.map((r) => r.kind), ['improve', 'verify'], 'chronological order');
-  assert.equal(manifest.runs[0].at, '2026-01-01T00:00:00Z');
-  assert.ok(manifest.runs[0].files.includes('iter-01-render.png'));
+  // a revisions-shaped history: create -> improve(iter with review+render) -> reproduce
+  const { runDir } = await import('../lib/paths.js');
+  const sid = 'studio';
+  const create = runDir(sid, 'create', '20260101-100000');
+  mkdirSync(create, { recursive: true });
+  writeFileSync(path.join(create, 'scene.json'), JSON.stringify({ machine_name: 'S', parts: [{ id: 'a' }] }));
+  const improve = runDir(sid, 'improve', '20260101-110000');
+  mkdirSync(improve, { recursive: true });
+  writeFileSync(path.join(improve, 'iter-01.json'), JSON.stringify({ machine_name: 'S', parts: [{ id: 'a' }, { id: 'b' }] }));
+  writeFileSync(path.join(improve, 'iter-01-review.json'), JSON.stringify({ total: 88, critique: 'add b' }));
+  writeFileSync(path.join(improve, 'iter-01-render.png'), 'PNG');
+  writeFileSync(path.join(improve, 'iter-01-events.jsonl'), 'heavy'); // must NOT be published
+  const repro = runDir(sid, 'reproduce', '20260101-120000');
+  mkdirSync(repro, { recursive: true });
+  writeFileSync(path.join(repro, 'report.json'), JSON.stringify({ reproducibility: 70, executable_verification: { enabled: true, passed: 1, total: 1 } }));
+  writeFileSync(path.join(repro, 'impl-1.py'), 'x = 1');
+  writeFileSync(path.join(repro, 'impl-1-verify.txt'), 'pass=true ran=true');
+
+  const n = publishHistory(sid, gallery, 'web');
+  assert.ok(n > 0);
+  const root = path.join(gallery, 'runs', sid);
+  const timeline = JSON.parse(readFileSync(path.join(root, 'timeline.json'), 'utf8'));
+  assert.equal(timeline.entries.length, 3, 'create + improve + verification');
+  // every frame has its precomputed detail under the deterministic safe key
+  const { safeFrameKey } = await import('../lib/upload.js');
+  for (const e of timeline.entries) {
+    assert.ok(existsSync(path.join(root, 'frames', safeFrameKey(e.key) + '.json')), 'frame detail for ' + e.key);
+  }
+  // referenced files (scene snapshots, render, impl code) are copied — nothing else
+  assert.ok(existsSync(path.join(root, 'create-20260101-100000', 'scene.json')));
+  assert.ok(existsSync(path.join(root, 'improve-20260101-110000', 'iter-01.json')));
+  assert.ok(existsSync(path.join(root, 'improve-20260101-110000', 'iter-01-render.png')));
+  assert.ok(existsSync(path.join(root, 'reproduce-20260101-120000', 'impl-1.py')));
+  assert.ok(!existsSync(path.join(root, 'improve-20260101-110000', 'iter-01-events.jsonl')), 'heavy trace not published');
 });
 
-test('writeHistoryManifest picks up runs placed in the published dir by hand', async () => {
-  const { writeHistoryManifest } = await import('../lib/upload.js');
-  const gallery = mkdtempSync(path.join(os.tmpdir(), 'vt-gal5-'));
-  publishHistory(id, gallery, 'web');
-  const extra = path.join(gallery, 'runs', id, 'improve-20270101-000000');
-  mkdirSync(extra, { recursive: true });
-  writeFileSync(path.join(extra, 'iter-01-render.png'), 'PNG');
-  const runs = writeHistoryManifest(id, gallery);
-  assert.equal(runs.length, 3);
-  assert.equal(runs[2].dir, 'improve-20270101-000000', 'hand-placed run sorts last');
+test('safeFrameKey is filename-safe and deterministic', async () => {
+  const { safeFrameKey } = await import('../lib/upload.js');
+  assert.equal(safeFrameKey('improve-20260101-110000:1'), 'improve-20260101-110000_1');
 });

@@ -22,6 +22,20 @@ function fileUrl(id: string, ref: FileRef): string {
   return `/api/runs/${encodeURIComponent(id)}/${encodeURIComponent(ref.runId)}/file?path=${encodeURIComponent(ref.file)}`;
 }
 
+// On the STATIC site (no local backend) the same payloads are served as
+// files precomputed by `visually upload --web` (see lib/upload.ts):
+//   timeline.json, frames/<key>.json and the referenced run files.
+function staticBase(id: string): string {
+  return `/samples/runs/${encodeURIComponent(id)}`;
+}
+function staticFileUrl(id: string, ref: FileRef): string {
+  return `${staticBase(id)}/${encodeURIComponent(ref.runId)}/${encodeURIComponent(ref.file)}`;
+}
+// Must mirror safeFrameKey in lib/upload.ts.
+function staticFrameUrl(id: string, key: string): string {
+  return `${staticBase(id)}/frames/${key.replace(/[^A-Za-z0-9._-]/g, '_')}.json`;
+}
+
 function fmt(v: unknown): string {
   if (v === undefined) return '—';
   if (v === null) return 'null';
@@ -148,6 +162,9 @@ function FrameReadout({ url }: { url: string }) {
 
 export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
   const [frames, setFrames] = useState<TimelineEntry[] | null>(null);
+  // true when history comes from the published static files instead of /api
+  // (the deployed gallery); switches every file/frame URL to /samples/runs/…
+  const [isStatic, setIsStatic] = useState(false);
   const [frame, setFrame] = useState(0);
   const [selectedPart, setSelectedPart] = useState<Part | null>(null);
   const [partOpen, setPartOpen] = useState(false);
@@ -190,16 +207,26 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
     // no-history studio instead of spinning forever.
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 2500);
+    const apply = (entries: TimelineEntry[], fromStatic: boolean) => {
+      if (cancelled) return;
+      setIsStatic(fromStatic);
+      setFrames(entries);
+      setFrame(Math.max(0, entries.length - 1));
+      // No history → default to 3D + screenshot only (no implementation yet).
+      if (entries.length === 0) setShow({ model: true, shot: true, impl: false });
+    };
     fetch(`/api/revisions?scene=${encodeURIComponent(id)}`, { signal: ctrl.signal })
       .then((r) => (r.ok ? (r.json() as Promise<{ entries: TimelineEntry[] }>) : Promise.reject(r)))
-      .then((d) => {
-        if (cancelled) return;
-        setFrames(d.entries);
-        setFrame(Math.max(0, d.entries.length - 1));
-        // No history → default to 3D + screenshot only (no implementation yet).
-        if (d.entries.length === 0) setShow({ model: true, shot: true, impl: false });
+      .then((d) => apply(d.entries, false))
+      .catch(() => {
+        // No backend (static deploy, or `vite dev` without `serve`): fall back
+        // to the published history. A missing file 404s (or the SPA fallback
+        // returns HTML, which fails json()) → empty studio, as before.
+        fetch(`${staticBase(id)}/timeline.json`)
+          .then((r) => (r.ok ? (r.json() as Promise<{ entries: TimelineEntry[] }>) : Promise.reject(r)))
+          .then((d) => apply(d.entries, true))
+          .catch(() => { if (!cancelled) setFrames([]); });
       })
-      .catch(() => { if (!cancelled) setFrames([]); })
       .finally(() => clearTimeout(timer));
     return () => { cancelled = true; ctrl.abort(); clearTimeout(timer); };
   }, [id]);
@@ -232,11 +259,12 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
   const verif = hasHistory ? latestVerification(frames, cur) : null;
   const impl = verif?.impls.find((i) => i.pass === true) ?? verif?.impls[0] ?? null;
 
-  const sceneUrl = rev ? fileUrl(id, rev.scene) : null;
+  const refUrl = (ref: FileRef) => (isStatic ? staticFileUrl(id, ref) : fileUrl(id, ref));
+  const sceneUrl = rev ? refUrl(rev.scene) : null;
   // The screenshot at the cursor — the history render, else the scene's static
   // contact sheet (bundled for samples, rendered on the fly for workspace scenes).
-  const renderUrl = renderRef ? fileUrl(id, renderRef) : `/samples/${encodeURIComponent(id)}.sheet.png`;
-  const implUrl = verif && impl ? fileUrl(id, { runId: verif.runId, file: impl.codeFile }) : null;
+  const renderUrl = renderRef ? refUrl(renderRef) : `/samples/${encodeURIComponent(id)}.sheet.png`;
+  const implUrl = verif && impl ? refUrl({ runId: verif.runId, file: impl.codeFile }) : null;
 
   // The implementation is generated from the scene as it was at its reproduce
   // run. If the scene was refined *after* that (a newer revision sits between
@@ -246,7 +274,9 @@ export function SceneStudio({ id, fallbackScene }: SceneStudioProps) {
   const revIdx = rev ? frames.indexOf(rev) : -1;
   const implVersion = verif ? (latestRevision(frames, verIdx)?.version ?? null) : null;
   const implStale = verif != null && rev != null && verIdx < revIdx;
-  const frameUrl = entry ? `/api/revisions?scene=${encodeURIComponent(id)}&rev=${encodeURIComponent(entry.key)}` : null;
+  const frameUrl = entry
+    ? (isStatic ? staticFrameUrl(id, entry.key) : `/api/revisions?scene=${encodeURIComponent(id)}&rev=${encodeURIComponent(entry.key)}`)
+    : null;
 
   const set = (f: number) => setFrame(Math.max(0, Math.min(n - 1, f)));
 

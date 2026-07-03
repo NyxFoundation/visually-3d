@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { InfoPanel } from '../components/InfoPanel';
 import { SceneStudio } from '../components/SceneStudio';
-import { HistoryTimeline } from '../components/HistoryTimeline';
 import { Icon } from '../components/Icon';
 import { GALLERY_HREF } from '../router';
 import type { SampleEntry, SceneDescriptor } from '../types';
@@ -85,7 +84,6 @@ export function DetailPage({ id, samples, samplesLoaded }: DetailPageProps) {
       </header>
 
       <SceneStudio id={id} fallbackScene={scene} />
-      <HistoryTimeline id={id} />
       <InfoPanel scene={scene} open={infoOpen} onClose={() => setInfoOpen(false)} />
     </main>
   );

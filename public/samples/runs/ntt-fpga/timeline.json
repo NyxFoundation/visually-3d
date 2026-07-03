@@ -1,0 +1,1263 @@
+{
+  "entries": [
+    {
+      "kind": "revision",
+      "key": "create-20260617-175341:0",
+      "runId": "create-20260617-175341",
+      "startedAt": "2026-06-17T17:53:41",
+      "version": 0,
+      "source": "created",
+      "iter": 0,
+      "score": null,
+      "delta": null,
+      "scene": {
+        "runId": "create-20260617-175341",
+        "file": "scene.json"
+      },
+      "render": null,
+      "hasReasoning": false
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260617-175805:1",
+      "runId": "improve-20260617-175805",
+      "startedAt": "2026-06-17T17:58:05",
+      "version": 1,
+      "source": "refined",
+      "iter": 1,
+      "score": 84,
+      "delta": null,
+      "scene": {
+        "runId": "improve-20260617-175805",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260617-175805",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260617-175805:2",
+      "runId": "improve-20260617-175805",
+      "startedAt": "2026-06-17T17:58:05",
+      "version": 2,
+      "source": "refined",
+      "iter": 2,
+      "score": 92,
+      "delta": 8,
+      "scene": {
+        "runId": "improve-20260617-175805",
+        "file": "iter-02.json"
+      },
+      "render": {
+        "runId": "improve-20260617-175805",
+        "file": "iter-02-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260617-175805:3",
+      "runId": "improve-20260617-175805",
+      "startedAt": "2026-06-17T17:58:05",
+      "version": 3,
+      "source": "refined",
+      "iter": 3,
+      "score": 94,
+      "delta": 2,
+      "scene": {
+        "runId": "improve-20260617-175805",
+        "file": "iter-03.json"
+      },
+      "render": {
+        "runId": "improve-20260617-175805",
+        "file": "iter-03-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260618-100536:v",
+      "runId": "reproduce-20260618-100536",
+      "startedAt": "2026-06-18T10:05:36",
+      "reproducibility": 8,
+      "verdict": "underspecified",
+      "impls": [
+        {
+          "n": 1,
+          "lang": "verilog",
+          "pass": null,
+          "codeFile": "impl-1.v"
+        },
+        {
+          "n": 2,
+          "lang": "verilog",
+          "pass": null,
+          "codeFile": "impl-2.v"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-144601:1",
+      "runId": "improve-20260618-144601",
+      "startedAt": "2026-06-18T14:46:01",
+      "version": 4,
+      "source": "refined",
+      "iter": 1,
+      "score": 90,
+      "delta": -4,
+      "scene": {
+        "runId": "improve-20260618-144601",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260618-144601",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-144601:2",
+      "runId": "improve-20260618-144601",
+      "startedAt": "2026-06-18T14:46:01",
+      "version": 5,
+      "source": "refined",
+      "iter": 2,
+      "score": 95,
+      "delta": 5,
+      "scene": {
+        "runId": "improve-20260618-144601",
+        "file": "iter-02.json"
+      },
+      "render": {
+        "runId": "improve-20260618-144601",
+        "file": "iter-02-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260618-145350:v",
+      "runId": "reproduce-20260618-145350",
+      "startedAt": "2026-06-18T14:53:50",
+      "reproducibility": 8,
+      "verdict": "underspecified",
+      "verify": {
+        "passed": 1,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": true,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-145750:1",
+      "runId": "improve-20260618-145750",
+      "startedAt": "2026-06-18T14:57:50",
+      "version": 6,
+      "source": "refined",
+      "iter": 1,
+      "score": 92,
+      "delta": -3,
+      "scene": {
+        "runId": "improve-20260618-145750",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260618-145750",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-145750:2",
+      "runId": "improve-20260618-145750",
+      "startedAt": "2026-06-18T14:57:50",
+      "version": 7,
+      "source": "refined",
+      "iter": 2,
+      "score": 93,
+      "delta": 1,
+      "scene": {
+        "runId": "improve-20260618-145750",
+        "file": "iter-02.json"
+      },
+      "render": {
+        "runId": "improve-20260618-145750",
+        "file": "iter-02-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260618-150735:v",
+      "runId": "reproduce-20260618-150735",
+      "startedAt": "2026-06-18T15:07:35",
+      "reproducibility": 8,
+      "verdict": "underspecified",
+      "verify": {
+        "passed": 1,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": true,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-151139:1",
+      "runId": "improve-20260618-151139",
+      "startedAt": "2026-06-18T15:11:39",
+      "version": 8,
+      "source": "refined",
+      "iter": 1,
+      "score": 93,
+      "delta": 0,
+      "scene": {
+        "runId": "improve-20260618-151139",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260618-151139",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260618-151626:v",
+      "runId": "reproduce-20260618-151626",
+      "startedAt": "2026-06-18T15:16:26",
+      "reproducibility": 8,
+      "verdict": "underspecified",
+      "verify": {
+        "passed": 2,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": true,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": true,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-161418:1",
+      "runId": "improve-20260618-161418",
+      "startedAt": "2026-06-18T16:14:18",
+      "version": 9,
+      "source": "refined",
+      "iter": 1,
+      "score": 92,
+      "delta": -1,
+      "scene": {
+        "runId": "improve-20260618-161418",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260618-161418",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-161418:2",
+      "runId": "improve-20260618-161418",
+      "startedAt": "2026-06-18T16:14:18",
+      "version": 10,
+      "source": "refined",
+      "iter": 2,
+      "score": 94,
+      "delta": 2,
+      "scene": {
+        "runId": "improve-20260618-161418",
+        "file": "iter-02.json"
+      },
+      "render": {
+        "runId": "improve-20260618-161418",
+        "file": "iter-02-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260618-162305:v",
+      "runId": "reproduce-20260618-162305",
+      "startedAt": "2026-06-18T16:23:05",
+      "reproducibility": 42,
+      "verdict": "underspecified",
+      "verify": {
+        "passed": 0,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-163518:1",
+      "runId": "improve-20260618-163518",
+      "startedAt": "2026-06-18T16:35:18",
+      "version": 11,
+      "source": "refined",
+      "iter": 1,
+      "score": 88,
+      "delta": -6,
+      "scene": {
+        "runId": "improve-20260618-163518",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260618-163518",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-163518:2",
+      "runId": "improve-20260618-163518",
+      "startedAt": "2026-06-18T16:35:18",
+      "version": 12,
+      "source": "refined",
+      "iter": 2,
+      "score": 93,
+      "delta": 5,
+      "scene": {
+        "runId": "improve-20260618-163518",
+        "file": "iter-02.json"
+      },
+      "render": {
+        "runId": "improve-20260618-163518",
+        "file": "iter-02-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260618-164625:v",
+      "runId": "reproduce-20260618-164625",
+      "startedAt": "2026-06-18T16:46:25",
+      "reproducibility": 68,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 0,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-165332:1",
+      "runId": "improve-20260618-165332",
+      "startedAt": "2026-06-18T16:53:32",
+      "version": 13,
+      "source": "refined",
+      "iter": 1,
+      "score": 91,
+      "delta": -2,
+      "scene": {
+        "runId": "improve-20260618-165332",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260618-165332",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-165332:2",
+      "runId": "improve-20260618-165332",
+      "startedAt": "2026-06-18T16:53:32",
+      "version": 14,
+      "source": "refined",
+      "iter": 2,
+      "score": 95,
+      "delta": 4,
+      "scene": {
+        "runId": "improve-20260618-165332",
+        "file": "iter-02.json"
+      },
+      "render": {
+        "runId": "improve-20260618-165332",
+        "file": "iter-02-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260618-170631:v",
+      "runId": "reproduce-20260618-170631",
+      "startedAt": "2026-06-18T17:06:31",
+      "reproducibility": 52,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 1,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": true,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-181146:1",
+      "runId": "improve-20260618-181146",
+      "startedAt": "2026-06-18T18:11:46",
+      "version": 15,
+      "source": "refined",
+      "iter": 1,
+      "score": 93,
+      "delta": -2,
+      "scene": {
+        "runId": "improve-20260618-181146",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260618-181146",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-181146:2",
+      "runId": "improve-20260618-181146",
+      "startedAt": "2026-06-18T18:11:46",
+      "version": 16,
+      "source": "refined",
+      "iter": 2,
+      "score": 93,
+      "delta": 0,
+      "scene": {
+        "runId": "improve-20260618-181146",
+        "file": "iter-02.json"
+      },
+      "render": {
+        "runId": "improve-20260618-181146",
+        "file": "iter-02-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260618-182403:v",
+      "runId": "reproduce-20260618-182403",
+      "startedAt": "2026-06-18T18:24:03",
+      "reproducibility": 60,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 0,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-183642:1",
+      "runId": "improve-20260618-183642",
+      "startedAt": "2026-06-18T18:36:42",
+      "version": 17,
+      "source": "refined",
+      "iter": 1,
+      "score": 90,
+      "delta": -3,
+      "scene": {
+        "runId": "improve-20260618-183642",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260618-183642",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-183642:2",
+      "runId": "improve-20260618-183642",
+      "startedAt": "2026-06-18T18:36:42",
+      "version": 18,
+      "source": "refined",
+      "iter": 2,
+      "score": 92,
+      "delta": 2,
+      "scene": {
+        "runId": "improve-20260618-183642",
+        "file": "iter-02.json"
+      },
+      "render": {
+        "runId": "improve-20260618-183642",
+        "file": "iter-02-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260618-185039:v",
+      "runId": "reproduce-20260618-185039",
+      "startedAt": "2026-06-18T18:50:39",
+      "reproducibility": 70,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 0,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-190434:1",
+      "runId": "improve-20260618-190434",
+      "startedAt": "2026-06-18T19:04:34",
+      "version": 19,
+      "source": "refined",
+      "iter": 1,
+      "score": 89,
+      "delta": -3,
+      "scene": {
+        "runId": "improve-20260618-190434",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260618-190434",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260618-190434:2",
+      "runId": "improve-20260618-190434",
+      "startedAt": "2026-06-18T19:04:34",
+      "version": 20,
+      "source": "refined",
+      "iter": 2,
+      "score": 90,
+      "delta": 1,
+      "scene": {
+        "runId": "improve-20260618-190434",
+        "file": "iter-02.json"
+      },
+      "render": {
+        "runId": "improve-20260618-190434",
+        "file": "iter-02-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260618-191714:v",
+      "runId": "reproduce-20260618-191714",
+      "startedAt": "2026-06-18T19:17:14",
+      "reproducibility": 58,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 0,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260619-112822:1",
+      "runId": "improve-20260619-112822",
+      "startedAt": "2026-06-19T11:28:22",
+      "version": 21,
+      "source": "refined",
+      "iter": 1,
+      "score": 93,
+      "delta": 3,
+      "scene": {
+        "runId": "improve-20260619-112822",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260619-112822",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260619-113508:v",
+      "runId": "reproduce-20260619-113508",
+      "startedAt": "2026-06-19T11:35:08",
+      "reproducibility": 62,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 0,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260619-114510:1",
+      "runId": "improve-20260619-114510",
+      "startedAt": "2026-06-19T11:45:10",
+      "version": 22,
+      "source": "refined",
+      "iter": 1,
+      "score": 91,
+      "delta": -2,
+      "scene": {
+        "runId": "improve-20260619-114510",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260619-114510",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260619-115200:v",
+      "runId": "reproduce-20260619-115200",
+      "startedAt": "2026-06-19T11:52:00",
+      "reproducibility": 74,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 1,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": true,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260619-120003:1",
+      "runId": "improve-20260619-120003",
+      "startedAt": "2026-06-19T12:00:03",
+      "version": 23,
+      "source": "refined",
+      "iter": 1,
+      "score": 88,
+      "delta": -3,
+      "scene": {
+        "runId": "improve-20260619-120003",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260619-120003",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260619-120859:v",
+      "runId": "reproduce-20260619-120859",
+      "startedAt": "2026-06-19T12:08:59",
+      "reproducibility": 70,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 1,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": true,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260619-162752:1",
+      "runId": "improve-20260619-162752",
+      "startedAt": "2026-06-19T16:27:52",
+      "version": 24,
+      "source": "refined",
+      "iter": 1,
+      "score": 92,
+      "delta": 4,
+      "scene": {
+        "runId": "improve-20260619-162752",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260619-162752",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260619-163512:v",
+      "runId": "reproduce-20260619-163512",
+      "startedAt": "2026-06-19T16:35:12",
+      "reproducibility": 64,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 1,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": true,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260619-164904:1",
+      "runId": "improve-20260619-164904",
+      "startedAt": "2026-06-19T16:49:04",
+      "version": 25,
+      "source": "refined",
+      "iter": 1,
+      "score": 88,
+      "delta": -4,
+      "scene": {
+        "runId": "improve-20260619-164904",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260619-164904",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260619-165857:v",
+      "runId": "reproduce-20260619-165857",
+      "startedAt": "2026-06-19T16:58:57",
+      "reproducibility": 72,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 1,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": true,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260619-171344:1",
+      "runId": "improve-20260619-171344",
+      "startedAt": "2026-06-19T17:13:44",
+      "version": 26,
+      "source": "refined",
+      "iter": 1,
+      "score": 87,
+      "delta": -1,
+      "scene": {
+        "runId": "improve-20260619-171344",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260619-171344",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260619-172158:v",
+      "runId": "reproduce-20260619-172158",
+      "startedAt": "2026-06-19T17:21:58",
+      "reproducibility": 64,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 0,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260619-193834:1",
+      "runId": "improve-20260619-193834",
+      "startedAt": "2026-06-19T19:38:34",
+      "version": 27,
+      "source": "refined",
+      "iter": 1,
+      "score": 93,
+      "delta": 6,
+      "scene": {
+        "runId": "improve-20260619-193834",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260619-193834",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260619-194640:v",
+      "runId": "reproduce-20260619-194640",
+      "startedAt": "2026-06-19T19:46:40",
+      "reproducibility": 63,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 0,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260619-200009:1",
+      "runId": "improve-20260619-200009",
+      "startedAt": "2026-06-19T20:00:09",
+      "version": 28,
+      "source": "refined",
+      "iter": 1,
+      "score": 90,
+      "delta": -3,
+      "scene": {
+        "runId": "improve-20260619-200009",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260619-200009",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260619-200836:v",
+      "runId": "reproduce-20260619-200836",
+      "startedAt": "2026-06-19T20:08:36",
+      "reproducibility": 58,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 1,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": true,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "verification",
+      "key": "reproduce-20260619-202930:v",
+      "runId": "reproduce-20260619-202930",
+      "startedAt": "2026-06-19T20:29:30",
+      "reproducibility": 71,
+      "verdict": "ambiguous",
+      "verify": {
+        "passed": 0,
+        "total": 2
+      },
+      "impls": [
+        {
+          "n": 1,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-1.py",
+          "verifyFile": "impl-1-verify.txt",
+          "logFile": "impl-1.txt"
+        },
+        {
+          "n": 2,
+          "lang": "python",
+          "pass": false,
+          "codeFile": "impl-2.py",
+          "verifyFile": "impl-2-verify.txt",
+          "logFile": "impl-2.txt"
+        }
+      ]
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260622-100511:1",
+      "runId": "improve-20260622-100511",
+      "startedAt": "2026-06-22T10:05:11",
+      "version": 29,
+      "source": "refined",
+      "iter": 1,
+      "score": 90,
+      "delta": 0,
+      "scene": {
+        "runId": "improve-20260622-100511",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260622-100511",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260622-105615:1",
+      "runId": "improve-20260622-105615",
+      "startedAt": "2026-06-22T10:56:15",
+      "version": 30,
+      "source": "refined",
+      "iter": 1,
+      "score": 91,
+      "delta": 1,
+      "scene": {
+        "runId": "improve-20260622-105615",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260622-105615",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260622-105615:2",
+      "runId": "improve-20260622-105615",
+      "startedAt": "2026-06-22T10:56:15",
+      "version": 31,
+      "source": "refined",
+      "iter": 2,
+      "score": 92,
+      "delta": 1,
+      "scene": {
+        "runId": "improve-20260622-105615",
+        "file": "iter-02.json"
+      },
+      "render": {
+        "runId": "improve-20260622-105615",
+        "file": "iter-02-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260702-190616:1",
+      "runId": "improve-20260702-190616",
+      "startedAt": "2026-07-02T19:06:16",
+      "version": 32,
+      "source": "refined",
+      "iter": 1,
+      "score": 85,
+      "delta": -7,
+      "scene": {
+        "runId": "improve-20260702-190616",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260702-190616",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260702-210011:1",
+      "runId": "improve-20260702-210011",
+      "startedAt": "2026-07-02T21:00:11",
+      "version": 33,
+      "source": "refined",
+      "iter": 1,
+      "score": 90,
+      "delta": 5,
+      "scene": {
+        "runId": "improve-20260702-210011",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260702-210011",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260702-210011:2",
+      "runId": "improve-20260702-210011",
+      "startedAt": "2026-07-02T21:00:11",
+      "version": 34,
+      "source": "refined",
+      "iter": 2,
+      "score": 94,
+      "delta": 4,
+      "scene": {
+        "runId": "improve-20260702-210011",
+        "file": "iter-02.json"
+      },
+      "render": {
+        "runId": "improve-20260702-210011",
+        "file": "iter-02-render.png"
+      },
+      "hasReasoning": true
+    }
+  ]
+}
