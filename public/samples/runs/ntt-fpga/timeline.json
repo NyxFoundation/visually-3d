@@ -1258,6 +1258,46 @@
         "file": "iter-02-render.png"
       },
       "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260703-113545:1",
+      "runId": "improve-20260703-113545",
+      "startedAt": "2026-07-03T11:35:45",
+      "version": 35,
+      "source": "refined",
+      "iter": 1,
+      "score": 88,
+      "delta": -6,
+      "scene": {
+        "runId": "improve-20260703-113545",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260703-113545",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260703-113912:1",
+      "runId": "improve-20260703-113912",
+      "startedAt": "2026-07-03T11:39:12",
+      "version": 36,
+      "source": "refined",
+      "iter": 1,
+      "score": 90,
+      "delta": 2,
+      "scene": {
+        "runId": "improve-20260703-113912",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260703-113912",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
     }
   ]
 }
