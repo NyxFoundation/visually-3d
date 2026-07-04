@@ -1298,6 +1298,26 @@
         "file": "iter-01-render.png"
       },
       "hasReasoning": true
+    },
+    {
+      "kind": "revision",
+      "key": "improve-20260704-192355:1",
+      "runId": "improve-20260704-192355",
+      "startedAt": "2026-07-04T19:23:55",
+      "version": 37,
+      "source": "refined",
+      "iter": 1,
+      "score": 92,
+      "delta": 2,
+      "scene": {
+        "runId": "improve-20260704-192355",
+        "file": "iter-01.json"
+      },
+      "render": {
+        "runId": "improve-20260704-192355",
+        "file": "iter-01-render.png"
+      },
+      "hasReasoning": true
     }
   ]
 }
