@@ -1,1269 +1,1427 @@
 {
-  "machine_name": "CFNTT Radix-2/4 NTT Multiplication Accelerator (FPGA)",
-  "assembly_instructions": "1) Start from the FPGA PCB substrate (14x9 m floorplan) and overlay the silicon-die outline plate that bounds the placed-and-routed logic. 2) Along the left edge mount the eight interleaved BRAM banks at 1.1 m pitch and flank them with the forward-NTT input FIFO and the natural-order output FIFO. 3) Drop the conflict-free crossbar network as a vertical spine just inboard of the banks, and place the inverse-NTT N^-1 scaling unit on its output side. 4) For each of the four parallel butterfly clusters, lay an open baseplate, then populate it with a DSP modular multiplier, a symmetric modular adder, a symmetric modular subtractor, and a pipeline register. 5) Place the shared modular-reduction stage to the right of the clusters as two members: the Barrett q-multiplier first, then the shift/subtract+correction member, wired from every pipeline register and returning to the crossbar. 6) On the right, install the twiddle-factor ROM (feeding all multipliers), the address-generation unit, the radix-2/4 config selector, the schedule/FSM controller, and the clock PLL. 7) For inspection, lift one butterfly cluster onto two riser posts into an exploded view above the array, and clamp the exploded aluminum heatsink onto its riser stub above the die.",
+  "machine_name": "FoldNTT",
+  "assembly_instructions": [
+    "Lay down the Basys-3-class black-composite PCB substrate with its four mounting holes, edge connector rows, USB/JTAG connector, power switch, oscillator, reset button, voltage regulator, 7-segment display, LEDs, and slide switches fixed to the board substrate.",
+    "Install the Artix-7 package base at the board center, then add the four low package rails as an open cutaway frame so the internal floorplan remains visible from isometric view.",
+    "Place the thin FPGA fabric floorplan plate on the exposed package base and root the accelerator blocks to that fabric plane.",
+    "Mount the single brass DSP48 K-RED multiplier at the center of the fabric and seat the copper highlight ring around its base to mark that exactly one DSP slice is active.",
+    "Attach the modular add unit on the forward coefficient path, the modular subtract unit on the inverse path, the op21 x1/2 halving gate directly after the subtract path, and the modular output mux before write-back.",
+    "Place the three small K-RED shift-add fold gates around the DSP48 multiplier and connect them as the multiplier-free modular-reduction chain that replaces the three Barrett multipliers.",
+    "Install the 1024x14 coefficient BRAM on one side of the DSP, add the dual-port BRAM arbiter beside it, then run separate copper read and write-back buses between the BRAM and the butterfly.",
+    "Install the half-height psi-fold twiddle ROM on the opposite side of the DSP, attach the psi-fold derive gate to the ROM, and run the twiddle bus into the DSP multiplier input.",
+    "Place the custom control FSM, BRAM address generator, ROM address driver, stage counter, mode register, and done flag along the rear edge of the fabric; connect control lines to BRAM, ROM, and datapath blocks in assembly order.",
+    "Add the timing pipeline strip and compact register bank above the butterfly datapath, connect them to the DSP48 and control FSM, and feed them from the board oscillator through the clock distribution spine.",
+    "Add the formal proof checker and formal obligation trace beside the controller, connect them to the done flag and datapath output, then bridge the verified done signal to the board LED bank.",
+    "Verify that every accelerator block is visible above the open package frame and that all non-root parts connect back through the fabric or board substrate."
+  ],
   "metadata": {
-    "reference": "https://tches.iacr.org/index.php/TCHES/article/view/9291",
-    "domain": "cryptographic-hardware",
+    "reference": "https://en.wikipedia.org/wiki/Number-theoretic_transform",
+    "domain": "hardware-acceleration",
     "mode": "hardware",
     "thumbnail_camera": [
-      10.4,
-      8.3,
-      10.4
+      9.8,
+      6.8,
+      9.8
     ],
     "info": {
-      "japanese_name": "CFNTT スケーラブル基数2/4 NTT 乗算アーキテクチャ (FPGA)",
-      "english_name": "CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture",
-      "summary": "An FPGA accelerator for the Number Theoretic Transform that combines a conflict-free memory mapping scheme with parallel radix-4 butterfly units, the polynomial-multiplication engine behind lattice post-quantum cryptography and homomorphic encryption.",
-      "description": "CFNTT is an algorithm-hardware co-designed NTT core proposed by Chen et al. (Tsinghua University) in TCHES 2022. Its central contribution is a conflict-free memory mapping scheme that lets an arbitrary radix and an arbitrary number of parallel butterfly units access an interleaved BRAM system without bank conflicts, removing the bit-reversal cost and reducing memory footprint by reusing twiddle factors across a rearranged loop structure.",
-      "description2": "Built on this scheme, the architecture realizes a scalable radix-2 / radix-4 datapath. A dedicated schedule cuts radix-4 modular additions/subtractions by 20% and modular multiplications by 33%, while exploiting symmetric operators saves nearly 50% of the butterfly hardware. For a 1024-point, 14-bit NTT with 8 parallel butterfly units, the radix-4 core achieves roughly 2.2x/1.2x/1.1x/1.9x lower LUT/FF/DSP/BRAM area-time product than the radix-2 core.",
+      "english_name": "FoldNTT DSP-minimal verified NTT accelerator",
+      "summary": "A formally-verified, DSP-minimal number-theoretic-transform accelerator for the Falcon/Proth prime q=12289 at N=1024, built around a single pipelined radix-2 butterfly that uses exactly one DSP48 slice on a small Artix-7 (Basys 3).",
+      "description": "FoldNTT computes the length-1024 NTT modulo q=12289 in place on a single on-chip coefficient BRAM (1024x14, one RAMB18). Its lone pipelined radix-2 butterfly spends only ONE DSP48 slice because its K-RED modular multiplier replaces the reference design's three Barrett multipliers with shift-add 'folds', collapsing the multiply-reduce chain onto a single hardware multiplier. Twiddle factors are served from a psi-fold ROM that physically stores only half the words — a small shift-add gate derives the other half — so the twiddle table is a compact, half-height block.",
+      "description2": "A small custom control FSM walks the transform, sequencing the BRAM address generator and the twiddle ROM. The datapath is coefficient BRAM -> K-RED butterfly (1 DSP multiply + modular add + modular sub + op21 x1/2 halving on the inverse path) -> written back in place. The op21 halving gate is the fix for a real bug found in the reference inverse transform. The whole core fits comfortably in an xc7a35t with a single DSP slice lit.",
       "facts": [
         {
-          "label": "Transform",
-          "value": "Number Theoretic Transform (NTT/INTT)"
+          "label": "Prime modulus q",
+          "value": "12289 (Falcon/Proth)"
         },
         {
-          "label": "Radix support",
-          "value": "Scalable radix-2 and radix-4"
+          "label": "Transform length N",
+          "value": "1024"
         },
         {
-          "label": "Benchmark size",
-          "value": "1024 points, 14-bit modulus"
+          "label": "DSP48 slices used",
+          "value": "1 (K-RED)"
         },
         {
-          "label": "Parallel butterfly units",
-          "value": "up to 8 (4 modeled)"
+          "label": "Barrett multipliers removed",
+          "value": "3 → 0 (shift-add folds)"
         },
         {
-          "label": "Radix-4 mult reduction",
-          "value": "33% fewer modular multiplications"
+          "label": "Coefficient memory",
+          "value": "1024 x 14 bit, one RAMB18"
         },
         {
-          "label": "Radix-4 add/sub reduction",
-          "value": "20% fewer modular add/sub"
+          "label": "Twiddle ROM",
+          "value": "half-size (psi-fold, shift-add derived)"
         },
         {
-          "label": "Hardware saving",
-          "value": "~50% via symmetric operators"
+          "label": "Butterfly",
+          "value": "single pipelined radix-2, in place"
         },
         {
-          "label": "Reduction",
-          "value": "Barrett: q-multiply then shift/subtract"
+          "label": "Inverse-path fix",
+          "value": "op21 x1/2 halving gate"
         },
         {
-          "label": "ATP advantage (LUT)",
-          "value": "~2.2x lower vs radix-2"
+          "label": "Target device",
+          "value": "Artix-7 xc7a35t (Basys 3)"
         },
         {
-          "label": "Publication",
-          "value": "TCHES 2022, Issue 1, pp. 94-126"
+          "label": "Verification",
+          "value": "formally verified datapath"
         }
       ],
       "sources": [
         {
-          "title": "CFNTT: Scalable Radix-2/4 NTT Multiplication Architecture (TCHES 2022)",
-          "url": "https://tches.iacr.org/index.php/TCHES/article/view/9291"
+          "title": "Number-theoretic transform (overview)",
+          "url": "https://en.wikipedia.org/wiki/Number-theoretic_transform"
         },
         {
-          "title": "CFNTT PDF (IACR TCHES)",
-          "url": "https://tches.iacr.org/index.php/TCHES/article/download/9291/8857"
+          "title": "Falcon post-quantum signature (uses q=12289)",
+          "url": "https://falcon-sign.info/"
         },
         {
-          "title": "DOI 10.46586/tches.v2022.i1.94-126",
-          "url": "https://doi.org/10.46586/tches.v2022.i1.94-126"
+          "title": "Digilent Basys 3 (Artix-7 xc7a35t)",
+          "url": "https://digilent.com/reference/programmable-logic/basys-3/start"
         }
       ]
     }
   },
   "parts": [
     {
-      "id": "pcb_substrate",
-      "name": "FPGA PCB Substrate",
+      "id": "board_substrate",
+      "name": "Basys-3-class FPGA board substrate",
       "shape": "box",
       "position": [
         0,
-        0.2,
+        0.12,
         0
       ],
       "size": [
-        14,
-        0.4,
-        9
+        13.6,
+        0.24,
+        9.6
       ],
       "material": "black composite",
-      "role": "The 14x9 m FPGA board floorplan carrying every NTT datapath block and the routing between them.",
+      "role": "The scaled black PCB substrate carries the Artix-7 package and all Basys-3-style user I/O peripherals.",
       "connections": [
-        "fpga_die",
-        "bram_0",
-        "bram_1",
-        "bram_2",
-        "bram_3",
-        "bram_4",
-        "bram_5",
-        "bram_6",
-        "bram_7",
-        "input_fifo",
-        "output_fifo",
-        "crossbar_network",
-        "bu_base_0",
-        "bu_base_1",
-        "bu_base_2",
-        "bu_base_3",
-        "mod_red_mult",
-        "mod_red_subshift",
-        "twiddle_rom",
-        "addr_gen_unit",
-        "config_radix_selector",
-        "clock_pll",
-        "schedule_controller",
-        "heatsink_base"
-      ]
+        "mount_hole_fl",
+        "mount_hole_fr",
+        "mount_hole_bl",
+        "mount_hole_br",
+        "fpga_package_base",
+        "usb_connector",
+        "power_switch",
+        "pmod_header_top",
+        "pmod_header_right",
+        "seven_seg_display",
+        "slide_switch_bank",
+        "led_bank",
+        "clock_oscillator",
+        "reset_button",
+        "voltage_regulator",
+        "vga_connector"
+      ],
+      "spec": {
+        "params": {
+          "board_class": "Digilent Basys 3",
+          "target_fpga": "Artix-7 xc7a35t",
+          "scaled_width_m": 13.6,
+          "scaled_depth_m": 9.6
+        }
+      }
     },
     {
-      "id": "fpga_die",
-      "name": "FPGA Silicon Die Outline",
-      "shape": "box",
+      "id": "mount_hole_fl",
+      "name": "Front-left mounting hole marker",
+      "shape": "cylinder",
       "position": [
+        -5.9,
+        0.27,
+        3.9
+      ],
+      "rotation": [
+        1.5708,
         0,
-        0.46,
         0
       ],
       "size": [
-        12,
-        0.08,
-        7.4
+        0.18,
+        0.05
       ],
       "material": "brushed steel",
-      "role": "Silicon-die outline of the FPGA; every block standing above this plate is placed-and-routed logic inside the die boundary, marking the chip extent on the board.",
+      "role": "A plated mounting-hole marker fixes the PCB orientation and shows the board thickness at one corner.",
       "connections": [
-        "pcb_substrate",
-        "heatsink_riser"
+        "board_substrate"
       ]
     },
     {
-      "id": "bram_0",
-      "name": "BRAM Bank 0",
-      "shape": "box",
+      "id": "mount_hole_fr",
+      "name": "Front-right mounting hole marker",
+      "shape": "cylinder",
       "position": [
-        -5.8,
-        1,
-        -3.85
+        5.9,
+        0.27,
+        3.9
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
       ],
       "size": [
-        1.3,
-        1.2,
-        0.85
+        0.18,
+        0.05
       ],
-      "material": "glass display",
-      "role": "Interleaved ~18 Kb block RAM holding polynomial coefficients under conflict-free addressing; head bank of the input stream.",
+      "material": "brushed steel",
+      "role": "A plated mounting-hole marker fixes the PCB orientation and shows the board thickness at the opposite front corner.",
       "connections": [
-        "pcb_substrate",
-        "crossbar_network",
-        "input_fifo"
+        "board_substrate"
       ]
     },
     {
-      "id": "bram_1",
-      "name": "BRAM Bank 1",
-      "shape": "box",
+      "id": "mount_hole_bl",
+      "name": "Back-left mounting hole marker",
+      "shape": "cylinder",
       "position": [
-        -5.8,
-        1,
-        -2.75
+        -5.9,
+        0.27,
+        -3.9
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
       ],
       "size": [
-        1.3,
-        1.2,
-        0.85
+        0.18,
+        0.05
       ],
-      "material": "glass display",
-      "role": "Interleaved BRAM bank in the eight-way conflict-free memory system.",
+      "material": "brushed steel",
+      "role": "A plated mounting-hole marker identifies the rear-left corner of the dev board.",
       "connections": [
-        "pcb_substrate",
-        "crossbar_network",
-        "input_fifo"
+        "board_substrate"
       ]
     },
     {
-      "id": "bram_2",
-      "name": "BRAM Bank 2",
+      "id": "mount_hole_br",
+      "name": "Back-right mounting hole marker",
+      "shape": "cylinder",
+      "position": [
+        5.9,
+        0.27,
+        -3.9
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.18,
+        0.05
+      ],
+      "material": "brushed steel",
+      "role": "A plated mounting-hole marker identifies the rear-right corner of the dev board.",
+      "connections": [
+        "board_substrate"
+      ]
+    },
+    {
+      "id": "fpga_package_base",
+      "name": "Artix-7 package base",
       "shape": "box",
       "position": [
-        -5.8,
-        1,
+        0,
+        0.43,
+        0
+      ],
+      "size": [
+        7.6,
+        0.38,
+        6.6
+      ],
+      "material": "dark anodized aluminum",
+      "role": "The low package base supports the exposed xc7a35t floorplan without covering the accelerator blocks.",
+      "connections": [
+        "board_substrate",
+        "package_rail_front",
+        "package_rail_back",
+        "package_rail_left",
+        "package_rail_right",
+        "fpga_fabric"
+      ]
+    },
+    {
+      "id": "package_rail_front",
+      "name": "Open package front rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.8,
+        3.45
+      ],
+      "size": [
+        7.8,
+        0.34,
+        0.22
+      ],
+      "material": "dark anodized aluminum",
+      "role": "The front rail is a cutaway package wall that frames the fabric while leaving the interior visible.",
+      "connections": [
+        "fpga_package_base"
+      ]
+    },
+    {
+      "id": "package_rail_back",
+      "name": "Open package back rail",
+      "shape": "box",
+      "position": [
+        0,
+        0.8,
+        -3.45
+      ],
+      "size": [
+        7.8,
+        0.34,
+        0.22
+      ],
+      "material": "dark anodized aluminum",
+      "role": "The back rail is a cutaway package wall that frames the fabric while avoiding opaque coverage.",
+      "connections": [
+        "fpga_package_base"
+      ]
+    },
+    {
+      "id": "package_rail_left",
+      "name": "Open package left rail",
+      "shape": "box",
+      "position": [
+        -3.9,
+        0.8,
+        0
+      ],
+      "size": [
+        0.22,
+        0.34,
+        6.7
+      ],
+      "material": "dark anodized aluminum",
+      "role": "The left rail defines the FPGA package edge and keeps the floorplan exposed in isometric view.",
+      "connections": [
+        "fpga_package_base"
+      ]
+    },
+    {
+      "id": "package_rail_right",
+      "name": "Open package right rail",
+      "shape": "box",
+      "position": [
+        3.9,
+        0.8,
+        0
+      ],
+      "size": [
+        0.22,
+        0.34,
+        6.7
+      ],
+      "material": "dark anodized aluminum",
+      "role": "The right rail defines the FPGA package edge and keeps all logic blocks visible above the package.",
+      "connections": [
+        "fpga_package_base"
+      ]
+    },
+    {
+      "id": "fpga_fabric",
+      "name": "Exposed FPGA fabric floorplan plate",
+      "shape": "box",
+      "position": [
+        0,
+        0.9,
+        0
+      ],
+      "size": [
+        7.1,
+        0.12,
+        6.1
+      ],
+      "material": "aluminum",
+      "role": "The thin fabric plate is the visible placement surface for the FoldNTT datapath and controller.",
+      "connections": [
+        "fpga_package_base",
+        "dsp48_multiplier",
+        "coeff_bram",
+        "psi_fold_rom",
+        "control_fsm",
+        "stage_counter",
+        "mode_register",
+        "done_flag",
+        "timing_pipeline_strip",
+        "pipeline_register_bank",
+        "formal_proof_checker"
+      ],
+      "spec": {
+        "params": {
+          "device": "xc7a35t",
+          "core": "FoldNTT",
+          "floorplan_style": "open cutaway"
+        }
+      }
+    },
+    {
+      "id": "dsp48_multiplier",
+      "name": "K-RED DSP48 multiplier",
+      "shape": "box",
+      "position": [
+        0,
+        1.55,
+        0
+      ],
+      "size": [
+        1.05,
+        1.05,
+        1.05
+      ],
+      "material": "brass",
+      "role": "The central brass block is the single DSP48 slice used by the K-RED modular multiplier.",
+      "connections": [
+        "fpga_fabric",
+        "dsp_halo",
+        "modular_add_unit",
+        "modular_sub_unit",
+        "kred_fold_1",
+        "kred_fold_2",
+        "kred_fold_3",
+        "twiddle_bus",
+        "datapath_bus_in",
+        "datapath_bus_out",
+        "timing_pipeline_strip",
+        "pipeline_register_bank"
+      ],
+      "spec": {
+        "params": {
+          "dsp48_slices": 1,
+          "modulus": 12289,
+          "barrett_multipliers_removed": 3
+        },
+        "ops": [
+          "single hardware multiply",
+          "K-RED shift-add modular reduction"
+        ]
+      }
+    },
+    {
+      "id": "dsp_halo",
+      "name": "Single-DSP highlight ring",
+      "shape": "torus",
+      "position": [
+        0,
+        1.02,
+        0
+      ],
+      "rotation": [
+        1.5708,
+        0,
+        0
+      ],
+      "size": [
+        0.82,
+        0.08
+      ],
+      "material": "copper",
+      "role": "The copper ring encircles the one active DSP slice so the one-multiplier design choice is visually unambiguous.",
+      "connections": [
+        "dsp48_multiplier"
+      ]
+    },
+    {
+      "id": "modular_add_unit",
+      "name": "Modular add unit",
+      "shape": "box",
+      "position": [
+        -1.35,
+        1.22,
+        0.95
+      ],
+      "size": [
+        0.9,
+        0.48,
+        0.72
+      ],
+      "material": "copper",
+      "role": "This butterfly unit computes the modular sum output for each radix-2 pair modulo q=12289.",
+      "connections": [
+        "dsp48_multiplier",
+        "modular_output_mux",
+        "datapath_bus_out"
+      ],
+      "spec": {
+        "params": {
+          "modulus": 12289,
+          "output": "a + w*b mod q"
+        }
+      }
+    },
+    {
+      "id": "modular_sub_unit",
+      "name": "Modular subtract unit",
+      "shape": "box",
+      "position": [
+        -1.35,
+        1.22,
+        -0.95
+      ],
+      "size": [
+        0.9,
+        0.48,
+        0.72
+      ],
+      "material": "copper",
+      "role": "This butterfly unit computes the modular difference output before the optional inverse-path halving step.",
+      "connections": [
+        "dsp48_multiplier",
+        "op21_halving_gate",
+        "modular_output_mux",
+        "datapath_bus_out"
+      ],
+      "spec": {
+        "params": {
+          "modulus": 12289,
+          "output": "a - w*b mod q"
+        }
+      }
+    },
+    {
+      "id": "op21_halving_gate",
+      "name": "op21 x1/2 inverse halving gate",
+      "shape": "box",
+      "position": [
+        -2.45,
+        1.18,
+        -0.95
+      ],
+      "size": [
+        0.74,
+        0.4,
+        0.62
+      ],
+      "material": "brass",
+      "role": "The inverse-path gate applies the op21 one-half correction that fixes the reference inverse-transform bug.",
+      "connections": [
+        "modular_sub_unit",
+        "mode_register",
+        "modular_output_mux"
+      ],
+      "spec": {
+        "params": {
+          "inverse_path_only": true,
+          "operation": "multiply by 1/2 modulo 12289"
+        }
+      }
+    },
+    {
+      "id": "modular_output_mux",
+      "name": "Butterfly output mux",
+      "shape": "box",
+      "position": [
+        -2.18,
+        1.12,
+        0.08
+      ],
+      "size": [
+        0.62,
+        0.34,
+        0.5
+      ],
+      "material": "dark anodized aluminum",
+      "role": "The output mux selects the add result and the inverse-corrected subtract result before both are written back to coefficient BRAM.",
+      "connections": [
+        "modular_add_unit",
+        "modular_sub_unit",
+        "op21_halving_gate",
+        "datapath_bus_out",
+        "mode_register"
+      ],
+      "spec": {
+        "ports": {
+          "inputs": [
+            "add_output",
+            "sub_output",
+            "op21_halved_sub_output"
+          ],
+          "output": "write_back_pair"
+        }
+      }
+    },
+    {
+      "id": "kred_fold_1",
+      "name": "K-RED shift-add fold gate 1",
+      "shape": "box",
+      "position": [
+        0.95,
+        1.2,
+        0.75
+      ],
+      "size": [
+        0.46,
+        0.34,
+        0.46
+      ],
+      "material": "welded steel",
+      "role": "This first fold gate performs a shift-add reduction step that replaces one Barrett multiplier stage.",
+      "connections": [
+        "dsp48_multiplier"
+      ]
+    },
+    {
+      "id": "kred_fold_2",
+      "name": "K-RED shift-add fold gate 2",
+      "shape": "box",
+      "position": [
+        1.15,
+        1.2,
+        0
+      ],
+      "size": [
+        0.46,
+        0.34,
+        0.46
+      ],
+      "material": "welded steel",
+      "role": "This second fold gate continues the K-RED shift-add reduction without consuming another DSP slice.",
+      "connections": [
+        "dsp48_multiplier"
+      ]
+    },
+    {
+      "id": "kred_fold_3",
+      "name": "K-RED shift-add fold gate 3",
+      "shape": "box",
+      "position": [
+        0.95,
+        1.2,
+        -0.75
+      ],
+      "size": [
+        0.46,
+        0.34,
+        0.46
+      ],
+      "material": "welded steel",
+      "role": "This third fold gate completes the three-stage replacement for the removed Barrett multipliers.",
+      "connections": [
+        "dsp48_multiplier"
+      ]
+    },
+    {
+      "id": "coeff_bram",
+      "name": "Coefficient BRAM 1024x14 RAMB18",
+      "shape": "box",
+      "position": [
+        -2.65,
+        1.28,
+        1.75
+      ],
+      "size": [
+        1.35,
+        0.66,
+        1.9
+      ],
+      "material": "glass display",
+      "role": "The single RAMB18 stores all 1024 fourteen-bit coefficients and is updated in place by the butterfly.",
+      "connections": [
+        "fpga_fabric",
+        "bram_dual_port_arbiter",
+        "datapath_bus_in",
+        "datapath_bus_out",
+        "address_generator"
+      ],
+      "spec": {
+        "params": {
+          "words": 1024,
+          "width_bits": 14,
+          "primitive": "RAMB18",
+          "storage": "in-place coefficient array"
+        }
+      }
+    },
+    {
+      "id": "bram_dual_port_arbiter",
+      "name": "BRAM dual-port read write arbiter",
+      "shape": "box",
+      "position": [
+        -2.72,
+        1.12,
+        0.82
+      ],
+      "size": [
+        0.74,
+        0.3,
+        0.48
+      ],
+      "material": "dark anodized aluminum",
+      "role": "The arbiter shows the shared RAMB18 port scheduling between coefficient reads and in-place write-back.",
+      "connections": [
+        "coeff_bram",
+        "address_generator",
+        "datapath_bus_in",
+        "datapath_bus_out",
+        "control_bus"
+      ],
+      "spec": {
+        "ports": {
+          "a": "coefficient_pair_read",
+          "b": "butterfly_write_back"
+        }
+      }
+    },
+    {
+      "id": "datapath_bus_in",
+      "name": "Coefficient read bus",
+      "shape": "box",
+      "position": [
+        -1.45,
+        1.03,
+        1.15
+      ],
+      "rotation": [
+        0,
+        0.62,
+        0
+      ],
+      "size": [
+        0.24,
+        0.12,
+        2.25
+      ],
+      "material": "copper",
+      "role": "This copper bus carries coefficient pairs from the RAMB18 into the central K-RED butterfly input.",
+      "connections": [
+        "coeff_bram",
+        "bram_dual_port_arbiter",
+        "dsp48_multiplier"
+      ],
+      "spec": {
+        "params": {
+          "data_width_bits": 14,
+          "direction": "BRAM to butterfly"
+        }
+      }
+    },
+    {
+      "id": "datapath_bus_out",
+      "name": "Coefficient write-back bus",
+      "shape": "box",
+      "position": [
+        -1.55,
+        1.07,
+        0.35
+      ],
+      "rotation": [
+        0,
+        -0.48,
+        0
+      ],
+      "size": [
+        0.24,
+        0.12,
+        2.35
+      ],
+      "material": "copper",
+      "role": "This separate copper bus returns the butterfly add/sub outputs to the same BRAM address space.",
+      "connections": [
+        "dsp48_multiplier",
+        "coeff_bram",
+        "bram_dual_port_arbiter",
+        "modular_add_unit",
+        "modular_sub_unit",
+        "modular_output_mux",
+        "formal_proof_checker"
+      ],
+      "spec": {
+        "params": {
+          "data_width_bits": 14,
+          "direction": "butterfly to BRAM"
+        }
+      }
+    },
+    {
+      "id": "psi_fold_rom",
+      "name": "Psi-fold twiddle ROM half-height",
+      "shape": "box",
+      "position": [
+        2.55,
+        1.16,
         -1.65
       ],
       "size": [
-        1.3,
-        1.2,
-        0.85
+        1.25,
+        0.38,
+        1.72
       ],
       "material": "glass display",
-      "role": "Interleaved BRAM bank addressed by the mapping scheme so no two parallel butterflies collide.",
+      "role": "The half-height ROM stores only half of the twiddle words for the N=1024 transform.",
       "connections": [
-        "pcb_substrate",
-        "crossbar_network"
-      ]
+        "fpga_fabric",
+        "psi_fold_gate",
+        "twiddle_bus",
+        "rom_address_driver"
+      ],
+      "spec": {
+        "params": {
+          "transform_length": 1024,
+          "storage": "half-size psi-fold table",
+          "derived_half": true
+        }
+      }
     },
     {
-      "id": "bram_3",
-      "name": "BRAM Bank 3",
+      "id": "psi_fold_gate",
+      "name": "Psi-fold derive gate",
       "shape": "box",
       "position": [
-        -5.8,
-        1,
-        -0.55
+        2.55,
+        1.12,
+        -0.45
       ],
       "size": [
-        1.3,
-        1.2,
-        0.85
-      ],
-      "material": "glass display",
-      "role": "Interleaved BRAM bank in the eight-way conflict-free memory system.",
-      "connections": [
-        "pcb_substrate",
-        "crossbar_network"
-      ]
-    },
-    {
-      "id": "bram_4",
-      "name": "BRAM Bank 4",
-      "shape": "box",
-      "position": [
-        -5.8,
-        1,
-        0.55
-      ],
-      "size": [
-        1.3,
-        1.2,
-        0.85
-      ],
-      "material": "glass display",
-      "role": "Interleaved BRAM bank in the eight-way conflict-free memory system.",
-      "connections": [
-        "pcb_substrate",
-        "crossbar_network"
-      ]
-    },
-    {
-      "id": "bram_5",
-      "name": "BRAM Bank 5",
-      "shape": "box",
-      "position": [
-        -5.8,
-        1,
-        1.65
-      ],
-      "size": [
-        1.3,
-        1.2,
-        0.85
-      ],
-      "material": "glass display",
-      "role": "Interleaved BRAM bank in the eight-way conflict-free memory system.",
-      "connections": [
-        "pcb_substrate",
-        "crossbar_network"
-      ]
-    },
-    {
-      "id": "bram_6",
-      "name": "BRAM Bank 6",
-      "shape": "box",
-      "position": [
-        -5.8,
-        1,
-        2.75
-      ],
-      "size": [
-        1.3,
-        1.2,
-        0.85
-      ],
-      "material": "glass display",
-      "role": "Interleaved BRAM bank in the eight-way conflict-free memory system.",
-      "connections": [
-        "pcb_substrate",
-        "crossbar_network",
-        "output_fifo"
-      ]
-    },
-    {
-      "id": "bram_7",
-      "name": "BRAM Bank 7",
-      "shape": "box",
-      "position": [
-        -5.8,
-        1,
-        3.85
-      ],
-      "size": [
-        1.3,
-        1.2,
-        0.85
-      ],
-      "material": "glass display",
-      "role": "Interleaved BRAM bank providing the natural-order write-back path to the output FIFO (no bit-reversal).",
-      "connections": [
-        "pcb_substrate",
-        "crossbar_network",
-        "output_fifo"
-      ]
-    },
-    {
-      "id": "input_fifo",
-      "name": "Forward-NTT Input FIFO",
-      "shape": "capsule",
-      "position": [
-        -6.8,
-        0.95,
-        3.2
-      ],
-      "rotation": [
-        1.5708,
-        0,
-        0
-      ],
-      "size": [
-        0.45,
-        1.8
-      ],
-      "material": "white composite",
-      "role": "Streams raw input coefficients into the head BRAM banks in natural order at the start of the forward NTT pass.",
-      "connections": [
-        "pcb_substrate",
-        "bram_0",
-        "bram_1"
-      ]
-    },
-    {
-      "id": "output_fifo",
-      "name": "Natural-Order Output FIFO",
-      "shape": "capsule",
-      "position": [
-        -6.8,
-        0.95,
-        -3.2
-      ],
-      "rotation": [
-        1.5708,
-        0,
-        0
-      ],
-      "size": [
-        0.45,
-        1.8
-      ],
-      "material": "white composite",
-      "role": "Drains transformed coefficients out of the tail banks in natural order, eliminating the bit-reversal pass.",
-      "connections": [
-        "pcb_substrate",
-        "bram_6",
-        "bram_7",
-        "intt_scale"
-      ]
-    },
-    {
-      "id": "crossbar_network",
-      "name": "Conflict-Free Crossbar Network",
-      "shape": "box",
-      "position": [
-        -4.2,
-        0.9,
-        0
-      ],
-      "size": [
-        1.2,
-        1,
-        8.4
+        0.64,
+        0.32,
+        0.48
       ],
       "material": "dark anodized aluminum",
-      "role": "Permutation crossbar (8x4) implementing the conflict-free mapping, routing operands between banks and butterfly clusters and reduction results back.",
+      "role": "The derive gate reconstructs the missing psi-fold twiddle half using shift-add logic beside the ROM.",
       "connections": [
-        "pcb_substrate",
-        "bram_0",
-        "bram_1",
-        "bram_2",
-        "bram_3",
-        "bram_4",
-        "bram_5",
-        "bram_6",
-        "bram_7",
-        "bu_base_0",
-        "bu_base_1",
-        "bu_base_2",
-        "bu_base_3",
-        "mod_red_subshift",
-        "addr_gen_unit",
-        "schedule_controller",
-        "intt_scale"
+        "psi_fold_rom",
+        "twiddle_bus"
       ]
     },
     {
-      "id": "intt_scale",
-      "name": "Inverse-NTT N^-1 Scaling Unit",
+      "id": "twiddle_bus",
+      "name": "Twiddle factor bus",
+      "shape": "box",
+      "position": [
+        1.25,
+        1.05,
+        -0.75
+      ],
+      "rotation": [
+        0,
+        -0.78,
+        0
+      ],
+      "size": [
+        0.22,
+        0.12,
+        2.35
+      ],
+      "material": "copper",
+      "role": "This bus feeds selected twiddle factors from the psi-fold ROM into the DSP48 multiplier input.",
+      "connections": [
+        "psi_fold_rom",
+        "psi_fold_gate",
+        "dsp48_multiplier"
+      ],
+      "spec": {
+        "params": {
+          "direction": "ROM to DSP48",
+          "twiddle_source": "psi-fold ROM plus derive gate"
+        }
+      }
+    },
+    {
+      "id": "control_fsm",
+      "name": "Custom control FSM",
+      "shape": "box",
+      "position": [
+        -2.65,
+        1.2,
+        -1.9
+      ],
+      "size": [
+        1.1,
+        0.5,
+        0.95
+      ],
+      "material": "white composite",
+      "role": "The custom finite-state machine sequences all NTT stages, BRAM accesses, and twiddle selections.",
+      "connections": [
+        "fpga_fabric",
+        "address_generator",
+        "rom_address_driver",
+        "stage_counter",
+        "mode_register",
+        "done_flag",
+        "control_bus",
+        "timing_pipeline_strip",
+        "pipeline_register_bank",
+        "formal_proof_checker",
+        "formal_obligation_trace",
+        "clock_spine"
+      ],
+      "spec": {
+        "fsm": {
+          "controls": [
+            "BRAM address sequence",
+            "ROM address sequence",
+            "forward_inverse_mode",
+            "done flag"
+          ],
+          "transform_length": 1024
+        }
+      }
+    },
+    {
+      "id": "address_generator",
+      "name": "BRAM address generator",
+      "shape": "box",
+      "position": [
+        -3.05,
+        1.15,
+        0
+      ],
+      "size": [
+        0.82,
+        0.42,
+        0.82
+      ],
+      "material": "dark anodized aluminum",
+      "role": "The address generator emits the in-place read and write addresses for each butterfly pair.",
+      "connections": [
+        "control_fsm",
+        "coeff_bram",
+        "bram_dual_port_arbiter",
+        "control_bus"
+      ]
+    },
+    {
+      "id": "rom_address_driver",
+      "name": "Twiddle ROM address driver",
+      "shape": "box",
+      "position": [
+        1.35,
+        1.12,
+        -2.55
+      ],
+      "size": [
+        0.86,
+        0.38,
+        0.58
+      ],
+      "material": "dark anodized aluminum",
+      "role": "The ROM address driver converts the current stage and butterfly index into a psi-fold ROM address.",
+      "connections": [
+        "control_fsm",
+        "psi_fold_rom",
+        "control_bus"
+      ]
+    },
+    {
+      "id": "control_bus",
+      "name": "FSM control bus spine",
+      "shape": "box",
+      "position": [
+        -0.75,
+        1,
+        -2.35
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.18,
+        0.1,
+        3.2
+      ],
+      "material": "copper",
+      "role": "This thin control spine distributes FSM enables to the address generator, ROM driver, and datapath blocks.",
+      "connections": [
+        "control_fsm",
+        "address_generator",
+        "bram_dual_port_arbiter",
+        "rom_address_driver",
+        "mode_register",
+        "stage_counter"
+      ]
+    },
+    {
+      "id": "stage_counter",
+      "name": "NTT stage counter",
+      "shape": "box",
+      "position": [
+        -1.35,
+        1.15,
+        -2.75
+      ],
+      "size": [
+        0.72,
+        0.34,
+        0.52
+      ],
+      "material": "aluminum",
+      "role": "The stage counter tracks the radix-2 transform stage across the 1024-point NTT schedule.",
+      "connections": [
+        "fpga_fabric",
+        "control_fsm",
+        "control_bus",
+        "timing_pipeline_strip"
+      ],
+      "spec": {
+        "params": {
+          "stages": 10,
+          "because": "log2(1024)"
+        }
+      }
+    },
+    {
+      "id": "mode_register",
+      "name": "Forward inverse mode register",
+      "shape": "box",
+      "position": [
+        -2.1,
+        1.12,
+        -2.75
+      ],
+      "size": [
+        0.62,
+        0.32,
+        0.5
+      ],
+      "material": "aluminum",
+      "role": "The mode register selects forward NTT or inverse NTT and enables the op21 halving path only when needed.",
+      "connections": [
+        "fpga_fabric",
+        "control_fsm",
+        "op21_halving_gate",
+        "modular_output_mux",
+        "control_bus"
+      ]
+    },
+    {
+      "id": "done_flag",
+      "name": "Verified done flag latch",
       "shape": "box",
       "position": [
         -3.25,
-        0.7,
-        3
+        1.1,
+        -2.75
       ],
       "size": [
-        0.85,
-        0.6,
-        1
-      ],
-      "material": "brass",
-      "role": "Inverse-NTT (INTT) stage: multiplies the returning coefficients by the modular inverse of the transform length (N^-1 mod q) so the same butterfly array performs both forward and inverse transforms.",
-      "connections": [
-        "pcb_substrate",
-        "crossbar_network",
-        "output_fifo"
-      ]
-    },
-    {
-      "id": "bu_base_0",
-      "name": "Radix-4 Butterfly Cluster 0 Baseplate",
-      "shape": "box",
-      "position": [
-        0,
-        0.475,
-        -3
-      ],
-      "size": [
-        3.6,
-        0.15,
-        1.6
-      ],
-      "material": "brushed steel",
-      "role": "Open mounting baseplate for parallel butterfly cluster 0, exposing its DSP multiplier and symmetric add/sub operators.",
-      "connections": [
-        "pcb_substrate",
-        "crossbar_network",
-        "bu_mult_0",
-        "bu_add_0",
-        "bu_sub_0",
-        "bu_reg_0"
-      ]
-    },
-    {
-      "id": "bu_mult_0",
-      "name": "DSP Modular Multiplier 0",
-      "shape": "cylinder",
-      "position": [
-        -1.1,
-        1,
-        -3
-      ],
-      "size": [
-        0.4,
-        1
-      ],
-      "material": "copper",
-      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly cluster 0.",
-      "connections": [
-        "bu_base_0",
-        "twiddle_rom"
-      ]
-    },
-    {
-      "id": "bu_add_0",
-      "name": "Symmetric Modular Adder 0",
-      "shape": "box",
-      "position": [
         0.5,
-        0.75,
-        -3.42
-      ],
-      "size": [
-        1.1,
-        0.7,
-        0.62
-      ],
-      "material": "dark anodized aluminum",
-      "role": "Symmetric modular adder forming the sum half of radix-4 butterfly cluster 0.",
-      "connections": [
-        "bu_base_0",
-        "bu_reg_0"
-      ]
-    },
-    {
-      "id": "bu_sub_0",
-      "name": "Symmetric Modular Subtractor 0",
-      "shape": "box",
-      "position": [
-        0.5,
-        0.75,
-        -2.58
-      ],
-      "size": [
-        1.1,
-        0.7,
-        0.62
-      ],
-      "material": "dark anodized aluminum",
-      "role": "Symmetric modular subtractor sharing operands with the adder to save ~50% butterfly hardware in cluster 0.",
-      "connections": [
-        "bu_base_0",
-        "bu_reg_0"
-      ]
-    },
-    {
-      "id": "bu_reg_0",
-      "name": "Pipeline Register 0",
-      "shape": "box",
-      "position": [
-        1.5,
-        0.7,
-        -3
-      ],
-      "size": [
-        0.4,
-        0.55,
-        1.2
-      ],
-      "material": "white composite",
-      "role": "Pipeline register latching butterfly-0 outputs before the shared modular-reduction stage.",
-      "connections": [
-        "bu_base_0",
-        "mod_red_mult"
-      ]
-    },
-    {
-      "id": "bu_base_1",
-      "name": "Radix-4 Butterfly Cluster 1 Baseplate",
-      "shape": "box",
-      "position": [
-        0,
-        0.475,
-        -1
-      ],
-      "size": [
-        3.6,
-        0.15,
-        1.6
-      ],
-      "material": "brushed steel",
-      "role": "Open mounting baseplate for parallel butterfly cluster 1, exposing its DSP multiplier and symmetric add/sub operators; this cluster is also shown exploded above on riser posts.",
-      "connections": [
-        "pcb_substrate",
-        "crossbar_network",
-        "bu_mult_1",
-        "bu_add_1",
-        "bu_sub_1",
-        "bu_reg_1",
-        "ex_riser_a",
-        "ex_riser_b"
-      ]
-    },
-    {
-      "id": "bu_mult_1",
-      "name": "DSP Modular Multiplier 1",
-      "shape": "cylinder",
-      "position": [
-        -1.1,
-        1,
-        -1
-      ],
-      "size": [
-        0.4,
-        1
-      ],
-      "material": "copper",
-      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly cluster 1.",
-      "connections": [
-        "bu_base_1",
-        "twiddle_rom"
-      ]
-    },
-    {
-      "id": "bu_add_1",
-      "name": "Symmetric Modular Adder 1",
-      "shape": "box",
-      "position": [
-        0.5,
-        0.75,
-        -1.42
-      ],
-      "size": [
-        1.1,
-        0.7,
-        0.62
-      ],
-      "material": "dark anodized aluminum",
-      "role": "Symmetric modular adder forming the sum half of radix-4 butterfly cluster 1.",
-      "connections": [
-        "bu_base_1",
-        "bu_reg_1"
-      ]
-    },
-    {
-      "id": "bu_sub_1",
-      "name": "Symmetric Modular Subtractor 1",
-      "shape": "box",
-      "position": [
-        0.5,
-        0.75,
-        -0.58
-      ],
-      "size": [
-        1.1,
-        0.7,
-        0.62
-      ],
-      "material": "dark anodized aluminum",
-      "role": "Symmetric modular subtractor sharing operands with the adder to save ~50% butterfly hardware in cluster 1.",
-      "connections": [
-        "bu_base_1",
-        "bu_reg_1"
-      ]
-    },
-    {
-      "id": "bu_reg_1",
-      "name": "Pipeline Register 1",
-      "shape": "box",
-      "position": [
-        1.5,
-        0.7,
-        -1
-      ],
-      "size": [
-        0.4,
-        0.55,
-        1.2
-      ],
-      "material": "white composite",
-      "role": "Pipeline register latching butterfly-1 outputs before the shared modular-reduction stage.",
-      "connections": [
-        "bu_base_1",
-        "mod_red_mult"
-      ]
-    },
-    {
-      "id": "bu_base_2",
-      "name": "Radix-4 Butterfly Cluster 2 Baseplate",
-      "shape": "box",
-      "position": [
-        0,
-        0.475,
-        1
-      ],
-      "size": [
-        3.6,
-        0.15,
-        1.6
-      ],
-      "material": "brushed steel",
-      "role": "Open mounting baseplate for parallel butterfly cluster 2, exposing its DSP multiplier and symmetric add/sub operators.",
-      "connections": [
-        "pcb_substrate",
-        "crossbar_network",
-        "bu_mult_2",
-        "bu_add_2",
-        "bu_sub_2",
-        "bu_reg_2"
-      ]
-    },
-    {
-      "id": "bu_mult_2",
-      "name": "DSP Modular Multiplier 2",
-      "shape": "cylinder",
-      "position": [
-        -1.1,
-        1,
-        1
-      ],
-      "size": [
-        0.4,
-        1
-      ],
-      "material": "copper",
-      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly cluster 2.",
-      "connections": [
-        "bu_base_2",
-        "twiddle_rom"
-      ]
-    },
-    {
-      "id": "bu_add_2",
-      "name": "Symmetric Modular Adder 2",
-      "shape": "box",
-      "position": [
-        0.5,
-        0.75,
-        0.58
-      ],
-      "size": [
-        1.1,
-        0.7,
-        0.62
-      ],
-      "material": "dark anodized aluminum",
-      "role": "Symmetric modular adder forming the sum half of radix-4 butterfly cluster 2.",
-      "connections": [
-        "bu_base_2",
-        "bu_reg_2"
-      ]
-    },
-    {
-      "id": "bu_sub_2",
-      "name": "Symmetric Modular Subtractor 2",
-      "shape": "box",
-      "position": [
-        0.5,
-        0.75,
-        1.42
-      ],
-      "size": [
-        1.1,
-        0.7,
-        0.62
-      ],
-      "material": "dark anodized aluminum",
-      "role": "Symmetric modular subtractor sharing operands with the adder to save ~50% butterfly hardware in cluster 2.",
-      "connections": [
-        "bu_base_2",
-        "bu_reg_2"
-      ]
-    },
-    {
-      "id": "bu_reg_2",
-      "name": "Pipeline Register 2",
-      "shape": "box",
-      "position": [
-        1.5,
-        0.7,
-        1
-      ],
-      "size": [
-        0.4,
-        0.55,
-        1.2
-      ],
-      "material": "white composite",
-      "role": "Pipeline register latching butterfly-2 outputs before the shared modular-reduction stage.",
-      "connections": [
-        "bu_base_2",
-        "mod_red_mult"
-      ]
-    },
-    {
-      "id": "bu_base_3",
-      "name": "Radix-4 Butterfly Cluster 3 Baseplate",
-      "shape": "box",
-      "position": [
-        0,
-        0.475,
-        3
-      ],
-      "size": [
-        3.6,
-        0.15,
-        1.6
-      ],
-      "material": "brushed steel",
-      "role": "Open mounting baseplate for parallel butterfly cluster 3, exposing its DSP multiplier and symmetric add/sub operators.",
-      "connections": [
-        "pcb_substrate",
-        "crossbar_network",
-        "bu_mult_3",
-        "bu_add_3",
-        "bu_sub_3",
-        "bu_reg_3"
-      ]
-    },
-    {
-      "id": "bu_mult_3",
-      "name": "DSP Modular Multiplier 3",
-      "shape": "cylinder",
-      "position": [
-        -1.1,
-        1,
-        3
-      ],
-      "size": [
-        0.4,
-        1
-      ],
-      "material": "copper",
-      "role": "DSP-slice modular multiplier applying twiddle factors at the front of butterfly cluster 3.",
-      "connections": [
-        "bu_base_3",
-        "twiddle_rom"
-      ]
-    },
-    {
-      "id": "bu_add_3",
-      "name": "Symmetric Modular Adder 3",
-      "shape": "box",
-      "position": [
-        0.5,
-        0.75,
-        2.58
-      ],
-      "size": [
-        1.1,
-        0.7,
-        0.62
-      ],
-      "material": "dark anodized aluminum",
-      "role": "Symmetric modular adder forming the sum half of radix-4 butterfly cluster 3.",
-      "connections": [
-        "bu_base_3",
-        "bu_reg_3"
-      ]
-    },
-    {
-      "id": "bu_sub_3",
-      "name": "Symmetric Modular Subtractor 3",
-      "shape": "box",
-      "position": [
-        0.5,
-        0.75,
-        3.42
-      ],
-      "size": [
-        1.1,
-        0.7,
-        0.62
-      ],
-      "material": "dark anodized aluminum",
-      "role": "Symmetric modular subtractor sharing operands with the adder to save ~50% butterfly hardware in cluster 3.",
-      "connections": [
-        "bu_base_3",
-        "bu_reg_3"
-      ]
-    },
-    {
-      "id": "bu_reg_3",
-      "name": "Pipeline Register 3",
-      "shape": "box",
-      "position": [
-        1.5,
-        0.7,
-        3
-      ],
-      "size": [
-        0.4,
-        0.55,
-        1.2
-      ],
-      "material": "white composite",
-      "role": "Pipeline register latching butterfly-3 outputs before the shared modular-reduction stage.",
-      "connections": [
-        "bu_base_3",
-        "mod_red_mult"
-      ]
-    },
-    {
-      "id": "ex_base",
-      "name": "Exploded Butterfly Cluster Baseplate",
-      "shape": "box",
-      "position": [
-        0,
-        2.3,
-        -1
-      ],
-      "size": [
-        3.6,
-        0.12,
-        1.6
-      ],
-      "material": "brushed steel",
-      "role": "EXPLODED VIEW floating above the array on two riser posts: one radix-4 butterfly cluster lifted off the board to expose its left-to-right datapath (DSP multiply -> symmetric add/sub -> pipeline register).",
-      "connections": [
-        "ex_riser_a",
-        "ex_riser_b",
-        "ex_mult",
-        "ex_add",
-        "ex_sub",
-        "ex_reg"
-      ]
-    },
-    {
-      "id": "ex_riser_a",
-      "name": "Exploded-View Riser Post A",
-      "shape": "cylinder",
-      "position": [
-        -1.5,
-        1.39,
-        -1
-      ],
-      "size": [
-        0.07,
-        1.7
-      ],
-      "material": "brushed steel",
-      "role": "Thin support post linking butterfly cluster 1's baseplate to the lifted exploded baseplate, making the exploded relationship explicit in the elevation views.",
-      "connections": [
-        "bu_base_1",
-        "ex_base"
-      ]
-    },
-    {
-      "id": "ex_riser_b",
-      "name": "Exploded-View Riser Post B",
-      "shape": "cylinder",
-      "position": [
-        1.5,
-        1.39,
-        -1
-      ],
-      "size": [
-        0.07,
-        1.7
-      ],
-      "material": "brushed steel",
-      "role": "Second support post for the exploded butterfly cluster, anchoring the lifted baseplate over its source cluster so it does not read as floating.",
-      "connections": [
-        "bu_base_1",
-        "ex_base"
-      ]
-    },
-    {
-      "id": "ex_mult",
-      "name": "Exploded DSP Modular Multiplier",
-      "shape": "cylinder",
-      "position": [
-        -1.1,
-        2.75,
-        -1
-      ],
-      "size": [
-        0.4,
-        0.9
-      ],
-      "material": "copper",
-      "role": "Exploded view: first datapath stage — DSP-slice modular multiplier applies the twiddle factor to one operand.",
-      "connections": [
-        "ex_base"
-      ]
-    },
-    {
-      "id": "ex_add",
-      "name": "Exploded Symmetric Modular Adder",
-      "shape": "box",
-      "position": [
-        0.5,
-        2.65,
-        -1.42
-      ],
-      "size": [
-        1.1,
-        0.65,
-        0.62
-      ],
-      "material": "dark anodized aluminum",
-      "role": "Exploded view: symmetric modular adder producing the sum output of the radix-4 butterfly.",
-      "connections": [
-        "ex_base"
-      ]
-    },
-    {
-      "id": "ex_sub",
-      "name": "Exploded Symmetric Modular Subtractor",
-      "shape": "box",
-      "position": [
-        0.5,
-        2.65,
-        -0.58
-      ],
-      "size": [
-        1.1,
-        0.65,
-        0.62
-      ],
-      "material": "dark anodized aluminum",
-      "role": "Exploded view: symmetric modular subtractor reusing the adder's operands, the ~50% hardware-saving trick.",
-      "connections": [
-        "ex_base"
-      ]
-    },
-    {
-      "id": "ex_reg",
-      "name": "Exploded Pipeline Register",
-      "shape": "box",
-      "position": [
-        1.5,
-        2.6,
-        -1
-      ],
-      "size": [
-        0.4,
-        0.55,
-        1.2
-      ],
-      "material": "white composite",
-      "role": "Exploded view: pipeline register that latches the butterfly result and feeds the shared modular-reduction spine.",
-      "connections": [
-        "ex_base"
-      ]
-    },
-    {
-      "id": "mod_red_mult",
-      "name": "Modular Reduction — Barrett q-Multiplier",
-      "shape": "box",
-      "position": [
-        2.2,
-        0.95,
-        0
-      ],
-      "size": [
-        0.7,
-        1.1,
-        8
-      ],
-      "material": "welded steel",
-      "role": "First member of the shared modular-reduction stage: the Barrett quotient multiplier estimates floor(x*mu / 2^k) for every incoming butterfly product before correction.",
-      "connections": [
-        "pcb_substrate",
-        "bu_reg_0",
-        "bu_reg_1",
-        "bu_reg_2",
-        "bu_reg_3",
-        "mod_red_subshift"
-      ]
-    },
-    {
-      "id": "mod_red_subshift",
-      "name": "Modular Reduction — Shift/Subtract & Correct",
-      "shape": "box",
-      "position": [
-        3.05,
-        0.85,
-        0
-      ],
-      "size": [
-        0.7,
-        0.9,
-        8
-      ],
-      "material": "dark anodized aluminum",
-      "role": "Second member of the reduction stage: shifts and subtracts the quotient*q estimate and applies the conditional correction to bring results into [0, q) before returning them to the crossbar.",
-      "connections": [
-        "pcb_substrate",
-        "mod_red_mult",
-        "crossbar_network"
-      ]
-    },
-    {
-      "id": "twiddle_rom",
-      "name": "Twiddle-Factor ROM",
-      "shape": "box",
-      "position": [
-        4.6,
-        1.15,
-        -2.5
-      ],
-      "size": [
-        2.2,
-        1.5,
-        2.6
+        0.3,
+        0.45
       ],
       "material": "glass display",
-      "role": "On-chip ROM storing precomputed roots of unity, reused across the rearranged loop so each factor is fetched once and broadcast to all four multipliers.",
+      "role": "The done flag latch represents the formally checked completion signal for the datapath controller.",
       "connections": [
-        "pcb_substrate",
-        "addr_gen_unit",
-        "bu_mult_0",
-        "bu_mult_1",
-        "bu_mult_2",
-        "bu_mult_3"
+        "fpga_fabric",
+        "control_fsm",
+        "formal_proof_checker",
+        "formal_obligation_trace",
+        "proof_status_bridge"
       ]
     },
     {
-      "id": "addr_gen_unit",
-      "name": "Address Generation Unit",
+      "id": "timing_pipeline_strip",
+      "name": "Radix-2 butterfly timing pipeline strip",
       "shape": "box",
       "position": [
-        4.6,
-        0.95,
-        2.5
+        0,
+        1.94,
+        1.55
       ],
       "size": [
-        2.2,
-        1.1,
-        2.6
+        3.65,
+        0.18,
+        0.34
       ],
-      "material": "dark anodized aluminum",
-      "role": "Generates the conflict-free read/write addresses and bank indices that realize the memory-mapping scheme each cycle.",
+      "material": "white composite",
+      "role": "The narrow raised strip summarizes the registered pipeline stages that carry each coefficient pair through the single radix-2 butterfly.",
       "connections": [
-        "pcb_substrate",
-        "crossbar_network",
-        "twiddle_rom",
-        "config_radix_selector",
-        "clock_pll",
-        "schedule_controller"
+        "fpga_fabric",
+        "dsp48_multiplier",
+        "stage_counter",
+        "control_fsm",
+        "pipeline_register_bank",
+        "clock_spine"
+      ],
+      "spec": {
+        "params": {
+          "pipeline": "single radix-2 butterfly",
+          "stage_counter_width": "10 stages for N=1024"
+        }
+      }
+    },
+    {
+      "id": "pipeline_register_bank",
+      "name": "Compact butterfly register bank",
+      "shape": "box",
+      "position": [
+        0.05,
+        1.72,
+        2.08
+      ],
+      "size": [
+        2.75,
+        0.28,
+        0.36
+      ],
+      "material": "aluminum",
+      "role": "The compact register bank makes the cycle-aligned butterfly pipeline visible without modeling every flip-flop as a separate part.",
+      "connections": [
+        "fpga_fabric",
+        "timing_pipeline_strip",
+        "dsp48_multiplier",
+        "control_fsm",
+        "clock_spine"
+      ],
+      "spec": {
+        "params": {
+          "representation": "aggregated pipeline registers",
+          "reason": "cycle alignment for coefficient pair, twiddle, add/sub, and write-back"
+        }
+      }
+    },
+    {
+      "id": "formal_proof_checker",
+      "name": "Formal datapath proof checker",
+      "shape": "box",
+      "position": [
+        -3.25,
+        1.16,
+        -1.05
+      ],
+      "size": [
+        0.78,
+        0.34,
+        0.58
+      ],
+      "material": "white composite",
+      "role": "The proof checker block marks the formally verified equivalence and completion checks that watch the controller and write-back datapath.",
+      "connections": [
+        "fpga_fabric",
+        "control_fsm",
+        "done_flag",
+        "formal_obligation_trace",
+        "datapath_bus_out"
+      ],
+      "spec": {
+        "params": {
+          "checks": [
+            "controller completion",
+            "datapath equivalence",
+            "write-back correctness"
+          ]
+        }
+      }
+    },
+    {
+      "id": "formal_obligation_trace",
+      "name": "Formal obligation trace",
+      "shape": "box",
+      "position": [
+        -2.98,
+        1.05,
+        -1.45
+      ],
+      "rotation": [
+        0,
+        0.28,
+        0
+      ],
+      "size": [
+        0.12,
+        0.08,
+        1.35
+      ],
+      "material": "copper",
+      "role": "This trace ties the proof checker to the controller, done latch, and write-back path so verification is shown as a connected observation path.",
+      "connections": [
+        "formal_proof_checker",
+        "control_fsm",
+        "done_flag",
+        "datapath_bus_out"
       ]
     },
     {
-      "id": "config_radix_selector",
-      "name": "Radix-2/4 Config Selector",
+      "id": "clock_spine",
+      "name": "Clock distribution spine",
       "shape": "box",
       "position": [
-        6.1,
+        -2.7,
+        0.96,
+        -2.9
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
+      ],
+      "size": [
+        0.14,
+        0.1,
+        4.25
+      ],
+      "material": "copper",
+      "role": "The clock spine carries the board oscillator clock into the controller and registered butterfly pipeline.",
+      "connections": [
+        "clock_oscillator",
+        "control_fsm",
+        "timing_pipeline_strip",
+        "pipeline_register_bank"
+      ]
+    },
+    {
+      "id": "proof_status_bridge",
+      "name": "Verified status LED bridge",
+      "shape": "box",
+      "position": [
+        0.55,
         0.7,
-        1.2
+        -2.9
+      ],
+      "rotation": [
+        0,
+        1.5708,
+        0
       ],
       "size": [
-        0.9,
-        0.6,
-        1.1
+        0.12,
+        0.08,
+        7.55
       ],
-      "material": "black composite",
-      "role": "Configuration register selecting radix (2 or 4) and the number of active parallel butterfly units.",
+      "material": "copper",
+      "role": "This routed status bridge carries the verified done signal from the FPGA core to the board LED bank.",
       "connections": [
-        "pcb_substrate",
-        "addr_gen_unit",
-        "schedule_controller"
+        "done_flag",
+        "led_bank"
       ]
     },
     {
-      "id": "schedule_controller",
-      "name": "Conflict-Free Schedule/FSM Controller",
+      "id": "usb_connector",
+      "name": "USB JTAG connector",
       "shape": "box",
       "position": [
-        6.1,
-        0.85,
-        3.4
+        -5.8,
+        0.62,
+        3.25
       ],
       "size": [
         1,
-        0.9,
-        1.3
+        0.65,
+        0.72
       ],
-      "material": "welded steel",
-      "role": "Finite-state controller driving the rearranged loop order that cuts radix-4 mults by 33% and add/sub by 20% while keeping memory accesses conflict-free.",
+      "material": "brushed steel",
+      "role": "The USB/JTAG connector programs the Artix-7 and powers the board during development.",
       "connections": [
-        "pcb_substrate",
-        "addr_gen_unit",
-        "crossbar_network",
-        "config_radix_selector"
+        "board_substrate"
       ]
     },
     {
-      "id": "clock_pll",
-      "name": "Clock PLL",
-      "shape": "cylinder",
+      "id": "power_switch",
+      "name": "Board power switch",
+      "shape": "box",
       "position": [
-        6.2,
-        0.8,
-        -1.2
+        5.8,
+        0.48,
+        3.5
       ],
       "size": [
+        0.42,
+        0.36,
+        0.32
+      ],
+      "material": "white composite",
+      "role": "The slide power switch controls board power before the FPGA configuration loads.",
+      "connections": [
+        "board_substrate"
+      ]
+    },
+    {
+      "id": "pmod_header_top",
+      "name": "Top PMOD expansion header",
+      "shape": "box",
+      "position": [
+        0,
+        0.48,
+        4.25
+      ],
+      "size": [
+        3.2,
+        0.38,
+        0.32
+      ],
+      "material": "black composite",
+      "role": "The top PMOD row anchors the board as a Basys-3-style teaching FPGA platform.",
+      "connections": [
+        "board_substrate"
+      ]
+    },
+    {
+      "id": "pmod_header_right",
+      "name": "Right PMOD expansion header",
+      "shape": "box",
+      "position": [
+        6.15,
+        0.48,
+        0.85
+      ],
+      "size": [
+        0.32,
+        0.38,
+        2.6
+      ],
+      "material": "black composite",
+      "role": "The right PMOD row shows the additional expansion edge used on small FPGA dev boards.",
+      "connections": [
+        "board_substrate"
+      ]
+    },
+    {
+      "id": "seven_seg_display",
+      "name": "Four-digit seven-segment display",
+      "shape": "box",
+      "position": [
+        4.15,
+        0.56,
+        -2.7
+      ],
+      "size": [
+        2.05,
+        0.46,
+        0.92
+      ],
+      "material": "glass display",
+      "role": "The four-digit display provides visible status output for test firmware and transform completion.",
+      "connections": [
+        "board_substrate"
+      ]
+    },
+    {
+      "id": "slide_switch_bank",
+      "name": "Slide switch bank",
+      "shape": "box",
+      "position": [
+        5.75,
         0.5,
-        0.8
-      ],
-      "material": "metal",
-      "role": "Phase-locked loop generating the core datapath clock for the pipelined butterfly array.",
-      "connections": [
-        "pcb_substrate",
-        "addr_gen_unit"
-      ]
-    },
-    {
-      "id": "heatsink_base",
-      "name": "Heatsink Baseplate (Exploded)",
-      "shape": "box",
-      "position": [
-        4.6,
-        2.75,
-        0
+        -0.85
       ],
       "size": [
-        3,
-        0.2,
-        4
+        1.75,
+        0.34,
+        0.42
       ],
-      "material": "brushed steel",
-      "role": "EXPLODED ABOVE: aluminum heatsink baseplate that clamps onto the FPGA package lid, lifted off here on a riser stub so the die floorplan stays visible.",
+      "material": "white composite",
+      "role": "The grouped slide-switch bank represents user inputs such as mode select and reset options.",
       "connections": [
-        "pcb_substrate",
-        "heatsink_riser",
-        "heatsink_fin_0",
-        "heatsink_fin_1",
-        "heatsink_fin_2"
+        "board_substrate"
       ]
     },
     {
-      "id": "heatsink_riser",
-      "name": "Heatsink Riser Stub",
+      "id": "led_bank",
+      "name": "User LED bank",
+      "shape": "box",
+      "position": [
+        4.65,
+        0.48,
+        0.2
+      ],
+      "size": [
+        1.55,
+        0.28,
+        0.28
+      ],
+      "material": "glass display",
+      "role": "The LED bank exposes simple debug bits from the controller and done flag during bring-up.",
+      "connections": [
+        "board_substrate",
+        "done_flag",
+        "proof_status_bridge"
+      ]
+    },
+    {
+      "id": "clock_oscillator",
+      "name": "Board clock oscillator",
+      "shape": "box",
+      "position": [
+        -4.8,
+        0.52,
+        -2.85
+      ],
+      "size": [
+        0.72,
+        0.36,
+        0.58
+      ],
+      "material": "brushed steel",
+      "role": "The oscillator supplies the board clock used by the synchronous NTT controller and datapath.",
+      "connections": [
+        "board_substrate",
+        "control_fsm",
+        "clock_spine"
+      ]
+    },
+    {
+      "id": "reset_button",
+      "name": "Reset push button",
       "shape": "cylinder",
       "position": [
-        4.6,
-        1.6,
-        0
+        -5.1,
+        0.54,
+        -1.75
       ],
       "size": [
-        0.08,
-        2.2
+        0.28,
+        0.26
       ],
-      "material": "brushed steel",
-      "role": "Support stub grounding the exploded heatsink baseplate to the silicon die, showing where the heatsink seats on the package in the assembled machine.",
+      "material": "white composite",
+      "role": "The push button provides a manual reset input to the control FSM during board tests.",
       "connections": [
-        "fpga_die",
-        "heatsink_base"
+        "board_substrate",
+        "control_fsm"
       ]
     },
     {
-      "id": "heatsink_fin_0",
-      "name": "Heatsink Fin 0",
+      "id": "voltage_regulator",
+      "name": "FPGA voltage regulator",
       "shape": "box",
       "position": [
-        3.7,
-        3.25,
-        0
+        -5.35,
+        0.5,
+        0.85
       ],
       "size": [
-        0.22,
-        0.85,
-        3.7
+        0.92,
+        0.34,
+        0.72
       ],
       "material": "brushed steel",
-      "role": "Heatsink fin dissipating switching heat from the DSP multiplier array into airflow.",
+      "role": "The regulator block represents the board power stage feeding the Artix-7 package rails.",
       "connections": [
-        "heatsink_base"
+        "board_substrate",
+        "fpga_package_base"
       ]
     },
     {
-      "id": "heatsink_fin_1",
-      "name": "Heatsink Fin 1",
+      "id": "vga_connector",
+      "name": "VGA display connector",
       "shape": "box",
       "position": [
-        4.6,
-        3.25,
-        0
+        5.25,
+        0.64,
+        2.3
       ],
       "size": [
-        0.22,
-        0.85,
-        3.7
+        1.35,
+        0.72,
+        0.58
       ],
       "material": "brushed steel",
-      "role": "Heatsink fin dissipating switching heat from the DSP multiplier array into airflow.",
+      "role": "The VGA connector is a recognizable Basys-3 board peripheral outside the FoldNTT core.",
       "connections": [
-        "heatsink_base"
-      ]
-    },
-    {
-      "id": "heatsink_fin_2",
-      "name": "Heatsink Fin 2",
-      "shape": "box",
-      "position": [
-        5.5,
-        3.25,
-        0
-      ],
-      "size": [
-        0.22,
-        0.85,
-        3.7
-      ],
-      "material": "brushed steel",
-      "role": "Heatsink fin dissipating switching heat from the DSP multiplier array into airflow.",
-      "connections": [
-        "heatsink_base"
+        "board_substrate"
       ]
     }
   ]

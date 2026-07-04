@@ -1,15 +1,45 @@
 {
   "categories": [
-    { "id": "all",           "label": "All" },
-    { "id": "vehicles",      "label": "Vehicles" },
-    { "id": "aerospace",     "label": "Aerospace" },
-    { "id": "robotics",      "label": "Robotics" },
-    { "id": "manufacturing", "label": "Manufacturing" },
-    { "id": "energy",        "label": "Energy" },
-    { "id": "medical",       "label": "Medical" },
-    { "id": "defense",       "label": "Defense / RF" },
-    { "id": "ml",            "label": "ML Architectures" },
-    { "id": "silicon",       "label": "CPU / GPU" }
+    {
+      "id": "all",
+      "label": "All"
+    },
+    {
+      "id": "vehicles",
+      "label": "Vehicles"
+    },
+    {
+      "id": "aerospace",
+      "label": "Aerospace"
+    },
+    {
+      "id": "robotics",
+      "label": "Robotics"
+    },
+    {
+      "id": "manufacturing",
+      "label": "Manufacturing"
+    },
+    {
+      "id": "energy",
+      "label": "Energy"
+    },
+    {
+      "id": "medical",
+      "label": "Medical"
+    },
+    {
+      "id": "defense",
+      "label": "Defense / RF"
+    },
+    {
+      "id": "ml",
+      "label": "ML Architectures"
+    },
+    {
+      "id": "silicon",
+      "label": "CPU / GPU"
+    }
   ],
   "samples": [
     {
@@ -286,8 +316,8 @@
     },
     {
       "id": "ntt-fpga",
-      "title": "CFNTT NTT Accelerator",
-      "subtitle": "Conflict-free radix-2/4 Number Theoretic Transform FPGA accelerator for lattice PQC / FHE polynomial multiplication (TCHES)",
+      "title": "FoldNTT Accelerator",
+      "subtitle": "A new, formally-verified, DSP-minimal NTT accelerator for Falcon/Proth primes — one K-RED multiplier (1 DSP), a psi-fold twiddle ROM, own-FSM banked core, on-board Basys 3 demo (Vivado-free)",
       "path": "/samples/ntt-fpga.json",
       "accent": "#fcd34d",
       "category": "silicon"
