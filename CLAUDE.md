@@ -64,9 +64,9 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
 ## Architecture map
 
 - `bin/visually.ts` — command dispatcher. Bare `visually` in a TTY launches the
-  Ink TUI; otherwise/with args it routes to subcommands. The loop is THREE
-  commands — `visualize` → `verify` → `refine` — plus infra (`serve`, `check`,
-  `upload`, `tui`). Keeps a `#!/usr/bin/env node` shebang (preserved through tsc).
+  Ink TUI; otherwise/with args it routes to subcommands. The core loop is THREE
+  commands — `visualize` → `verify` → `refine` — plus the INVENTION loop
+  (`invent`) and infra (`serve`, `check`, `upload`, `tui`). Keeps a `#!/usr/bin/env node` shebang (preserved through tsc).
 - `lib/visualize.ts` — the VISUALIZE leg: fetch ground-truth evidence (reference
   paper + real source code) up front, then build/improve the 3D model GROUNDED in
   it (`visualizeStep`); births a draft via `create` if the scene is new.
@@ -77,6 +77,19 @@ When converting/adding a CLI file: write `.ts`, add its generated `.js` to
 - `lib/refine.ts` — the REFINE leg: the closed loop that runs visualize → verify
   each round; goal = visual ≥ goal AND the source verifies. Visual-budget taper +
   best-scene ratchet.
+- `lib/invent.ts` — the INVENT leg: `visually invent <id>` runs the invention
+  loop (hassou → jissou → verify → visualize). Each round ideates concept
+  candidates from the cached evidence (five delta operators: subtraction /
+  status-change / re-representation / unification / decomposition; every 3rd
+  round is a variance round that lifts the one-atypical-ingredient
+  constraint), implements the chosen concept as a self-checking program whose
+  pass/fail tests the concept's falsifiable PREDICTION, runs it on the verify
+  backend (a falsified prediction is an honest kill, recorded — the fix loop
+  repairs implementation bugs but must never weaken the check), and appends
+  VERIFIED inventions to the scene's evidence notes so the next visualize pass
+  renders them. Concept log + per-concept impls under
+  `~/.visually-3d/impls/<id>/inventions/` (never re-proposes a tried slug).
+  Method background: NyxFoundation/lean4-speedup `docs/invention-theory.md`.
 - `lib/upload.ts` — `visually upload <id>`: publish a scene into the WEB GALLERY
   `public/samples/` (what the site serves: `<id>.json` + `index.json` entry +
   `runs/<id>/` history; full as-is, `--scrub` for the lean set, `--web` for only

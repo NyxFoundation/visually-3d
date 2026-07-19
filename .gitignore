@@ -34,6 +34,7 @@ __pycache__/
 /lib/tui/app.js
 /lib/impls.js
 /lib/refine.js
+/lib/invent.js
 /lib/visualize.js
 /lib/verify.js
 /lib/runs.js

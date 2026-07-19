@@ -29,6 +29,14 @@ Usage:
        [--rounds 3] [--visual 90]         visualize → verify, ratcheting on the best
        [--iters 1] [--backend <id>]       scene, until the visual goal is met AND the
        [--no-evidence] [--no-refs]        source verifies (or max rounds).
+  visually invent <scene>                 the INVENTION loop: each round ideates
+       [--rounds 3] [--contradiction "…"] concept candidates from the evidence
+       [--concept <slug>] [--attempts N]  (five delta operators; every 3rd round
+       [--backend <id>] [--no-visual]     lifts the conventionality constraint),
+                                          implements the chosen concept, verifies
+                                          its falsifiable prediction with the
+                                          backend (falsified = recorded honest
+                                          kill), and renders verified inventions.
   visually check <scene> [--png]          inspect a scene (browser, or PNG contact sheet)
        [--out <file.png>] [--no-open]
   visually upload <scene>                 publish the scene + history to the WEB
@@ -70,6 +78,8 @@ async function main() {
       return (await import('../lib/verify.js')).verify(rest);
     case 'refine':
       return (await import('../lib/refine.js')).refine(rest);
+    case 'invent':
+      return (await import('../lib/invent.js')).invent(rest);
     case 'check':
       return (await import('../lib/check.js')).check(rest);
     case 'upload':
